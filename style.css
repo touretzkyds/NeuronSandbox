@@ -1,0 +1,113 @@
+/* 
+.inputs {
+    width: 1%;
+    display: flex;
+    flex-direction: column;
+    float: left;
+    margin-left:5%;
+    margin-right:5%;
+} */
+h1 {
+    text-align: center;
+}
+
+.textbox{
+    width:30px;
+    height:30px;
+    text-align: center;
+}
+/* 
+#button {
+    height: 100px;
+    width: 100px;
+    background-color: rgb(255, 255, 255);
+    border-radius: 50%;
+    float:inline-flex;
+    margin-left:5%;
+}
+
+.output {
+    width: 30px;
+    height: 30px;
+    float:inline-flex;
+    text-align: left;
+    margin-left:5%;
+    margin-right:5%;
+    background-color: white;
+} */
+
+.center {
+    margin: 3px;
+    width: 60%;
+    border: 3px solid #73AD21;
+    display: inline-flex;
+}
+
+#svg{
+    position: inherit;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}   
+
+#line{
+    stroke-width:2px;
+    stroke:rgb(255,0,0);
+}
+
+#one{
+    position: inherit;
+}
+
+#all-containers {
+    display: inline-flex;
+}
+
+#input-container {
+    display: inline-flex;
+}
+
+#output-container {
+    display: inline-flex;
+}
+
+.table {
+    border-collapse: collapse;
+    width: 200px;
+    text-align: center;
+}
+
+.table th {
+    background-color: darkblue;
+    color: white;
+}
+
+.table td, #table th {
+    border: 1px solid #ddd;
+}
+
+.table tr:nth-child(even){
+    background-color: #f2f2f2;
+}
+
+.table td:nth-child(odd){
+    text-align: center;
+}
+
+.table tr:hover {
+    background-color: lightblue;
+}
+
+#compute-button {
+    background-color: rgb(130, 230, 255);
+    color: black;
+    padding: 15px 80px; /* change to % */
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 10px;
+  }

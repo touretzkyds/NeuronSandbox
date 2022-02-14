@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>NeuronSandbox</title>
+        
+        <link rel="stylesheet" href="style.css" />
+        <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
+        <script src="https://pixijs.download/release/pixi.js"></script>
+
+        <div id="header">
+            <h1>NeuronSandbox</h1>
+        </div>
+        
+        <div id="all-containers">
+            <div id = "input-container">
+                <table id="input-table" cellspacing="1" cellpadding="8" class="table">
+                    <tr>
+                        <th>x<sub>1</sub></th>
+                        <th>x<sub>2</sub></th>
+                    </tr>
+                </table>
+            </div>
+            <div id="network-container" class="center">
+                <div class="center">
+                    <table class="table" id="selected-inputs">
+                        <tr>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+                <div id = "links" class="center">
+                    <svg id="svg">
+                        <line id="line" stroke="black" stroke-width="3" x1="0%" y1="10%" x2="100%" y2="30%"/>
+                        
+                        <line id="line" stroke="black" stroke-width="3" x1="0%" y1="90%" x2="100%" y2="70%"/>
+                    </svg>
+                </div>
+                <div id = "perceptrons" class="center">
+                    <svg height="200" width="150">
+                        <circle cx="75" cy="100" r="70" stroke="black" stroke-width="3" fill="none" />
+                    </svg>
+                </div>
+                <div id = "links" class="center">
+                    <svg id="svg">
+                        <line id="line" stroke="black" stroke-width="3" x1="-10" y1="100" x2="100%" y2="100"  />
+                    </svg>
+                </div>
+                <div id = "highlighted-input" class="center">
+                    
+                </div>
+            </div>
+            
+            <div id = "output-container">
+                <table id="output-table" class="table">
+                    <tr>
+                        <th>combinations</sub></th>
+                        <th>activations</sub></th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+            
+        <script src="perceptron.js"></script>
+
+    </head>
+    
+    <body>
+        <div>
+           <button id="compute-button" onclick="javascript:demo.update()">
+            Compute
+           </button> 
+        </div>
+        <div id="mode-button">
+            <button onclick="javascript:demo.switchMode('mode-button')">Switch Mode</button>
+        </div>
+            
+        <div>
+            <button onclick="javascript:demo.add('example')">+Col</button>
+            <button onclick="javascript:demo.remove('example')">-Col</button>
+            <button onclick="javascript:demo.add('dimension')">+Row</button>
+            <button onclick="javascript:demo.remove('dimension')">-Row</button>
+        </div>
+    </body>
