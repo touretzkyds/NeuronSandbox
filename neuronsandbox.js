@@ -133,12 +133,17 @@ class Table {
                 cell.innerHTML = array[r][c];
                 if (editable) {
                     cell.contentEditable = true;
-                    // cell.addEventListener("change", dataOp.updateData(inputs, this));
+                    cell.rowIdx = r;
+                    console.log(cell.rowIdx)
+                    cell.addEventListener("mouseenter", function(event){
+                        display.hoverInput(event.target.rowIdx);
+                    });
                 }
             }
         }
         this.table = table
     }
+
     updateTable(){
         let table = this.table;
         let array = this.dataObj.data;
@@ -205,10 +210,48 @@ class Perceptron {
 
 class Display {
     constructor(inpObj=null, percepObj=null, outObj=null){
-
+        demo.weights.map((w, idx) => this.displayWeight(`w${idx+1}`, idx));
+        this.displayThreshold("th1");
+        this.displaySelectedInput();
+        this.displaySelectedOutput();
     }
-    displaySelectedInputs(id=null, arr=null){
-        document.getElementById("selected-inputs").rows[0].value = 10;
+
+    displayWeight(wID, idx){
+        document.getElementById(wID).innerHTML = `w${idx+1}= ${demo.weights[idx]}`;
+    }
+
+    displayThreshold(thID, idx=null){
+        document.getElementById(thID).innerHTML = `Threshold = ${demo.threshold}`;
+    }
+
+    displaySelectedInput(){
+        var table = document.getElementById("selected-input");
+        var cell = table.rows[1].cells[0];
+        let strArray = [];
+        for (var r=0; r<table.rows.length; r++){
+            const str = `${demo.selectedInput[r]} * ${demo.weights[r]}`;
+            strArray.push(str);
+        }
+        cell.innerHTML = strArray.join(" + ")
+    }
+
+    displaySelectedOutput(){
+        var table = document.getElementById("selected-output");
+        for (var r=0; r<table.rows.length; r++){
+            var cell = table.rows[r].cells[0];
+            cell.innerHTML = `y = ${demo.selectedOutput[0]}`
+        }
+    }
+    
+    hoverInput(rowIdx){
+        console.log('rowIdx ', rowIdx)
+        console.log('demo.inputData ', demo.inputData)
+        console.log('demo.selectedInput first ', demo.selectedInput)
+        demo.selectedInput = demo.inputData[rowIdx];
+        console.log('demo.selectedInput after ', demo.selectedInput)
+        demo.selectedOutput = demo.inputData[rowIdx];
+        this.displaySelectedInput();
+        this.displaySelectedOutput();
     }
 }
 
@@ -229,8 +272,9 @@ class Demo {
             [-2, -5],
         ];
         this.weights = [5,-2];
-        this.threshold = 3;
+        this.threshold = 10;
         this.selectedInput = this.inputData[0];
+        this.selectedOutput = [3, 0];
     }
 
     add(type){ //@better name needed in place of 'type'
@@ -378,7 +422,6 @@ let outputTable = new Table(outputs, "output-table", false);
 dataOp.createBinaryData(2);
 perceptron.displayPerceptron();
 const display = new Display();
-display.displaySelectedInputs();
 
 document.addEventListener("DOMContentLoaded", () => {
     demo.main().catch(e => console.error(e));

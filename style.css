@@ -37,10 +37,11 @@ h1 {
 } */
 
 .center {
-    margin: 3px;
+    margin: 1px;
     width: 60%;
-    border: 3px solid #73AD21;
+    /* border: 3px solid #73AD21; */
     display: inline-flex;
+    fill: none
 }
 
 #svg{
@@ -53,7 +54,7 @@ h1 {
 
 #line{
     stroke-width:2px;
-    stroke:rgb(255,0,0);
+    stroke:rgb(0,0,0);
 }
 
 #one{
@@ -62,6 +63,7 @@ h1 {
 
 #all-containers {
     display: inline-flex;
+    width: 100%;
 }
 
 #input-container {
@@ -74,7 +76,8 @@ h1 {
 
 .table {
     border-collapse: collapse;
-    width: 200px;
+    width: 250px;
+    height: 400px;
     text-align: center;
 }
 
@@ -111,3 +114,12 @@ h1 {
     cursor: pointer;
     border-radius: 10px;
   }
+
+.selected{
+    color: red;
+    font-size: 25px;
+    border-collapse: collapse;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}

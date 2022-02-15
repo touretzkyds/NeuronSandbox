@@ -24,34 +24,40 @@
             </div>
             <div id="network-container" class="center">
                 <div class="center">
-                    <table class="table" id="selected-inputs">
+                    <table class="selected">
                         <tr>
-                            <td></td>
+                            <td>x<sub>1</sub></td>
                         </tr>
                         <tr>
-                            <td></td>
+                            <td>x<sub>2</sub></td>
                         </tr>
                     </table>
                 </div>
-                <div id = "links" class="center">
+                <div id = "input-links" class="center">
                     <svg id="svg">
-                        <line id="line" stroke="black" stroke-width="3" x1="0%" y1="10%" x2="100%" y2="30%"/>
-                        
-                        <line id="line" stroke="black" stroke-width="3" x1="0%" y1="90%" x2="100%" y2="70%"/>
+                        <line id="line" stroke="black" stroke-width="3" x1="0%" y1="30%" x2="100%" y2="40%"/>
+                        <text contenteditable="true" id="w1" x="45%" y="30%" fill="black" class="weights"></text>
+                        <line id="line" stroke="black" stroke-width="3" x1="0%" y1="70%" x2="100%" y2="60%"/>
+                        <text contenteditable="true" id="w2" x="45%" y="70%" fill="black" class="weights"></text>
                     </svg>
                 </div>
                 <div id = "perceptrons" class="center">
-                    <svg height="200" width="150">
-                        <circle cx="75" cy="100" r="70" stroke="black" stroke-width="3" fill="none" />
+                    <svg width="150">
+                        <circle cx="50%" cy="50%" r="24%" stroke="black" stroke-width="3" fill="none" />
+                        <text contenteditable="true" id="th1" x="20%" y="52%" fill="black">threshold</text>
                     </svg>
                 </div>
-                <div id = "links" class="center">
+                <div id = "output-links" class="center">
                     <svg id="svg">
-                        <line id="line" stroke="black" stroke-width="3" x1="-10" y1="100" x2="100%" y2="100"  />
+                        <line id="line" stroke="black" stroke-width="3" x1="0%" y1="50%" x2="100%" y2="50%"  />
                     </svg>
                 </div>
-                <div id = "highlighted-input" class="center">
-                    
+                <div class="center">
+                    <table class="selected" id="selected-output">
+                        <tr>
+                            <td>selected output</td>
+                        </tr>
+                    </table>
                 </div>
             </div>
             
@@ -64,6 +70,17 @@
                 </table>
             </div>
         </div>
+
+        <div id="statements-container">
+            <table class="selected" id="selected-input">
+                <tr>
+                    <td>x<sub>1</sub> * w<sub>1</sub> + x<sub>2</sub> * w<sub>2</sub></td>
+                </tr>
+                <tr>
+                    <td>selected x2</td>
+                </tr>
+            </table>
+        </div>
             
         <script src="neuronsandbox.js"></script>
 
@@ -71,18 +88,10 @@
     
     <body>
         <div>
+            Change table values and press the button:
+            <br>
            <button id="compute-button" onclick="javascript:demo.update()">
-            Compute
+            Update table
            </button> 
-        </div>
-        <div id="mode-button">
-            <button onclick="javascript:demo.switchMode('mode-button')">Switch Mode</button>
-        </div>
-            
-        <div>
-            <button onclick="javascript:demo.add('example')">+Col</button>
-            <button onclick="javascript:demo.remove('example')">-Col</button>
-            <button onclick="javascript:demo.add('dimension')">+Row</button>
-            <button onclick="javascript:demo.remove('dimension')">-Row</button>
         </div>
     </body>
