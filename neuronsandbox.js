@@ -249,7 +249,7 @@ class Display {
         console.log('demo.selectedInput first ', demo.selectedInput)
         demo.selectedInput = demo.inputData[rowIdx];
         console.log('demo.selectedInput after ', demo.selectedInput)
-        demo.selectedOutput = demo.inputData[rowIdx];
+        demo.selectedOutput = perceptron.outputData[rowIdx];
         this.displaySelectedInput();
         this.displaySelectedOutput();
     }
