@@ -209,46 +209,41 @@ class Perceptron {
         // draw svg to next output elem id
     }
 
-    updateWeights(tblId){
-        var weightTable = document.getElementById(tblId);
-        for (let c=0; c<weightTable.rows[0].cells.length; c++){ // -1 for weights
-            demo.weights[c] = this.weights[c] = demo.stringToValidInt(weightTable.rows[1].cells[c].innerHTML);
+    updateWeights(){
+        for (let i=0; i<demo.weights.length; i++){
+            const weight = document.getElementById(`w${i+1}`)
+            demo.weights[i] = this.weights[i] = demo.stringToValidInt(weight.innerHTML)
         }
     }
     
-    updateThreshold(tblId){
-        var weightTable = document.getElementById(tblId);
-        demo.threshold = this.threshold = demo.stringToValidInt(weightTable.rows[1].cells[2].innerHTML);
+    updateThreshold(){
+        const threshold = document.getElementById(`th${1}`)
+        demo.threshold = this.threshold = demo.stringToValidInt(threshold.innerHTML)
     }
 }
 
 class Display {
     constructor(inpObj=null, percepObj=null, outObj=null){
         this.updateDisplay();
-        // update weight table for first run
-        this.displayWeightTable("weight-table");
     }
-
+    
     displayWeight(wID, idx){
         var weight = document.getElementById(wID)
         weight.innerHTML = `${demo.weights[idx]}`;
         weight.contentEditable = true;
+        weight.addEventListener("focusout", function(event){
+            demo.update();
+        })
     }
 
-    displayWeightTable(tblId){
-        // weight table for editing
-        var weightTable = document.getElementById(tblId);
-        for (let c=0; c<weightTable.rows[0].cells.length; c++){ // -1 for weights
-            weightTable.rows[1].cells[c].innerHTML = demo.weights[c];
-        }
+    displayThreshold(thID){
+        let threshold = document.getElementById(thID);
+        threshold.innerHTML = demo.threshold;
+        threshold.addEventListener("focusout", function(event){
+            demo.update();
+        })
     }
     
-    displayThreshold(thID, idx=null){
-        document.getElementById(thID).innerHTML = `∑ = ${demo.threshold}`;
-        var weightTable = document.getElementById("weight-table");
-        weightTable.rows[1].cells[2].innerHTML = perceptron.threshold;
-    }
-
     displaySelectedInput(){
         var table = document.getElementById("selected-input");
         var cell = table.rows[1].cells[0];
@@ -259,7 +254,7 @@ class Display {
         }
         cell.innerHTML = strArray.join(" + ")
     }
-
+    
     displaySelectedOutput(){
         var table = document.getElementById("selected-output");
         for (var r=0; r<table.rows.length; r++){
@@ -274,7 +269,7 @@ class Display {
         this.displaySelectedInput();
         this.displaySelectedOutput();
     }
-
+    
     updateDisplay(){
         demo.weights.map((w, idx) => this.displayWeight(`w${idx+1}`, idx));
         this.displayThreshold("th1");
@@ -355,8 +350,8 @@ class Demo {
 
     update(){
         dataOp.updateData(inputs, inputTable);
-        perceptron.updateWeights("weight-table");
-        perceptron.updateThreshold("weight-table");
+        perceptron.updateWeights();
+        perceptron.updateThreshold();
         perceptron.computeOutputs();
         // ineffecient 2 steps, update step needed:
         outputs.update(perceptron.outputData);

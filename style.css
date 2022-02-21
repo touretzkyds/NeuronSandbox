@@ -1,12 +1,3 @@
-/* 
-.inputs {
-    width: 1%;
-    display: flex;
-    flex-direction: column;
-    float: left;
-    margin-left:5%;
-    margin-right:5%;
-} */
 h1 {
     text-align: center;
 }
@@ -16,25 +7,6 @@ h1 {
     height:30px;
     text-align: center;
 }
-/* 
-#button {
-    height: 100px;
-    width: 100px;
-    background-color: rgb(255, 255, 255);
-    border-radius: 50%;
-    float:inline-flex;
-    margin-left:5%;
-}
-
-.output {
-    width: 30px;
-    height: 30px;
-    float:inline-flex;
-    text-align: left;
-    margin-left:5%;
-    margin-right:5%;
-    background-color: white;
-} */
 
 .center {
     margin: 1px;
@@ -44,13 +16,74 @@ h1 {
     fill: none
 }
 
+#input-links{
+    position: relative;
+}
+
+#input-link-text{
+    position: absolute;
+    left: 15%;
+    width: 80%;
+    height: 100%;
+}
+
+#weight-1{
+    position: absolute;
+    top: 22%;
+    font-size: 150%;
+}
+
+#weight-2{
+    position: absolute;
+    top: 70%;
+    font-size: 150%;
+}
+
 #svg{
-    position: inherit;
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
 }   
+
+#output-links{
+    position: relative;
+}
+
+#perceptrons{
+    position:relative;
+}
+
+#threshold-text{
+    position: absolute;
+    font-size: 200%;
+    width: 75%;
+    top: 45%;
+    left: 20%;
+}
+
+#th1{
+    position: relative;
+    padding:px;
+    border: solid;
+    border-color: gray;
+    background-color: #f2f2f2;
+}
+
+#w1{
+    padding:10px;
+    border: solid;
+    border-color: gray;
+    background-color: #f2f2f2;
+}
+
+#w2{
+    padding:10px;
+    border: solid;
+    border-color: gray;
+    background-color: #f2f2f2;
+}
 
 #line{
     stroke-width:2px;
@@ -102,31 +135,11 @@ h1 {
     background-color: lightblue;
 }
 
-#compute-button {
-    background-color: rgb(130, 230, 255);
-    color: black;
-    padding: 15px 80px; /* change to % */
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    border-radius: 10px;
-  }
-
 .selected{
     color: red;
     font-size: 25px;
     border-collapse: collapse;
     width: 100%;
     height: 100%;
-    text-align: center;
-}
-
-#weight-table{
-    border: solid;
-    width: 250px;
-    height: 30px;
     text-align: center;
 }
