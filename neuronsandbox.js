@@ -105,7 +105,7 @@ class DataOperator {
         for (var r = 0, n = table.rows.length; r < n; r++) {
             for (var c = 0, m = table.rows[r].cells.length; c < m; c++) {
                 var tableCellValue = table.rows[r].cells[c].innerHTML;
-                tableCellValue = parseInt(tableCellValue.replace(/(@\r\n|\n|\r)/gm, ""));
+                tableCellValue = parseInt(tableCellValue.replace(/(\r\n|\n|\r)/gm, ""));
                 // skip header row of table
                 if (r>0){
                     dataObj.data[r-1][c] = tableCellValue;
