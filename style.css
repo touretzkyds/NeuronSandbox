@@ -123,3 +123,10 @@ h1 {
     height: 100%;
     text-align: center;
 }
+
+#weight-table{
+    border: solid;
+    width: 250px;
+    height: 30px;
+    text-align: center;
+}

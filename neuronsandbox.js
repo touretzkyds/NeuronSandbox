@@ -104,7 +104,8 @@ class DataOperator {
         let table = tableObj.table;
         for (var r = 0, n = table.rows.length; r < n; r++) {
             for (var c = 0, m = table.rows[r].cells.length; c < m; c++) {
-                const tableCellValue = table.rows[r].cells[c].innerHTML;
+                var tableCellValue = table.rows[r].cells[c].innerHTML;
+                tableCellValue = parseInt(tableCellValue.replace(/(\r\n|\n|\r)/gm, ""));
                 // skip header row of table
                 if (r>0){
                     dataObj.data[r-1][c] = tableCellValue;
@@ -185,7 +186,7 @@ class Perceptron {
         this.activnOutput = new Array(this.numEgs).fill(0);
         if (activation === "relu") {
             for (let r=0; r<this.numEgs; ++r){
-                const res = (this.affineOutput[r] >= this.threshold ? this.affineOutput[r] : 0);
+                const res = (this.affineOutput[r] >= this.threshold ? 1 : 0);
                 this.activnOutput[r] = res;
                 this.outputData[r][1] = res;
             }
@@ -214,6 +215,7 @@ class Display {
         this.displayThreshold("th1");
         this.displaySelectedInput();
         this.displaySelectedOutput();
+        // this.displayWeightTable();
     }
 
     displayWeight(wID, idx){
