@@ -224,7 +224,7 @@ class Display {
     }
 
     displayThreshold(thID, idx=null){
-        document.getElementById(thID).innerHTML = `Threshold = ${demo.threshold}`;
+        document.getElementById(thID).innerHTML = `∑ = ${demo.threshold}`;
     }
 
     displaySelectedInput(){
