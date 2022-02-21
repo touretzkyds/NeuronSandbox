@@ -105,7 +105,7 @@ class DataOperator {
         for (var r = 0, n = table.rows.length; r < n; r++) {
             for (var c = 0, m = table.rows[r].cells.length; c < m; c++) {
                 var tableCellValue = table.rows[r].cells[c].innerHTML;
-                tableCellValue = parseInt(tableCellValue.replace(/(\r\n|\n|\r)/gm, ""));
+                tableCellValue = demo.stringToValidInt(tableCellValue);
                 // skip header row of table
                 if (r>0){
                     dataObj.data[r-1][c] = tableCellValue;
@@ -137,15 +137,18 @@ class Table {
                     cell.addEventListener("mouseenter", function(event){
                         display.hoverInput(event.target.rowIdx);
                     });
+                    // add event listener to update demo with table changes
+                    cell.addEventListener("focusout", function(event){
+                        demo.update();
+                    });
                 }
             }
         }
-        this.table = table
+        this.table = table;
     }
 
     updateTable(){
         let table = this.table;
-        let array = this.dataObj.data;
         for (var r = 0, n = table.rows.length; r < n; r++) {
             for (var c = 0, m = table.rows[r].cells.length; c < m; c++) {
                 // skip header row of table
@@ -209,28 +212,32 @@ class Perceptron {
     updateWeights(tblId){
         var weightTable = document.getElementById(tblId);
         for (let c=0; c<weightTable.rows[0].cells.length; c++){ // -1 for weights
-            demo.weights[c] = this.weights[c] = weightTable.rows[1].cells[c].innerHTML;
+            demo.weights[c] = this.weights[c] = demo.stringToValidInt(weightTable.rows[1].cells[c].innerHTML);
         }
     }
     
     updateThreshold(tblId){
         var weightTable = document.getElementById(tblId);
-        demo.threshold = this.threshold = weightTable.rows[1].cells[2].innerHTML;
+        demo.threshold = this.threshold = demo.stringToValidInt(weightTable.rows[1].cells[2].innerHTML);
     }
 }
 
 class Display {
     constructor(inpObj=null, percepObj=null, outObj=null){
         this.updateDisplay();
+        // update weight table for first run
+        this.displayWeightTable("weight-table");
     }
 
     displayWeight(wID, idx){
         var weight = document.getElementById(wID)
         weight.innerHTML = `${demo.weights[idx]}`;
         weight.contentEditable = true;
-        
+    }
+
+    displayWeightTable(tblId){
         // weight table for editing
-        var weightTable = document.getElementById("weight-table");
+        var weightTable = document.getElementById(tblId);
         for (let c=0; c<weightTable.rows[0].cells.length; c++){ // -1 for weights
             weightTable.rows[1].cells[c].innerHTML = demo.weights[c];
         }
@@ -355,6 +362,10 @@ class Demo {
         outputs.update(perceptron.outputData);
         outputTable.updateTable();
         display.updateDisplay();
+    }
+
+    stringToValidInt(str){
+        return parseInt(str.replace(/(\r\n|\n|\r)/gm, ""));
     }
 
     async main() {
