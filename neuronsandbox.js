@@ -125,9 +125,7 @@ class Table {
 
     initializeTable(dataObj, tblId, editable){
         let array = dataObj.data;
-        console.log(`table ID: ${tblId}`);
         let table = document.getElementById(tblId);
-        console.log(`table: ${table}`);
         for(var r=0; r<array.length; r++){
             var newRow = table.insertRow(table.length);
             for(var c=0; c<array[r].length; c++){
@@ -136,7 +134,6 @@ class Table {
                 if (editable) {
                     cell.contentEditable = true;
                     cell.rowIdx = r;
-                    console.log(cell.rowIdx)
                     cell.addEventListener("mouseenter", function(event){
                         display.hoverInput(event.target.rowIdx);
                     });
@@ -183,9 +180,9 @@ class Perceptron {
         }
     }
     
-    computeActivnOutput(activation = "relu"){
+    computeActivnOutput(activation = "threshold"){
         this.activnOutput = new Array(this.numEgs).fill(0);
-        if (activation === "relu") {
+        if (activation === "threshold") {
             for (let r=0; r<this.numEgs; ++r){
                 const res = (this.affineOutput[r] >= this.threshold ? 1 : 0);
                 this.activnOutput[r] = res;
@@ -208,23 +205,41 @@ class Perceptron {
         // write editable weights on lines
         // draw svg to next output elem id
     }
+
+    updateWeights(tblId){
+        var weightTable = document.getElementById(tblId);
+        for (let c=0; c<weightTable.rows[0].cells.length; c++){ // -1 for weights
+            demo.weights[c] = this.weights[c] = weightTable.rows[1].cells[c].innerHTML;
+        }
+    }
+    
+    updateThreshold(tblId){
+        var weightTable = document.getElementById(tblId);
+        demo.threshold = this.threshold = weightTable.rows[1].cells[2].innerHTML;
+    }
 }
 
 class Display {
     constructor(inpObj=null, percepObj=null, outObj=null){
-        demo.weights.map((w, idx) => this.displayWeight(`w${idx+1}`, idx));
-        this.displayThreshold("th1");
-        this.displaySelectedInput();
-        this.displaySelectedOutput();
-        // this.displayWeightTable();
+        this.updateDisplay();
     }
 
     displayWeight(wID, idx){
-        document.getElementById(wID).innerHTML = `w${idx+1}= ${demo.weights[idx]}`;
+        var weight = document.getElementById(wID)
+        weight.innerHTML = `${demo.weights[idx]}`;
+        weight.contentEditable = true;
+        
+        // weight table for editing
+        var weightTable = document.getElementById("weight-table");
+        for (let c=0; c<weightTable.rows[0].cells.length; c++){ // -1 for weights
+            weightTable.rows[1].cells[c].innerHTML = demo.weights[c];
+        }
     }
-
+    
     displayThreshold(thID, idx=null){
         document.getElementById(thID).innerHTML = `∑ = ${demo.threshold}`;
+        var weightTable = document.getElementById("weight-table");
+        weightTable.rows[1].cells[2].innerHTML = perceptron.threshold;
     }
 
     displaySelectedInput(){
@@ -247,12 +262,15 @@ class Display {
     }
     
     hoverInput(rowIdx){
-        console.log('rowIdx ', rowIdx)
-        console.log('demo.inputData ', demo.inputData)
-        console.log('demo.selectedInput first ', demo.selectedInput)
         demo.selectedInput = demo.inputData[rowIdx];
-        console.log('demo.selectedInput after ', demo.selectedInput)
         demo.selectedOutput = perceptron.outputData[rowIdx];
+        this.displaySelectedInput();
+        this.displaySelectedOutput();
+    }
+
+    updateDisplay(){
+        demo.weights.map((w, idx) => this.displayWeight(`w${idx+1}`, idx));
+        this.displayThreshold("th1");
         this.displaySelectedInput();
         this.displaySelectedOutput();
     }
@@ -274,7 +292,7 @@ class Demo {
             [3, 4],
             [-2, -5],
         ];
-        this.weights = [5,-2];
+        this.weights = [10,-2];
         this.threshold = 10;
         this.selectedInput = this.inputData[0];
         this.selectedOutput = [3, 0];
@@ -329,17 +347,14 @@ class Demo {
     }
 
     update(){
-        console.log("update")
-        console.log('in input:', inputs.data);
-        console.log('per input:', perceptron.inputData);
         dataOp.updateData(inputs, inputTable);
-        // perceptron.inputData = inputs.data;
+        perceptron.updateWeights("weight-table");
+        perceptron.updateThreshold("weight-table");
         perceptron.computeOutputs();
-        console.log('perc output:', perceptron.outputData);
-        console.log('out output:', outputs.data);
         // ineffecient 2 steps, update step needed:
         outputs.update(perceptron.outputData);
         outputTable.updateTable();
+        display.updateDisplay();
     }
 
     async main() {
