@@ -114,6 +114,22 @@ class DataOperator {
         }
         tableObj.updateTable(tableObj); // update table to remove any erroneous symbols by user
     }
+
+    makeEditable(textbox){
+        textbox.contentEditable = true;
+        // add event listener to update demo with table changes
+        textbox.addEventListener("focusout", function(event){
+            demo.update();
+        });
+        // accept enter and esc keypress in text boxes
+        textbox.addEventListener("keydown", function(event){
+            if (event.key === "Enter" || event.key === "Escape") {
+                textbox.blur(); // focus out of text box
+                demo.update();
+            }
+        });
+    }
+
 }
 
 class Table {
@@ -132,24 +148,24 @@ class Table {
                 var cell = newRow.insertCell(c);
                 cell.innerHTML = array[r][c];
                 if (editable) {
-                    cell.contentEditable = true;
-                    cell.rowIdx = r;
                     // update displayed selections on hover
+                    cell.rowIdx = r;
                     cell.addEventListener("mouseenter", function(event){
                         display.hovermode = true;
-                        display.hoverInput(event.target.rowIdx);
+                        display.hoverInput(event.target.rowIdx, "enter");
                     });
-                    // add event listener to update demo with table changes
-                    cell.addEventListener("focusout", function(event){
-                        demo.update();
+                    cell.addEventListener("mouseleave", function(event){
+                        display.hovermode = true;
+                        display.hoverInput(event.target.rowIdx, "exit");
                     });
+                    dataOp.makeEditable(cell);
                 }
             }
         }
-        // on exiting table, display initial values again
+        // on exiting table, display initial values again (#3)
         table.addEventListener("mouseleave", function(event){
             display.hovermode = false;
-            display.hoverInput(0); // reset to default value
+            display.hoverInput(0, "exit"); // reset to default value
         });
         this.table = table;
     }
@@ -175,15 +191,32 @@ class Perceptron {
         this.inputData = dataObj.data;
         this.weights = weights;
         this.threshold = threshold;
-    }
+    }    
     
+    // simple float operations give precision problems (#6)
+    correctPrecision(val, refs){
+        // find number of decimal places in all references and select the highest number
+        const decimals = refs.map(elem => {
+            const strings = elem.toString().split(".")
+            if (strings.length === 1) {
+                return 0
+            }
+            return strings[1].length;
+        });
+        console.log(decimals)
+        const precision = Math.max(...decimals)
+        val = (precision>0) ? val.toFixed(precision) : val
+        return val
+    }
+
     computeAffineOutput(){
         this.affineOutput = new Array(this.numEgs).fill(0);
         // console.log('feats x egs', this.numFeats, this.numEgs)
         for (let r=0; r<this.numEgs; ++r){
             for (let c=0; c<this.numFeats; ++c){
-                const prod = this.inputData[r][c] * this.weights[c];
-                // console.log('prod', prod);
+                var prod = this.inputData[r][c] * this.weights[c];
+                // simple float operations give precision problems (#6)
+                // prod = this.correctPrecision(prod, [this.inputData[r][c], this.weights[c], this.outputData[r][0]]);
                 this.affineOutput[r] += prod;
                 this.outputData[r][0] += prod;
             }
@@ -238,29 +271,17 @@ class Display {
     displayWeight(wID, idx){
         var weight = document.getElementById(wID)
         weight.innerHTML = `${demo.weights[idx]}`;
-        weight.contentEditable = true;
-        weight.addEventListener("focusout", function(event){
-            demo.update();
-        })
+        dataOp.makeEditable(weight);
     }
 
     displayThreshold(thID){
         let threshold = document.getElementById(thID);
         threshold.innerHTML = demo.threshold;
-        threshold.addEventListener("focusout", function(event){
-            demo.update();
-        })
+        dataOp.makeEditable(threshold)
     }
     
     displaySelectedInput(){
-        const equation = document.getElementById("input-equation");
-        const cell = equation.rows[1].cells[0]; // element with numerical value of equation
-        let strArray = [];
-        for (var r=0; r<equation.rows.length; r++){
-            const str = `${demo.selectedInput[r]} * ${demo.weights[r]}`;
-            strArray.push(str);
-        }
-        cell.innerHTML = strArray.join(" + ")
+        // got rid of equation below neuron diagram
         // replace variable names in selected inputs display with values on hover (#3)
         const selections = document.getElementById("selected-inputs");
         for (var r=0; r<selections.rows.length; r++){
@@ -287,11 +308,19 @@ class Display {
         }
     }
     
-    hoverInput(rowIdx){
+    hoverInput(rowIdx, mode){
         demo.selectedInput = demo.inputData[rowIdx];
         demo.selectedOutput = perceptron.outputData[rowIdx];
         this.displaySelectedInput();
         this.displaySelectedOutput();
+        // highlight corresponding output
+        const outputRow = document.querySelector(`#output-table > tbody > tr:nth-child(${rowIdx+2})`)
+        if (mode === "enter"){
+            outputRow.style.background = "lightblue"
+        }
+        else {
+            outputRow.style.background = "none"
+        }
     }
     
     updateDisplay(){
@@ -383,9 +412,9 @@ class Demo {
         display.updateDisplay();
     }
 
-    // support floating point numbers, convert NaN to 0 (#6)
+    // allow floating point numbers, convert NaN to 0 (#6)
     stringToValidFloat(str){
-        var float = parseFloat(str.replace(/(\r\n|\n|\r)/gm, ""));
+        var float = parseFloat(str.replace(/(\r\n|\n|\r)/gm, "")); //@console log and debug
         var isValid = true;
         if (isNaN(float)){
             float = 0;

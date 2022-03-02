@@ -57,9 +57,9 @@ h1 {
 
 #threshold-text{
     position: absolute;
-    font-size: 200%;
+    font-size: 250%;
     width: 75%;
-    top: 45%;
+    top: 44%;
     left: 20%;
 }
 
@@ -130,6 +130,7 @@ h1 {
 .table tr:hover {
     background-color: lightblue;
 }
+
 
 .selected{
     color: red;
