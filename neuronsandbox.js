@@ -105,7 +105,7 @@ class DataOperator {
         for (var r = 0, n = table.rows.length; r < n; r++) {
             for (var c = 0, m = table.rows[r].cells.length; c < m; c++) {
                 var tableCellValue = table.rows[r].cells[c].innerHTML;
-                tableCellValue = demo.stringToValidInt(tableCellValue);
+                tableCellValue = demo.stringToValidFloat(tableCellValue);
                 // skip header row of table
                 if (r>0){
                     dataObj.data[r-1][c] = tableCellValue;
@@ -219,13 +219,13 @@ class Perceptron {
     updateWeights(){
         for (let i=0; i<demo.weights.length; i++){
             const weight = document.getElementById(`w${i+1}`)
-            demo.weights[i] = this.weights[i] = demo.stringToValidInt(weight.innerHTML)
+            demo.weights[i] = this.weights[i] = demo.stringToValidFloat(weight.innerHTML)
         }
     }
     
     updateThreshold(){
         const threshold = document.getElementById(`th${1}`)
-        demo.threshold = this.threshold = demo.stringToValidInt(threshold.innerHTML)
+        demo.threshold = this.threshold = demo.stringToValidFloat(threshold.innerHTML)
     }
 }
 
@@ -383,8 +383,15 @@ class Demo {
         display.updateDisplay();
     }
 
-    stringToValidInt(str){
-        return parseInt(str.replace(/(\r\n|\n|\r)/gm, ""));
+    // support floating point numbers, convert NaN to 0 (#6)
+    stringToValidFloat(str){
+        var float = parseFloat(str.replace(/(\r\n|\n|\r)/gm, ""));
+        var isValid = true;
+        if (isNaN(float)){
+            float = 0;
+            isValid = false;
+        }
+        return float;
     }
 
     async main() {
