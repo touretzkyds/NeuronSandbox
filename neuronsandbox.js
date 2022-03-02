@@ -136,8 +136,8 @@ class Table {
                     cell.rowIdx = r;
                     // update displayed selections on hover
                     cell.addEventListener("mouseenter", function(event){
-                        display.hoverInput(event.target.rowIdx);
                         display.hovermode = true;
+                        display.hoverInput(event.target.rowIdx);
                     });
                     // add event listener to update demo with table changes
                     cell.addEventListener("focusout", function(event){
@@ -254,13 +254,14 @@ class Display {
     
     displaySelectedInput(){
         const equation = document.getElementById("input-equation");
-        const cell = equation.rows[1].cells[0]; // lower portion of equation
+        const cell = equation.rows[1].cells[0]; // element with numerical value of equation
         let strArray = [];
         for (var r=0; r<equation.rows.length; r++){
             const str = `${demo.selectedInput[r]} * ${demo.weights[r]}`;
             strArray.push(str);
         }
         cell.innerHTML = strArray.join(" + ")
+        // replace variable names in selected inputs display with values on hover (#3)
         const selections = document.getElementById("selected-inputs");
         for (var r=0; r<selections.rows.length; r++){
             if (this.hovermode){
@@ -273,6 +274,7 @@ class Display {
     }
     
     displaySelectedOutput(){
+        // replace variable names in selected output display with values on hover (#3)
         var table = document.getElementById("selected-output");
         for (var r=0; r<table.rows.length; r++){
             var cell = table.rows[r].cells[0];
