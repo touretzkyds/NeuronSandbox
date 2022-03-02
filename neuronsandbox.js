@@ -77,9 +77,9 @@ class DataOperator {
 
     removeFeature(){
         console.log('original features', data.features);
-        data.numFeat -= 1
+        data.numFeat -= 1;
         if (demo.mode === "binary"){
-            data.numEg = 2**numFeat
+            data.numEg = 2**numFeat;
             data.features = (new Array((data.numFeat))).fill((new Array(data.numEg)).fill(-1)) //@@@
         }
         else{
@@ -134,8 +134,10 @@ class Table {
                 if (editable) {
                     cell.contentEditable = true;
                     cell.rowIdx = r;
+                    // update displayed selections on hover
                     cell.addEventListener("mouseenter", function(event){
                         display.hoverInput(event.target.rowIdx);
+                        display.hovermode = true;
                     });
                     // add event listener to update demo with table changes
                     cell.addEventListener("focusout", function(event){
@@ -144,6 +146,11 @@ class Table {
                 }
             }
         }
+        // on exiting table, display initial values again
+        table.addEventListener("mouseleave", function(event){
+            display.hovermode = false;
+            display.hoverInput(0); // reset to default value
+        });
         this.table = table;
     }
 
@@ -224,6 +231,7 @@ class Perceptron {
 
 class Display {
     constructor(inpObj=null, percepObj=null, outObj=null){
+        this.hovermode = false;
         this.updateDisplay();
     }
     
@@ -245,21 +253,35 @@ class Display {
     }
     
     displaySelectedInput(){
-        var table = document.getElementById("selected-input");
-        var cell = table.rows[1].cells[0];
+        const equation = document.getElementById("input-equation");
+        const cell = equation.rows[1].cells[0]; // lower portion of equation
         let strArray = [];
-        for (var r=0; r<table.rows.length; r++){
+        for (var r=0; r<equation.rows.length; r++){
             const str = `${demo.selectedInput[r]} * ${demo.weights[r]}`;
             strArray.push(str);
         }
         cell.innerHTML = strArray.join(" + ")
+        const selections = document.getElementById("selected-inputs");
+        for (var r=0; r<selections.rows.length; r++){
+            if (this.hovermode){
+                selections.rows[r].cells[0].innerHTML = demo.selectedInput[r];
+            }
+            else{
+                selections.rows[r].cells[0].innerHTML = `x<sub>${r+1}</sub>`;
+            }
+        }
     }
     
     displaySelectedOutput(){
         var table = document.getElementById("selected-output");
         for (var r=0; r<table.rows.length; r++){
             var cell = table.rows[r].cells[0];
-            cell.innerHTML = `y = ${demo.selectedOutput[0]}`
+            if (this.hovermode){
+                cell.innerHTML = `${demo.selectedOutput[1]}`
+            }
+            else{
+                cell.innerHTML = 'y'
+            }
         }
     }
     

@@ -90,10 +90,6 @@ h1 {
     stroke:rgb(0,0,0);
 }
 
-#one{
-    position: inherit;
-}
-
 #all-containers {
     display: inline-flex;
     width: 100%;
@@ -137,7 +133,7 @@ h1 {
 
 .selected{
     color: red;
-    font-size: 25px;
+    font-size: 35px;
     border-collapse: collapse;
     width: 100%;
     height: 100%;
