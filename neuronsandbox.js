@@ -347,8 +347,8 @@ class Demo {
             [3, 4],
             [-2, -5],
         ];
-        this.weights = [10,-2];
-        this.threshold = 10;
+        this.weights = [1,-2];
+        this.threshold = 1;
         this.selectedInput = this.inputData[0];
         this.selectedOutput = [3, 0];
     }
