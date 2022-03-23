@@ -100,14 +100,15 @@ class DataOperator {
             }
         }
     }
-    updateData(dataObj, tableObj){
+    updateData(dataObj, tableObj){ //TODO: make more efficient by passing specific location to update
+        console.log('updateData called')
         let table = tableObj.table;
         for (var r = 0, n = table.rows.length; r < n; r++) {
             for (var c = 0, m = table.rows[r].cells.length; c < m; c++) {
-                var tableCellValue = table.rows[r].cells[c].innerHTML;
-                tableCellValue = demo.stringToValidFloat(tableCellValue);
                 // skip header row of table
                 if (r>0){
+                    var tableCellValue = table.rows[r].cells[c].innerHTML;
+                    tableCellValue = demo.stringToValidFloat(tableCellValue);
                     dataObj.data[r-1][c] = tableCellValue;
                 }
             }
@@ -115,17 +116,17 @@ class DataOperator {
         tableObj.updateTable(tableObj); // update table to remove any erroneous symbols by user
     }
 
-    makeEditable(textbox){
+    makeEditable(textbox){ // TODO: Move from dataOp to displayOp
         textbox.contentEditable = true;
         // add event listener to update demo with table changes
         textbox.addEventListener("focusout", function(event){
+            console.log('triggered focusout once')
             demo.update();
         });
         // accept enter and esc keypress in text boxes
         textbox.addEventListener("keydown", function(event){
             if (event.key === "Enter" || event.key === "Escape") {
                 textbox.blur(); // focus out of text box
-                demo.update();
             }
         });
     }
@@ -151,11 +152,11 @@ class Table {
                     // update displayed selections on hover
                     cell.rowIdx = r;
                     cell.addEventListener("mouseenter", function(event){
-                        display.hovermode = true;
+                        display.hovering = true;
                         display.hoverInput(event.target.rowIdx, "enter");
                     });
                     cell.addEventListener("mouseleave", function(event){
-                        display.hovermode = true;
+                        display.hovering = true;
                         display.hoverInput(event.target.rowIdx, "exit");
                     });
                     dataOp.makeEditable(cell);
@@ -164,20 +165,19 @@ class Table {
         }
         // on exiting table, display initial values again (#3)
         table.addEventListener("mouseleave", function(event){
-            display.hovermode = false;
+            display.hovering = false;
             display.hoverInput(0, "exit"); // reset to default value
         });
         this.table = table;
     }
 
     updateTable(){
-        let table = this.table;
-        for (var r = 0, n = table.rows.length; r < n; r++) {
-            for (var c = 0, m = table.rows[r].cells.length; c < m; c++) {
+        for (var r = 0, n = this.table.rows.length; r < n; r++) {
+            for (var c = 0, m = this.table.rows[r].cells.length; c < m; c++) {
                 // skip header row of table
                 if (r>0){
                     const arrayValue = this.dataObj.data[r-1][c];
-                    table.rows[r].cells[c].innerHTML = arrayValue;
+                    this.table.rows[r].cells[c].innerHTML = arrayValue;
                 }
             }
         }
@@ -194,19 +194,10 @@ class Perceptron {
     }    
     
     // simple float operations give precision problems (#6)
-    correctPrecision(val, refs){
-        // find number of decimal places in all references and select the highest number
-        const decimals = refs.map(elem => {
-            const strings = elem.toString().split(".")
-            if (strings.length === 1) {
-                return 0
-            }
-            return strings[1].length;
-        });
-        console.log(decimals)
-        const precision = Math.max(...decimals)
-        val = (precision>0) ? val.toFixed(precision) : val
-        return val
+    correctPrecision(val){
+        // do arbitrary large num multiplication since precision error occurs at consistent decimal place
+        val = Math.round(val * 10000) / 10000;
+        return val;
     }
 
     computeAffineOutput(){
@@ -214,11 +205,11 @@ class Perceptron {
         // console.log('feats x egs', this.numFeats, this.numEgs)
         for (let r=0; r<this.numEgs; ++r){
             for (let c=0; c<this.numFeats; ++c){
-                var prod = this.inputData[r][c] * this.weights[c];
+                const prod = this.inputData[r][c] * this.weights[c];
                 // simple float operations give precision problems (#6)
-                // prod = this.correctPrecision(prod, [this.inputData[r][c], this.weights[c], this.outputData[r][0]]);
-                this.affineOutput[r] += prod;
-                this.outputData[r][0] += prod;
+                const affineOutput = this.correctPrecision(this.affineOutput[r] + prod);
+                this.affineOutput[r] = affineOutput;
+                this.outputData[r][0] = affineOutput;
             }
         }
     }
@@ -264,20 +255,25 @@ class Perceptron {
 
 class Display {
     constructor(inpObj=null, percepObj=null, outObj=null){
-        this.hovermode = false;
+        this.hovering = false;
         this.updateDisplay();
+        // make weights and threshold editable on first call to function
+        demo.weights.map((val, idx) => {
+            const weight = document.getElementById(`w${idx+1}`);
+            dataOp.makeEditable(weight);
+        });
+        const threshold = document.getElementById(`th${1}`);
+        dataOp.makeEditable(threshold);
     }
     
     displayWeight(wID, idx){
         var weight = document.getElementById(wID)
         weight.innerHTML = `${demo.weights[idx]}`;
-        dataOp.makeEditable(weight);
     }
 
     displayThreshold(thID){
         let threshold = document.getElementById(thID);
         threshold.innerHTML = demo.threshold;
-        dataOp.makeEditable(threshold)
     }
     
     displaySelectedInput(){
@@ -285,7 +281,7 @@ class Display {
         // replace variable names in selected inputs display with values on hover (#3)
         const selections = document.getElementById("selected-inputs");
         for (var r=0; r<selections.rows.length; r++){
-            if (this.hovermode){
+            if (this.hovering){
                 selections.rows[r].cells[0].innerHTML = demo.selectedInput[r];
             }
             else{
@@ -299,7 +295,7 @@ class Display {
         var table = document.getElementById("selected-output");
         for (var r=0; r<table.rows.length; r++){
             var cell = table.rows[r].cells[0];
-            if (this.hovermode){
+            if (this.hovering){
                 cell.innerHTML = `${demo.selectedOutput[1]}`
             }
             else{
@@ -414,7 +410,7 @@ class Demo {
 
     // allow floating point numbers, convert NaN to 0 (#6)
     stringToValidFloat(str){
-        var float = parseFloat(str.replace(/(\r\n|\n|\r)/gm, "")); //@console log and debug
+        var float = parseFloat(str.replace(/(\r\n|\n|\r)/gm, ""));
         var isValid = true;
         if (isNaN(float)){
             float = 0;
