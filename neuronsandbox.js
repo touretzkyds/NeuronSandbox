@@ -14,7 +14,7 @@ class Data {
 
 class DataOperator {
     constructor(){
-        this.DEFAULT_VALUE = null;
+        this.DEFAULT_VALUE = 10;
     }
 
     computeSize(dataObj, demo, addFeature=0, addEg=0){
@@ -40,43 +40,33 @@ class DataOperator {
 
     changeDims(dataObj, numRows, numCols){
         let data = (new Array((numCols))).fill((new Array(numRows)).fill(this.DEFAULT_VALUE));
-        let shape = [data.length, data[0].length];
         dataObj.data = data;
-        dataObj.shape = shape;
-        dataObj.rows = shape[0];
-        dataObj.cols = shape[1];
+        dataObj.rows = data.length;
+        dataObj.cols = data[0].length;
     }
 
-    addRow(dataObj, n=1, pos){
-        console.log('original rows', dataObj.rows);
-        row = Array(dataObj.cols, null);
-        arr.splice(pos, 0, row);
-        console.log('new rows', dataObj.rows);
+    insertDataRow(dataObj, n=1, pos){
+        const row = Array(dataObj.cols, this.DEFAULT_VALUE);
+        dataObj.data.splice(pos, 0, row);
+        dataObj.rows++;
     }
-
-    removeRow(dataObj, n=1, pos){
-        console.log('original rows', dataObj.rows);
-        dataObj.data.pop(pos);
-        console.log('new rows', dataObj.rows);
+    
+    removeDataRow(dataObj, n=1, pos){
+        dataObj.data.splice(pos, -1);
     }
     
     addColumn(dataObj, n=1, pos){
-        console.log('original cols', dataObj.cols);
         col = Array(dataObj.rows, null);
         // for (r=0; r<dataObj.rows; ++r){
         //     dataObj.
         // }
-        console.log('new rows', arr.rows);
     }
     
     removeColumn(arr, n=1, pos){
-        console.log('original rows', arr.rows);
         col = Array(nRows, null);
-        console.log('new rows', arr.rows);
     }
 
     removeFeature(){
-        console.log('original features', data.features);
         data.numFeat -= 1;
         if (demo.mode === "binary"){
             data.numEg = 2**numFeat;
@@ -85,23 +75,19 @@ class DataOperator {
         else{
             data.features.pop(-1);
         }
-        console.log('new features', data.features);
     }
 
     createBinaryData(dim){
         let arr = new Array(2**dim).fill(new Array(dim).fill(0));
-        // console.log(`arr = `, arr);
-        // console.log(`dim = ${dim}`);
         for (let i=0; i<arr.length; i++){
             const binaryString = i.toString(2);
-            // console.log(binaryString);
             for (let j=binaryString.length-1; j>=0; j--){
                 arr[i][binaryString.length-j-1] = Number(binaryString[binaryString.length-j-1]);
             }
         }
     }
+
     updateData(dataObj, tableObj){ //TODO: make more efficient by passing specific location to update
-        console.log('updateData called')
         let table = tableObj.table;
         for (var r = 0, n = table.rows.length; r < n; r++) {
             for (var c = 0, m = table.rows[r].cells.length; c < m; c++) {
@@ -120,7 +106,6 @@ class DataOperator {
         textbox.contentEditable = true;
         // add event listener to update demo with table changes
         textbox.addEventListener("focusout", function(event){
-            console.log('triggered focusout once')
             demo.update();
         });
         // accept enter and esc keypress in text boxes
@@ -137,28 +122,24 @@ class Table {
     constructor(dataObj, tblId, editable){
         this.tblId = tblId;
         this.dataObj = dataObj;
-        this.initializeTable(dataObj, tblId, editable);
+        this.isEditable = editable;
+        this.numRows = dataObj.rows;
+        this.numCols = dataObj.cols;
+        this.rowButtons = null;
+        this.initializeTable(dataObj, tblId);
     }
 
-    initializeTable(dataObj, tblId, editable){
+    initializeTable(dataObj, tblId){
         let array = dataObj.data;
         let table = document.getElementById(tblId);
         for(var r=0; r<array.length; r++){
             var newRow = table.insertRow(table.length);
+            // update displayed selections on hover
+            this.makeHoverable(newRow);
             for(var c=0; c<array[r].length; c++){
                 var cell = newRow.insertCell(c);
                 cell.innerHTML = array[r][c];
-                if (editable) {
-                    // update displayed selections on hover
-                    cell.rowIdx = r;
-                    cell.addEventListener("mouseenter", function(event){
-                        display.hovering = true;
-                        display.hoverInput(event.target.rowIdx, "enter");
-                    });
-                    cell.addEventListener("mouseleave", function(event){
-                        display.hovering = true;
-                        display.hoverInput(event.target.rowIdx, "exit");
-                    });
+                if (this.isEditable) {
                     dataOp.makeEditable(cell);
                 }
             }
@@ -169,11 +150,28 @@ class Table {
             display.hoverInput(0, "exit"); // reset to default value
         });
         this.table = table;
+        // add buttons if table is editable ie. input table
+        if (this.isEditable) {
+            this.createButtons(); //@change to our func
+            this.rowButtons = document.getElementById("row-buttons");
+            this.createRowButtons()
+        }
+    }
+
+    makeHoverable(row){
+        row.addEventListener("mouseenter", function(event){
+            display.hovering = true;
+            display.hoverInput(this, "enter");
+        });
+        row.addEventListener("mouseleave", function(event){
+            display.hovering = false;
+            display.hoverInput(this, "exit");
+        });
     }
 
     updateTable(){
-        for (var r = 0, n = this.table.rows.length; r < n; r++) {
-            for (var c = 0, m = this.table.rows[r].cells.length; c < m; c++) {
+        for (var r = 0, n = this.numRows; r < n; r++) {
+            for (var c = 0, m = this.numCols; c < m; c++) {
                 // skip header row of table
                 if (r>0){
                     const arrayValue = this.dataObj.data[r-1][c];
@@ -182,12 +180,111 @@ class Table {
             }
         }
     }
+    
+    createRowButtons(all=true, r=null){
+        // add hover event listener to header row
+        this.rowButtons.addEventListener("mouseenter", function(event){
+            console.log('need to show children')
+            const hiddenElems = document.getElementsByClassName("edit-button")
+            console.log(hiddenElems)
+            hiddenElems.forEach(element => {
+                console.log(element)
+                element.style.display = "inherit"
+            });
+        });
+        this.rowButtons.addEventListener("mouseleave", function(event){
+            console.log('need to hide children')
+            const hiddenElems = document.getElementsByClassName("edit-button")
+            hiddenElems.forEach(element => {
+                element.style.display = "none"
+            });
+        });
+        
+        const n = this.table.rows.length - 1; // exclude header row
+        const h = this.table.rows[0].offsetHeight; // row height of input table @
+        if (all == false){
+            var row = this.rowButtons.insertRow(r);
+            var cell = row.insertCell(-1)
+            cell.innerHTML = "<button class='edit-button' onclick='demo.removeRow(this)'>–</button>";
+            var row = this.rowButtons.insertRow(r);
+            cell.innerHTML = "<button class='edit-button' onclick='demo.insertRow(this)'>+</button>" 
+            var cell = row.insertCell(-1)
+        }
+        for (var r = 0; r < 2*n+1; r++) {
+            var row = this.rowButtons.insertRow(-1);
+            var cell = row.insertCell(-1)
+            if (r%2 == 0){
+                cell.innerHTML = "<button class='edit-button' onclick='demo.insertRow(this)'>+</button>" 
+            }
+            else{
+                cell.innerHTML = "<button class='edit-button' onclick='demo.removeRow(this)'>–</button>";
+            }
+        }
+    }
+
+    createButtons(all=true, r=null){ // TODO: change function to operate on one row at a time
+        if (!all){
+            var cell = this.table.rows[r].insertCell(this.numCols);
+            cell.className = "shown";
+            cell.innerHTML = 
+            "<button onclick='demo.insertRow(this)'>+</button>" +
+            "<button onclick='demo.removeRow(this)'>-</button>";
+            return;
+        }
+        for (var r = 0, n = this.table.rows.length; r < n; r++) {
+            // skip header row of table
+            if (r>0){
+                var cell = this.table.rows[r].insertCell(this.numCols);
+                cell.className = "shown";
+                cell.id = `button${r}`
+                cell.innerHTML = 
+                "<button onclick='demo.insertRow(this)'>+</button>" +
+                "<button onclick='demo.removeRow(this)'>-</button>";
+            }
+        }  
+    }
+
+    removeButtons(r){
+        this.rowButtons.deleteRow(r);
+    }
+
+    insertTableRow(r){
+        var newRow = this.table.insertRow(r);
+        this.makeHoverable(newRow);
+        for (var c = 0; c < this.numCols; c++) { 
+            var cell = newRow.insertCell(c);
+            // cell.innerHTML = array[r][c];
+            if (this.isEditable){
+                dataOp.makeEditable(cell);
+            }
+        }
+        if (this.isEditable){
+            this.createButtons(false, r);
+        }
+        this.numRows++;
+    }
+    
+    removeTableRow(r){
+        this.table.deleteRow(r);
+        this.removeButtons(r)
+        this.numRows--;
+    }
+
+    // map button to row index
+    mapButtonToRow(r){
+        if (r%2 == 1){
+            r = parseInt((r-1)/2)
+        }
+        else{
+            r = parseInt(r/2)
+        }
+        return r + 1
+    }
 }
 
 class Perceptron {
     constructor(dataObj, weights, threshold){
-        this.numFeats = dataObj.cols;
-        this.numEgs = dataObj.rows;
+        this.dataObj = dataObj;
         this.inputData = dataObj.data;
         this.weights = weights;
         this.threshold = threshold;
@@ -201,10 +298,9 @@ class Perceptron {
     }
 
     computeAffineOutput(){
-        this.affineOutput = new Array(this.numEgs).fill(0);
-        // console.log('feats x egs', this.numFeats, this.numEgs)
-        for (let r=0; r<this.numEgs; ++r){
-            for (let c=0; c<this.numFeats; ++c){
+        this.affineOutput = new Array(this.dataObj.rows).fill(0);
+        for (let r=0; r<this.dataObj.rows; ++r){
+            for (let c=0; c<this.dataObj.cols; ++c){
                 const prod = this.inputData[r][c] * this.weights[c];
                 // simple float operations give precision problems (#6)
                 const affineOutput = this.correctPrecision(this.affineOutput[r] + prod);
@@ -215,9 +311,9 @@ class Perceptron {
     }
     
     computeActivnOutput(activation = "threshold"){
-        this.activnOutput = new Array(this.numEgs).fill(0);
+        this.activnOutput = new Array(this.dataObj.rows).fill(0);
         if (activation === "threshold") {
-            for (let r=0; r<this.numEgs; ++r){
+            for (let r=0; r<this.dataObj.rows; ++r){
                 const res = (this.affineOutput[r] > this.threshold ? 1 : 0);
                 this.activnOutput[r] = res;
                 this.outputData[r][1] = res;
@@ -226,7 +322,7 @@ class Perceptron {
     }
     
     computeOutputs(){
-        this.outputData = new Array(this.numEgs).fill(0).map(() => new Array(this.numFeats).fill(0));
+        this.outputData = new Array(this.dataObj.rows).fill(0).map(() => new Array(this.dataObj.cols).fill(0));
         this.computeAffineOutput();
         this.computeActivnOutput();
     }
@@ -257,7 +353,7 @@ class Display {
     constructor(inpObj=null, percepObj=null, outObj=null){
         this.hovering = false;
         this.updateDisplay();
-        // make weights and threshold editable on first call to function
+        // make weights and threshold editable on initialization
         demo.weights.map((val, idx) => {
             const weight = document.getElementById(`w${idx+1}`);
             dataOp.makeEditable(weight);
@@ -304,19 +400,30 @@ class Display {
         }
     }
     
-    hoverInput(rowIdx, mode){
-        demo.selectedInput = demo.inputData[rowIdx];
-        demo.selectedOutput = perceptron.outputData[rowIdx];
+    // respond to user hovering over table
+    hoverInput(row, mode){
+        const rowIdx = row.rowIndex;
+        // update the active inputs and outputs to display in perceptron diagram
+        demo.selectedInput = demo.inputData[rowIdx-1];
+        demo.selectedOutput = perceptron.outputData[rowIdx-1];
         this.displaySelectedInput();
         this.displaySelectedOutput();
-        // highlight corresponding output
-        const outputRow = document.querySelector(`#output-table > tbody > tr:nth-child(${rowIdx+2})`)
+        // highlight output row corresponding to the hovered input row
+        const outputRow = document.querySelector(`#output-table > tbody > tr:nth-child(${rowIdx+1})`)
+        const buttonCell = document.getElementById(`button${rowIdx}`);
         if (mode === "enter"){
-            outputRow.style.background = "lightblue"
+            outputRow.style.background = "lightblue";
+            // buttonCell.style.display = "inherit"
         }
         else {
-            outputRow.style.background = "none"
+            const buttons = document.getElementsByClassName("shown");
+            outputRow.style.background = "none";
+            // buttonCell.style.display = "none"
         }
+
+        // TODO: show edit buttons on hover
+        // console.log('buttons', buttons[rowIdx]);
+        // button display = "block";
     }
     
     updateDisplay(){
@@ -349,42 +456,25 @@ class Demo {
         this.selectedOutput = [3, 0];
     }
 
-    add(type){ //@better name needed in place of 'type'
-        if (type="dimension"){
-            this.data.numFeat += 1;
-            this.data.numEg += (this.mode == "binary") ? this.data.numEg : 0;
-            this.data.addFeature();
-            this.addColumn('input-table'); //@change to this.display
-        }
-        else { // ie. type = "example"
-            //@add cols button shouldnt be there in binary mode
-            if (this.mode == "binary"){
-                console.error('Binary mode does not support example addition')
-                return
-            }
-            this.data.numEg += 1;
-            this.data.addExample();
-            // this.addColumn('input-table'); //@change to this.display
-        }
+    insertRow(button){
+        const r = inputTable.mapButtonToRow(button.parentNode.parentNode.rowIndex);
+        inputTable.insertTableRow(r);
+        dataOp.insertDataRow(inputs, r);
+        outputTable.insertTableRow(r);
+        dataOp.insertDataRow(outputs, r);
+        demo.update(); //TODO: check if efficient
     }
 
-    remove(type){ //@better name needed in place of 'type'
-        if (type="dimension"){
-            this.data.numFeat -= 1;
-            this.data.numEg -= (this.mode == "binary") ? this.data.numEg : 0;
-            this.data.addFeature();
-            this.deleteColumn('input-table'); //@change to this.display
-        }
-        else { // ie. type = "example"
-            //@add cols button shouldnt be there in binary mode
-            if (this.mode == "binary"){
-                console.error('Binary mode does not support example addition')
-                return
-            }
-            this.data.numEg -= 1;
-            // this.data.addExample();
-            this.deleteColumn('input-table'); //@change to this.display
-        }
+    removeRow(button){
+        console.log('inputTable', inputTable.table.rows.length, 'outputTable', outputTable.table.rows.length)
+        // const r = button.parentNode.parentNode.rowIndex;
+        const r = inputTable.mapButtonToRow(button.parentNode.parentNode.rowIndex);
+        inputTable.removeTableRow(r);
+        dataOp.removeDataRow(inputs, r);
+        outputTable.removeTableRow(r); // left here @@@@@
+        dataOp.removeDataRow(outputs, r);
+        // demo.update(); //TODO: check if efficient
+        console.log('new inputTable', inputTable.table.rows.length, 'new outputTable', outputTable.table.rows.length)
     }
 
     switchMode(buttonId){
@@ -408,12 +498,12 @@ class Demo {
         display.updateDisplay();
     }
 
-    // allow floating point numbers, convert NaN to 0 (#6)
+    // convert to valid inputs for processing and keeep track of invalid parts of input
     stringToValidFloat(str){
-        var float = parseFloat(str.replace(/(\r\n|\n|\r)/gm, ""));
+        var float = parseFloat(str.replace(/(\r\n|\n|\r)/gm, "")); // allow floating point numbers (#6)
         var isValid = true;
         if (isNaN(float)){
-            float = 0;
+            float = 0; // convert NaN to 0 (#6)
             isValid = false;
         }
         return float;
