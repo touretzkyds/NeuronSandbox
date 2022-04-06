@@ -52,7 +52,8 @@ class DataOperator {
     }
     
     removeDataRow(dataObj, n=1, pos){
-        dataObj.data.splice(pos, -1);
+        dataObj.data.splice(pos, 1);
+        dataObj.rows--;
     }
     
     addColumn(dataObj, n=1, pos){
@@ -269,7 +270,6 @@ class Table {
     removeTableRow(r){
         console.log('original table = ', this.table.rows)
         this.table.deleteRow(r);
-        this.removeButtons(r)
         console.log('deleted table = ', this.table.rows)
         this.numRows--;
     }
@@ -421,8 +421,8 @@ class Display {
     hoverInput(row, mode){
         const rowIdx = row.rowIndex || 0; // default to 0
         // update the active inputs and outputs to display in perceptron diagram
-        demo.selectedInput = demo.inputData[rowIdx-1];
-        demo.selectedOutput = perceptron.outputData[rowIdx-1];
+        demo.selectedInput = inputs.data[rowIdx-1];
+        demo.selectedOutput = outputs.data[rowIdx-1];
         this.displaySelectedInput();
         this.displaySelectedOutput();
         // highlight output row corresponding to the hovered input row
@@ -493,7 +493,6 @@ class Demo {
 
     removeRow(button){
         console.log('inputTable', inputTable.table.rows.length, 'outputTable', outputTable.table.rows.length)
-        // const r = button.parentNode.parentNode.rowIndex;
         const r = button.parentNode.parentNode.rowIndex;
         inputTable.removeTableRow(r);
         dataOp.removeDataRow(inputs, r);
