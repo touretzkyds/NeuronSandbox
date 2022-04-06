@@ -91,15 +91,18 @@ class DataOperator {
         let table = tableObj.table;
         for (var r = 0, n = table.rows.length; r < n; r++) {
             for (var c = 0, m = table.rows[r].cells.length; c < m; c++) {
-                // skip header row of table
-                if (r>0){
-                    var tableCellValue = table.rows[r].cells[c].innerHTML;
-                    tableCellValue = demo.stringToValidFloat(tableCellValue);
-                    dataObj.data[r-1][c] = tableCellValue;
+                // skip header row of table and button column
+                if (r>0 && c<m-1){
+                    const cell = table.rows[r].cells[c];
+                    const rawValue = cell.innerHTML;
+                    const [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
+                    display.highlighInvalidText(cell, isValid);
+                    dataObj.data[r-1][c] = parsedValue;
                 }
             }
         }
-        tableObj.updateTable(tableObj); // update table to remove any erroneous symbols by user
+        // do not update table, let user see what they have typed wrong (#6)
+        // tableObj.updateTable(tableObj); // update table to remove any erroneous symbols by user
     }
 
     makeEditable(textbox){ // TODO: Move from dataOp to displayOp
@@ -147,7 +150,7 @@ class Table {
         // on exiting table, display initial values again (#3)
         table.addEventListener("mouseleave", function(event){
             display.hovering = false;
-            display.hoverInput(0, "exit"); // reset to default value
+            display.hoverInput(this, "exit");
         });
         this.table = table;
         // add buttons if table is editable ie. input table
@@ -188,7 +191,6 @@ class Table {
             const hiddenElems = document.getElementsByClassName("edit-button")
             console.log(hiddenElems)
             hiddenElems.forEach(element => {
-                console.log(element)
                 element.style.display = "inherit"
             });
         });
@@ -253,7 +255,7 @@ class Table {
         this.makeHoverable(newRow);
         for (var c = 0; c < this.numCols; c++) { 
             var cell = newRow.insertCell(c);
-            // cell.innerHTML = array[r][c];
+            cell.innerHTML = 0;
             if (this.isEditable){
                 dataOp.makeEditable(cell);
             }
@@ -265,8 +267,10 @@ class Table {
     }
     
     removeTableRow(r){
+        console.log('original table = ', this.table.rows)
         this.table.deleteRow(r);
         this.removeButtons(r)
+        console.log('deleted table = ', this.table.rows)
         this.numRows--;
     }
 
@@ -338,38 +342,51 @@ class Perceptron {
 
     updateWeights(){
         for (let i=0; i<demo.weights.length; i++){
-            const weight = document.getElementById(`w${i+1}`)
-            demo.weights[i] = this.weights[i] = demo.stringToValidFloat(weight.innerHTML)
+            const cell = document.getElementById(`w${i+1}`);
+            const [parsedValue, isValid] = demo.stringToValidFloat(cell.innerHTML);
+            display.highlighInvalidText(cell, isValid);
+            this.weights[i] = parsedValue;
         }
     }
     
     updateThreshold(){
-        const threshold = document.getElementById(`th${1}`)
-        demo.threshold = this.threshold = demo.stringToValidFloat(threshold.innerHTML)
+        const cell = document.getElementById(`th${1}`);
+        const [parsedValue, isValid] = demo.stringToValidFloat(cell.innerHTML);
+        display.highlighInvalidText(cell, isValid);
+        this.threshold = parsedValue;
     }
 }
 
 class Display {
     constructor(inpObj=null, percepObj=null, outObj=null){
         this.hovering = false;
-        this.updateDisplay();
+        this.initializeDisplay();
+        
+    }
+
+    initializeDisplay(){
         // make weights and threshold editable on initialization
-        demo.weights.map((val, idx) => {
+        demo.weights.map((w, idx) => {
+            this.displayWeightFromData(`w${idx+1}`, idx);
             const weight = document.getElementById(`w${idx+1}`);
             dataOp.makeEditable(weight);
         });
+        this.displayThresholdFromData(perceptron);
         const threshold = document.getElementById(`th${1}`);
         dataOp.makeEditable(threshold);
+        this.displaySelectedInput();
+        this.displaySelectedOutput();
     }
     
-    displayWeight(wID, idx){
+    displayWeightFromData(wID, idx){
         var weight = document.getElementById(wID)
-        weight.innerHTML = `${demo.weights[idx]}`;
+        weight.innerHTML = `${perceptron.weights[idx]}`;
     }
 
-    displayThreshold(thID){
+    displayThresholdFromData(percepObj){
+        const thID = "th1";
         let threshold = document.getElementById(thID);
-        threshold.innerHTML = demo.threshold;
+        threshold.innerHTML = percepObj.threshold;
     }
     
     displaySelectedInput(){
@@ -402,7 +419,7 @@ class Display {
     
     // respond to user hovering over table
     hoverInput(row, mode){
-        const rowIdx = row.rowIndex;
+        const rowIdx = row.rowIndex || 0; // default to 0
         // update the active inputs and outputs to display in perceptron diagram
         demo.selectedInput = demo.inputData[rowIdx-1];
         demo.selectedOutput = perceptron.outputData[rowIdx-1];
@@ -427,16 +444,25 @@ class Display {
     }
     
     updateDisplay(){
-        demo.weights.map((w, idx) => this.displayWeight(`w${idx+1}`, idx));
-        this.displayThreshold("th1");
         this.displaySelectedInput();
         this.displaySelectedOutput();
+    }
+
+    //highlight invalid inputs, reset as soon as they are valid (#6)
+    highlighInvalidText(cell, isValid){
+        console.log(cell);
+        if (!isValid){
+            cell.style.backgroundColor = "pink";
+        }
+        else{
+            cell.style.removeProperty('background-color');
+        }
     }
 }
 
 class Demo {
     constructor(){
-        // initialize tables for the first time
+        // initialize parameters for the first time
         this.setDefaultValues();
     }
 
@@ -457,7 +483,7 @@ class Demo {
     }
 
     insertRow(button){
-        const r = inputTable.mapButtonToRow(button.parentNode.parentNode.rowIndex);
+        const r = button.parentNode.parentNode.rowIndex;
         inputTable.insertTableRow(r);
         dataOp.insertDataRow(inputs, r);
         outputTable.insertTableRow(r);
@@ -468,12 +494,12 @@ class Demo {
     removeRow(button){
         console.log('inputTable', inputTable.table.rows.length, 'outputTable', outputTable.table.rows.length)
         // const r = button.parentNode.parentNode.rowIndex;
-        const r = inputTable.mapButtonToRow(button.parentNode.parentNode.rowIndex);
+        const r = button.parentNode.parentNode.rowIndex;
         inputTable.removeTableRow(r);
         dataOp.removeDataRow(inputs, r);
-        outputTable.removeTableRow(r); // left here @@@@@
+        outputTable.removeTableRow(r);
         dataOp.removeDataRow(outputs, r);
-        // demo.update(); //TODO: check if efficient
+        demo.update(); //TODO: check if efficient
         console.log('new inputTable', inputTable.table.rows.length, 'new outputTable', outputTable.table.rows.length)
     }
 
@@ -501,12 +527,11 @@ class Demo {
     // convert to valid inputs for processing and keeep track of invalid parts of input
     stringToValidFloat(str){
         var float = parseFloat(str.replace(/(\r\n|\n|\r)/gm, "")); // allow floating point numbers (#6)
-        var isValid = true;
         if (isNaN(float)){
             float = 0; // convert NaN to 0 (#6)
-            isValid = false;
         }
-        return float;
+        const isValid = (str == float)
+        return [float, isValid];
     }
 
     async main() {
