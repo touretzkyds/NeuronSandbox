@@ -316,12 +316,7 @@ class Display {
         // replace variable names in selected inputs display with values on hover (#3)
         const selections = document.getElementById("selected-inputs");
         for (var r=0; r<selections.rows.length; r++){
-            if (this.hovering){
-                selections.rows[r].cells[0].innerHTML = demo.selectedInput[r];
-            }
-            else{
-                selections.rows[r].cells[0].innerHTML = `x<sub>${r+1}</sub>`;
-            }
+            selections.rows[r].cells[0].innerHTML = demo.selectedInput[r];
         }
     }
     
@@ -331,12 +326,7 @@ class Display {
         var table = document.getElementById("selected-output");
         for (var r=0; r<table.rows.length; r++){
             var cell = table.rows[r].cells[0];
-            if (this.hovering){
-                cell.innerHTML = `${demo.selectedOutput[1]}`
-            }
-            else{
-                cell.innerHTML = 'y'
-            }
+            cell.innerHTML = `${demo.selectedOutput[1]}`;
         }
     }
     
@@ -344,23 +334,21 @@ class Display {
     hoverInput(row, mode){
         const rowIdx = row.rowIndex || 0; // default to 0
         // update the active inputs and outputs to display in perceptron diagram
-        demo.selectedInput = inputs.data[rowIdx-1];
-        demo.selectedOutput = outputs.data[rowIdx-1];
+        demo.selectedInput = inputs.data[rowIdx-1] || demo.defaultSelectedInput;
+        demo.selectedOutput = outputs.data[rowIdx-1] || demo.defaultSelectedOutput;
         this.displaySelectedInput();
         this.displaySelectedOutput();
         // highlight output row corresponding to the hovered input row
         const outputRow = document.querySelector(`#output-table > tbody > tr:nth-child(${rowIdx+1})`)
-        const buttonCell = document.getElementById(`button${rowIdx}`);
         if (mode === "enter"){
             outputRow.style.background = "lightblue";
         }
         else {
-            const buttons = document.getElementsByClassName("shown");
             outputRow.style.background = "none";
         }
     }
     
-    // update selected perceptron inputs display
+    // update display panel
     updateDisplay(){
         this.displaySelectedInput();
         this.displaySelectedOutput();
@@ -418,8 +406,10 @@ class Demo {
         ];
         this.weights = [1,-2];
         this.threshold = 1;
-        this.selectedInput = this.inputData[0];
-        this.selectedOutput = [3, 0];
+        this.defaultSelectedInput = [`x<sub>1</sub>`, `x<sub>2</sub>`];
+        this.defaultSelectedOutput = ["activation", "y"];
+        this.selectedInput = this.defaultSelectedInput;
+        this.selectedOutput = this.defaultSelectedOutput;
     }
 
     // calculate row to insert at, from html button address
@@ -495,8 +485,8 @@ const dataOp = new DataOperator();
 const inputTable = new Table(inputs, "input-table", true);
 const perceptron = new Perceptron(inputs, demo.weights, demo.threshold);
 perceptron.computeOutputs();
-let outputs = new Data(perceptron.outputData);
-let outputTable = new Table(outputs, "output-table", false);
+const outputs = new Data(perceptron.outputData);
+const outputTable = new Table(outputs, "output-table", false);
 dataOp.createBinaryData(2);
 perceptron.displayPerceptron();
 const display = new Display();
