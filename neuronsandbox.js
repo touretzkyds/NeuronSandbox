@@ -109,8 +109,14 @@ class Table {
     // initialize table from data array
     // add edit buttons and hover features if table is input table
     initializeTable(dataObj, tblId){
-        let array = dataObj.data;
         let table = document.getElementById(tblId);
+        // allow user to edit input table header (#11)
+        for (var c=1; c<table.rows[0].cells.length; c++){
+            const headerCell = table.rows[0].cells[c];
+            dataOp.makeEditable(headerCell);
+        }
+        // add data rows to table
+        let array = dataObj.data;
         for(var r=0; r<array.length; r++){
             var newRow = table.insertRow(table.length);
             // update displayed selections on hover
@@ -126,7 +132,7 @@ class Table {
         // on exiting table, display initial values again (#3)
         table.addEventListener("mouseleave", function(event){
             display.hovering = false;
-            display.hoverInput(this, "exit");
+            display.hoverInput(this, "input-table", "exit");
         });
         this.table = table;
         // add buttons if table is editable ie. input table
@@ -140,11 +146,11 @@ class Table {
     makeHoverable(row){
         row.addEventListener("mouseenter", function(event){
             display.hovering = true;
-            display.hoverInput(this, "enter");
+            display.hoverInput(this, "input-table", "enter");
         });
         row.addEventListener("mouseleave", function(event){
             display.hovering = false;
-            display.hoverInput(this, "exit");
+            display.hoverInput(this, "input-table", "exit");
         });
     }
 
@@ -331,21 +337,31 @@ class Display {
     }
     
     // respond to user hovering over table
-    hoverInput(row, mode){
-        const rowIdx = row.rowIndex || 0; // default to 0
-        // update the active inputs and outputs to display in perceptron diagram
-        demo.selectedInput = inputs.data[rowIdx-1] || demo.defaultSelectedInput;
-        demo.selectedOutput = outputs.data[rowIdx-1] || demo.defaultSelectedOutput;
-        this.displaySelectedInput();
-        this.displaySelectedOutput();
-        // highlight output row corresponding to the hovered input row
+    hoverInput(row, tblId, mode){
+        const rowIdx = row.rowIndex || 0;
         const outputRow = document.querySelector(`#output-table > tbody > tr:nth-child(${rowIdx+1})`)
         if (mode === "enter"){
+            // update the active inputs and outputs to display in perceptron diagram
+            demo.selectedInput = inputs.data[rowIdx-1];
+            demo.selectedOutput = outputs.data[rowIdx-1];
+            // highlight output row corresponding to the hovered input row
             outputRow.style.background = "lightblue";
         }
         else {
+            // reset display panel inputs to user-defined inputs (#11)
+            const headerCells = document.getElementById(tblId).rows[0].cells;
+            var headerRowVals = [];
+            for (var c=1; c<headerCells.length; c++){
+                headerRowVals.push(document.getElementById(`tblinput${c}`).innerHTML);
+            }
+            // reset displayed input to header row values
+            demo.selectedInput = headerRowVals;
+            // reset displayed output to default
+            demo.selectedOutput = demo.defaultSelectedOutput;
             outputRow.style.background = "none";
         }
+        this.displaySelectedInput();
+        this.displaySelectedOutput();
     }
     
     // update display panel
