@@ -5,9 +5,10 @@ class Data {
         this.update(inputData); //default shape: (2, 4)
     }
 
+    // update data array
     update(inputData) {
-        this.rows = inputData.length;
-        this.cols = inputData[0].length;
+        this.rows = inputData.length || 0;
+        this.cols = inputData[0].length || 0;
         this.data = inputData;
     }
 }
@@ -38,13 +39,6 @@ class DataOperator {
         return [r, c]
     }
 
-    changeDims(dataObj, numRows, numCols){
-        let data = (new Array((numCols))).fill((new Array(numRows)).fill(this.DEFAULT_VALUE));
-        dataObj.data = data;
-        dataObj.rows = data.length;
-        dataObj.cols = data[0].length;
-    }
-
     insertDataRow(dataObj, n=1, pos){
         const row = Array(dataObj.cols, this.DEFAULT_VALUE);
         dataObj.data.splice(pos, 0, row);
@@ -56,28 +50,6 @@ class DataOperator {
         dataObj.rows--;
     }
     
-    addColumn(dataObj, n=1, pos){
-        col = Array(dataObj.rows, null);
-        // for (r=0; r<dataObj.rows; ++r){
-        //     dataObj.
-        // }
-    }
-    
-    removeColumn(arr, n=1, pos){
-        col = Array(nRows, null);
-    }
-
-    removeFeature(){
-        data.numFeat -= 1;
-        if (demo.mode === "binary"){
-            data.numEg = 2**numFeat;
-            data.features = (new Array((data.numFeat))).fill((new Array(data.numEg)).fill(-1)) //@@@
-        }
-        else{
-            data.features.pop(-1);
-        }
-    }
-
     createBinaryData(dim){
         let arr = new Array(2**dim).fill(new Array(dim).fill(0));
         for (let i=0; i<arr.length; i++){
@@ -88,24 +60,24 @@ class DataOperator {
         }
     }
 
-    updateData(dataObj, tableObj){ //TODO: make more efficient by passing specific location to update
+    // update data from table when user changes entry
+    updateDataFromTable(dataObj, tableObj){ //TODO: make more efficient by passing specific location to update
         let table = tableObj.table;
-        for (var r = 0, n = table.rows.length; r < n; r++) {
-            for (var c = 0, m = table.rows[r].cells.length; c < m; c++) {
-                // skip header row of table and button column
-                if (r>0 && c>0){
-                    const cell = table.rows[r].cells[c];
-                    const rawValue = cell.innerHTML;
-                    const [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
-                    display.highlighInvalidText(cell, isValid);
-                    dataObj.data[r-1][c-1] = parsedValue;
-                }
+        // skip header row and button column of table, start from 1
+        for (var r = 1, n = table.rows.length; r < n; r++) {
+            for (var c = 1, m = table.rows[r].cells.length; c < m; c++) { 
+                const cell = table.rows[r].cells[c];
+                const rawValue = cell.innerHTML;
+                const [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
+                display.highlighInvalidText(cell, isValid);
+                dataObj.data[r-1][c-1] = parsedValue;
             }
         }
         // do not update table, let user see what they have typed wrong (#6)
         // tableObj.updateTable(tableObj); // update table to remove any erroneous symbols by user
     }
 
+    // make editable and update demo on edit
     makeEditable(textbox){ // TODO: Move from dataOp to displayOp
         textbox.contentEditable = true;
         // add event listener to update demo with table changes
@@ -122,6 +94,7 @@ class DataOperator {
 
 }
 
+// displays and manipulates HTML table, holds data object
 class Table {
     constructor(dataObj, tblId, editable){
         this.tblId = tblId;
@@ -133,6 +106,8 @@ class Table {
         this.initializeTable(dataObj, tblId);
     }
 
+    // initialize table from data array
+    // add edit buttons and hover features if table is input table
     initializeTable(dataObj, tblId){
         let array = dataObj.data;
         let table = document.getElementById(tblId);
@@ -161,6 +136,7 @@ class Table {
         }
     }
 
+    // show table values hovered over in selection panel
     makeHoverable(row){
         row.addEventListener("mouseenter", function(event){
             display.hovering = true;
@@ -172,22 +148,22 @@ class Table {
         });
     }
 
+    // update table from data array
     updateTable(){
-        for (var r = 0, n = this.numRows + 1; r < n; r++) {
+        // skip header row of table, start from 1
+        for (var r = 1, n = this.numRows + 1; r < n; r++) {
             for (var c = 0, m = this.numCols; c < m; c++) {
-                // skip header row of table
-                if (r>0){
-                    const arrayValue = this.dataObj.data[r-1][c];
-                    this.table.rows[r].cells[c].innerHTML = arrayValue;
-                }
+                const arrayValue = this.dataObj.data[r-1][c];
+                this.table.rows[r].cells[c].innerHTML = arrayValue;
             }
         }
     }
 
+    // create +/- buttons for adding rows to table
     createRowButtons(all=true, r=null){ // TODO: change function to operate on one row at a time
-        const content = '<div class="edit-buttons-container">' + 
-                        '<button class="edit-button" onclick="demo.removeRow(this)">–</button>' + 
-                        '<button class="edit-button" onclick="demo.insertRow(this)">+</button>' + 
+        const content = '<div class="row-buttons-container">' + 
+                        '<button class="row-button" onclick="demo.removeRow(this)">–</button>' + 
+                        '<button class="row-button" onclick="demo.insertRow(this)">+</button>' + 
                         '</div>';
         if (!all){
             var cell = this.table.rows[r].insertCell(0);
@@ -203,6 +179,7 @@ class Table {
         }  
     }
 
+    // insert row at given position and add editable attributes/ cells if reqd.
     insertTableRow(r){
         var newRow = this.table.insertRow(r);
         this.makeHoverable(newRow);
@@ -225,6 +202,7 @@ class Table {
     }
 }
 
+// perceptron: holds a data object, weights, threshold
 class Perceptron {
     constructor(dataObj, weights, threshold){
         this.dataObj = dataObj;
@@ -240,6 +218,7 @@ class Perceptron {
         return val;
     }
 
+    // compute combination column of output table
     computeAffineOutput(){
         this.affineOutput = new Array(this.dataObj.rows).fill(0);
         for (let r=0; r<this.dataObj.rows; ++r){
@@ -253,6 +232,7 @@ class Perceptron {
         }
     }
     
+    // compute activation column of output table
     computeActivnOutput(activation = "threshold"){
         this.activnOutput = new Array(this.dataObj.rows).fill(0);
         if (activation === "threshold") {
@@ -330,6 +310,7 @@ class Display {
         threshold.innerHTML = percepObj.threshold;
     }
     
+    // set display panel input
     displaySelectedInput(){
         // got rid of equation below neuron diagram
         // replace variable names in selected inputs display with values on hover (#3)
@@ -344,6 +325,7 @@ class Display {
         }
     }
     
+    // set display panel output
     displaySelectedOutput(){
         // replace variable names in selected output display with values on hover (#3)
         var table = document.getElementById("selected-output");
@@ -371,19 +353,14 @@ class Display {
         const buttonCell = document.getElementById(`button${rowIdx}`);
         if (mode === "enter"){
             outputRow.style.background = "lightblue";
-            // buttonCell.style.display = "inherit"
         }
         else {
             const buttons = document.getElementsByClassName("shown");
             outputRow.style.background = "none";
-            // buttonCell.style.display = "none"
         }
-
-        // TODO: show edit buttons on hover
-        // console.log('buttons', buttons[rowIdx]);
-        // button display = "block";
     }
     
+    // update selected perceptron inputs display
     updateDisplay(){
         this.displaySelectedInput();
         this.displaySelectedOutput();
@@ -391,7 +368,6 @@ class Display {
 
     //highlight invalid inputs, reset as soon as they are valid (#6)
     highlighInvalidText(cell, isValid){
-        // console.log(cell);
         if (!isValid){
             cell.style.backgroundColor = "pink";
         }
@@ -402,20 +378,20 @@ class Display {
 
     initializeButtonHover(tableObj){
         // hide all at initialization
-        const buttons = document.getElementsByClassName("edit-buttons-container");
+        const buttons = document.getElementsByClassName("row-buttons-container");
             buttons.forEach(element => {
                 element.style.display = "none";
         });
         // show when hovering over table
         tableObj.table.addEventListener("mouseenter", function(event){
-            const buttons = document.getElementsByClassName("edit-buttons-container");
+            const buttons = document.getElementsByClassName("row-buttons-container");
             buttons.forEach(element => {
                 element.style.display = "flex";
             });
         });
         // hide when hover out
         tableObj.table.addEventListener("mouseleave", function(event){
-            const buttons = document.getElementsByClassName("edit-buttons-container");
+            const buttons = document.getElementsByClassName("row-buttons-container");
             buttons.forEach(element => {
                 element.style.display = "none";
             });
@@ -429,6 +405,7 @@ class Demo {
         this.setDefaultValues();
     }
 
+    // initial default values for demo
     setDefaultValues() { 
         this.mode = "regular";
         this.numFeat = 2;
@@ -450,6 +427,7 @@ class Demo {
         return button.parentNode.parentNode.parentNode.rowIndex + 1;
     }
 
+    // add new row at specific location on button click
     insertRow(button){
         const r = this.getRowLocation(button);
         inputTable.insertTableRow(r);
@@ -459,6 +437,7 @@ class Demo {
         demo.update(); //TODO: check if efficient
     }
 
+    // remove row at specific location on button click
     removeRow(button){
         const r = this.getRowLocation(button) - 1;
         inputTable.removeTableRow(r);
@@ -468,6 +447,7 @@ class Demo {
         demo.update(); //TODO: check if efficient
     }
 
+    // switch between binary and regular mode
     switchMode(buttonId){
         if (this.mode==="binary"){
             this.mode = "regular";
@@ -478,18 +458,19 @@ class Demo {
         console.log('mode set as', this.mode)
     }
 
+    // update entire demo 
     update(){
-        dataOp.updateData(inputs, inputTable);
+        dataOp.updateDataFromTable(inputs, inputTable);
         perceptron.updateWeights();
         perceptron.updateThreshold();
         perceptron.computeOutputs();
-        // ineffecient 2 steps, update step needed:
+        // TODO: ineffecient 2 steps, update step needed:
         outputs.update(perceptron.outputData);
         outputTable.updateTable();
         display.updateDisplay();
     }
 
-    // convert to valid inputs for processing and keeep track of invalid parts of input
+    // convert to valid inputs for processing and keep track of invalid parts of input
     stringToValidFloat(str){
         var float = parseFloat(str.replace(/(\r\n|\n|\r)/gm, "")); // allow floating point numbers (#6)
         if (isNaN(float)){
@@ -507,6 +488,7 @@ window.onload = function(){
     console.log("window loaded")
 }
 
+// initialize all classes
 const demo = new Demo();
 const inputs = new Data(demo.inputData);
 const dataOp = new DataOperator();
