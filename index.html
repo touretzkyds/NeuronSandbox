@@ -15,15 +15,15 @@
         
         <div id="all-containers">
             <div id = "input-container">
-                <table id="row-buttons">
-                    <tr>
-                      <th> ▼ </th>
-                    </tr>
-                  </table>
                 <table id="input-table" cellspacing="1" cellpadding="8" class="table">
                     <tr>
-                        <th>x<sub>1</sub></th>
-                        <th >x<sub>2</sub></th>
+                        <td> <!-- edit button container -->
+                            <div class="edit-buttons-container">
+                                <button id="first-add-button" onclick="demo.insertRow(this)">+</button>
+                            </div>
+                        </td> 
+                        <th id="tblinput1" >x<sub>1</sub></th>
+                        <th id="tblinput2" >x<sub>2</sub></th>
                     </tr>
                 </table>
             </div>
@@ -32,10 +32,10 @@
                 <div class="center">
                     <table id="selected-inputs" class="selected">
                         <tr>
-                            <td>x<sub>1</sub></td>
+                            <td id="selinput1" >x<sub>1</sub></td>
                         </tr>
                         <tr>
-                            <td>x<sub>2</sub></td>
+                            <td id="selinput2" >x<sub>2</sub></td>
                         </tr>
                     </table>
                 </div>

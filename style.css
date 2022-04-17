@@ -123,6 +123,10 @@ h1 {
     border: 1px solid #ddd;
 }
 
+.table td {
+    border: 1px solid #ddd;
+}
+
 .table tr:nth-child(even){
     background-color: #f2f2f2;
 }
@@ -135,6 +139,14 @@ h1 {
     background-color: lightblue;
 }
 
+/* style column containing buttons */
+#input-table td:first-child{
+    text-align: center;
+    padding: 0px 0px 0px 0px;
+    width:25px;
+    background-color: white;
+    min-width: 25px;
+}
 
 .selected{
     color: red;
@@ -145,31 +157,30 @@ h1 {
     text-align: center;
 }
 
-.hidden{
-    display: inherit;
-}
-
-.shown{
-    display: inherit;
-}
-
 #row-buttons{
     min-height: 103%;
 }
 
 #row-buttons th{
-    /* border: 3px solid #73AD21; */
-    /* line-height: 25px; */
     vertical-align: top;
 }
 
 #row-buttons td{
-    /* border: 3px solid #73AD21; */
     line-height: 25px;
     vertical-align: bottom;
 }
 
-.edit-button{
-    border-radius: 50%;
-    display: none;
+/* edit buttons container to hold and position + and - buttons */
+.edit-buttons-container{
+    height: 55px;
+    width: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transform: translate(0%, 32%);
+}
+
+#first-add-button{
+    position: absolute;
+    bottom: 0;
 }

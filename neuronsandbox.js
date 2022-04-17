@@ -93,12 +93,12 @@ class DataOperator {
         for (var r = 0, n = table.rows.length; r < n; r++) {
             for (var c = 0, m = table.rows[r].cells.length; c < m; c++) {
                 // skip header row of table and button column
-                if (r>0 && c<m-1){
+                if (r>0 && c>0){
                     const cell = table.rows[r].cells[c];
                     const rawValue = cell.innerHTML;
                     const [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
                     display.highlighInvalidText(cell, isValid);
-                    dataObj.data[r-1][c] = parsedValue;
+                    dataObj.data[r-1][c-1] = parsedValue;
                 }
             }
         }
@@ -156,9 +156,8 @@ class Table {
         this.table = table;
         // add buttons if table is editable ie. input table
         if (this.isEditable) {
-            this.createButtons(); //@change to our func
+            this.createRowButtons();
             this.rowButtons = document.getElementById("row-buttons");
-            this.createRowButtons()
         }
     }
 
@@ -174,7 +173,7 @@ class Table {
     }
 
     updateTable(){
-        for (var r = 0, n = this.numRows; r < n; r++) {
+        for (var r = 0, n = this.numRows + 1; r < n; r++) {
             for (var c = 0, m = this.numCols; c < m; c++) {
                 // skip header row of table
                 if (r>0){
@@ -184,71 +183,24 @@ class Table {
             }
         }
     }
-    
-    createRowButtons(all=true, r=null){
-        // add hover event listener to header row
-        this.rowButtons.addEventListener("mouseenter", function(event){
-            console.log('need to show children')
-            const hiddenElems = document.getElementsByClassName("edit-button")
-            console.log(hiddenElems)
-            hiddenElems.forEach(element => {
-                element.style.display = "inherit"
-            });
-        });
-        this.rowButtons.addEventListener("mouseleave", function(event){
-            console.log('need to hide children')
-            const hiddenElems = document.getElementsByClassName("edit-button")
-            hiddenElems.forEach(element => {
-                element.style.display = "none"
-            });
-        });
-        
-        const n = this.table.rows.length - 1; // exclude header row
-        const h = this.table.rows[0].offsetHeight; // row height of input table @
-        if (all == false){
-            var row = this.rowButtons.insertRow(r);
-            var cell = row.insertCell(-1)
-            cell.innerHTML = "<button class='edit-button' onclick='demo.removeRow(this)'>–</button>";
-            var row = this.rowButtons.insertRow(r);
-            cell.innerHTML = "<button class='edit-button' onclick='demo.insertRow(this)'>+</button>" 
-            var cell = row.insertCell(-1)
-        }
-        for (var r = 0; r < 2*n+1; r++) {
-            var row = this.rowButtons.insertRow(-1);
-            var cell = row.insertCell(-1)
-            if (r%2 == 0){
-                cell.innerHTML = "<button class='edit-button' onclick='demo.insertRow(this)'>+</button>" 
-            }
-            else{
-                cell.innerHTML = "<button class='edit-button' onclick='demo.removeRow(this)'>–</button>";
-            }
-        }
-    }
 
-    createButtons(all=true, r=null){ // TODO: change function to operate on one row at a time
+    createRowButtons(all=true, r=null){ // TODO: change function to operate on one row at a time
+        const content = '<div class="edit-buttons-container">' + 
+                        '<button class="edit-button" onclick="demo.removeRow(this)">–</button>' + 
+                        '<button class="edit-button" onclick="demo.insertRow(this)">+</button>' + 
+                        '</div>';
         if (!all){
-            var cell = this.table.rows[r].insertCell(this.numCols);
-            cell.className = "shown";
-            cell.innerHTML = 
-            "<button onclick='demo.insertRow(this)'>+</button>" +
-            "<button onclick='demo.removeRow(this)'>-</button>";
+            var cell = this.table.rows[r].insertCell(0);
+            cell.innerHTML = content;
             return;
         }
         for (var r = 0, n = this.table.rows.length; r < n; r++) {
             // skip header row of table
             if (r>0){
-                var cell = this.table.rows[r].insertCell(this.numCols);
-                cell.className = "shown";
-                cell.id = `button${r}`
-                cell.innerHTML = 
-                "<button onclick='demo.insertRow(this)'>+</button>" +
-                "<button onclick='demo.removeRow(this)'>-</button>";
+                var cell = this.table.rows[r].insertCell(0);
+                cell.innerHTML = content;
             }
         }  
-    }
-
-    removeButtons(r){
-        this.rowButtons.deleteRow(r);
     }
 
     insertTableRow(r){
@@ -262,27 +214,14 @@ class Table {
             }
         }
         if (this.isEditable){
-            this.createButtons(false, r);
+            this.createRowButtons(false, r);
         }
         this.numRows++;
     }
     
     removeTableRow(r){
-        console.log('original table = ', this.table.rows)
         this.table.deleteRow(r);
-        console.log('deleted table = ', this.table.rows)
         this.numRows--;
-    }
-
-    // map button to row index
-    mapButtonToRow(r){
-        if (r%2 == 1){
-            r = parseInt((r-1)/2)
-        }
-        else{
-            r = parseInt(r/2)
-        }
-        return r + 1
     }
 }
 
@@ -376,6 +315,8 @@ class Display {
         dataOp.makeEditable(threshold);
         this.displaySelectedInput();
         this.displaySelectedOutput();
+        // edit buttons hover functionality
+        this.initializeButtonHover(inputTable);
     }
     
     displayWeightFromData(wID, idx){
@@ -450,13 +391,35 @@ class Display {
 
     //highlight invalid inputs, reset as soon as they are valid (#6)
     highlighInvalidText(cell, isValid){
-        console.log(cell);
+        // console.log(cell);
         if (!isValid){
             cell.style.backgroundColor = "pink";
         }
         else{
             cell.style.removeProperty('background-color');
         }
+    }
+
+    initializeButtonHover(tableObj){
+        // hide all at initialization
+        const buttons = document.getElementsByClassName("edit-buttons-container");
+            buttons.forEach(element => {
+                element.style.display = "none";
+        });
+        // show when hovering over table
+        tableObj.table.addEventListener("mouseenter", function(event){
+            const buttons = document.getElementsByClassName("edit-buttons-container");
+            buttons.forEach(element => {
+                element.style.display = "flex";
+            });
+        });
+        // hide when hover out
+        tableObj.table.addEventListener("mouseleave", function(event){
+            const buttons = document.getElementsByClassName("edit-buttons-container");
+            buttons.forEach(element => {
+                element.style.display = "none";
+            });
+        });
     }
 }
 
@@ -482,8 +445,13 @@ class Demo {
         this.selectedOutput = [3, 0];
     }
 
+    // calculate row to insert at, from html button address
+    getRowLocation(button){
+        return button.parentNode.parentNode.parentNode.rowIndex + 1;
+    }
+
     insertRow(button){
-        const r = button.parentNode.parentNode.rowIndex;
+        const r = this.getRowLocation(button);
         inputTable.insertTableRow(r);
         dataOp.insertDataRow(inputs, r);
         outputTable.insertTableRow(r);
@@ -492,14 +460,12 @@ class Demo {
     }
 
     removeRow(button){
-        console.log('inputTable', inputTable.table.rows.length, 'outputTable', outputTable.table.rows.length)
-        const r = button.parentNode.parentNode.rowIndex;
+        const r = this.getRowLocation(button) - 1;
         inputTable.removeTableRow(r);
         dataOp.removeDataRow(inputs, r);
         outputTable.removeTableRow(r);
         dataOp.removeDataRow(outputs, r);
         demo.update(); //TODO: check if efficient
-        console.log('new inputTable', inputTable.table.rows.length, 'new outputTable', outputTable.table.rows.length)
     }
 
     switchMode(buttonId){
