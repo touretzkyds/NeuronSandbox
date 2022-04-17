@@ -339,12 +339,14 @@ class Display {
     // respond to user hovering over table
     hoverInput(row, tblId, mode){
         const rowIdx = row.rowIndex || 0;
+        const inputRow = document.querySelector(`#input-table > tbody > tr:nth-child(${rowIdx+1})`)
         const outputRow = document.querySelector(`#output-table > tbody > tr:nth-child(${rowIdx+1})`)
         if (mode === "enter"){
             // update the active inputs and outputs to display in perceptron diagram
             demo.selectedInput = inputs.data[rowIdx-1];
             demo.selectedOutput = outputs.data[rowIdx-1];
-            // highlight output row corresponding to the hovered input row
+            // highlight input and output rows corresponding to the hovered input row
+            inputRow.style.background = "lightblue";
             outputRow.style.background = "lightblue";
         }
         else {
@@ -358,6 +360,7 @@ class Display {
             demo.selectedInput = headerRowVals;
             // reset displayed output to default
             demo.selectedOutput = demo.defaultSelectedOutput;
+            inputRow.style.background = "none";
             outputRow.style.background = "none";
         }
         this.displaySelectedInput();
