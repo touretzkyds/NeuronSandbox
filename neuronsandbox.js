@@ -168,8 +168,8 @@ class Table {
     // create +/- buttons for adding rows to table
     createRowButtons(all=true, r=null){ // TODO: change function to operate on one row at a time
         const content = '<div class="row-buttons-container">' + 
-                        '<button class="row-button" onclick="demo.removeRow(this)">–</button>' + 
-                        '<button class="row-button" onclick="demo.insertRow(this)">+</button>' + 
+                        '<button class="button" onclick="demo.removeRow(this)">–</button>' + 
+                        '<button class="button" onclick="demo.insertRow(this)">+</button>' + 
                         '</div>';
         if (!all){
             var cell = this.table.rows[r].insertCell(0);

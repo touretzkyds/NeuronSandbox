@@ -2,18 +2,32 @@ h1 {
     text-align: center;
 }
 
-.textbox{
-    width:30px;
-    height:30px;
-    text-align: center;
-}
-
 .center {
     margin: 1px;
     width: 60%;
-    /* border: 3px solid #73AD21; */
+    height: 100%;
     display: inline-flex;
-    fill: none
+    justify-content: center;
+    align-items: center;
+}
+
+#all-containers {
+    align-items: flex-start;
+}
+
+#network-container {
+    display: inline-flex;  
+    width: 75vw;
+    height: 50vh;
+}
+
+.circle {
+    border-radius: 50%;
+    width: calc(7vw + 7vh);
+    height: calc(7vw + 7vh);
+    border: 3px solid;
+    position: relative;
+    display: flex;
 }
 
 #input-links{
@@ -22,7 +36,6 @@ h1 {
 
 #input-link-text{
     position: absolute;
-    left: 15%;
     width: 80%;
     height: 100%;
 }
@@ -30,13 +43,13 @@ h1 {
 #weight-1{
     position: absolute;
     top: 22%;
-    font-size: 150%;
+    font-size: 2vw;
 }
 
 #weight-2{
     position: absolute;
     top: 70%;
-    font-size: 150%;
+    font-size: 2vw;
 }
 
 #svg{
@@ -51,35 +64,28 @@ h1 {
     position: relative;
 }
 
-#perceptrons{
-    position:relative;
-}
-
 #threshold-text{
     position: absolute;
-    font-size: 250%;
-    top: 42%;
-    left: 25%;
-    right: 30%;
+    font-size: 3vw;
 }
 
 #th1{
     position: relative;
-    padding:px;
+    padding: 0px 2px;
     border: solid;
     border-color: gray;
     background-color: #f2f2f2;
 }
 
 #w1{
-    padding:10px;
+    padding:0.5vw;
     border: solid;
     border-color: gray;
     background-color: #f2f2f2;
 }
 
 #w2{
-    padding:10px;
+    padding:0.5vw;
     border: solid;
     border-color: gray;
     background-color: #f2f2f2;
@@ -96,7 +102,6 @@ h1 {
 }
 
 #input-container {
-    /* border: 3px solid #73AD21; */
     display: inline-flex;
 }
 
@@ -107,6 +112,7 @@ h1 {
 .table {
     border-collapse: collapse;
     text-align: center;
+    border-spacing: 1px;
 }
 
 .table th {
@@ -115,16 +121,16 @@ h1 {
 }
 
 .table td, .table th {
-    line-height: 50px;
-    width: 100px;
+    line-height: 10vh;
+    width: 10vw;
 }
 
 .table tr {
-    border: 1px solid #ddd;
+    border: 0.05vw solid #ddd;
 }
 
 .table td {
-    border: 1px solid #ddd;
+    border: 0.05vw solid #ddd;
 }
 
 .table tr:nth-child(even){
@@ -137,43 +143,42 @@ h1 {
 
 /* style column containing buttons */
 #input-table td:first-child{
-    text-align: center;
-    padding: 0px 0px 0px 0px;
-    width:25px;
+    padding: 0 0 0 0;
+    width: 2vw;
     background-color: white;
-    min-width: 25px;
+    min-width: 2vw;
+    justify-content: center;
+    align-items: center;
 }
 
 .selected{
     color: red;
-    font-size: 35px;
+    font-size: 3vw;
     border-collapse: collapse;
-    width: 100%;
+    width: 20%;
     height: 100%;
     text-align: center;
 }
 
-#row-buttons{
-    min-height: 103%;
-}
-
-#row-buttons th{
-    vertical-align: top;
-}
-
-#row-buttons td{
-    line-height: 25px;
-    vertical-align: bottom;
+.button {
+    width: 80%;
+    aspect-ratio: 1;
+    font-size: calc(0.6vh + 0.6vw);
+    justify-content: center;
+    align-items: center;
+    padding: 0 0 0 0;
 }
 
 /* edit buttons container to hold and position + and - buttons */
 .row-buttons-container{
-    height: 55px;
-    width: 25px;
+    height: 8vh;
+    width: 2vw;
     display: flex;
     flex-direction: column;
+    transform: translate(0, 2.5vh);
     justify-content: space-between;
-    transform: translate(0%, 32%);
+    align-items: center;
+    position: relative;
 }
 
 #first-row-button{
