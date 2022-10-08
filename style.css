@@ -160,6 +160,10 @@ h1 {
     text-align: center;
 }
 
+.input-content {
+    display: inline;
+}
+
 .button {
     width: 80%;
     aspect-ratio: 1;

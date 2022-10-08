@@ -44,12 +44,12 @@ class DataOperator {
         dataObj.data.splice(pos, 0, row);
         dataObj.rows++;
     }
-    
+
     removeDataRow(dataObj, n=1, pos){
         dataObj.data.splice(pos, 1);
         dataObj.rows--;
     }
-    
+
     createBinaryData(dim){
         let arr = new Array(2**dim).fill(new Array(dim).fill(0));
         for (let i=0; i<arr.length; i++){
@@ -65,11 +65,11 @@ class DataOperator {
         let table = tableObj.table;
         // skip header row and button column of table, start from 1
         for (var r = 1, n = table.rows.length; r < n; r++) {
-            for (var c = 1, m = table.rows[r].cells.length; c < m; c++) { 
+            for (var c = 1, m = table.rows[r].cells.length; c < m; c++) {
                 const cell = table.rows[r].cells[c];
                 const rawValue = cell.innerHTML;
                 const [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
-                display.highlighInvalidText(cell, isValid);
+                display.highlightInvalidText(cell, isValid);
                 dataObj.data[r-1][c-1] = parsedValue;
             }
         }
@@ -167,10 +167,10 @@ class Table {
 
     // create +/- buttons for adding rows to table
     createRowButtons(all=true, r=null){ // TODO: change function to operate on one row at a time
-        const content = '<div class="row-buttons-container">' + 
-                        '<button class="button" onclick="demo.removeRow(this)">–</button>' + 
-                        '<button class="button" onclick="demo.insertRow(this)">+</button>' + 
-                        '</div>';
+        const content = '<div class="row-buttons-container">' +
+            '<button class="button" onclick="demo.removeRow(this)">–</button>' +
+            '<button class="button" onclick="demo.insertRow(this)">+</button>' +
+            '</div>';
         if (!all){
             var cell = this.table.rows[r].insertCell(0);
             cell.innerHTML = content;
@@ -182,14 +182,14 @@ class Table {
                 var cell = this.table.rows[r].insertCell(0);
                 cell.innerHTML = content;
             }
-        }  
+        }
     }
 
     // insert row at given position and add editable attributes/ cells if reqd.
     insertTableRow(r){
         var newRow = this.table.insertRow(r);
         this.makeHoverable(newRow);
-        for (var c = 0; c < this.numCols; c++) { 
+        for (var c = 0; c < this.numCols; c++) {
             var cell = newRow.insertCell(c);
             cell.innerHTML = 0;
             if (this.isEditable){
@@ -201,7 +201,7 @@ class Table {
         }
         this.numRows++;
     }
-    
+
     removeTableRow(r){
         this.table.deleteRow(r);
         this.numRows--;
@@ -215,8 +215,8 @@ class Perceptron {
         this.inputData = dataObj.data;
         this.weights = weights;
         this.threshold = threshold;
-    }    
-    
+    }
+
     // simple float operations give precision problems (#6)
     correctPrecision(val){
         // do arbitrary large num multiplication since precision error occurs at consistent decimal place
@@ -237,7 +237,7 @@ class Perceptron {
             }
         }
     }
-    
+
     // compute activation column of output table
     computeActivnOutput(activation = "threshold"){
         this.activnOutput = new Array(this.dataObj.rows).fill(0);
@@ -249,7 +249,7 @@ class Perceptron {
             }
         }
     }
-    
+
     computeOutputs(){
         this.outputData = new Array(this.dataObj.rows).fill(0).map(() => new Array(this.dataObj.cols).fill(0));
         this.computeAffineOutput();
@@ -269,15 +269,15 @@ class Perceptron {
         for (let i=0; i<demo.weights.length; i++){
             const cell = document.getElementById(`w${i+1}`);
             const [parsedValue, isValid] = demo.stringToValidFloat(cell.innerHTML);
-            display.highlighInvalidText(cell, isValid);
+            display.highlightInvalidText(cell, isValid);
             this.weights[i] = parsedValue;
         }
     }
-    
+
     updateThreshold(){
         const cell = document.getElementById(`th${1}`);
         const [parsedValue, isValid] = demo.stringToValidFloat(cell.innerHTML);
-        display.highlighInvalidText(cell, isValid);
+        display.highlightInvalidText(cell, isValid);
         this.threshold = parsedValue;
     }
 }
@@ -286,7 +286,7 @@ class Display {
     constructor(inpObj=null, percepObj=null, outObj=null){
         this.hovering = false;
         this.initializeDisplay();
-        
+
     }
 
     initializeDisplay(){
@@ -304,7 +304,7 @@ class Display {
         // edit buttons hover functionality
         this.initializeButtonHover(inputTable);
     }
-    
+
     displayWeightFromData(wID, idx){
         var weight = document.getElementById(wID)
         weight.innerHTML = `${perceptron.weights[idx]}`;
@@ -315,7 +315,7 @@ class Display {
         let threshold = document.getElementById(thID);
         threshold.innerHTML = percepObj.threshold;
     }
-    
+
     // set display panel input
     displaySelectedInput(){
         // got rid of equation below neuron diagram
@@ -325,7 +325,7 @@ class Display {
             selections.rows[r].cells[0].innerHTML = demo.selectedInput[r];
         }
     }
-    
+
     // set display panel output
     displaySelectedOutput(){
         // replace variable names in selected output display with values on hover (#3)
@@ -335,7 +335,7 @@ class Display {
             cell.innerHTML = `${demo.selectedOutput[1]}`;
         }
     }
-    
+
     // respond to user hovering over table
     hoverInput(row, tblId, mode){
         const rowIdx = row.rowIndex || 0;
@@ -365,8 +365,34 @@ class Display {
         }
         this.displaySelectedInput();
         this.displaySelectedOutput();
+
+        //removes lines when not hovered
+        demo.lines.forEach(line => line.remove());
+        //empties lines array
+        demo.lines = []
+
+        const selections = document.getElementById("selected-inputs");
+        //demo.selectedInput = demo.inputData[rowIdx];
+        //demo.selectedOutput = perceptron.outputData[rowIdx];
+        for (var r=0; r<selections.rows.length; r++) {
+            if (this.hovering){
+                //console.log(selections.rows[r].cells[0].children);
+
+                selections.rows[r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</div>`;
+                console.log(demo.selectedInput[r])
+                //draws line
+                demo.lines[r] = new LeaderLine(
+                    LeaderLine.pointAnchor(inputRow.children[r+1], {x: '60%', y: '50%'}),
+                    LeaderLine.pointAnchor(selections.rows[r].cells[0], {x: '40%', y: '50%'}),
+                    {dash: {animation: true}}
+                );
+            }
+            else{
+                selections.rows[r].cells[0].innerHTML = `<div class="input-content">x<sub>${r+1}</sub></div>`;
+            }
+        }
     }
-    
+
     // update display panel
     updateDisplay(){
         this.displaySelectedInput();
@@ -374,7 +400,7 @@ class Display {
     }
 
     //highlight invalid inputs, reset as soon as they are valid (#6)
-    highlighInvalidText(cell, isValid){
+    highlightInvalidText(cell, isValid){
         if (!isValid){
             cell.style.backgroundColor = "pink";
         }
@@ -386,8 +412,8 @@ class Display {
     initializeButtonHover(tableObj){
         // hide all at initialization
         const buttons = document.getElementsByClassName("row-buttons-container");
-            buttons.forEach(element => {
-                element.style.display = "none";
+        buttons.forEach(element => {
+            element.style.display = "none";
         });
         // show when hovering over table
         tableObj.table.addEventListener("mouseenter", function(event){
@@ -413,7 +439,7 @@ class Demo {
     }
 
     // initial default values for demo
-    setDefaultValues() { 
+    setDefaultValues() {
         this.mode = "regular";
         this.numFeat = 2;
         this.numEg = 4;
@@ -429,6 +455,7 @@ class Demo {
         this.defaultSelectedOutput = ["activation", "y"];
         this.selectedInput = this.defaultSelectedInput;
         this.selectedOutput = this.defaultSelectedOutput;
+        this.lines = [];
     }
 
     // calculate row to insert at, from html button address
@@ -467,7 +494,7 @@ class Demo {
         console.log('mode set as', this.mode)
     }
 
-    // update entire demo 
+    // update entire demo
     update(){
         dataOp.updateDataFromTable(inputs, inputTable);
         perceptron.updateWeights();
