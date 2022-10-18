@@ -40,17 +40,17 @@ h1 {
     height: 100%;
 }
 
-#weight-1{
-    position: absolute;
-    top: 22%;
-    font-size: 2vw;
-}
+/*#weight-1{*/
+/*    position: absolute;*/
+/*    top: 22%;*/
+/*    font-size: 2vw;*/
+/*}*/
 
-#weight-2{
-    position: absolute;
-    top: 70%;
-    font-size: 2vw;
-}
+/*#weight-2{*/
+/*    position: absolute;*/
+/*    top: 70%;*/
+/*    font-size: 2vw;*/
+/*}*/
 
 #svg{
     position: absolute;
@@ -188,4 +188,15 @@ h1 {
 #first-row-button{
     position: absolute;
     bottom: 0;
+}
+
+.weights {
+    padding:0.5vw;
+    border: solid;
+    border-color: gray;
+    background-color: #f2f2f2;
+}
+
+.weight_label {
+    position: absolute;
 }
