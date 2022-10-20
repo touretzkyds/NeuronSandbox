@@ -458,13 +458,33 @@ class Display {
         demo.weight_lines = []
 
         //TODO: somehow add "percentages" so arrows will not point to same place
-        var diff = 0;
+
+        // var diff = 50/demo.selectedInput.length;
+        // var start = 20;
+
+        //let first = 20;
+        //let last = 70;
+        //let interval = (last - first) / (demo.selectedInput.length);
+        var percents = [];
+        let interval = 35/demo.selectedInput.length
+        var pre = -interval;
+        var start = 35;
+
+        if(demo.selectedInput.length == 2)
+            percents = [35, 65]
+        else {
+            for(let i = 0; i < demo.selectedInput.length; i++ ) {
+                percents.push(start);
+                start += interval;
+            }
+        }
+
         for(let i = 0; i < demo.selectedInput.length; i++)
         {
-            diff += 20
+
             demo.weight_lines[i] = new LeaderLine(
                 LeaderLine.pointAnchor(selections.rows[i].cells[0], {x: '110%', y: '50%'}),
-                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '-5%', y: '50%'})
+                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '-5%', y: percents[i]+'%'})
             );
             demo.weight_lines[i].path = 'straight';
         }
