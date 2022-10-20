@@ -4,33 +4,39 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Neuron Sandbox</title>
-        
+
         <link rel="stylesheet" href="style.css" />
         <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
         <script src="https://pixijs.download/release/pixi.js"></script>
         <script src="leader_line.min.js"></script>
+        <script src = "truth_table.js"></script>
 
         <div id="header">
             <h1>Neuron Sandbox</h1>
         </div>
-        
+
         <div id="all-containers">
             <div id = "input-container">
-                <table id="input-table" class="table">
-                    <tr>
-                        <td> <!-- edit button container -->
-                            <div class="row-buttons-container">
-                                <button class="button" id="first-row-button" onclick="demo.insertRow(this)">+</button>
-                            </div>
-                        </td>
-                        <th id="tblinput1">
-                            <div class="input-content">x<sub>1</sub></div>
-                        </th>
-                        <th id="tblinput2">
-                            <div class="input-content">x<sub>2</sub></div>
-                        </th>
-                    </tr>
-                </table>
+                <div class="rows">
+                    <!--<button id="generateTruthTable">Generate truth table</button>-->
+                </div>
+                <div class="rows">
+                    <table id="input-table" class="table">
+                        <tr>
+                            <td> <!-- edit button container -->
+                                <div class="row-buttons-container">
+                                    <button class="button" id="first-row-button" onclick="demo.insertRow(this)">+</button>
+                                </div>
+                            </td>
+                            <th id="tblinput1">
+                                <div class="input-content">x<sub>1</sub></div>
+                            </th>
+                            <th id="tblinput2">
+                                <div class="input-content">x<sub>2</sub></div>
+                            </th>
+                        </tr>
+                    </table>
+                </div>
             </div>
 
             <div id="network-container" class="center">
@@ -92,7 +98,7 @@
                     </table>
                 </div>
             </div>
-            
+
             <div id = "output-container">
                 <table id="output-table" class="table">
                     <tr>
@@ -102,11 +108,11 @@
                 </table>
             </div>
         </div>
-            
+
         <script src="neuronsandbox.js"></script>
 
     </head>
-    
+
     <body>
 
     </body>

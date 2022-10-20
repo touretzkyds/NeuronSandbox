@@ -123,6 +123,7 @@ class Table {
         this.numCols = dataObj.cols;
         this.rowButtons = null;
         this.initializeTable(dataObj, tblId);
+        //setupGenerateTruthTable();
     }
 
     // initialize table from data array
@@ -456,12 +457,16 @@ class Display {
         //empties lines array
         demo.weight_lines = []
 
+        //TODO: somehow add "percentages" so arrows will not point to same place
+        var diff = 0;
         for(let i = 0; i < demo.selectedInput.length; i++)
         {
+            diff += 20
             demo.weight_lines[i] = new LeaderLine(
                 LeaderLine.pointAnchor(selections.rows[i].cells[0], {x: '110%', y: '50%'}),
                 LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '-5%', y: '50%'})
             );
+            demo.weight_lines[i].path = 'straight';
         }
 
 
@@ -540,6 +545,7 @@ class Display {
                     LeaderLine.pointAnchor(selections.rows[r].cells[0], {x: '10%', y: '50%'}),
                     {dash: {animation: true}}
                 );
+                demo.lines[r].setOptions({startSocket: 'right', endSocket: 'left'});
             }
             else{
                 selections.rows[r].cells[0].innerHTML = `<div class="input-content">x<sub>${r+1}</sub></div>`;
@@ -633,6 +639,15 @@ class Demo {
         demo.update(); //TODO: check if efficient
     }
 
+    insertRowByIndex(r, needUpdate = false) {
+        inputTable.insertTableRow(r);
+        dataOp.insertDataRow(inputs, r-2);
+        outputTable.insertTableRow(r-1);
+        dataOp.insertDataRow(outputs, r-2);
+        if(needUpdate)
+            demo.update();
+    }
+
     // remove row at specific location on button click
     removeRow(button){
         const r = this.getRowLocation(button) - 1;
@@ -641,6 +656,16 @@ class Demo {
         outputTable.removeTableRow(r);
         dataOp.removeDataRow(outputs, r);
         demo.update(); //TODO: check if efficient
+    }
+
+    removeAllInputDataRows(needUpdate = true) {
+        for( let r = 0; r < inputTable.numRows; r++) {
+            inputTable.removeTableRow(r);
+            dataOp.removeDataRow(inputs, r);
+            outputTable.removeTableRow(r);
+            dataOp.removeDataRow(outputs, r);
+        }
+        if(needUpdate) demo.update();
     }
 
     insertWeightCol(n) {
@@ -690,7 +715,11 @@ class Demo {
     // remove row at specific location on button click
     removeCol(button){
         const c = this.getColLocation(button) - 1;
-        if(c < 1) return;
+        if(inputTable.numCols <= 1)
+        {
+            alert("Cannot remove all inputs!")
+            return;
+        }
         inputTable.removeTableCol(c);
         dataOp.removeDataCol(inputs, c);
         this.removeWeightCol(c);
