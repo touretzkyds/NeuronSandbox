@@ -140,7 +140,7 @@ class Table {
         for(var r=0; r<array.length; r++){
             var newRow = table.insertRow(table.length);
             // update displayed selections on hover
-            this.makeHoverable(newRow);
+            this.makeHoverable(newRow, tblId);
             for(var c=0; c<array[r].length; c++){
                 var cell = newRow.insertCell(c);
                 cell.innerHTML = array[r][c];
@@ -152,7 +152,7 @@ class Table {
         // on exiting table, display initial values again (#3)
         table.addEventListener("mouseleave", function(event){
             display.hovering = false;
-            display.hoverInput(this, "input-table", "exit");
+            display.hoverInput(this, tblId, "exit");
         });
         this.table = table;
         // add buttons if table is editable ie. input table
@@ -164,14 +164,14 @@ class Table {
     }
 
     // show table values hovered over in selection panel
-    makeHoverable(row){
+    makeHoverable(row, tblId){
         row.addEventListener("mouseenter", function(event){
             display.hovering = true;
-            display.hoverInput(this, "input-table", "enter");
+            display.hoverInput(this, tblId, "enter");
         });
         row.addEventListener("mouseleave", function(event){
             display.hovering = false;
-            display.hoverInput(this, "input-table", "exit");
+            display.hoverInput(this, tblId, "exit");
         });
     }
 
@@ -215,7 +215,7 @@ class Table {
         if(all)
         {
             newRow = this.table.insertRow(0);
-            this.makeHoverable(newRow);
+            this.makeHoverable(newRow, "input-table");
             newRow.insertCell(0);
         }
 
@@ -239,7 +239,7 @@ class Table {
     insertTableRow(r){
         console.log("insertTableRow, trying to add new row at row=" + r);
         var newRow = this.table.insertRow(r);
-        this.makeHoverable(newRow);
+        this.makeHoverable(newRow, "input-table");
         for (var c = 0; c < this.numCols; c++) {
             var cell = newRow.insertCell(c);
             cell.innerHTML = 0;
@@ -253,23 +253,45 @@ class Table {
         this.numRows++;
     }
 
+    findAvailableVariable()
+    {
+        let i = 1;
+        const headerCells = document.getElementById("input-table").rows[1].cells;
+        for(; i < 1024; i++) {
+            let found = false;
+            for (let c = 1; c < headerCells.length; c++) {
+                var headerInput = headerCells[c];
+                if (headerInput.id === ("tblinput" + i))
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if(!found)
+                return i;
+        }
+        return -1;
+    }
+
     insertTableCol(c){
+        let newCol = this.findAvailableVariable();
+        if(newCol < 0 )
+            return;
         var th = document.createElement('th'); //column
-        th.innerHTML = "<div class=\"input-content\">" + "x<sub>" + (this.numCols + 1) + "</sub>" + "</div>";
-        th.setAttribute("id", `tblinput${this.numCols + 1}`);
+        th.innerHTML = "<div class=\"input-content\">" + "x<sub>" + newCol + "</sub>" + "</div>";
+        th.setAttribute("id", `tblinput${newCol}`);
 
         // <div class="input-content">x<sub>2</sub></div>
-        this.table.rows[1].appendChild(th);
-
+        //this.table.rows[1].appendChild(th);
+        this.table.rows[1].insertBefore(th, this.table.rows[1].children[c-1]);
 
         //add new variable to the header row
         //var cellHeader = this.table.rows[1].insertCell(this.numCols + 1);
         //cellHeader.innerHTML = "x<sub>" + (this.numCols + 1) + "</sub>";
         //cellHeader.setAttribute("id", `tblinput${this.numCols + 1}`);
-        //TODO row headers dark blue
 
         for (var r = 0; r < this.numRows; r++) { //skip column buttons + row headers
-            var cell = this.table.rows[r+2].insertCell(c);
+            var cell = this.table.rows[r+2].insertCell(c-1);
             cell.innerHTML = 0;
             if (this.isEditable){
                 dataOp.makeEditable(cell);
@@ -279,10 +301,7 @@ class Table {
         this.numCols++;
 
         let cols = []
-        for(let i = 0; i < this.numCols; i++)
-        {
-            cols.push(`x<sub>${i+1}</sub>`);
-        }
+        display.getHeaderRowVals(cols);
         this.defaultSelectedInput = cols;
     }
 
@@ -295,10 +314,7 @@ class Table {
         }
         this.numCols--;
         let cols = []
-        for(let i = 0; i < this.numCols; i++)
-        {
-            cols.push(`x<sub>${i+1}</sub>`);
-        }
+        display.getHeaderRowVals(cols);
         this.defaultSelectedInput = cols;
     }
 
@@ -442,6 +458,7 @@ class Display {
 
     updateSelectedInput()
     {
+        console.log("selected input: " + demo.selectedInput)
         if(!demo.selectedInput)
             return;
         let selections = document.getElementById("selected-inputs");
@@ -457,14 +474,6 @@ class Display {
         //empties lines array
         demo.weight_lines = []
 
-        //TODO: somehow add "percentages" so arrows will not point to same place
-
-        // var diff = 50/demo.selectedInput.length;
-        // var start = 20;
-
-        //let first = 20;
-        //let last = 70;
-        //let interval = (last - first) / (demo.selectedInput.length);
         var percents = [];
         let interval = 35/demo.selectedInput.length
         var pre = -interval;
@@ -472,12 +481,15 @@ class Display {
 
         if(demo.selectedInput.length == 2)
             percents = [35, 65]
+        else if(demo.selectedInput.length == 1)
+            percents = [50]
         else {
             for(let i = 0; i < demo.selectedInput.length; i++ ) {
                 percents.push(start);
                 start += interval;
             }
         }
+
 
         for(let i = 0; i < demo.selectedInput.length; i++)
         {
@@ -504,42 +516,38 @@ class Display {
         }
     }
 
+    isInputTable(tblId) {
+        return tblId === "input-table";
+    }
     // respond to user hovering over table
     hoverInput(row, tblId, mode){
-        const rowIdx = row.rowIndex || 0;
-        console.log("hoverInput row=" + rowIdx);
+        let rowIdx = row.rowIndex || 0;
+        if(!this.isInputTable(tblId)) //output table, convert to corresponding input row index
+            rowIdx += 1;
+        console.log(`hoverInput tblId=${tblId },input row=${rowIdx}, mode=${mode}`);
+        if(rowIdx < 2) //headers, or leave
+        {
+            this.handleHoverExit();
+            return;
+        }
+
         const inputRow = document.querySelector(`#input-table > tbody > tr:nth-child(${rowIdx+1})`)
-        let outputRowIndex = (rowIdx <= 0) ? 1 : rowIdx;
-        const outputRow = document.querySelector(`#output-table > tbody > tr:nth-child(${outputRowIndex})`)
+        //let outputRowIndex = (rowIdx <= 0) ? 1 : rowIdx;
+        let outputRowIndex = rowIdx - 1;
+        const outputRow = document.querySelector(`#output-table > tbody > tr:nth-child(${outputRowIndex + 1})`)
         if (mode === "enter"){
             // update the active inputs and outputs to display in perceptron diagram
             demo.selectedInput = inputs.data[rowIdx-2];
             demo.selectedOutput = outputs.data[rowIdx-2];
-            //console.log("enter: set demo.selectedInput =" + demo.selectedInput);
-            //console.log("enter: set demo.selectedOutput =" + demo.selectedOutput);
+            console.log("enter: set demo.selectedInput =" + demo.selectedInput);
+            console.log("enter: set demo.selectedOutput =" + demo.selectedOutput);
             // highlight input and output rows corresponding to the hovered input row
             inputRow.style.background = "lightblue";
             outputRow.style.background = "lightblue";
             //console.log("enter: set outputRow =" + outputRow);
         }
         else {
-            // reset display panel inputs to user-defined inputs (#11)
-            const headerCells = document.getElementById(tblId).rows[1].cells;
-            var headerRowVals = [];
-            for (var c=1; c<headerCells.length; c++){
-                headerRowVals.push(document.getElementById(`tblinput${c}`).innerHTML);
-            }
-
-            // reset displayed input to header row values
-            demo.selectedInput = headerRowVals;
-            // reset displayed output to default
-            demo.selectedOutput = demo.defaultSelectedOutput;
-            //console.log("exit: set demo.selectedInput =" + demo.selectedInput);
-            //console.log("exit: set demo.selectedOutput =" + demo.selectedOutput);
-
-            //console.log("exit: set outputRow =" + outputRow);
-            inputRow.style.background = "none";
-            outputRow.style.background = "none";
+            this.handleHoverExit(inputRow, outputRow);
         }
         //this.displaySelectedInput();
         this.updateSelectedInput();
@@ -568,12 +576,45 @@ class Display {
                 demo.lines[r].setOptions({startSocket: 'right', endSocket: 'left'});
             }
             else{
-                selections.rows[r].cells[0].innerHTML = `<div class="input-content">x<sub>${r+1}</sub></div>`;
+                selections.rows[r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</sub></div>`;
             }
         }
     }
 
-    // update display panel
+    handleHoverExit(inputRow, outputRow) {
+        // reset display panel inputs to user-defined inputs (#11)
+        var headerRowVals = [];
+        this.getHeaderRowVals(headerRowVals);
+
+        // reset displayed input to header row values
+        demo.selectedInput = headerRowVals;
+        // reset displayed output to default
+        demo.selectedOutput = demo.defaultSelectedOutput;
+        //console.log("exit: set demo.selectedInput =" + demo.selectedInput);
+        //console.log("exit: set demo.selectedOutput =" + demo.selectedOutput);
+
+        //console.log("exit: set outputRow =" + outputRow);
+        if(inputRow)
+            inputRow.style.background = "none";
+        if(outputRow)
+            outputRow.style.background = "none";
+        this.updateSelectedInput();
+    }
+
+    getHeaderRowVals(headerRowVals) {
+        const headerCells = document.getElementById("input-table").rows[1].cells;
+        for (var c = 1; c < headerCells.length; c++) {
+            //var headerInput = document.getElementById(`tblinput${c}`);
+            var headerInput = headerCells[c];
+            //var headerInput = document.querySelector(`#input-table> tbody > tr:nth-child(${2}) > td:nth-child(${c} > div:nth-child(${1}))`);
+            if (headerInput.id.startsWith("tblinput"))
+                headerRowVals.push(headerInput.children[0].innerHTML);
+            else
+                console.log("missing input")
+        }
+    }
+
+// update display panel
     updateDisplay(){
         //this.displaySelectedInput();
         this.updateSelectedInput();
@@ -673,7 +714,7 @@ class Demo {
         const r = this.getRowLocation(button) - 1;
         inputTable.removeTableRow(r);
         dataOp.removeDataRow(inputs, r);
-        outputTable.removeTableRow(r);
+        outputTable.removeTableRow(r-1);
         dataOp.removeDataRow(outputs, r);
         demo.update(); //TODO: check if efficient
     }
@@ -690,12 +731,12 @@ class Demo {
 
     insertWeightCol(n) {
         let parentElement = document.getElementById("input-link-text");
-        demo.weights.splice(n, 0, 0); //add a weight
+        demo.weights.splice(n-1, 0, 0); //add a weight
         var wDiv = document.createElement('div');
         wDiv.id = `weight-${n+1}`;
         wDiv.className = "weight_label";
         wDiv.innerHTML = `<text fill="black" class="weights">w<sub>${n+1}</sub> =</text> <text contenteditable="true" id="w${n+1}" fill="black" class="weights">0</text>`;
-        parentElement.insertBefore(wDiv, parentElement.children[n+1]);
+        parentElement.insertBefore(wDiv, parentElement.children[n-1]);
         const weightText = document.getElementById(`w${n+1}`);
         dataOp.makeEditable(weightText);
         this.updateWeightUI(parentElement);
@@ -710,16 +751,16 @@ class Demo {
             let child = parentElement.children[i];
             let top = Math.floor(first + i * interval);
             child.style = "top:" + top + "%;";
-            child.innerHTML = `<text fill="black" class="weights">w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" fill="black" class="weights">${demo.weights[i]}</text>`;
+            child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" fill="black" class="weights">${demo.weights[i]}</text>`;
         }
     }
 
     removeWeightCol(n) {
         demo.weights.splice(n, 1);
         let parentElement = document.getElementById("input-link-text");
-        let child = document.getElementById(`weight-${n+1}`);
-        if(child)
-            parentElement.removeChild(child);
+        //let child = document.getElementById(`weight-${n+1}`);
+        let child = parentElement.children[n];
+        parentElement.removeChild(child);
         this.updateWeightUI(parentElement);
     }
     // add new row at specific location on button click
@@ -728,6 +769,7 @@ class Demo {
         inputTable.insertTableCol(c+1);
         dataOp.insertDataCol(inputs, c);
         this.insertWeightCol(c);
+        display.handleHoverExit();
         demo.update(); //TODO: check if efficient
     }
 
@@ -743,6 +785,7 @@ class Demo {
         inputTable.removeTableCol(c);
         dataOp.removeDataCol(inputs, c);
         this.removeWeightCol(c);
+        display.handleHoverExit();
         demo.update(); //TODO: check if efficient
     }
 
