@@ -6,8 +6,11 @@
         <title>Neuron Sandbox</title>
 
         <link rel="stylesheet" href="style.css" />
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
         <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
         <script src="https://pixijs.download/release/pixi.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
         <script src="leader_line.min.js"></script>
         <script src = "truth_table.js"></script>
 
@@ -16,9 +19,9 @@
         </div>
 
         <div id="all-containers">
-            <div id = "input-container">
+            <div id = "input-container" class="cols">
                 <div class="rows">
-                    <!--<button id="generateTruthTable">Generate truth table</button>-->
+                    <button class="custom-btn myButton" id="generateTruthTable">Generate truth table</button>
                 </div>
                 <div class="rows">
                     <table id="input-table" class="table">
@@ -69,11 +72,11 @@
                     <div id="input-link-text" class="center">
                         <div id="weight-1" class="weight_label" style="top:22%;">
                             <text fill="black">w<sub>1</sub> =</text>
-                            <text contenteditable="true" id="w1" fill="black" class="weights"></text>
+                            <text contenteditable="true" id="w1" fill="black" class="weights" onkeypress="if (keyCode == 13) return false;"></text>
                         </div>
                         <div id="weight-2" class="weight_label" style="top:70%;">
                             <text fill="black">w<sub>2</sub> =</text>
-                            <text contenteditable="true" id="w2" fill="black" class="weights"></text>
+                            <text contenteditable="true" id="w2" fill="black" class="weights" onkeypress="if (keyCode == 13) return false;"></text>
                         </div>
                     </div>
                 </div>

@@ -68,13 +68,18 @@ class DataOperator {
     }
 
     createBinaryData(dim){
-        let arr = new Array(2**dim).fill(new Array(dim).fill(0));
-        for (let i=0; i<arr.length; i++){
-            const binaryString = i.toString(2);
-            for (let j=binaryString.length-1; j>=0; j--){
-                arr[i][binaryString.length-j-1] = Number(binaryString[binaryString.length-j-1]);
+        var arr = [];
+        for (let i=0; i<2**dim; i++){
+            arr[i] = [];
+            let binaryString = i.toString(2);
+            while(binaryString.length < dim) {
+                binaryString = "0" + binaryString;
+            }
+            for( let j = 0; j < binaryString.length; j++ ) {
+                arr[i][j] = Number(binaryString.substring(j, j+1));
             }
         }
+        return arr;
     }
 
     // update data from table when user changes entry
@@ -232,6 +237,12 @@ class Table {
                 let cell = this.table.rows[0].insertCell(j);
                 cell.innerHTML = content;
             }
+            //add the additional last column
+            let cell = this.table.rows[0].insertCell(this.numCols+1);
+            cell.innerHTML = '<div class="row-buttons-container">' +
+                '<button class="button" onclick="demo.insertCol(this)">+</button>' +
+                '</div>';
+
         }
     }
 
@@ -386,6 +397,7 @@ class Perceptron {
             const cell = document.getElementById(`w${i+1}`);
             if(cell)
             {
+                dataOp.makeEditable(cell);
                 const [parsedValue, isValid] = demo.stringToValidFloat(cell.innerHTML);
                 display.highlightInvalidText(cell, isValid);
                 this.weights[i] = parsedValue;
@@ -425,6 +437,10 @@ class Display {
         this.displaySelectedOutput();
         // edit buttons hover functionality
         this.initializeButtonHover(inputTable);
+        $( ".weight_label" ).draggable();
+        $( ".weight" ).draggable();
+        $( ".draggable" ).draggable();
+        setupGenerateTruthTable();
     }
 
     displayWeightFromData(wID, idx){
@@ -432,7 +448,7 @@ class Display {
         if(!weight) {
             var wDiv = document.createElement('div');
             wDiv.id = `weight-${idx+1}`;
-            wDiv.innerHTML = `<text fill="black" class="weights">w<sub>${idx+1}</sub> =</text> <text contenteditable="true" id="w${idx+1}" fill="black" class="weights"></text>`;
+            wDiv.innerHTML = `<text fill="black" class="weights">w<sub>${idx+1}</sub> =</text> <text contenteditable="true" onkeypress="if (keyCode == 13) return false;" id="w${idx+1}" fill="black" class="weights"></text>`;
             document.getElementById("input-link-text").appendChild(wDiv);
             weight = document.getElementById(wID);
         }
@@ -467,7 +483,7 @@ class Display {
         {
             let newRow = selections.insertRow(i);
             let newCell = newRow.insertCell(0);
-            newCell.innerHTML = `<div class=\"input-content\">${demo.selectedInput[i]}</div>`;
+            newCell.innerHTML = `<div class=\"input-content draggable\">${demo.selectedInput[i]}</div>`;
         }
         //removes lines when not hovered
         demo.weight_lines.forEach(line => line.remove());
@@ -500,8 +516,9 @@ class Display {
             );
             demo.weight_lines[i].path = 'straight';
         }
-
-
+        $(".draggable").draggable();
+        $( ".weight_label" ).draggable();
+        $( ".weight" ).draggable();
     }
 
     // set display panel output
@@ -565,7 +582,7 @@ class Display {
             if (this.hovering){
                 //console.log(selections.rows[r].cells[0].children);
 
-                selections.rows[r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</div>`;
+                selections.rows[r].cells[0].innerHTML = `<div class="input-content draggable">${demo.selectedInput[r]}</div>`;
                 console.log(demo.selectedInput[r])
                 //draws line
                 demo.lines[r] = new LeaderLine(
@@ -576,7 +593,7 @@ class Display {
                 demo.lines[r].setOptions({startSocket: 'right', endSocket: 'left'});
             }
             else{
-                selections.rows[r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</sub></div>`;
+                selections.rows[r].cells[0].innerHTML = `<div class="input-content draggable">${demo.selectedInput[r]}</sub></div>`;
             }
         }
     }
@@ -608,7 +625,13 @@ class Display {
             var headerInput = headerCells[c];
             //var headerInput = document.querySelector(`#input-table> tbody > tr:nth-child(${2}) > td:nth-child(${c} > div:nth-child(${1}))`);
             if (headerInput.id.startsWith("tblinput"))
-                headerRowVals.push(headerInput.children[0].innerHTML);
+                if(headerInput.children[0]) {
+                    headerRowVals.push(headerInput.children[0].innerHTML);
+                }
+                else
+                {
+                    headerRowVals.push(headerInput.innerHTML);
+                }
             else
                 console.log("missing input")
         }
@@ -700,7 +723,7 @@ class Demo {
         demo.update(); //TODO: check if efficient
     }
 
-    insertRowByIndex(r, needUpdate = false) {
+    insertRowAtIndex(r, needUpdate = false) {
         inputTable.insertTableRow(r);
         dataOp.insertDataRow(inputs, r-2);
         outputTable.insertTableRow(r-1);
@@ -720,11 +743,11 @@ class Demo {
     }
 
     removeAllInputDataRows(needUpdate = true) {
-        for( let r = 0; r < inputTable.numRows; r++) {
-            inputTable.removeTableRow(r);
-            dataOp.removeDataRow(inputs, r);
-            outputTable.removeTableRow(r);
-            dataOp.removeDataRow(outputs, r);
+        while( inputTable.numRows > 0) {
+            inputTable.removeTableRow(2);
+            dataOp.removeDataRow(inputs, 0);
+            outputTable.removeTableRow(1);
+            dataOp.removeDataRow(outputs, 0);
         }
         if(needUpdate) demo.update();
     }
@@ -735,7 +758,7 @@ class Demo {
         var wDiv = document.createElement('div');
         wDiv.id = `weight-${n+1}`;
         wDiv.className = "weight_label";
-        wDiv.innerHTML = `<text fill="black" class="weights">w<sub>${n+1}</sub> =</text> <text contenteditable="true" id="w${n+1}" fill="black" class="weights">0</text>`;
+        wDiv.innerHTML = `<text fill="black" class="weights">w<sub>${n+1}</sub> =</text> <text contenteditable="true" onkeypress="if (keyCode == 13) return false;" id="w${n+1}" fill="black" class="weights">0</text>`;
         parentElement.insertBefore(wDiv, parentElement.children[n-1]);
         const weightText = document.getElementById(`w${n+1}`);
         dataOp.makeEditable(weightText);
@@ -751,7 +774,7 @@ class Demo {
             let child = parentElement.children[i];
             let top = Math.floor(first + i * interval);
             child.style = "top:" + top + "%;";
-            child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" fill="black" class="weights">${demo.weights[i]}</text>`;
+            child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>`;
         }
     }
 
