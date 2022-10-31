@@ -106,7 +106,7 @@ class DataOperator {
         textbox.contentEditable = true;
         // add event listener to update demo with table changes
         textbox.addEventListener("focusout", function(event){
-            demo.update();
+            demo.update(this);
         });
         // accept enter and esc keypress in text boxes
         textbox.addEventListener("keydown", function(event){
@@ -128,7 +128,6 @@ class Table {
         this.numCols = dataObj.cols;
         this.rowButtons = null;
         this.initializeTable(dataObj, tblId);
-        //setupGenerateTruthTable();
     }
 
     // initialize table from data array
@@ -212,9 +211,10 @@ class Table {
     }
 
     createColumnButtons(all=true, c=null){ // TODO: change function to operate on one col at a time
-        const content = '<div class="row-buttons-container">' +
-            '<button class="button" onclick="demo.removeCol(this)">–</button>' +
-            '<button class="button" onclick="demo.insertCol(this)">+</button>' +
+        const content = '<div class="column-buttons-container" >' +
+            '<button class="invisible-button button">–</button>' +
+            '<button class="row-button button" onclick="demo.removeCol(this)">–</button>' +
+            '<button class="row-button button" onclick="demo.insertCol(this)">+</button>' +
             '</div>';
         var newRow = this.table.rows[0];
         if(all)
@@ -237,12 +237,11 @@ class Table {
                 let cell = this.table.rows[0].insertCell(j);
                 cell.innerHTML = content;
             }
-            //add the additional last column
-            let cell = this.table.rows[0].insertCell(this.numCols+1);
-            cell.innerHTML = '<div class="row-buttons-container">' +
-                '<button class="button" onclick="demo.insertCol(this)">+</button>' +
+            //add the additional first column
+            let cell = this.table.rows[0].cells[0];
+            cell.innerHTML = '<div class="column-buttons-container" id="first-column-button-container">' +
+                '<button class="row-button" id="first-col-button" onclick="demo.insertCol(this)">+</button>' +
                 '</div>';
-
         }
     }
 
@@ -250,10 +249,11 @@ class Table {
     insertTableRow(r){
         console.log("insertTableRow, trying to add new row at row=" + r);
         var newRow = this.table.insertRow(r);
-        this.makeHoverable(newRow, "input-table");
+        this.makeHoverable(newRow, this.tblId);
         for (var c = 0; c < this.numCols; c++) {
             var cell = newRow.insertCell(c);
             cell.innerHTML = 0;
+            cell.className = "animation";
             if (this.isEditable){
                 dataOp.makeEditable(cell);
             }
@@ -262,6 +262,11 @@ class Table {
             this.createRowButtons(false, r);
         }
         this.numRows++;
+        //animation
+        $(".animation").each(function () {
+            $(this).css('animation-delay',0.2 +'s');
+            $(this).className="";
+        });
     }
 
     findAvailableVariable()
@@ -291,10 +296,11 @@ class Table {
         var th = document.createElement('th'); //column
         th.innerHTML = "<div class=\"input-content\">" + "x<sub>" + newCol + "</sub>" + "</div>";
         th.setAttribute("id", `tblinput${newCol}`);
+        dataOp.makeEditable(th);
 
         // <div class="input-content">x<sub>2</sub></div>
         //this.table.rows[1].appendChild(th);
-        this.table.rows[1].insertBefore(th, this.table.rows[1].children[c-1]);
+        this.table.rows[1].insertBefore(th, this.table.rows[1].children[c]);
 
         //add new variable to the header row
         //var cellHeader = this.table.rows[1].insertCell(this.numCols + 1);
@@ -302,14 +308,22 @@ class Table {
         //cellHeader.setAttribute("id", `tblinput${this.numCols + 1}`);
 
         for (var r = 0; r < this.numRows; r++) { //skip column buttons + row headers
-            var cell = this.table.rows[r+2].insertCell(c-1);
+            var cell = this.table.rows[r+2].insertCell(c);
             cell.innerHTML = 0;
+            cell.className = "animation";
             if (this.isEditable){
                 dataOp.makeEditable(cell);
             }
         }
         this.createColumnButtons(false, this.numCols + 1);
+        //this.createColumnButtons(false, 0);
         this.numCols++;
+
+        //animation
+        $(".animation").each(function () {
+            $(this).css('animation-delay',0.2 +'s');
+            $(this).className="";
+        });
 
         let cols = []
         display.getHeaderRowVals(cols);
@@ -483,7 +497,7 @@ class Display {
         {
             let newRow = selections.insertRow(i);
             let newCell = newRow.insertCell(0);
-            newCell.innerHTML = `<div class=\"input-content draggable\">${demo.selectedInput[i]}</div>`;
+            newCell.innerHTML = `<div class=\"input-content\">${demo.selectedInput[i]}</div>`;
         }
         //removes lines when not hovered
         demo.weight_lines.forEach(line => line.remove());
@@ -509,11 +523,11 @@ class Display {
 
         for(let i = 0; i < demo.selectedInput.length; i++)
         {
-
             demo.weight_lines[i] = new LeaderLine(
                 LeaderLine.pointAnchor(selections.rows[i].cells[0], {x: '110%', y: '50%'}),
                 LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '-5%', y: percents[i]+'%'})
             );
+            demo.weight_lines[i].color = 'black';
             demo.weight_lines[i].path = 'straight';
         }
         $(".draggable").draggable();
@@ -582,7 +596,7 @@ class Display {
             if (this.hovering){
                 //console.log(selections.rows[r].cells[0].children);
 
-                selections.rows[r].cells[0].innerHTML = `<div class="input-content draggable">${demo.selectedInput[r]}</div>`;
+                selections.rows[r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</div>`;
                 console.log(demo.selectedInput[r])
                 //draws line
                 demo.lines[r] = new LeaderLine(
@@ -593,7 +607,7 @@ class Display {
                 demo.lines[r].setOptions({startSocket: 'right', endSocket: 'left'});
             }
             else{
-                selections.rows[r].cells[0].innerHTML = `<div class="input-content draggable">${demo.selectedInput[r]}</sub></div>`;
+                selections.rows[r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</div>`;
             }
         }
     }
@@ -656,23 +670,37 @@ class Display {
 
     initializeButtonHover(tableObj){
         // hide all at initialization
-        const buttons = document.getElementsByClassName("row-buttons-container");
-        buttons.forEach(element => {
+        const buttonRows = document.getElementsByClassName("row-buttons-container");
+        buttonRows.forEach(element => {
+            element.style.display = "none";
+        });
+        const buttonColumns = document.getElementsByClassName("column-buttons-container");
+        buttonColumns.forEach(element => {
             element.style.display = "none";
         });
         // show when hovering over table
         tableObj.table.addEventListener("mouseenter", function(event){
-            const buttons = document.getElementsByClassName("row-buttons-container");
-            buttons.forEach(element => {
+            const buttonRows = document.getElementsByClassName("row-buttons-container");
+            buttonRows.forEach(element => {
                 element.style.display = "flex";
             });
+            const buttonColumns = document.getElementsByClassName("column-buttons-container");
+            buttonColumns.forEach(element => {
+                element.style.display = "flex";
+            });
+            display.updateDisplay();
         });
         // hide when hover out
         tableObj.table.addEventListener("mouseleave", function(event){
-            const buttons = document.getElementsByClassName("row-buttons-container");
-            buttons.forEach(element => {
+            const buttonRows = document.getElementsByClassName("row-buttons-container");
+            buttonRows.forEach(element => {
                 element.style.display = "none";
             });
+            const buttonColumns = document.getElementsByClassName("column-buttons-container");
+            buttonColumns.forEach(element => {
+                element.style.display = "none";
+            });
+            display.updateDisplay();
         });
     }
 }
@@ -788,6 +816,10 @@ class Demo {
     }
     // add new row at specific location on button click
     insertCol(button){
+        if(inputTable.numCols >= 8) {
+            alert("Cannot have more than 8 inputs!")
+            return;
+        }
         const c = this.getColLocation(button);
         inputTable.insertTableCol(c+1);
         dataOp.insertDataCol(inputs, c);
@@ -824,7 +856,14 @@ class Demo {
     }
 
     // update entire demo
-    update(){
+    update(sender = undefined){
+        if(sender && sender.tagName === 'TH') //header changed
+        {
+            //update selected input so it update immediately
+            var headerRowVals = [];
+            display.getHeaderRowVals(headerRowVals);
+            demo.selectedInput = headerRowVals;
+        }
         dataOp.updateDataFromTable(inputs, inputTable);
         perceptron.updateWeights();
         perceptron.updateThreshold();

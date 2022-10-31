@@ -176,8 +176,11 @@ h1 {
 #input-table td:first-child{
     padding: 0 0 0 0;
     width: 2vw;
+    height: 2vh;
     background-color: white;
     min-width: 2vw;
+    max-width: 4vw;
+    min-height: 2vh;
     justify-content: center;
     align-items: center;
 }
@@ -207,7 +210,15 @@ h1 {
     padding: 0 0 0 0;
 }
 
-/* edit buttons container to hold and position + and - buttons */
+.row-button {
+    width: 20%;
+}
+
+.invisible-button {
+    width: 0%;
+    visibility: hidden;
+}
+    /* edit buttons container to hold and position + and - buttons */
 .row-buttons-container{
     height: 8vh;
     width: 2vw;
@@ -219,18 +230,68 @@ h1 {
     position: relative;
 }
 
+.column-buttons-container{
+    height: 4vh;
+    width: 8vw;
+    display: flex;
+    flex-direction: row;
+    transform: translate(1.0vw, 0);
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    /*background-color: lightblue;*/
+}
+
+#first-column-button-container {
+    width: 4vw;
+}
+
+
 #first-row-button{
+    width: 80%;
     position: absolute;
     bottom: 0;
+}
+
+#first-col-button{
+    position: absolute;
+    width: 40%;
+    right: 0;
 }
 
 .weights {
     padding:0.5vw;
     border: solid;
     border-color: gray;
+    font-size: 2vw;
     background-color: #f2f2f2;
 }
 
 .weight_label {
+    font-size: 2vw;
     position: absolute;
+}
+
+.animation{
+    opacity: 0;
+    animation-name: fadeIn;
+    animation-duration: 3s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0.2;
+        border: 0.2vw solid red;
+    }
+
+    to {
+        opacity: 1;
+        border: 0.05vw solid #ddd;
+    }
+}
+
+.red-border {
+    border: 2px solid red;
 }
