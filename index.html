@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Neuron Sandbox</title>
 
+        <link rel="stylesheet" href="slider.css" />
         <link rel="stylesheet" href="style.css" />
         <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
         <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
@@ -20,9 +21,23 @@
 
         <div id="all-containers">
             <div id = "input-container" class="cols">
-                <div class="rows">
-                    <button class="custom-btn myButton" id="generateTruthTable">Generate truth table</button>
-                </div>
+                <div class = "rows"></div>
+                <table>
+                    <tr>
+                        <th> <button class="custom-btn myButton" id="generateTruthTable">Generate truth table</button></th>
+                        <!--<th> <button class="custom-btn myButton" id="editButton">Edit</button></th>-->
+                        <th>
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider round"></span>
+                        </label>
+                        </th>
+                    </tr>
+                </table>
+<!--                <div class="rows">-->
+<!--                    <button class="custom-btn myButton" id="generateTruthTable">Generate truth table</button>-->
+<!--                    <button class="custom-btn myButton" id="editButton">Edit</button>-->
+<!--                </div>-->
                 <div class="rows">
                     <table id="input-table" class="table">
                         <tr>
@@ -102,7 +117,7 @@
                 </div>
             </div>
 
-            <div id = "output-container">
+            <div style = "margin-top: 100px" id = "output-container">
                 <table id="output-table" class="table">
                     <tr>
                         <th>activation</sub></th>

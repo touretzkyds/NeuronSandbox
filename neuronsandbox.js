@@ -455,6 +455,7 @@ class Display {
         $( ".weight" ).draggable();
         $( ".draggable" ).draggable();
         setupGenerateTruthTable();
+        document.getElementById("generateTruthTable").disabled = true;
     }
 
     displayWeightFromData(wID, idx){
@@ -679,7 +680,7 @@ class Display {
             element.style.display = "none";
         });
         // show when hovering over table
-        tableObj.table.addEventListener("mouseenter", function(event){
+      /*  tableObj.table.addEventListener("mouseenter", function(event){
             const buttonRows = document.getElementsByClassName("row-buttons-container");
             buttonRows.forEach(element => {
                 element.style.display = "flex";
@@ -689,17 +690,17 @@ class Display {
                 element.style.display = "flex";
             });
             display.updateDisplay();
-        });
+        });*/
         // hide when hover out
         tableObj.table.addEventListener("mouseleave", function(event){
-            const buttonRows = document.getElementsByClassName("row-buttons-container");
+           /* const buttonRows = document.getElementsByClassName("row-buttons-container");
             buttonRows.forEach(element => {
                 element.style.display = "none";
             });
             const buttonColumns = document.getElementsByClassName("column-buttons-container");
             buttonColumns.forEach(element => {
                 element.style.display = "none";
-            });
+            });*/
             display.updateDisplay();
         });
     }
@@ -890,6 +891,8 @@ class Demo {
 
 window.onload = function(){
     console.log("window loaded")
+    $("#input-table tr:first").hide();
+    $("#input-table tr td:nth-child(1)").hide();
 }
 
 // initialize all classes
@@ -907,4 +910,33 @@ const display = new Display();
 
 document.addEventListener("DOMContentLoaded", () => {
     demo.main().catch(e => console.error(e));
+});
+
+$(':checkbox').change(function() {
+    if (!this.checked) {
+        $("#input-table tr:first").hide();
+        $("#input-table tr td:nth-child(1)").hide();
+        const buttonRows = document.getElementsByClassName("row-buttons-container");
+        buttonRows.forEach(element => {
+            element.style.display = "none";
+        });
+        const buttonColumns = document.getElementsByClassName("column-buttons-container");
+        buttonColumns.forEach(element => {
+            element.style.display = "none";
+        });
+        document.getElementById("generateTruthTable").disabled = true;
+    } else {
+        $("#input-table tr:first").show();
+        $("#input-table tr td:nth-child(1)").show();
+        const buttonRows = document.getElementsByClassName("row-buttons-container");
+        buttonRows.forEach(element => {
+            element.style.display = "flex";
+        });
+        const buttonColumns = document.getElementsByClassName("column-buttons-container");
+        buttonColumns.forEach(element => {
+            element.style.display = "flex";
+        });
+        document.getElementById("generateTruthTable").disabled = false;
+
+    }
 });
