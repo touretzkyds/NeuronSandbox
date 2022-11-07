@@ -27,9 +27,11 @@
                         <th> <button class="custom-btn myButton" id="generateTruthTable">Generate truth table</button></th>
                         <!--<th> <button class="custom-btn myButton" id="editButton">Edit</button></th>-->
                         <th>
-                        <label class="switch">
-                            <input type="checkbox">
+                        <label class="switch tooltip">
+                            <input type="checkbox" id="InputToggle">
                             <span class="slider round"></span>
+                            <span class="tooltiptext">edit mode</span>
+
                         </label>
                         </th>
                     </tr>
@@ -117,13 +119,32 @@
                 </div>
             </div>
 
-            <div style = "margin-top: 100px" id = "output-container">
-                <table id="output-table" class="table">
-                    <tr>
-                        <th>activation</sub></th>
-                        <th>output</sub></th>
-                    </tr>
-                </table>
+            <div id = "output-container" class="cols">
+                <div class = "rows">
+                    <table>
+                        <tr>
+                            <th> <button style="width: 100px; Visibility: hidden;" class="custom-btn myButton" id="OutputButton">Generate</button></th>
+                            <!--<th> <button class="custom-btn myButton" id="editButton">Edit</button></th>-->
+                            <th>
+                            <th>
+                                <label class="switch tooltip" >
+                                    <input type="checkbox" id="OutputToggle">
+                                    <span class="slider round"></span>
+                                    <span class="tooltiptext">show desired</span>
+                                </label>
+                            </th>
+                        </tr>
+                    </table>
+                </div>
+                <div class = "rows">
+                    <table id="output-table" class="table">
+                        <tr>
+                            <th>activation</sub></th>
+                            <th>output</sub></th>
+                            <th>desired output</sub></th>
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
 

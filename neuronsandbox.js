@@ -86,14 +86,15 @@ class DataOperator {
     updateDataFromTable(dataObj, tableObj){ //TODO: make more efficient by passing specific location to update
         let table = tableObj.table;
         // skip header row and button column of table, start from 1
-        for (var r = 2, n = table.rows.length; r < n; r++) {
+        let start = table == outputTable? 1 : 2;
+        let r = start;
+        for (let n = table.rows.length; r < n; r++) {
             for (var c = 1, m = table.rows[r].cells.length; c < m; c++) {
                 const cell = table.rows[r].cells[c];
                 const rawValue = cell.innerHTML;
                 const [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
                 display.highlightInvalidText(cell, isValid);
-                dataObj.data[r-2][c-1] = parsedValue;
-
+                dataObj.data[r-start][c-1] = parsedValue;
             }
         }
         console.log("updateDataFromTable, data = " + dataObj.data);
@@ -102,8 +103,8 @@ class DataOperator {
     }
 
     // make editable and update demo on edit
-    makeEditable(textbox){ // TODO: Move from dataOp to displayOp
-        textbox.contentEditable = true;
+    makeEditable(textbox, editable = true){ // TODO: Move from dataOp to displayOp
+        textbox.contentEditable = editable;
         // add event listener to update demo with table changes
         textbox.addEventListener("focusout", function(event){
             demo.update(this);
@@ -347,6 +348,16 @@ class Table {
         this.table.deleteRow(r);
         this.numRows--;
     }
+
+    showColumn(c, visible=true, editable=true, startingRow = 0) { //output table (desired)
+        for (var r = startingRow; r < this.numRows + 1; r++) {
+            const cells = this.table.rows[r].cells;
+            if(r != 0) {
+                dataOp.makeEditable(cells[c], editable);
+            }
+            cells[c].style.display = visible? "block" : "none";
+        }
+    }
 }
 
 // perceptron: holds a data object, weights, threshold
@@ -392,7 +403,7 @@ class Perceptron {
     }
 
     computeOutputs(){
-        this.outputData = new Array(this.dataObj.rows).fill(0).map(() => new Array(2).fill(0));
+        this.outputData = new Array(this.dataObj.rows).fill(0).map(() => new Array(3).fill(0));
         this.computeAffineOutput();
         this.computeActivnOutput();
     }
@@ -640,10 +651,10 @@ class Display {
             var headerInput = headerCells[c];
             //var headerInput = document.querySelector(`#input-table> tbody > tr:nth-child(${2}) > td:nth-child(${c} > div:nth-child(${1}))`);
             if (headerInput.id.startsWith("tblinput"))
-                if(headerInput.children[0]) {
+                /*if(headerInput.children[0]) {
                     headerRowVals.push(headerInput.children[0].innerHTML);
                 }
-                else
+                else*/
                 {
                     headerRowVals.push(headerInput.innerHTML);
                 }
@@ -652,11 +663,48 @@ class Display {
         }
     }
 
+    UpdateInputToggle() {
+        let checkbox = document.getElementById("InputToggle");
+        if (!checkbox.checked) {
+            $("#input-table tr:first").hide();
+            $("#input-table tr td:nth-child(1)").hide();
+            const buttonRows = document.getElementsByClassName("row-buttons-container");
+            buttonRows.forEach(element => {
+                element.style.display = "none";
+            });
+            const buttonColumns = document.getElementsByClassName("column-buttons-container");
+            buttonColumns.forEach(element => {
+                element.style.display = "none";
+            });
+            document.getElementById("generateTruthTable").disabled = true;
+        } else {
+            $("#input-table tr:first").show();
+            $("#input-table tr td:nth-child(1)").show();
+            const buttonRows = document.getElementsByClassName("row-buttons-container");
+            buttonRows.forEach(element => {
+                element.style.display = "flex";
+            });
+            const buttonColumns = document.getElementsByClassName("column-buttons-container");
+            buttonColumns.forEach(element => {
+                element.style.display = "flex";
+            });
+            document.getElementById("generateTruthTable").disabled = false;
+        }
+    }
+
+    UpdateOutputToggle()
+    {
+        let checkbox = document.getElementById("OutputToggle");
+        display.showDesiredOutput(checkbox.checked);
+    }
+
 // update display panel
     updateDisplay(){
         //this.displaySelectedInput();
         this.updateSelectedInput();
         this.displaySelectedOutput();
+        this.UpdateInputToggle();
+        this.UpdateOutputToggle();
     }
 
     //highlight invalid inputs, reset as soon as they are valid (#6)
@@ -703,6 +751,9 @@ class Display {
             });*/
             display.updateDisplay();
         });
+    }
+    showDesiredOutput (show) {
+        outputTable.showColumn(2, show, show);
     }
 }
 
@@ -866,6 +917,10 @@ class Demo {
             demo.selectedInput = headerRowVals;
         }
         dataOp.updateDataFromTable(inputs, inputTable);
+        if(document.getElementById("OutputToggle").checked) {
+            dataOp.updateDataFromTable(outputs, outputTable);
+        }
+
         perceptron.updateWeights();
         perceptron.updateThreshold();
         perceptron.computeOutputs();
@@ -893,6 +948,7 @@ window.onload = function(){
     console.log("window loaded")
     $("#input-table tr:first").hide();
     $("#input-table tr td:nth-child(1)").hide();
+    //$("#OutputButton").hide();
 }
 
 // initialize all classes
@@ -907,36 +963,17 @@ const outputTable = new Table(outputs, "output-table", false);
 dataOp.createBinaryData(2);
 perceptron.displayPerceptron();
 const display = new Display();
+display.updateDisplay();
 
 document.addEventListener("DOMContentLoaded", () => {
     demo.main().catch(e => console.error(e));
 });
 
-$(':checkbox').change(function() {
-    if (!this.checked) {
-        $("#input-table tr:first").hide();
-        $("#input-table tr td:nth-child(1)").hide();
-        const buttonRows = document.getElementsByClassName("row-buttons-container");
-        buttonRows.forEach(element => {
-            element.style.display = "none";
-        });
-        const buttonColumns = document.getElementsByClassName("column-buttons-container");
-        buttonColumns.forEach(element => {
-            element.style.display = "none";
-        });
-        document.getElementById("generateTruthTable").disabled = true;
-    } else {
-        $("#input-table tr:first").show();
-        $("#input-table tr td:nth-child(1)").show();
-        const buttonRows = document.getElementsByClassName("row-buttons-container");
-        buttonRows.forEach(element => {
-            element.style.display = "flex";
-        });
-        const buttonColumns = document.getElementsByClassName("column-buttons-container");
-        buttonColumns.forEach(element => {
-            element.style.display = "flex";
-        });
-        document.getElementById("generateTruthTable").disabled = false;
-
-    }
+$('#InputToggle').change(function() { //toggle edit
+    display.UpdateInputToggle();
 });
+
+$('#OutputToggle').change(function() { //toggle output
+    display.UpdateOutputToggle();
+});
+
