@@ -655,9 +655,9 @@ class Display {
                     headerRowVals.push(headerInput.children[0].innerHTML);
                 }
                 else*/
-                {
-                    headerRowVals.push(headerInput.innerHTML);
-                }
+            {
+                headerRowVals.push(headerInput.innerHTML);
+            }
             else
                 console.log("missing input")
         }
@@ -677,6 +677,7 @@ class Display {
                 element.style.display = "none";
             });
             document.getElementById("generateTruthTable").disabled = true;
+            document.getElementById("output-table").style.marginTop = "0px";
         } else {
             $("#input-table tr:first").show();
             $("#input-table tr td:nth-child(1)").show();
@@ -689,6 +690,7 @@ class Display {
                 element.style.display = "flex";
             });
             document.getElementById("generateTruthTable").disabled = false;
+            document.getElementById("output-table").style.marginTop = "50px";
         }
     }
 
@@ -696,6 +698,30 @@ class Display {
     {
         let checkbox = document.getElementById("OutputToggle");
         display.showDesiredOutput(checkbox.checked);
+        var outputCol = document.getElementById("output-table");
+        var n = outputCol.rows.length;
+
+        for(var i = 1; i < n; i++)
+        {
+            //var tr = outputCol.rows[i];
+            let output = outputCol.rows[i].cells[1];
+            let desired = outputCol.rows[i].cells[2];
+            this.checkDesiredOutput(output, desired);
+        }
+    }
+
+    checkDesiredOutput(output, desired) {
+        const outputInt = parseInt(output.innerHTML, 10);
+        const desiredInt = parseInt(desired.innerHTML, 10);
+
+        if (outputInt !== desiredInt) {
+            if(document.getElementById("OutputToggle").checked)
+                output.style.backgroundColor = "#ffbfcb";
+            //output.style.opacity = "0.2";
+        } else {
+            output.style.removeProperty('background-color');
+        }
+
     }
 
 // update display panel
@@ -728,27 +754,27 @@ class Display {
             element.style.display = "none";
         });
         // show when hovering over table
-      /*  tableObj.table.addEventListener("mouseenter", function(event){
-            const buttonRows = document.getElementsByClassName("row-buttons-container");
-            buttonRows.forEach(element => {
-                element.style.display = "flex";
-            });
-            const buttonColumns = document.getElementsByClassName("column-buttons-container");
-            buttonColumns.forEach(element => {
-                element.style.display = "flex";
-            });
-            display.updateDisplay();
-        });*/
+        /*  tableObj.table.addEventListener("mouseenter", function(event){
+              const buttonRows = document.getElementsByClassName("row-buttons-container");
+              buttonRows.forEach(element => {
+                  element.style.display = "flex";
+              });
+              const buttonColumns = document.getElementsByClassName("column-buttons-container");
+              buttonColumns.forEach(element => {
+                  element.style.display = "flex";
+              });
+              display.updateDisplay();
+          });*/
         // hide when hover out
         tableObj.table.addEventListener("mouseleave", function(event){
-           /* const buttonRows = document.getElementsByClassName("row-buttons-container");
-            buttonRows.forEach(element => {
-                element.style.display = "none";
-            });
-            const buttonColumns = document.getElementsByClassName("column-buttons-container");
-            buttonColumns.forEach(element => {
-                element.style.display = "none";
-            });*/
+            /* const buttonRows = document.getElementsByClassName("row-buttons-container");
+             buttonRows.forEach(element => {
+                 element.style.display = "none";
+             });
+             const buttonColumns = document.getElementsByClassName("column-buttons-container");
+             buttonColumns.forEach(element => {
+                 element.style.display = "none";
+             });*/
             display.updateDisplay();
         });
     }
@@ -915,6 +941,13 @@ class Demo {
             var headerRowVals = [];
             display.getHeaderRowVals(headerRowVals);
             demo.selectedInput = headerRowVals;
+        }
+        let bEditOutput = false;
+        if(sender.closest('table').id == "output-table") { //must be the desired output cell, no need to calculate
+            console.log("clicked the desired output cell");
+            bEditOutput = true;
+            display.checkDesiredOutput(sender.previousSibling, sender);
+            return;
         }
         dataOp.updateDataFromTable(inputs, inputTable);
         if(document.getElementById("OutputToggle").checked) {
