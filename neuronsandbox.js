@@ -13,6 +13,15 @@ class Data {
     }
 }
 
+class DesiredOutputData {
+    constructor(desired) {
+        this.update(desired);
+    }
+    update(inputData) {
+        this.data = inputData;
+    }
+}
+
 class DataOperator {
     constructor(){
         this.DEFAULT_VALUE = 10;
@@ -100,6 +109,35 @@ class DataOperator {
         console.log("updateDataFromTable, data = " + dataObj.data);
         // do not update table, let user see what they have typed wrong (#6)
         // tableObj.updateTable(tableObj); // update table to remove any erroneous symbols by user
+    }
+
+    updateTableFromData(dataObj, tableObj){ //TODO: make more efficient by passing specific location to update
+        let table = tableObj.table;
+        // skip header row and button column of table, start from 1
+        let start = table == outputTable? 1 : 2;
+        let r = start;
+        for (let n = table.rows.length; r < n; r++) {
+            for (var c = 1, m = table.rows[r].cells.length; c < m; c++) {
+                const cell = table.rows[r].cells[c];
+                cell.innerHTML = dataObj.data[r-start][c-1];
+            }
+        }
+        console.log("updateTableFromData, data = " + dataObj.data);
+    }
+
+    updateDesiredOutput(dataObj, tableObj) {
+        let table = tableObj.table;
+        let start = 1;
+        let r = start;
+        for (let n = table.rows.length; r < n; r++) {
+            let c = 2;
+            const cell = table.rows[r].cells[c];
+            const rawValue = cell.innerHTML;
+            const [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
+            display.highlightInvalidText(cell, isValid);
+            dataObj.data[r-start] = parsedValue;
+        }
+        console.log("updateDesiredOutput, data = " + dataObj.data);
     }
 
     // make editable and update demo on edit
@@ -539,6 +577,7 @@ class Display {
                 LeaderLine.pointAnchor(selections.rows[i].cells[0], {x: '110%', y: '50%'}),
                 LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '-5%', y: percents[i]+'%'})
             );
+            //console.log("making leader lines: " + selections.rows[i].cells[0]);
             demo.weight_lines[i].color = 'black';
             demo.weight_lines[i].path = 'straight';
         }
@@ -656,7 +695,11 @@ class Display {
                 }
                 else*/
             {
-                headerRowVals.push(headerInput.innerHTML);
+                let headerInputHtml = headerInput.innerHTML;
+                if(!headerInputHtml.length) {
+                    headerInputHtml = "<br>";
+                }
+                headerRowVals.push(headerInputHtml);
             }
             else
                 console.log("missing input")
@@ -808,6 +851,7 @@ class Demo {
         this.selectedOutput = this.defaultSelectedOutput;
         this.lines = [];
         this.weight_lines = [];
+        this.desiredOutput = [1, 0];
     }
 
     // calculate row to insert at, from html button address
@@ -872,16 +916,27 @@ class Demo {
     }
 
     updateWeightUI(parentElement) {
+
         let childCount = parentElement.children.length;
-        let first = 20;
-        let last = 70;
-        let interval = (last - first) / (childCount - 1);
-        for (let i = 0; i < parentElement.children.length; i++) {
-            let child = parentElement.children[i];
-            let top = Math.floor(first + i * interval);
-            child.style = "top:" + top + "%;";
-            child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>`;
-        }
+        // if(childCount === 1) {
+        //     let child = parentElement.children[0];
+        //     let top = 5;
+        //     child.style = "top:" + top + "%;";
+        //     child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>`;
+        // }
+        // else {
+            let first = 20;
+            let last = 70;
+            let interval = (last - first) / (childCount - 1);
+            for (let i = 0; i < parentElement.children.length; i++) {
+                let child = parentElement.children[i];
+                let top = Math.floor(first + i * interval);
+                child.style = "top:" + top + "%;";
+                child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>`;
+            }
+
+        //}
+
     }
 
     removeWeightCol(n) {
@@ -943,7 +998,7 @@ class Demo {
             demo.selectedInput = headerRowVals;
         }
         let bEditOutput = false;
-        if(sender.closest('table').id == "output-table") { //must be the desired output cell, no need to calculate
+        if(sender && sender.closest('table')?.id == "output-table") { //must be the desired output cell, no need to calculate
             console.log("clicked the desired output cell");
             bEditOutput = true;
             display.checkDesiredOutput(sender.previousSibling, sender);
@@ -977,6 +1032,38 @@ class Demo {
     }
 }
 
+function downloadFile() {
+    let dict = {
+        "input": demo.inputData,
+        "weight": demo.weights,
+        "threshold": demo.threshold,
+        "desired-output": desiredOutputs
+    };
+    let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dict));
+    let el = document.getElementById('downloadFile');
+    el.setAttribute("href", dataStr);
+    el.setAttribute("download", "neuronsandbox.json");
+}
+
+async function uploadFile(event)
+{
+    const file = event.target.files.item(0)
+    const text = await file.text();
+    try {
+        let dict = JSON.parse(text);
+        demo.inputData = dict["input"];
+        demo.weights = dict["weight"];
+        demo.threshold = dict["threshold"];
+        desiredOutputs = dict["desired-output"];
+        inputs = new Data(demo.inputData);
+        dataOp.updateTableFromData(inputs, inputTable);
+        perceptron = new Perceptron(inputs, demo.weights, demo.threshold);
+        demo.update();
+    } catch (ex) {
+        console.log(ex);
+    }
+}
+
 window.onload = function(){
     console.log("window loaded")
     $("#input-table tr:first").hide();
@@ -986,12 +1073,13 @@ window.onload = function(){
 
 // initialize all classes
 const demo = new Demo();
-const inputs = new Data(demo.inputData);
+let inputs = new Data(demo.inputData);
+let desiredOutputs = new Data(demo.desiredOutput);
 const dataOp = new DataOperator();
 const inputTable = new Table(inputs, "input-table", true);
-const perceptron = new Perceptron(inputs, demo.weights, demo.threshold);
+let perceptron = new Perceptron(inputs, demo.weights, demo.threshold);
 perceptron.computeOutputs();
-const outputs = new Data(perceptron.outputData);
+let outputs = new Data(perceptron.outputData);
 const outputTable = new Table(outputs, "output-table", false);
 dataOp.createBinaryData(2);
 perceptron.displayPerceptron();

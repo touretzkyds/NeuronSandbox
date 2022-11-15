@@ -344,3 +344,7 @@ h1 {
     visibility: visible;
     opacity: 1;
 }
+
+/*input[type="file"] {*/
+/*    display: none;*/
+/*}*/

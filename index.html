@@ -7,6 +7,7 @@
 
         <link rel="stylesheet" href="slider.css" />
         <link rel="stylesheet" href="style.css" />
+        <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
         <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
         <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
         <script src="https://pixijs.download/release/pixi.js"></script>
@@ -21,10 +22,30 @@
 
         <div id="all-containers">
             <div id = "input-container" class="cols">
-                <div class = "rows"></div>
                 <table>
                     <tr>
-                        <th> <button class="custom-btn myButton" id="generateTruthTable">Generate truth table</button></th>
+                        <th>
+<!--                            <button for="upload-file" class="custom-btn myButton">-->
+<!--                                <i class="fa fa-upload" aria-hidden="true"></i>-->
+<!--                                upload file ...-->
+<!--                            </button>-->
+                            <input id="upload-file" type="file" name="name" accept="application/JSON" onchange="uploadFile(event)"/>
+                        </th>
+                        <th>
+                            <a id="downloadFile" role="button" onclick="downloadFile();" class="custom-btn myButton"><i class="fa fa-download" aria-hidden="true"></i> download file ...</a>
+
+<!--                            <button id="downloadFile" onclick="downloadFile();" class="custom-btn myButton" >-->
+<!--                                <i class="fa fa-download" aria-hidden="true"></i>-->
+<!--                                download file ...-->
+<!--                            </button>-->
+                        </th>
+                    </tr>
+                </table>
+                <table>
+                    <tr>
+                        <th>
+                            <button class="custom-btn myButton" id="generateTruthTable">Generate truth table</button>
+                        </th>
                         <!--<th> <button class="custom-btn myButton" id="editButton">Edit</button></th>-->
                         <th>
                         <label class="switch tooltip">
