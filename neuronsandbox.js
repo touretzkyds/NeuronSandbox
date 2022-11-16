@@ -374,7 +374,7 @@ class Table {
         //     return
         // }
         for (var r = 0; r < this.numRows + 2; r++) { //skip column buttons + row headers
-            this.table.rows[r].deleteCell(c+1);
+            this.table.rows[r]?.deleteCell(c+1);
         }
         this.numCols--;
         let cols = []
@@ -456,6 +456,7 @@ class Perceptron {
     }
 
     updateWeights(){
+        console.log("updating weights: " + demo.weights);
         for (let i=0; i<demo.weights.length; i++){
             const cell = document.getElementById(`w${i+1}`);
             if(cell)
@@ -892,6 +893,13 @@ class Demo {
         demo.update(); //TODO: check if efficient
     }
 
+    removeAllInputDataCols(needUpdate = true) {
+        while( inputTable.numCols > 1) {
+            inputTable.removeTableCol(1);
+        }
+        if(needUpdate) demo.update();
+    }
+
     removeAllInputDataRows(needUpdate = true) {
         while( inputTable.numRows > 0) {
             inputTable.removeTableRow(2);
@@ -1032,6 +1040,7 @@ class Demo {
     }
 }
 
+//adding upload/download functionality (#10)
 function downloadFile() {
     let dict = {
         "input": demo.inputData,
@@ -1047,21 +1056,47 @@ function downloadFile() {
 
 async function uploadFile(event)
 {
+
     const file = event.target.files.item(0)
-    const text = await file.text();
-    try {
-        let dict = JSON.parse(text);
-        demo.inputData = dict["input"];
-        demo.weights = dict["weight"];
-        demo.threshold = dict["threshold"];
-        desiredOutputs = dict["desired-output"];
-        inputs = new Data(demo.inputData);
-        dataOp.updateTableFromData(inputs, inputTable);
-        perceptron = new Perceptron(inputs, demo.weights, demo.threshold);
-        demo.update();
-    } catch (ex) {
-        console.log(ex);
+    if(!file) {
+        return;
     }
+    const text = await file.text();
+
+    demo.removeAllInputDataRows(false);
+    demo.removeAllInputDataCols(false);
+
+    let dict = JSON.parse(text);
+    demo.inputData = dict["input"];
+    let cloneInputData = [...demo.inputData];
+    demo.weights = dict["weight"];
+    demo.threshold = dict["threshold"];
+    desiredOutputs = dict["desired-output"];
+    inputs = new Data(demo.inputData);
+
+    for(let c = inputTable.numCols; c < inputs.data[0]?.length;c++) {
+        inputTable.insertTableCol(1);
+    }
+
+    for (let r = 0, n = inputs.data.length; r < n; r++) {
+        inputTable.insertTableRow(2);
+        outputTable.insertTableRow(1);
+        dataOp.insertDataRow(outputs, 0);
+    }
+
+    demo.inputData = dict["input"];
+    inputs = new Data(demo.inputData);
+    dataOp.updateTableFromData(inputs, inputTable);
+    perceptron = new Perceptron(inputs, demo.weights, demo.threshold);
+    perceptron.updateWeights();
+    // demo.weights.map((w, idx) => {
+    //     this.displayWeightFromData(`w${idx+1}`, idx);
+    //     const weight = document.getElementById(`w${idx+1}`);
+    //     dataOp.makeEditable(weight);
+    // });
+
+    demo.update();
+
 }
 
 window.onload = function(){
