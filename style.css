@@ -4,6 +4,7 @@ h1 {
 
 .center {
     margin: 1px;
+    margin-top: 10%;
     width: 60%;
     height: 100%;
     display: inline-flex;
@@ -165,6 +166,13 @@ h1 {
 .table td, .table th {
     line-height: 10vh;
     width: 10vw;
+    overflow-wrap: break-word;
+}
+
+.custom-th {
+    width: 10vw;
+    line-height: 5vh !important;
+    overflow-wrap: break-word;
 }
 
 .table tr {

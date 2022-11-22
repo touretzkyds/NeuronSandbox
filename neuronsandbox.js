@@ -27,27 +27,6 @@ class DataOperator {
         this.DEFAULT_VALUE = 10;
     }
 
-    computeSize(dataObj, demo, addFeature=0, addEg=0){
-        if (demo.mode === "binary"){
-            if (addFeature !== 0){
-                c = dataObj.cols + addFeature;
-                r = 2 ** c;
-            }
-            else if (addEg !== 0){
-                c = dataObj.cols + addEg;
-            }
-        }
-        else {
-            if (addFeature !== 0){
-                c = dataObj.cols + addFeature;
-            }
-            else if (addEg !== 0){
-                r = dataObj.cols + addEg;
-            }
-        }
-        return [r, c]
-    }
-
     insertDataRow(dataObj, n=1, pos){
         const row = Array(dataObj.cols).fill(0);
         dataObj.data.splice(n, 0, row);
@@ -455,8 +434,16 @@ class Perceptron {
         // draw svg to next output elem id
     }
 
-    updateWeights(){
-        console.log("updating weights: " + demo.weights);
+    setWeightsUI() {
+        for (let i=0; i<demo.weights.length; i++){
+            const cell = document.getElementById(`w${i+1}`);
+            if(cell)
+            {
+                cell.innerHTML = this.weights[i];
+            }
+        }
+    }
+    updateWeightsFromUI(){
         for (let i=0; i<demo.weights.length; i++){
             const cell = document.getElementById(`w${i+1}`);
             if(cell)
@@ -758,14 +745,12 @@ class Display {
         const outputInt = parseInt(output.innerHTML, 10);
         const desiredInt = parseInt(desired.innerHTML, 10);
 
-        if (outputInt !== desiredInt) {
-            if(document.getElementById("OutputToggle").checked)
-                output.style.backgroundColor = "#ffbfcb";
-            //output.style.opacity = "0.2";
-        } else {
+        if (outputInt !== desiredInt && document.getElementById("OutputToggle").checked) {
+            output.style.backgroundColor = "#ffbfcb";
+        }
+        else {
             output.style.removeProperty('background-color');
         }
-
     }
 
 // update display panel
@@ -839,10 +824,10 @@ class Demo {
         this.numFeat = 2;
         this.numEg = 4;
         this.inputData = [
-            [1, 1],
-            [3, -2],
-            [3, 4],
-            [-2, -5],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
         ];
         this.weights = [1,-2];
         this.threshold = 1;
@@ -852,7 +837,7 @@ class Demo {
         this.selectedOutput = this.defaultSelectedOutput;
         this.lines = [];
         this.weight_lines = [];
-        this.desiredOutput = [1, 0];
+        this.desiredOutput = [0, 0, 0, 0];
     }
 
     // calculate row to insert at, from html button address
@@ -952,8 +937,17 @@ class Demo {
         let parentElement = document.getElementById("input-link-text");
         //let child = document.getElementById(`weight-${n+1}`);
         let child = parentElement.children[n];
-        parentElement.removeChild(child);
+        if(child && parentElement)
+        {
+            parentElement.removeChild(child);
+        }
         this.updateWeightUI(parentElement);
+    }
+
+    removeAllWeightCol() {
+        for(let i = 0; i < demo.weights.length; i++) {
+            this.removeWeightCol(0);
+        }
     }
     // add new row at specific location on button click
     insertCol(button){
@@ -1017,7 +1011,7 @@ class Demo {
             dataOp.updateDataFromTable(outputs, outputTable);
         }
 
-        perceptron.updateWeights();
+        perceptron.updateWeightsFromUI();
         perceptron.updateThreshold();
         perceptron.computeOutputs();
         // TODO: ineffecient 2 steps, update step needed:
@@ -1040,13 +1034,16 @@ class Demo {
     }
 }
 
-//adding upload/download functionality (#10)
 function downloadFile() {
+    let inputToggleChecked=document.getElementById("InputToggle").checked;
+    let outputToggleChecked=document.getElementById("OutputToggle").checked;
     let dict = {
         "input": demo.inputData,
         "weight": demo.weights,
         "threshold": demo.threshold,
-        "desired-output": desiredOutputs
+        "desired-output": desiredOutputs,
+        "input-toggle-checked" : inputToggleChecked,
+        "output-toggle-checked" : outputToggleChecked
     };
     let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dict));
     let el = document.getElementById('downloadFile');
@@ -1065,19 +1062,27 @@ async function uploadFile(event)
 
     demo.removeAllInputDataRows(false);
     demo.removeAllInputDataCols(false);
+    demo.removeAllWeightCol();
 
     let dict = JSON.parse(text);
     demo.inputData = dict["input"];
-    let cloneInputData = [...demo.inputData];
-    demo.weights = dict["weight"];
+    //demo.weights = dict["weight"];
+    demo.weights = []; //clear weight array first, due to the insertWeightCol below
     demo.threshold = dict["threshold"];
     desiredOutputs = dict["desired-output"];
+
     inputs = new Data(demo.inputData);
 
     for(let c = inputTable.numCols; c < inputs.data[0]?.length;c++) {
         inputTable.insertTableCol(1);
     }
 
+    let parentElement = document.getElementById("input-link-text");
+    for(let c = parentElement.children.length; c < inputs.data[0]?.length;c++) {
+        demo.insertWeightCol(0);
+    }
+
+    demo.weights = dict["weight"];
     for (let r = 0, n = inputs.data.length; r < n; r++) {
         inputTable.insertTableRow(2);
         outputTable.insertTableRow(1);
@@ -1088,15 +1093,11 @@ async function uploadFile(event)
     inputs = new Data(demo.inputData);
     dataOp.updateTableFromData(inputs, inputTable);
     perceptron = new Perceptron(inputs, demo.weights, demo.threshold);
-    perceptron.updateWeights();
-    // demo.weights.map((w, idx) => {
-    //     this.displayWeightFromData(`w${idx+1}`, idx);
-    //     const weight = document.getElementById(`w${idx+1}`);
-    //     dataOp.makeEditable(weight);
-    // });
-
+    perceptron.setWeightsUI();
+    document.getElementById('InputToggle').checked = dict["input-toggle-checked"];
+    document.getElementById('OutputToggle').checked = dict["output-toggle-checked"];
+    display.handleHoverExit();
     demo.update();
-
 }
 
 window.onload = function(){

@@ -29,10 +29,16 @@
 <!--                                <i class="fa fa-upload" aria-hidden="true"></i>-->
 <!--                                upload file ...-->
 <!--                            </button>-->
-                            <input class="custom-btn myButton" id="upload-file" type="file" name="name" accept="application/JSON" onchange="uploadFile(event)"/>
+                            <a href="javascript:document.getElementById('upload-file').click();" class="custom-btn myButton">
+                                <i class="fa fa-upload" aria-hidden="true"></i> Upload Model
+                            </a>
+
+<!--                            <input type="button"  class="custom-btn myButton" id="loadFileJson" value="Upload Model" onclick="document.getElementById('upload-file').click();"> </input>-->
+
+                            <input id="upload-file" style="display:none;" type="file" accept="application/JSON" onchange="uploadFile(event)"/>
                         </th>
                         <th>
-                            <a id="downloadFile" role="button" onclick="downloadFile();" class="custom-btn myButton"><i class="fa fa-download" aria-hidden="true"></i> download file ...</a>
+                            <a href="#" id="downloadFile" role="button" onclick="downloadFile();" class="custom-btn myButton"><i class="fa fa-download" aria-hidden="true"></i> Download Model</a>
 
 <!--                            <button id="downloadFile" onclick="downloadFile();" class="custom-btn myButton" >-->
 <!--                                <i class="fa fa-download" aria-hidden="true"></i>-->
@@ -43,17 +49,16 @@
                 </table>
                 <table>
                     <tr>
-                        <th>
+                        <th style="width: 50%;alignment: left">
                             <button class="custom-btn myButton" id="generateTruthTable">Generate truth table</button>
                         </th>
                         <!--<th> <button class="custom-btn myButton" id="editButton">Edit</button></th>-->
                         <th>
-                        <label class="switch tooltip">
-                            <input type="checkbox" id="InputToggle">
-                            <span class="slider round"></span>
-                            <span class="tooltiptext">edit mode</span>
-
-                        </label>
+                            <label>Edit</label>
+                            <label class="switch">
+                                <input type="checkbox" id="InputToggle">
+                                <span class="slider round"></span>
+                            </label>
                         </th>
                     </tr>
                 </table>
@@ -140,18 +145,15 @@
                 </div>
             </div>
 
-            <div id = "output-container" class="cols">
+            <div id = "output-container" class="cols" style="margin-top: 8%;">
                 <div class = "rows">
                     <table>
                         <tr>
-                            <th> <button style="width: 100px; Visibility: hidden;" class="custom-btn myButton" id="OutputButton">Generate</button></th>
-                            <!--<th> <button class="custom-btn myButton" id="editButton">Edit</button></th>-->
                             <th>
-                            <th>
-                                <label class="switch tooltip" >
+                                <label>Show Desired</label>
+                                <label class="switch" >
                                     <input type="checkbox" id="OutputToggle">
                                     <span class="slider round"></span>
-                                    <span class="tooltiptext">show desired</span>
                                 </label>
                             </th>
                         </tr>
@@ -160,9 +162,10 @@
                 <div class = "rows">
                     <table id="output-table" class="table">
                         <tr>
-                            <th>activation</sub></th>
-                            <th>output</sub></th>
-                            <th>desired output</sub></th>
+                            <th>Activation    </th>
+                            <th>Output        </th>
+                            <th class="custom-th"> Desired <br> Output
+                            </th>
                         </tr>
                     </table>
                 </div>
