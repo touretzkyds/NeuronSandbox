@@ -74,15 +74,16 @@ class DataOperator {
     updateDataFromTable(dataObj, tableObj){ //TODO: make more efficient by passing specific location to update
         let table = tableObj.table;
         // skip header row and button column of table, start from 1
-        let start = table == outputTable? 1 : 2;
+        let start = (table.id === 'output-table')? 1 : 2;
+        let startcol = (table.id === 'output-table')? 0 : 1;
         let r = start;
         for (let n = table.rows.length; r < n; r++) {
-            for (var c = 1, m = table.rows[r].cells.length; c < m; c++) {
+            for (var c = startcol, m = table.rows[r].cells.length; c < m; c++) {
                 const cell = table.rows[r].cells[c];
                 const rawValue = cell.innerHTML;
                 const [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
                 display.highlightInvalidText(cell, isValid);
-                dataObj.data[r-start][c-1] = parsedValue;
+                dataObj.data[r-start][c-startcol] = parsedValue;
             }
         }
         console.log("updateDataFromTable, data = " + dataObj.data);
@@ -104,6 +105,18 @@ class DataOperator {
         console.log("updateTableFromData, data = " + dataObj.data);
     }
 
+    updateTableFromDesired(desiredOutput, tableObj){ //TODO: make more efficient by passing specific location to update
+        let table = tableObj.table;
+        // skip header row and button column of table, start from 1
+        let start = 1;
+        let r = start;
+        for (let n = table.rows.length; r < n; r++) {
+                const cell = table.rows[r].cells[2];
+                cell.innerHTML = desiredOutput.data[r-1];
+        }
+        //console.log("updateTableFromData, data = " + dataObj.data);
+    }
+
     updateDesiredOutput(dataObj, tableObj) {
         let table = tableObj.table;
         let start = 1;
@@ -114,9 +127,9 @@ class DataOperator {
             const rawValue = cell.innerHTML;
             const [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
             display.highlightInvalidText(cell, isValid);
-            dataObj.data[r-start] = parsedValue;
+            dataObj[r-start] = parsedValue;
         }
-        console.log("updateDesiredOutput, data = " + dataObj.data);
+        console.log("updateDesiredOutput, data = " + dataObj);
     }
 
     // make editable and update demo on edit
@@ -264,7 +277,7 @@ class Table {
     }
 
     // insert row at given position and add editable attributes/ cells if reqd.
-    insertTableRow(r){
+    insertTableRow(r, makeEditable = true){
         console.log("insertTableRow, trying to add new row at row=" + r);
         var newRow = this.table.insertRow(r);
         this.makeHoverable(newRow, this.tblId);
@@ -272,8 +285,11 @@ class Table {
             var cell = newRow.insertCell(c);
             cell.innerHTML = 0;
             cell.className = "animation";
-            if (this.isEditable){
+            if (this.isEditable && makeEditable){
                 dataOp.makeEditable(cell);
+            }
+            else {
+                cell.contentEditable = false;
             }
         }
         if (this.isEditable){
@@ -491,8 +507,8 @@ class Display {
         $( ".weight_label" ).draggable();
         $( ".weight" ).draggable();
         $( ".draggable" ).draggable();
-        setupGenerateTruthTable();
-        document.getElementById("generateTruthTable").disabled = true;
+        //setupGenerateTruthTable();
+        //document.getElementById("generateTruthTable").disabled = true;
     }
 
     displayWeightFromData(wID, idx){
@@ -707,7 +723,7 @@ class Display {
             buttonColumns.forEach(element => {
                 element.style.display = "none";
             });
-            document.getElementById("generateTruthTable").disabled = true;
+            //document.getElementById("generateTruthTable").disabled = true;
             document.getElementById("output-table").style.marginTop = "0px";
         } else {
             $("#input-table tr:first").show();
@@ -720,7 +736,7 @@ class Display {
             buttonColumns.forEach(element => {
                 element.style.display = "flex";
             });
-            document.getElementById("generateTruthTable").disabled = false;
+            //document.getElementById("generateTruthTable").disabled = false;
             document.getElementById("output-table").style.marginTop = "50px";
         }
     }
@@ -738,6 +754,24 @@ class Display {
             let output = outputCol.rows[i].cells[1];
             let desired = outputCol.rows[i].cells[2];
             this.checkDesiredOutput(output, desired);
+        }
+    }
+
+    UpdateBinaryToggle() {
+        let checkbox = document.getElementById("BinaryToggle");
+        console.log("checkbox binary: " + checkbox);
+        if(checkbox.checked) {
+            setupGenerateTruthTable();
+        }
+        else { //leave table how it is, but make contenteditable
+            for (let r = 2, n = inputTable.table.rows.length; r < n; r++) {
+                for (let c = 1, m = inputTable.table.rows[r].cells.length; c < m; c++) {
+                    const cell = inputTable.table.rows[r].cells[c];
+                    //cell.innerHTML = Object.values(truthData[r - 2])[(c-1)].toString();
+                    dataOp.makeEditable(cell);
+
+                }
+            }
         }
     }
 
@@ -1004,6 +1038,7 @@ class Demo {
             console.log("clicked the desired output cell");
             bEditOutput = true;
             display.checkDesiredOutput(sender.previousSibling, sender);
+            //dataOp.updateDesiredOutput(demo.desiredOutput, outputTable);
             return;
         }
         dataOp.updateDataFromTable(inputs, inputTable);
@@ -1018,6 +1053,7 @@ class Demo {
         outputs.update(perceptron.outputData);
         outputTable.updateTable();
         display.updateDisplay();
+
     }
 
     // convert to valid inputs for processing and keep track of invalid parts of input
@@ -1037,6 +1073,7 @@ class Demo {
 function downloadFile() {
     let inputToggleChecked=document.getElementById("InputToggle").checked;
     let outputToggleChecked=document.getElementById("OutputToggle").checked;
+    //updateDesiredOutput();
     let dict = {
         "input": demo.inputData,
         "weight": demo.weights,
@@ -1089,8 +1126,14 @@ async function uploadFile(event)
         dataOp.insertDataRow(outputs, 0);
     }
 
+    dataOp.updateTableFromDesired(desiredOutputs, outputTable);
+
     demo.inputData = dict["input"];
     inputs = new Data(demo.inputData);
+    outputs = new Data(perceptron.outputData);
+    for(let i = 0; i < desiredOutputs.rows; i++) {
+        outputs.data[i][2] = desiredOutputs.data[i];
+    }
     dataOp.updateTableFromData(inputs, inputTable);
     perceptron = new Perceptron(inputs, demo.weights, demo.threshold);
     perceptron.setWeightsUI();
@@ -1132,5 +1175,9 @@ $('#InputToggle').change(function() { //toggle edit
 
 $('#OutputToggle').change(function() { //toggle output
     display.UpdateOutputToggle();
+});
+
+$('#BinaryToggle').change(function() { //toggle output
+    display.UpdateBinaryToggle();
 });
 
