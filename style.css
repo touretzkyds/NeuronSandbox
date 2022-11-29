@@ -2,15 +2,50 @@ h1 {
     text-align: center;
 }
 
+.top-table {
+    width: 20%;
+    padding: 0;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.top-table th {
+    padding: 15px;
+}
+
+.bottom-table {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.left {
+    margin: 1px;
+    width: 40%;
+    height: 100%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
 .center {
     margin: 1px;
-    margin-top: 10%;
-    width: 60%;
+    width: 40%;
     height: 100%;
     display: inline-flex;
     justify-content: center;
     align-items: center;
 }
+
+.right {
+    margin: 1px;
+    width: 20%;
+    height: 100%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
 
 #all-containers {
     align-items: flex-start;

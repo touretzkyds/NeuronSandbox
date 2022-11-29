@@ -504,8 +504,8 @@ class Display {
         this.displaySelectedOutput();
         // edit buttons hover functionality
         this.initializeButtonHover(inputTable);
-        $( ".weight_label" ).draggable();
-        $( ".weight" ).draggable();
+        //$( ".weight_label" ).draggable();
+        //$( ".weight" ).draggable();
         $( ".draggable" ).draggable();
         //setupGenerateTruthTable();
         //document.getElementById("generateTruthTable").disabled = true;
@@ -586,8 +586,8 @@ class Display {
             demo.weight_lines[i].path = 'straight';
         }
         $(".draggable").draggable();
-        $( ".weight_label" ).draggable();
-        $( ".weight" ).draggable();
+        //$( ".weight_label" ).draggable();
+        //$( ".weight" ).draggable();
     }
 
     // set display panel output
@@ -859,9 +859,9 @@ class Demo {
         this.numEg = 4;
         this.inputData = [
             [0, 0],
-            [0, 0],
-            [0, 0],
-            [0, 0],
+            [0, 1],
+            [1, 0],
+            [1, 1],
         ];
         this.weights = [1,-2];
         this.threshold = 1;
@@ -1074,6 +1074,7 @@ function downloadFile() {
     let inputToggleChecked=document.getElementById("InputToggle").checked;
     let outputToggleChecked=document.getElementById("OutputToggle").checked;
     //updateDesiredOutput();
+    //console.log("in download: "+  demo.inputData);
     let dict = {
         "input": demo.inputData,
         "weight": demo.weights,
@@ -1137,7 +1138,8 @@ async function uploadFile(event)
     dataOp.updateTableFromData(inputs, inputTable);
     perceptron = new Perceptron(inputs, demo.weights, demo.threshold);
     perceptron.setWeightsUI();
-    document.getElementById('InputToggle').checked = dict["input-toggle-checked"];
+    //document.getElementById('InputToggle').checked = dict["input-toggle-checked"];
+    document.getElementById('InputToggle').checked = false;
     document.getElementById('OutputToggle').checked = dict["output-toggle-checked"];
     display.handleHoverExit();
     demo.update();

@@ -20,164 +20,178 @@
             <h1>Neuron Sandbox</h1>
         </div>
 
-        <div id="all-containers">
-            <div id = "input-container" class="cols">
-                <table>
-                    <tr>
-                        <th>
-<!--                            <button for="upload-file" class="custom-btn myButton">-->
-<!--                                <i class="fa fa-upload" aria-hidden="true"></i>-->
-<!--                                upload file ...-->
-<!--                            </button>-->
-                            <a href="javascript:document.getElementById('upload-file').click();" class="custom-btn myButton">
-                                <i class="fa fa-upload" aria-hidden="true"></i> Upload Model
-                            </a>
+        <table class = "top-table">
+            <tr>
+                <!--                        <th style="width: 50%;alignment: left">-->
+                <!--                            <button class="custom-btn myButton" id="generateTruthTable">Generate truth table</button>-->
+                <!--                        </th>-->
+                <th>
+                    <label>Binary</label>
+                    <label class="switch">
+                        <input type="checkbox" id="BinaryToggle">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+                <!--<th> <button class="custom-btn myButton" id="editButton">Edit</button></th>-->
+                <th>
+                    <label>Edit</label>
+                    <label class="switch">
+                        <input type="checkbox" id="InputToggle">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
 
-<!--                            <input type="button"  class="custom-btn myButton" id="loadFileJson" value="Upload Model" onclick="document.getElementById('upload-file').click();"> </input>-->
+                <th>
+                    <!--                            <button for="upload-file" class="custom-btn myButton">-->
+                    <!--                                <i class="fa fa-upload" aria-hidden="true"></i>-->
+                    <!--                                upload file ...-->
+                    <!--                            </button>-->
+                    <a href="javascript:document.getElementById('upload-file').click();" class="custom-btn myButton">
+                        <i class="fa fa-upload" aria-hidden="true"></i> Load Model
+                    </a>
 
-                            <input id="upload-file" style="display:none;" type="file" accept="application/JSON" onchange="uploadFile(event)"/>
-                        </th>
-                        <th>
-                            <a href="#" id="downloadFile" role="button" onclick="downloadFile();" class="custom-btn myButton"><i class="fa fa-download" aria-hidden="true"></i> Download Model</a>
+                    <!--                            <input type="button"  class="custom-btn myButton" id="loadFileJson" value="Upload Model" onclick="document.getElementById('upload-file').click();"> </input>-->
 
-<!--                            <button id="downloadFile" onclick="downloadFile();" class="custom-btn myButton" >-->
-<!--                                <i class="fa fa-download" aria-hidden="true"></i>-->
-<!--                                download file ...-->
-<!--                            </button>-->
-                        </th>
-                    </tr>
-                </table>
-                <table>
-                    <tr>
-<!--                        <th style="width: 50%;alignment: left">-->
-<!--                            <button class="custom-btn myButton" id="generateTruthTable">Generate truth table</button>-->
-<!--                        </th>-->
-                        <th>
-                            <label>Binary</label>
-                            <label class="switch">
-                                <input type="checkbox" id="BinaryToggle">
-                                <span class="slider round"></span>
-                            </label>
-                        </th>
-                        <!--<th> <button class="custom-btn myButton" id="editButton">Edit</button></th>-->
-                        <th>
-                            <label>Edit</label>
-                            <label class="switch">
-                                <input type="checkbox" id="InputToggle">
-                                <span class="slider round"></span>
-                            </label>
-                        </th>
-                    </tr>
-                </table>
-<!--                <div class="rows">-->
-<!--                    <button class="custom-btn myButton" id="generateTruthTable">Generate truth table</button>-->
-<!--                    <button class="custom-btn myButton" id="editButton">Edit</button>-->
-<!--                </div>-->
-                <div class="rows">
-                    <table id="input-table" class="table">
-                        <tr>
-                            <td> <!-- edit button container -->
-                                <div class="row-buttons-container">
-                                    <button class="button" id="first-row-button" onclick="demo.insertRow(this)">+</button>
+                    <input id="upload-file" style="display:none;" type="file" accept="application/JSON" onchange="uploadFile(event)"/>
+                </th>
+                <th>
+                    <a href="#" id="downloadFile" role="button" onclick="downloadFile();" class="custom-btn myButton"><i class="fa fa-download" aria-hidden="true"></i> Save Model</a>
+
+                    <!--                            <button id="downloadFile" onclick="downloadFile();" class="custom-btn myButton" >-->
+                    <!--                                <i class="fa fa-download" aria-hidden="true"></i>-->
+                    <!--                                download file ...-->
+                    <!--                            </button>-->
+                </th>
+                <th>
+                    <label>Show Desired</label>
+                    <label class="switch" >
+                        <input type="checkbox" id="OutputToggle">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+            </tr>
+        </table>
+        <table class="bottom-table">
+            <tr>
+                <th colspan="100%">
+                    <div id="all-containers">
+                        <div id = "input-container" class="left">
+
+                            <!--                <div class="rows">-->
+                            <!--                    <button class="custom-btn myButton" id="generateTruthTable">Generate truth table</button>-->
+                            <!--                    <button class="custom-btn myButton" id="editButton">Edit</button>-->
+                            <!--                </div>-->
+                            <div class="rows">
+                                <table id="input-table" class="table">
+                                    <tr>
+                                        <td> <!-- edit button container -->
+                                            <div class="row-buttons-container">
+                                                <button class="button" id="first-row-button" onclick="demo.insertRow(this)">+</button>
+                                            </div>
+                                        </td>
+                                        <th id="tblinput1">
+                                            <div class="input-content">x<sub>1</sub></div>
+                                        </th>
+                                        <th id="tblinput2">
+                                            <div class="input-content">x<sub>2</sub></div>
+                                        </th>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="network-container" class="center">
+                            <div class="center">
+                                <table id="selected-inputs" class="selected">
+                                    <tr>
+                                        <td id="selinput1">
+                                            <div class="input-content">x<sub>1</sub></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td id="selinput2">
+                                            <div class="input-content">x<sub>2</sub></div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div id = "input-links" class="center">
+                                <svg id="svg">
+                                    <marker id="triangle" viewBox="0 0 10 10"
+                                            refX="1" refY="5"
+                                            markerUnits="strokeWidth"
+                                            markerWidth="10" markerHeight="10"
+                                            orient="auto">
+                                        <path d="M 0 0 L 10 5 L 0 10 z" fill="black"/>
+                                    </marker>
+                                    <!--<line id="line" stroke="black" stroke-width="3" x1="0%" y1="30%" x2="80%" y2="40%" marker-end="url(#triangle)"/>-->
+                                    <!--<line id="line" stroke="black" stroke-width="3" x1="0%" y1="70%" x2="80%" y2="60%" marker-end="url(#triangle)"/>-->
+                                </svg>
+                                <div id="input-link-text" class="center">
+                                    <div id="weight-1" class="weight_label" style="top:22%;">
+                                        <text fill="black">w<sub>1</sub> =</text>
+                                        <text contenteditable="true" id="w1" fill="black" class="weights" onkeypress="if (keyCode == 13) return false;"></text>
+                                    </div>
+                                    <div id="weight-2" class="weight_label" style="top:70%;">
+                                        <text fill="black">w<sub>2</sub> =</text>
+                                        <text contenteditable="true" id="w2" fill="black" class="weights" onkeypress="if (keyCode == 13) return false;"></text>
+                                    </div>
                                 </div>
-                            </td>
-                            <th id="tblinput1">
-                                <div class="input-content">x<sub>1</sub></div>
-                            </th>
-                            <th id="tblinput2">
-                                <div class="input-content">x<sub>2</sub></div>
-                            </th>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-
-            <div id="network-container" class="center">
-                <div class="center">
-                    <table id="selected-inputs" class="selected">
-                        <tr>
-                            <td id="selinput1">
-                                <div class="input-content">x<sub>1</sub></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td id="selinput2">
-                                <div class="input-content">x<sub>2</sub></div>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-                <div id = "input-links" class="center">
-                    <svg id="svg">
-                        <marker id="triangle" viewBox="0 0 10 10"
-                            refX="1" refY="5"
-                            markerUnits="strokeWidth"
-                            markerWidth="10" markerHeight="10"
-                            orient="auto">
-                            <path d="M 0 0 L 10 5 L 0 10 z" fill="black"/>
-                        </marker>
-                        <!--<line id="line" stroke="black" stroke-width="3" x1="0%" y1="30%" x2="80%" y2="40%" marker-end="url(#triangle)"/>-->
-                        <!--<line id="line" stroke="black" stroke-width="3" x1="0%" y1="70%" x2="80%" y2="60%" marker-end="url(#triangle)"/>-->
-                    </svg>
-                    <div id="input-link-text" class="center">
-                        <div id="weight-1" class="weight_label" style="top:22%;">
-                            <text fill="black">w<sub>1</sub> =</text>
-                            <text contenteditable="true" id="w1" fill="black" class="weights" onkeypress="if (keyCode == 13) return false;"></text>
+                            </div>
+                            <div id = "perceptron1" class="center">
+                                <div class="circle center">
+                                    <div id="threshold-text" class="center">
+                                        <text>∑> </text>
+                                        <text contenteditable="true" id="th1"></text>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id = "output-links" class="center">
+                                <svg id="svg">
+                                    <line id="line" stroke="black" stroke-width="3" x1="0%" y1="50%" x2="80%" y2="50%" marker-end="url(#triangle)"/>
+                                </svg>
+                            </div>
+                            <div class="center">
+                                <table class="selected" id="selected-output">
+                                    <tr>
+                                        <td id="seloutput"></td>
+                                    </tr>
+                                </table>
+                            </div>
                         </div>
-                        <div id="weight-2" class="weight_label" style="top:70%;">
-                            <text fill="black">w<sub>2</sub> =</text>
-                            <text contenteditable="true" id="w2" fill="black" class="weights" onkeypress="if (keyCode == 13) return false;"></text>
+
+                        <div id = "output-container" class="right">
+                            <div class = "rows">
+                                <table>
+                                    <tr>
+                                        <!--                            <th>-->
+                                        <!--                                <label>Show Desired</label>-->
+                                        <!--                                <label class="switch" >-->
+                                        <!--                                    <input type="checkbox" id="OutputToggle">-->
+                                        <!--                                    <span class="slider round"></span>-->
+                                        <!--                                </label>-->
+                                        <!--                            </th>-->
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class = "rows">
+                                <table id="output-table" class="table">
+                                    <tr>
+                                        <th>Activation    </th>
+                                        <th>Output        </th>
+                                        <th class="custom-th"> Desired <br> Output
+                                        </th>
+                                    </tr>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div id = "perceptron1" class="center">
-                    <div class="circle center">
-                        <div id="threshold-text" class="center">
-                            <text>∑> </text>
-                            <text contenteditable="true" id="th1"></text>
-                        </div>
-                    </div>
-                </div>
-                <div id = "output-links" class="center">
-                    <svg id="svg">
-                        <line id="line" stroke="black" stroke-width="3" x1="0%" y1="50%" x2="80%" y2="50%" marker-end="url(#triangle)"/>
-                    </svg>
-                </div>
-                <div class="center">
-                    <table class="selected" id="selected-output">
-                        <tr>
-                            <td id="seloutput"></td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
 
-            <div id = "output-container" class="cols" style="margin-top: 8%;">
-                <div class = "rows">
-                    <table>
-                        <tr>
-                            <th>
-                                <label>Show Desired</label>
-                                <label class="switch" >
-                                    <input type="checkbox" id="OutputToggle">
-                                    <span class="slider round"></span>
-                                </label>
-                            </th>
-                        </tr>
-                    </table>
-                </div>
-                <div class = "rows">
-                    <table id="output-table" class="table">
-                        <tr>
-                            <th>Activation    </th>
-                            <th>Output        </th>
-                            <th class="custom-th"> Desired <br> Output
-                            </th>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-        </div>
+
+                </th>
+            </tr>
+        </table>
+
 
         <script src="neuronsandbox.js"></script>
 
