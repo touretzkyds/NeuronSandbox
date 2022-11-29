@@ -81,7 +81,12 @@ class DataOperator {
             for (var c = startcol, m = table.rows[r].cells.length; c < m; c++) {
                 const cell = table.rows[r].cells[c];
                 const rawValue = cell.innerHTML;
-                const [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
+                let [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
+                console.log("parsed: " + parsedValue);
+                if(table.id === 'output-table' && c === 2 && (parsedValue !== 1 || parsedValue !== 0) ) {
+                    isValid = false;
+                    //console.log("invalid desired output")
+                }
                 display.highlightInvalidText(cell, isValid);
                 dataObj.data[r-start][c-startcol] = parsedValue;
             }
@@ -776,10 +781,29 @@ class Display {
     }
 
     checkDesiredOutput(output, desired) {
-        const outputInt = parseInt(output.innerHTML, 10);
-        const desiredInt = parseInt(desired.innerHTML, 10);
+        //const outputInt = parseInt(output.innerHTML, 10);
+        //const desiredInt = parseInt(desired.innerHTML, 10);
 
-        if (outputInt !== desiredInt && document.getElementById("OutputToggle").checked) {
+        const regex = '/^0*1?$/gm';
+
+
+        const outputInt = output.innerHTML;
+        let [oParsedValue, oisValid] = demo.stringToValidFloat(outputInt);
+
+        const desiredInt = desired.innerHTML;
+        console.log("comparing: " + outputInt + " " + desiredInt);
+        let [parsedValue, isValid] = demo.stringToValidFloat(desiredInt);
+
+        if(parsedValue === 1.0) desired.innerHTML = '1';
+        if(parsedValue === 0.0) desired.innerHTML = '0';
+        if(desiredInt.match(regex)) desired.innerHTML = '1';
+        //console.log("parsed: " + parsedValue);
+        if(parsedValue !== 1 && parsedValue !== 0 ) {
+            isValid = false;
+        }
+        display.highlightInvalidText(desired, isValid);
+
+        if (oParsedValue !== parsedValue && document.getElementById("OutputToggle").checked) {
             output.style.backgroundColor = "#ffbfcb";
         }
         else {
@@ -1043,6 +1067,7 @@ class Demo {
         }
         dataOp.updateDataFromTable(inputs, inputTable);
         if(document.getElementById("OutputToggle").checked) {
+            console.log("checking output")
             dataOp.updateDataFromTable(outputs, outputTable);
         }
 

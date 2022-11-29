@@ -2,6 +2,13 @@ h1 {
     text-align: center;
 }
 
+.heading-table {
+    width: 30%;
+    padding: 0;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .top-table {
     width: 20%;
     padding: 0;
