@@ -716,7 +716,11 @@ class Display {
     }
 
     UpdateInputToggle() {
+        console.log("In update input toggle");
         let checkbox = document.getElementById("InputToggle");
+
+        this.updateSelectedInput();
+
         if (!checkbox.checked) {
             $("#input-table tr:first").hide();
             $("#input-table tr td:nth-child(1)").hide();
@@ -969,13 +973,69 @@ class Demo {
     updateWeightUI(parentElement) {
 
         let childCount = parentElement.children.length;
-        // if(childCount === 1) {
-        //     let child = parentElement.children[0];
-        //     let top = 5;
-        //     child.style = "top:" + top + "%;";
-        //     child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>`;
-        // }
-        // else {
+        if(childCount === 1) {
+            let child = parentElement.children[0];
+            const top = 40;
+            child.style = "top:" + top + "%;";
+            child.innerHTML = `<text>w<sub>${1}</sub> =</text> <text contenteditable="true" id="w${1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[0]}</text>`;
+        }
+        else if(childCount === 3) {
+            let first = 20;
+            let last = 70;
+            let interval = (last - first) / (childCount - 1);
+            for (let i = 0; i < parentElement.children.length; i++) {
+                let child = parentElement.children[i];
+                let top = Math.floor(first + i * interval);
+                child.style = "top:" + top + "%;";
+                child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>`;
+            }
+            let child = parentElement.children[1];
+            const top = 38;
+            child.style = "top:" + top + "%;";
+            child.innerHTML = `<text>w<sub>${2}</sub> =</text> <text contenteditable="true" id="w${2}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[1]}</text>`;
+
+        }
+        else if(childCount === 4) {
+            let first = 10;
+            let last = 80;
+            let interval = (last - first) / (childCount - 1);
+            for (let i = 0; i < parentElement.children.length; i++) {
+                let child = parentElement.children[i];
+                let top = Math.floor(first + i * interval);
+                //child.style = "left:" + -10 + "%;";
+                child.style = "left:" + -10 + "%;" + "top:" + top + "%;";
+                child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>`;
+            }
+            // let child = parentElement.children[2];
+            // const top = 60;
+            // child.style = "top:" + top + "%;";
+            // child.innerHTML = `<text>w<sub>${3}</sub> =</text> <text contenteditable="true" id="w${3}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[2]}</text>`;
+            //
+            // let child2 = parentElement.children[3];
+            // const top2 = 80;
+            // child2.style = "top:" + top2 + "%;";
+            // child2.innerHTML = `<text>w<sub>${4}</sub> =</text> <text contenteditable="true" id="w${4}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[3]}</text>`;
+
+        }
+        else if(childCount === 5) {
+            let first = 10;
+            let last = 80;
+            let interval = (last - first) / (childCount - 1);
+            for (let i = 0; i < parentElement.children.length; i++) {
+                let child = parentElement.children[i];
+                let top = Math.floor(first + i * interval);
+                child.style = "left:" + -20 + "%;" + "top:" + top + "%;";
+                child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>`;
+            }
+            // let child = parentElement.children[4];
+            // const top = 80;
+            // child.style = "top:" + top + "%;";
+            // child.innerHTML = `<text>w<sub>${5}</sub> =</text> <text contenteditable="true" id="w${5}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[4]}</text>`;
+
+
+
+        }
+        else {
             let first = 20;
             let last = 70;
             let interval = (last - first) / (childCount - 1);
@@ -986,7 +1046,7 @@ class Demo {
                 child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>`;
             }
 
-        //}
+        }
 
     }
 
