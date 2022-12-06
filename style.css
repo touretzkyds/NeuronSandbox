@@ -49,6 +49,22 @@ h1 {
     align-items: center;
 }
 
+.center-input {
+
+    width: 40%;
+    height: 100%;
+    display: inline-flex;
+    margin-left: 0%;
+}
+
+.center-output {
+
+    width: 20%;
+    height: 100%;
+    display: inline-flex;
+    margin-left: 0%;
+}
+
 .right {
     margin: 1px;
     width: 20%;
@@ -220,6 +236,9 @@ h1 {
     width: 10vw;
     line-height: 5vh !important;
     overflow-wrap: break-word;
+}
+.output-th {
+    width: 2vw !important;
 }
 
 .table tr {

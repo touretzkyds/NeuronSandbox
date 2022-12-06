@@ -25,7 +25,7 @@
                 </th>
 
                 <th>
-                    <input type="text" id="fname" name="fname">
+                    <input type="text" id="fname" name="fname" placeholder="model">
                 </th>
 
 
@@ -57,11 +57,15 @@
                 </th>
 
                 <th>
+                    <input type="url" name="url" id="url"
+                           placeholder="model.json"
+                           pattern="https://.*" size="30"
+                    >
                     <!--                            <button for="upload-file" class="custom-btn myButton">-->
                     <!--                                <i class="fa fa-upload" aria-hidden="true"></i>-->
                     <!--                                upload file ...-->
                     <!--                            </button>-->
-                    <a href="javascript:document.getElementById('upload-file').click();" class="custom-btn myButton">
+                    <a href="javascript:uploadFileEx();" class="custom-btn myButton">
                         <i class="fa fa-upload" aria-hidden="true"></i> Load Model
                     </a>
 
@@ -116,7 +120,7 @@
                         </div>
 
                         <div id="network-container" class="center">
-                            <div class="center">
+                            <div class="center-input">
                                 <table id="selected-inputs" class="selected">
                                     <tr>
                                         <td id="selinput1">
@@ -166,10 +170,10 @@
                                     <line id="line" stroke="black" stroke-width="3" x1="0%" y1="50%" x2="80%" y2="50%" marker-end="url(#triangle)"/>
                                 </svg>
                             </div>
-                            <div class="center">
+                            <div class="center-output">
                                 <table class="selected" id="selected-output">
                                     <tr>
-                                        <td id="seloutput"></td>
+                                        <td id="seloutput" class = "output-th"></td>
                                     </tr>
                                 </table>
                             </div>

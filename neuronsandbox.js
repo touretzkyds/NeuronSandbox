@@ -494,7 +494,6 @@ class Display {
 
     initializeDisplay(){
         // make weights and threshold editable on initialization
-        //TODO make arrows here?
 
         demo.weights.map((w, idx) => {
             this.displayWeightFromData(`w${idx+1}`, idx);
@@ -579,6 +578,8 @@ class Display {
             }
         }
 
+        //TODO : line.position()
+        //TODO: line.setOptions()
 
         for(let i = 0; i < demo.selectedInput.length; i++)
         {
@@ -709,6 +710,25 @@ class Display {
                     headerInputHtml = "<br>";
                 }
                 headerRowVals.push(headerInputHtml);
+            }
+            else
+                console.log("missing input")
+        }
+    }
+
+    setHeaderRowVals (headerRowVals) {
+        const headerCells = document.getElementById("input-table").rows[1].cells;
+        for (var c = 1; c < headerCells.length; c++) {
+            //var headerInput = document.getElementById(`tblinput${c}`);
+            var headerInput = headerCells[c];
+            //var headerInput = document.querySelector(`#input-table> tbody > tr:nth-child(${2}) > td:nth-child(${c} > div:nth-child(${1}))`);
+            if (headerInput.id.startsWith("tblinput"))
+                /*if(headerInput.children[0]) {
+                    headerRowVals.push(headerInput.children[0].innerHTML);
+                }
+                else*/
+            {
+                headerInput.innerHTML = headerRowVals[c-1];
             }
             else
                 console.log("missing input")
@@ -892,7 +912,7 @@ class Demo {
             [1, 1],
         ];
         this.weights = [1,-2];
-        this.threshold = 1;
+        this.threshold = 0;
         this.defaultSelectedInput = [`x<sub>1</sub>`, `x<sub>2</sub>`];
         this.defaultSelectedOutput = ["activation", "y"];
         this.selectedInput = this.defaultSelectedInput;
@@ -1136,9 +1156,9 @@ class Demo {
         perceptron.computeOutputs();
         // TODO: ineffecient 2 steps, update step needed:
         outputs.update(perceptron.outputData);
+        outputTable.dataObj = outputs;
         outputTable.updateTable();
         display.updateDisplay();
-
     }
 
     // convert to valid inputs for processing and keep track of invalid parts of input
@@ -1155,34 +1175,69 @@ class Demo {
     }
 }
 
-function downloadFile() {
+async function downloadFile() {
     let inputToggleChecked=document.getElementById("InputToggle").checked;
     let outputToggleChecked=document.getElementById("OutputToggle").checked;
     //updateDesiredOutput();
     //console.log("in download: "+  demo.inputData);
+    let headerRows = [];
+    display.getHeaderRowVals(headerRows);
+    const modelname = document.getElementById("fname").value
+
+    const handle = await showSaveFilePicker({
+        suggestedName: modelname + '.json',
+        types: [{
+            description: 'Neuron Sandbox model',
+            accept: {'application/json': ['.json']},
+        }],
+    });
+
     let dict = {
+        "model-name" : handle.name.substring(0, handle.name.length - 5),
         "input": demo.inputData,
         "weight": demo.weights,
         "threshold": demo.threshold,
         "desired-output": desiredOutputs,
         "input-toggle-checked" : inputToggleChecked,
-        "output-toggle-checked" : outputToggleChecked
+        "output-toggle-checked" : outputToggleChecked,
+        "input-header": headerRows,
     };
-    let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dict));
-    let el = document.getElementById('downloadFile');
-    el.setAttribute("href", dataStr);
-    el.setAttribute("download", "neuronsandbox.json");
+
+
+
+    const blob = new Blob([JSON.stringify(dict)]);
+    const writableStream = await handle.createWritable();
+    await writableStream.write(blob);
+    await writableStream.close();
+}
+async function uploadFileEx(event) {
+    let url = document.getElementById("url").value;
+    if(url) {
+        fetch(url, {
+            mode: "no-cors",
+            method: "GET",
+            headers: {
+                accept: '*/*',
+            }
+        })
+            .then(res => res.text())
+            .then(text => {
+                console.log('Downloaded this JSON! ', text);
+                uploadJson(text);
+            })
+            .catch(err =>
+            {
+                throw err
+            });
+    }
+    else {
+        document.getElementById('upload-file').click();
+    }
 }
 
-async function uploadFile(event)
-{
-
-    const file = event.target.files.item(0)
-    if(!file) {
+function uploadJson(text) {
+    if(!text)
         return;
-    }
-    const text = await file.text();
-
     demo.removeAllInputDataRows(false);
     demo.removeAllInputDataCols(false);
     demo.removeAllWeightCol();
@@ -1193,15 +1248,16 @@ async function uploadFile(event)
     demo.weights = []; //clear weight array first, due to the insertWeightCol below
     demo.threshold = dict["threshold"];
     desiredOutputs = dict["desired-output"];
+    document.getElementById('fname').value  = dict["model-name"]
 
     inputs = new Data(demo.inputData);
 
-    for(let c = inputTable.numCols; c < inputs.data[0]?.length;c++) {
+    for (let c = inputTable.numCols; c < inputs.data[0]?.length; c++) {
         inputTable.insertTableCol(1);
     }
 
     let parentElement = document.getElementById("input-link-text");
-    for(let c = parentElement.children.length; c < inputs.data[0]?.length;c++) {
+    for (let c = parentElement.children.length; c < inputs.data[0]?.length; c++) {
         demo.insertWeightCol(0);
     }
 
@@ -1217,7 +1273,7 @@ async function uploadFile(event)
     demo.inputData = dict["input"];
     inputs = new Data(demo.inputData);
     outputs = new Data(perceptron.outputData);
-    for(let i = 0; i < desiredOutputs.rows; i++) {
+    for (let i = 0; i < desiredOutputs.rows; i++) {
         outputs.data[i][2] = desiredOutputs.data[i];
     }
     dataOp.updateTableFromData(inputs, inputTable);
@@ -1228,6 +1284,20 @@ async function uploadFile(event)
     document.getElementById('OutputToggle').checked = dict["output-toggle-checked"];
     display.handleHoverExit();
     demo.update();
+    let headerRows = dict["input-header"];
+    if(headerRows?.length) {
+        display.setHeaderRowVals(headerRows);
+    }
+}
+
+async function uploadFile(event)
+{
+    const file = event.target.files.item(0)
+    if(!file) {
+        return;
+    }
+    const text = await file.text();
+    uploadJson(text);
 }
 
 window.onload = function(){
