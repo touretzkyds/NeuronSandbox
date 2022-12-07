@@ -1047,10 +1047,25 @@ class Demo {
                 child.style = "left:" + -20 + "%;" + "top:" + top + "%;";
                 child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>`;
             }
-            // let child = parentElement.children[4];
-            // const top = 80;
-            // child.style = "top:" + top + "%;";
-            // child.innerHTML = `<text>w<sub>${5}</sub> =</text> <text contenteditable="true" id="w${5}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[4]}</text>`;
+             let child = parentElement.children[1];
+             const left = -40;
+             const top = 10 + 17.5
+             child.style = "left:" + left + "%;" + "top:" + top + "%;";
+             child.innerHTML = `<text>w<sub>${2}</sub> =</text> <text contenteditable="true" id="w${2}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[1]}</text>`;
+
+            let child1 = parentElement.children[2];
+            const left1 = -80;
+            const top1 = 10 + 17.5*2 - 5
+            child1.style = "left:" + left1 + "%;" + "top:" + top1 + "%;";
+            child1.innerHTML = `<text>w<sub>${3}</sub> =</text> <text contenteditable="true" id="w${3}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[2]}</text>`;
+
+            let child2 = parentElement.children[3];
+            const left2 = -40;
+            const top2 = 10 + 17.5*2 + 8
+            child2.style = "left:" + left2 + "%;" + "top:" + top2 + "%;";
+            child2.innerHTML = `<text>w<sub>${4}</sub> =</text> <text contenteditable="true" id="w${4}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[3]}</text>`;
+
+
 
 
 
@@ -1178,7 +1193,6 @@ class Demo {
 async function downloadFile() {
     let inputToggleChecked=document.getElementById("InputToggle").checked;
     let outputToggleChecked=document.getElementById("OutputToggle").checked;
-    //updateDesiredOutput();
     //console.log("in download: "+  demo.inputData);
     let headerRows = [];
     display.getHeaderRowVals(headerRows);
@@ -1192,6 +1206,19 @@ async function downloadFile() {
             accept: {'application/json': ['.json']},
         }],
     });
+
+    // var table = document.getElementById("output-table");
+    // console.log(table);
+    // if(desiredOutputs.length === 4) {
+    //     for(var i = 0; i < table.rows.length; i++ ) {
+    //         var tr = table.rows[i];
+    //         var td = tr.cells[2];
+    //         desiredOutputs[i] = td.innerHTML;
+    //         console.log("desired output: " + desiredOutputs[i])
+    //
+    //     }
+    // }
+    //dataOp.updateDataFromTable(outputs, outputTable);
 
     let dict = {
         "model-name" : handle.name.substring(0, handle.name.length - 5),
