@@ -1182,7 +1182,8 @@ async function downloadFile() {
     //console.log("in download: "+  demo.inputData);
     let headerRows = [];
     display.getHeaderRowVals(headerRows);
-    const modelname = document.getElementById("fname").value
+    let modelname = document.getElementById("fname").value
+    if(modelname.length == 0)  modelname = "model"
 
     const handle = await showSaveFilePicker({
         suggestedName: modelname + '.json',

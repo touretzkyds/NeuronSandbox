@@ -219,6 +219,8 @@ h1 {
     border-collapse: collapse;
     text-align: center;
     border-spacing: 1px;
+    /*table-layout: fixed;*/
+    /*width: 40%;*/
 }
 
 .table th {
@@ -226,14 +228,22 @@ h1 {
     color: white;
 }
 
-.table td, .table th {
+.table td {
     line-height: 10vh;
-    width: 10vw;
+    width: 7vw;
     overflow-wrap: break-word;
+    font-size: 25px;
+}
+
+.table th {
+    line-height: 10vh;
+    width: 7vw;
+    overflow-wrap: break-word;
+    font-size: 20px;
 }
 
 .custom-th {
-    width: 10vw;
+    width: 7vw;
     line-height: 5vh !important;
     overflow-wrap: break-word;
 }
@@ -317,10 +327,10 @@ h1 {
 
 .column-buttons-container{
     height: 4vh;
-    width: 8vw;
+    width: 7vw;
     display: flex;
     flex-direction: row;
-    transform: translate(1.0vw, 0);
+    transform: translate(.7vw, 0);
     justify-content: space-between;
     align-items: center;
     position: relative;
