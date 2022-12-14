@@ -25,7 +25,7 @@
                 </th>
 
                 <th>
-                    <input type="text" id="fname" name="fname" placeholder="model">
+                    <input type="text" class="input-name" id="fname" name="fname" placeholder="Enter Model Name">
                 </th>
 
 
@@ -57,10 +57,12 @@
                 </th>
 
                 <th>
-                    <input type="url" name="url" id="url"
-                           placeholder="model.json"
-                           pattern="https://.*" size="30"
-                    >
+                    <div class="user-input-wrp">
+                        <br/>
+                        <input type="text" class="inputText" name="url" id="url" size="160" required/>
+                        <span class="floating-label">Model Url Or Blank To Browse </span>
+                    </div>
+
                     <!--                            <button for="upload-file" class="custom-btn myButton">-->
                     <!--                                <i class="fa fa-upload" aria-hidden="true"></i>-->
                     <!--                                upload file ...-->
@@ -74,7 +76,7 @@
                     <input id="upload-file" style="display:none;" type="file" accept="application/JSON" onchange="uploadFile(event)"/>
                 </th>
                 <th>
-                    <a style = "margin-top: 14%" href="#" id="downloadFile" role="button" onclick="downloadFile();" class="custom-btn myButton"><i class="fa fa-download" aria-hidden="true"></i> Save Model</a>
+                    <a style = "margin-top: 19%" href="#" id="downloadFile" role="button" onclick="downloadFile();" class="custom-btn myButton"><i class="fa fa-download" aria-hidden="true"></i> Save Model</a>
 
                     <!--                            <button id="downloadFile" onclick="downloadFile();" class="custom-btn myButton" >-->
                     <!--                                <i class="fa fa-download" aria-hidden="true"></i>-->

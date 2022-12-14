@@ -568,13 +568,13 @@ class Display {
         var start = 35;
 
         if(demo.selectedInput.length == 2)
-            percents = [35, 65]
+            percents = [50, 50]
         else if(demo.selectedInput.length == 1)
             percents = [50]
         else {
             for(let i = 0; i < demo.selectedInput.length; i++ ) {
-                percents.push(start);
-                start += interval;
+                percents.push(50);
+                //start += interval;
             }
         }
 
@@ -585,7 +585,7 @@ class Display {
         {
             demo.weight_lines[i] = new LeaderLine(
                 LeaderLine.pointAnchor(selections.rows[i].cells[0], {x: '110%', y: '50%'}),
-                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '-5%', y: percents[i]+'%'})
+                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '6%', y: percents[i]+'%'})
             );
             //console.log("making leader lines: " + selections.rows[i].cells[0]);
             demo.weight_lines[i].color = 'black';
@@ -1006,12 +1006,12 @@ class Demo {
             for (let i = 0; i < parentElement.children.length; i++) {
                 let child = parentElement.children[i];
                 let top = Math.floor(first + i * interval);
-                child.style = "top:" + top + "%;";
+                child.style = "left:" + -20 + "%;" + "top:" + top + "%;";
                 child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>`;
             }
             let child = parentElement.children[1];
             const top = 38;
-            child.style = "top:" + top + "%;";
+            child.style = "left: -20%;" +  "top:" + top + "%;";
             child.innerHTML = `<text>w<sub>${2}</sub> =</text> <text contenteditable="true" id="w${2}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[1]}</text>`;
 
         }
@@ -1023,7 +1023,7 @@ class Demo {
                 let child = parentElement.children[i];
                 let top = Math.floor(first + i * interval);
                 //child.style = "left:" + -10 + "%;";
-                child.style = "left:" + -10 + "%;" + "top:" + top + "%;";
+                child.style = "left:" + -50 + "%;" + "top:" + top + "%;";
                 child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>`;
             }
             // let child = parentElement.children[2];
@@ -1219,7 +1219,7 @@ async function downloadFile() {
     //     }
     // }
     //dataOp.updateDataFromTable(outputs, outputTable);
-
+    demo.threshold = perceptron.threshold;
     let dict = {
         "model-name" : handle.name.substring(0, handle.name.length - 5),
         "input": demo.inputData,
@@ -1238,25 +1238,29 @@ async function downloadFile() {
     await writableStream.write(blob);
     await writableStream.close();
 }
+
+function uploadFromUrl(url) {
+    fetch(url, {
+        mode: "no-cors",
+        method: "GET",
+        headers: {
+            accept: '*/*',
+        }
+    })
+        .then(res => res.text())
+        .then(text => {
+            console.log('Downloaded this JSON! ', text);
+            uploadJson(text);
+        })
+        .catch(err => {
+            throw err
+        });
+}
+
 async function uploadFileEx(event) {
     let url = document.getElementById("url").value;
     if(url) {
-        fetch(url, {
-            mode: "no-cors",
-            method: "GET",
-            headers: {
-                accept: '*/*',
-            }
-        })
-            .then(res => res.text())
-            .then(text => {
-                console.log('Downloaded this JSON! ', text);
-                uploadJson(text);
-            })
-            .catch(err =>
-            {
-                throw err
-            });
+        uploadFromUrl(url);
     }
     else {
         document.getElementById('upload-file').click();
@@ -1307,6 +1311,7 @@ function uploadJson(text) {
     dataOp.updateTableFromData(inputs, inputTable);
     perceptron = new Perceptron(inputs, demo.weights, demo.threshold);
     perceptron.setWeightsUI();
+    display.displayThresholdFromData(perceptron);
     //document.getElementById('InputToggle').checked = dict["input-toggle-checked"];
     document.getElementById('InputToggle').checked = false;
     document.getElementById('OutputToggle').checked = dict["output-toggle-checked"];
@@ -1349,6 +1354,7 @@ dataOp.createBinaryData(2);
 perceptron.displayPerceptron();
 const display = new Display();
 display.updateDisplay();
+uploadFromUrl("SampleModel.json");
 
 document.addEventListener("DOMContentLoaded", () => {
     demo.main().catch(e => console.error(e));
@@ -1365,4 +1371,3 @@ $('#OutputToggle').change(function() { //toggle output
 $('#BinaryToggle').change(function() { //toggle output
     display.UpdateBinaryToggle();
 });
-

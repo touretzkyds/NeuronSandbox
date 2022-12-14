@@ -7,6 +7,12 @@ h1 {
     text-align: center;
 }
 
+.input-name {
+    width: 80%;
+    height: 25px;
+    font-size: large;
+}
+
 .heading-table {
     width: 30%;
     padding: 0;
@@ -286,7 +292,7 @@ h1 {
     border-collapse: collapse;
     width: 20%;
     height: 100%;
-    text-align: center;
+    text-align: right;
 }
 
 .input-content {
@@ -428,6 +434,39 @@ h1 {
     visibility: visible;
     opacity: 1;
 }
+
+/* Position the label so that it is initially hidden */
+.user-input-wrp {
+    position: relative;
+    width: 100%;
+}
+.user-input-wrp .inputText{
+    width: 100%;
+    outline: none;
+    border:none;
+    border-bottom: 1px solid #777;
+    box-shadow: none !important;
+}
+.user-input-wrp .inputText:focus{
+    border-color: blue;
+    border-width: medium medium 2px;
+}
+.user-input-wrp .floating-label {
+    position: absolute;
+    pointer-events: none;
+    top: 18px;
+    left: 10px;
+    Color: #808080;
+    transition: 0.2s ease all;
+}
+.user-input-wrp input:focus ~ .floating-label,
+.user-input-wrp input:not(:focus):valid ~ .floating-label{
+    top: 0px;
+    left: 10px;
+    font-size: 13px;
+    opacity: 1;
+}
+
 
 /*input[type="file"] {*/
 /*    display: none;*/
