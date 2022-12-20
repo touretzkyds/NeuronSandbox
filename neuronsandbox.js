@@ -563,18 +563,18 @@ class Display {
         demo.weight_lines = []
 
         var percents = [];
-        let interval = 35/demo.selectedInput.length
-        var pre = -interval;
-        var start = 35;
-
+        let interval = 6/demo.selectedInput.length
+        var start = 47;
         if(demo.selectedInput.length == 2)
-            percents = [50, 50]
+            percents = [47, 53]
+        else if(demo.selectedInput.length == 3)
+            percents = [47, 50, 53]
         else if(demo.selectedInput.length == 1)
             percents = [50]
         else {
             for(let i = 0; i < demo.selectedInput.length; i++ ) {
-                percents.push(50);
-                //start += interval;
+                percents.push(start);
+                start += interval;
             }
         }
 
@@ -583,13 +583,18 @@ class Display {
 
         for(let i = 0; i < demo.selectedInput.length; i++)
         {
+            // demo.weight_lines[i] = new LeaderLine(
+            //     LeaderLine.pointAnchor(selections.rows[i].cells[0], {x: '110%', y: '50%'}),
+            //     LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '6%', y: percents[i]+'%'})
+            // );
             demo.weight_lines[i] = new LeaderLine(
                 LeaderLine.pointAnchor(selections.rows[i].cells[0], {x: '110%', y: '50%'}),
-                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '6%', y: percents[i]+'%'})
+                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '-8%', y: percents[i]+'%'})
             );
             //console.log("making leader lines: " + selections.rows[i].cells[0]);
             demo.weight_lines[i].color = 'black';
             demo.weight_lines[i].path = 'straight';
+            demo.weight_lines[i].position();
         }
         $(".draggable").draggable();
         //$( ".weight_label" ).draggable();
@@ -767,6 +772,11 @@ class Display {
             });
             //document.getElementById("generateTruthTable").disabled = false;
             document.getElementById("output-table").style.marginTop = "50px";
+        }
+
+        for(let i = 0; i < demo.weight_lines.length; i++)
+        {
+            demo.weight_lines[i].position();
         }
     }
 

@@ -55,6 +55,16 @@ h1 {
     align-items: center;
 }
 
+.center-perceptron {
+    margin: 10px;
+    width: 40%;
+    height: 100%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
 .center-input {
 
     width: 40%;
