@@ -583,10 +583,6 @@ class Display {
 
         for(let i = 0; i < demo.selectedInput.length; i++)
         {
-            // demo.weight_lines[i] = new LeaderLine(
-            //     LeaderLine.pointAnchor(selections.rows[i].cells[0], {x: '110%', y: '50%'}),
-            //     LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '6%', y: percents[i]+'%'})
-            // );
             demo.weight_lines[i] = new LeaderLine(
                 LeaderLine.pointAnchor(selections.rows[i].cells[0], {x: '110%', y: '50%'}),
                 LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '-8%', y: percents[i]+'%'})
@@ -967,6 +963,8 @@ class Demo {
         dataOp.removeDataRow(inputs, r);
         outputTable.removeTableRow(r-1);
         dataOp.removeDataRow(outputs, r);
+        demo.lines.forEach(line => line.remove());
+        demo.lines = []
         demo.update(); //TODO: check if efficient
     }
 
