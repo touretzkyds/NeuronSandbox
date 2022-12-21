@@ -1217,17 +1217,16 @@ async function downloadFile() {
         }],
     });
 
-    // var table = document.getElementById("output-table");
-    // console.log(table);
-    // if(desiredOutputs.length === 4) {
-    //     for(var i = 0; i < table.rows.length; i++ ) {
-    //         var tr = table.rows[i];
-    //         var td = tr.cells[2];
-    //         desiredOutputs[i] = td.innerHTML;
-    //         console.log("desired output: " + desiredOutputs[i])
-    //
-    //     }
-    // }
+    var table = document.getElementById("output-table");
+    console.log(table);
+    for(var i = 1; i < table.rows.length; i++ ) {
+        var tr = table.rows[i];
+        var td = tr.cells[2];
+        desiredOutputs.data[i-1] = td.innerHTML;
+        console.log("desired output: " + desiredOutputs.data[i-1]);
+    }
+    desiredOutputs.rows = table.rows.length-1;
+
     //dataOp.updateDataFromTable(outputs, outputTable);
     demo.threshold = perceptron.threshold;
     let dict = {
@@ -1310,7 +1309,7 @@ function uploadJson(text) {
         dataOp.insertDataRow(outputs, 0);
     }
 
-    dataOp.updateTableFromDesired(desiredOutputs, outputTable);
+    //dataOp.updateTableFromDesired(desiredOutputs, outputTable);
 
     demo.inputData = dict["input"];
     inputs = new Data(demo.inputData);
@@ -1330,6 +1329,18 @@ function uploadJson(text) {
     let headerRows = dict["input-header"];
     if(headerRows?.length) {
         display.setHeaderRowVals(headerRows);
+    }
+    dataOp.updateTableFromDesired(desiredOutputs, outputTable);
+
+    var outputCol = document.getElementById("output-table");
+    var n = outputCol.rows.length;
+
+    for(var i = 1; i < n; i++)
+    {
+        //var tr = outputCol.rows[i];
+        let output = outputCol.rows[i].cells[1];
+        let desired = outputCol.rows[i].cells[2];
+        display.checkDesiredOutput(output, desired);
     }
 }
 
