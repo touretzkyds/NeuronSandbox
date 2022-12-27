@@ -73,7 +73,7 @@
 
                     <!--                            <input type="button"  class="custom-btn myButton" id="loadFileJson" value="Upload Model" onclick="document.getElementById('upload-file').click();"> </input>-->
 
-                    <input id="upload-file" style="display:none;" type="file" accept="application/JSON" onchange="uploadFile(event)"/>
+                    <input id="upload-file" style="display:none;" type="file" accept="application/JSON" onchange="console.log('event = ', event); uploadFile(event)"/>
                 </th>
                 <th>
                     <a style = "margin-top: 19%" href="#" id="downloadFile" role="button" onclick="downloadFile();" class="custom-btn myButton"><i class="fa fa-download" aria-hidden="true"></i> Save Model</a>
@@ -149,11 +149,11 @@
                                     <!--<line id="line" stroke="black" stroke-width="3" x1="0%" y1="70%" x2="80%" y2="60%" marker-end="url(#triangle)"/>-->
                                 </svg>
                                 <div id="input-link-text" class="center">
-                                    <div id="weight-1" class="weight_label" style="top:22%;">
+                                    <div id="weight-1" class="weight_label" >
                                         <text fill="black">w<sub>1</sub> =</text>
                                         <text contenteditable="true" id="w1" fill="black" class="weights" onkeypress="if (keyCode == 13) return false;"></text>
                                     </div>
-                                    <div id="weight-2" class="weight_label" style="top:70%;">
+                                    <div id="weight-2" class="weight_label">
                                         <text fill="black">w<sub>2</sub> =</text>
                                         <text contenteditable="true" id="w2" fill="black" class="weights" onkeypress="if (keyCode == 13) return false;"></text>
                                     </div>

@@ -247,6 +247,7 @@ h1 {
 .table td {
     line-height: 10vh;
     width: 7vw;
+    min-width: 5vw;
     overflow-wrap: break-word;
     font-size: 25px;
 }

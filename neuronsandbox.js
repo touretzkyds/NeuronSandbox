@@ -24,7 +24,6 @@ class DesiredOutputData {
 
 class DataOperator {
     constructor(){
-        this.DEFAULT_VALUE = 10;
     }
 
     insertDataRow(dataObj, n=1, pos){
@@ -581,6 +580,13 @@ class Display {
         //TODO : line.position()
         //TODO: line.setOptions()
 
+        const min = 0.0
+        const max = 100.0
+        const new_min = 5.0
+        const new_max = 20.0
+
+        let weight_labels = document.getElementById("input-link-text").children;
+
         for(let i = 0; i < demo.selectedInput.length; i++)
         {
             demo.weight_lines[i] = new LeaderLine(
@@ -588,11 +594,26 @@ class Display {
                 LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '-8%', y: percents[i]+'%'})
             );
             //console.log("making leader lines: " + selections.rows[i].cells[0]);
-            demo.weight_lines[i].color = 'black';
+            //TODO: some color to indicate that weight is incorrect? (if it's not a valid number/weight)
+            let splitup = weight_labels[i].textContent.split(" ")
+            let num = splitup[splitup.length-1]
+            console.log("weight label html: " + weight_labels[i].innerHTML);
+            if(demo.stringToValidFloat(num)[0] === 0)
+                demo.weight_lines[i].color = 'blue';
+            else if(demo.stringToValidFloat(num)[0] < 0)
+                demo.weight_lines[i].color = 'red';
+            else
+                demo.weight_lines[i].color = 'black';
             demo.weight_lines[i].path = 'straight';
             demo.weight_lines[i].position();
+            if(demo.stringToValidFloat(num)[1]) { //value is a valid number
+                let line_size = ((new_max-new_min)*(Math.abs(demo.stringToValidFloat(num)[0])-min))/(max-min)+new_min
+                demo.weight_lines[i].size = line_size;
+            }
+
+            //line weights can range from 1-6
         }
-        $(".draggable").draggable();
+        $( ".draggable" ).draggable();
         //$( ".weight_label" ).draggable();
         //$( ".weight" ).draggable();
     }
@@ -789,6 +810,11 @@ class Display {
             let output = outputCol.rows[i].cells[1];
             let desired = outputCol.rows[i].cells[2];
             this.checkDesiredOutput(output, desired);
+        }
+
+        for(let i = 0; i < demo.weight_lines.length; i++)
+        {
+            demo.weight_lines[i].position();
         }
     }
 
@@ -1270,12 +1296,14 @@ async function uploadFileEx(event) {
         uploadFromUrl(url);
     }
     else {
-        document.getElementById('upload-file').click();
+        const fileInput = document.getElementById('upload-file');
+        fileInput.value = '';
+        fileInput.click();
     }
 }
 
 function uploadJson(text) {
-    if(!text)
+    if (!text)
         return;
     demo.removeAllInputDataRows(false);
     demo.removeAllInputDataCols(false);
@@ -1342,10 +1370,9 @@ function uploadJson(text) {
     }
 }
 
-async function uploadFile(event)
-{
+async function uploadFile(event) {
     const file = event.target.files.item(0)
-    if(!file) {
+    if (!file) {
         return;
     }
     const text = await file.text();
