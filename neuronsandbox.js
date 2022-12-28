@@ -81,7 +81,6 @@ class DataOperator {
                 const cell = table.rows[r].cells[c];
                 const rawValue = cell.innerHTML;
                 let [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
-                console.log("parsed: " + parsedValue);
                 if(table.id === 'output-table' && c === 2 && (parsedValue !== 1 || parsedValue !== 0) ) {
                     isValid = false;
                     //console.log("invalid desired output")
@@ -140,15 +139,18 @@ class DataOperator {
     makeEditable(textbox, editable = true){ // TODO: Move from dataOp to displayOp
         textbox.contentEditable = editable;
         // add event listener to update demo with table changes
-        textbox.addEventListener("focusout", function(event){
-            demo.update(this);
-        });
-        // accept enter and esc keypress in text boxes
-        textbox.addEventListener("keydown", function(event){
-            if (event.key === "Enter" || event.key === "Escape") {
-                textbox.blur(); // focus out of text box
-            }
-        });
+        if (!textbox.classList.contains("edit-handler")) {
+            textbox.classList.add("edit-handler")
+            textbox.addEventListener("keydown", function(event){
+                if (event.keyCode === 13 || event.keyCode === 27) {
+                    textbox.blur(); // focus out of text box
+                    demo.update(this);
+                    console.log(this);
+                }
+            });
+
+        }
+
     }
 
 }
@@ -545,7 +547,6 @@ class Display {
 
     updateSelectedInput()
     {
-        console.log("selected input: " + demo.selectedInput)
         if(!demo.selectedInput)
             return;
         let selections = document.getElementById("selected-inputs");
@@ -561,14 +562,14 @@ class Display {
         //empties lines array
         demo.weight_lines = []
 
-        var percents = [];
-        let interval = 6/demo.selectedInput.length
-        var start = 47;
-        if(demo.selectedInput.length == 2)
-            percents = [47, 53]
-        else if(demo.selectedInput.length == 3)
-            percents = [47, 50, 53]
-        else if(demo.selectedInput.length == 1)
+        let percents = [];
+        let interval = 16/demo.selectedInput.length
+        let start = 42;
+        if(demo.selectedInput.length === 2)
+            percents = [42, 58]
+        else if(demo.selectedInput.length === 3)
+            percents = [42, 50, 58]
+        else if(demo.selectedInput.length === 1)
             percents = [50]
         else {
             for(let i = 0; i < demo.selectedInput.length; i++ ) {
@@ -597,7 +598,6 @@ class Display {
             //TODO: some color to indicate that weight is incorrect? (if it's not a valid number/weight)
             let splitup = weight_labels[i].textContent.split(" ")
             let num = splitup[splitup.length-1]
-            console.log("weight label html: " + weight_labels[i].innerHTML);
             if(demo.stringToValidFloat(num)[0] === 0)
                 demo.weight_lines[i].color = 'blue';
             else if(demo.stringToValidFloat(num)[0] < 0)
@@ -608,10 +608,11 @@ class Display {
             demo.weight_lines[i].position();
             if(demo.stringToValidFloat(num)[1]) { //value is a valid number
                 let line_size = ((new_max-new_min)*(Math.abs(demo.stringToValidFloat(num)[0])-min))/(max-min)+new_min
+                if(line_size >= 20)
+                    line_size = 20;
                 demo.weight_lines[i].size = line_size;
             }
 
-            //line weights can range from 1-6
         }
         $( ".draggable" ).draggable();
         //$( ".weight_label" ).draggable();
@@ -661,7 +662,11 @@ class Display {
             //console.log("enter: set outputRow =" + outputRow);
         }
         else {
-            this.handleHoverExit(inputRow, outputRow);
+            if(rowIdx % 2 === 0)
+                this.handleHoverExit(inputRow, outputRow );
+            else
+                this.handleHoverExit(inputRow, outputRow, true );
+
         }
         //this.displaySelectedInput();
         this.updateSelectedInput();
@@ -695,7 +700,7 @@ class Display {
         }
     }
 
-    handleHoverExit(inputRow, outputRow) {
+    handleHoverExit(inputRow, outputRow, isOdd = false) {
         // reset display panel inputs to user-defined inputs (#11)
         var headerRowVals = [];
         this.getHeaderRowVals(headerRowVals);
@@ -704,14 +709,19 @@ class Display {
         demo.selectedInput = headerRowVals;
         // reset displayed output to default
         demo.selectedOutput = demo.defaultSelectedOutput;
-        //console.log("exit: set demo.selectedInput =" + demo.selectedInput);
-        //console.log("exit: set demo.selectedOutput =" + demo.selectedOutput);
 
-        //console.log("exit: set outputRow =" + outputRow);
-        if(inputRow)
-            inputRow.style.background = "none";
-        if(outputRow)
-            outputRow.style.background = "none";
+        if(isOdd) {
+            if(inputRow)
+                inputRow.style.background = "#f2f2f2";
+            if(outputRow)
+                outputRow.style.background = "#f2f2f2";
+        }
+        else {
+            if(inputRow)
+                inputRow.style.background = "none";
+            if(outputRow)
+                outputRow.style.background = "none";
+        }
         this.updateSelectedInput();
     }
 
@@ -847,7 +857,6 @@ class Display {
         let [oParsedValue, oisValid] = demo.stringToValidFloat(outputInt);
 
         const desiredInt = desired.innerHTML;
-        console.log("comparing: " + outputInt + " " + desiredInt);
         let [parsedValue, isValid] = demo.stringToValidFloat(desiredInt);
 
         if(parsedValue === 1.0) desired.innerHTML = '1';
@@ -1060,15 +1069,6 @@ class Demo {
                 child.style = "left:" + -50 + "%;" + "top:" + top + "%;";
                 child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>`;
             }
-            // let child = parentElement.children[2];
-            // const top = 60;
-            // child.style = "top:" + top + "%;";
-            // child.innerHTML = `<text>w<sub>${3}</sub> =</text> <text contenteditable="true" id="w${3}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[2]}</text>`;
-            //
-            // let child2 = parentElement.children[3];
-            // const top2 = 80;
-            // child2.style = "top:" + top2 + "%;";
-            // child2.innerHTML = `<text>w<sub>${4}</sub> =</text> <text contenteditable="true" id="w${4}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[3]}</text>`;
 
         }
         else if(childCount === 5) {
@@ -1098,11 +1098,6 @@ class Demo {
             const top2 = 10 + 17.5*2 + 8
             child2.style = "left:" + left2 + "%;" + "top:" + top2 + "%;";
             child2.innerHTML = `<text>w<sub>${4}</sub> =</text> <text contenteditable="true" id="w${4}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[3]}</text>`;
-
-
-
-
-
         }
         else {
             let first = 20;
@@ -1179,6 +1174,7 @@ class Demo {
 
     // update entire demo
     update(sender = undefined){
+        console.log("in overall update function")
         if(sender && sender.tagName === 'TH') //header changed
         {
             //update selected input so it update immediately
