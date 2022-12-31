@@ -573,35 +573,44 @@ class Display {
         //TODO: line.setOptions()
 
         const min = 0.0
-        const max = 100.0
-        const new_min = 5.0
-        const new_max = 20.0
+        const max = 6.0
+        const new_min = 2.0
+        const new_max = 10.0
 
         let weight_labels = document.getElementById("input-link-text").children;
 
+        //TODO: x values should also be variable
         for(let i = 0; i < demo.selectedInput.length; i++) {
             demo.weightLines[i] = new LeaderLine(
                 LeaderLine.pointAnchor(selections.rows[i].cells[0], {x: '110%', y: '50%'}),
-                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '-8%', y: percents[i]+'%'})
+                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '6%', y: percents[i]+'%'})
             );
 
             //TODO: some color to indicate that weight is incorrect? (if it's not a valid number/weight)
             let splitup = weight_labels[i].textContent.split(" ")
             let num = splitup[splitup.length-1]
-            if(demo.stringToValidFloat(num)[0] === 0)
-                demo.weightLines[i].color = 'blue';
-            else if(demo.stringToValidFloat(num)[0] < 0)
-                demo.weightLines[i].color = 'red';
-            else
-                demo.weightLines[i].color = 'black';
-            demo.weightLines[i].path = 'straight';
-            demo.weightLines[i].position();
-            if(demo.stringToValidFloat(num)[1]) { //value is a valid number
-                let line_size = ((new_max-new_min)*(Math.abs(demo.stringToValidFloat(num)[0])-min))/(max-min)+new_min
-                if(line_size >= 20)
-                    line_size = 20;
-                demo.weightLines[i].size = line_size;
+            if(!demo.stringToValidFloat(num)[1]) {
+                demo.weightLines[i].color = '#ffbfcb'
+                demo.weightLines[i].path = 'straight'
+                demo.weightLines[i].position();
             }
+            else {
+                if(demo.stringToValidFloat(num)[0] === 0)
+                    demo.weightLines[i].color = 'blue';
+                else if(demo.stringToValidFloat(num)[0] < 0)
+                    demo.weightLines[i].color = '#c91a0e';
+                else
+                    demo.weightLines[i].color = 'black';
+                demo.weightLines[i].path = 'straight';
+                demo.weightLines[i].position();
+                if(demo.stringToValidFloat(num)[1]) { //value is a valid number
+                    let line_size = ((new_max-new_min)*(Math.abs(demo.stringToValidFloat(num)[0])-min))/(max-min)+new_min
+                    if(line_size >= 10.0)
+                        line_size = 10.0;
+                    demo.weightLines[i].size = line_size;
+                }
+            }
+
 
         }
         $( ".draggable" ).draggable();
