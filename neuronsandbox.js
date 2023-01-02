@@ -632,7 +632,7 @@ class Display {
 
             let numConvertedArray = demo.stringToValidFloat(num)
             if(!numConvertedArray[1]) { //if weight is invalid
-                child.style.color = '#ffbfcb'
+                child.style.color = '#fc496b'
             }
             else {
                 if (numConvertedArray[0] === 0) //value is zer0
