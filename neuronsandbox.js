@@ -503,8 +503,16 @@ class Display {
         //$( ".weight_label" ).draggable();
         //$( ".weight" ).draggable();
         $( ".draggable" ).draggable();
-        //setupGenerateTruthTable();
-        //document.getElementById("generateTruthTable").disabled = true;
+
+
+        let outputLine = new LeaderLine(
+            LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '110%', y: '50%'}),
+            LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '6%', y: 50+'%'})
+        );
+        outputLine.color = 'black';
+        outputLine.path = 'straight';
+
+
     }
 
     displayWeightFromData(wID, idx){
@@ -611,8 +619,31 @@ class Display {
                 }
             }
 
-
         }
+        let parentElement = document.getElementById("input-link-text");
+        const childCount = parentElement.children.length
+
+        for (let i = 0; i < childCount; i++) {
+            let child = parentElement.children[i]
+            let text = child.textContent
+
+            let splitup = child.textContent.split(" ")
+            let num = splitup[splitup.length-1]
+
+            let numConvertedArray = demo.stringToValidFloat(num)
+            if(!numConvertedArray[1]) { //if weight is invalid
+                child.style.color = '#ffbfcb'
+            }
+            else {
+                if (numConvertedArray[0] === 0) //value is zer0
+                    child.style.color = 'blue'
+                else if (numConvertedArray[0] < 0) //negative weight
+                    child.style.color = '#c91a0e'
+                else
+                    child.style.color = 'black'
+            }
+        }
+
         $( ".draggable" ).draggable();
         //$( ".weight_label" ).draggable();
         //$( ".weight" ).draggable();
@@ -1103,7 +1134,6 @@ class Demo {
             }
 
         }
-
     }
 
     removeWeightCol(n) {
@@ -1217,8 +1247,8 @@ async function downloadFile() {
     //console.log("in download: "+  demo.inputData);
     let headerRows = [];
     display.getHeaderRowVals(headerRows);
-    let modelname = document.getElementById("fname").value
-    if(modelname.length == 0)  modelname = "model"
+    let modelname = document.getElementById("fname").innerText
+    //if(modelname.length == 0)  modelname = "model"
 
     const handle = await showSaveFilePicker({
         suggestedName: modelname + '.json',
@@ -1239,9 +1269,12 @@ async function downloadFile() {
     desiredOutputs.rows = table.rows.length-1;
 
     //dataOp.updateDataFromTable(outputs, outputTable);
+    let newName = handle.name.substring(0, handle.name.length - 5)
+    document.getElementById("fname").textContent = newName
+
     demo.threshold = perceptron.threshold;
     let dict = {
-        "model-name" : handle.name.substring(0, handle.name.length - 5),
+        "model-name" : newName,
         "input": demo.inputData,
         "weight": demo.weights,
         "threshold": demo.threshold,
@@ -1302,7 +1335,7 @@ function uploadJson(text) {
     demo.weights = []; //clear weight array first, due to the insertWeightCol below
     demo.threshold = dict["threshold"];
     desiredOutputs = dict["desired-output"];
-    document.getElementById('fname').value  = dict["model-name"]
+    document.getElementById('fname').innerText  = dict["model-name"]
 
     inputs = new Data(demo.inputData);
 
@@ -1355,6 +1388,7 @@ function uploadJson(text) {
         let desired = outputCol.rows[i].cells[2];
         display.checkDesiredOutput(output, desired);
     }
+    display.handleHoverExit();
 }
 
 async function uploadFile(event) {

@@ -478,6 +478,10 @@ h1 {
     opacity: 1;
 }
 
+.model-name {
+    font-size: 25px;
+}
+
 
 /*input[type="file"] {*/
 /*    display: none;*/
