@@ -482,6 +482,13 @@ class Display {
     constructor(inpObj=null, percepObj=null, outObj=null){
         this.hovering = false;
         this.initializeDisplay();
+        this.outputLine = new LeaderLine(
+            LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '110%', y: '50%'}),
+            LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '-50%', y: 50+'%'})
+        );
+        this.outputLine.color = 'black';
+        this.outputLine.path = 'straight';
+        this.outputLine.position();
     }
 
     initializeDisplay(){
@@ -504,14 +511,13 @@ class Display {
         //$( ".weight" ).draggable();
         $( ".draggable" ).draggable();
 
-
-        let outputLine = new LeaderLine(
-            LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '110%', y: '50%'}),
-            LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '6%', y: 50+'%'})
-        );
-        outputLine.color = 'black';
-        outputLine.path = 'straight';
-
+        // let outputLine = new LeaderLine(
+        //     LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '110%', y: '50%'}),
+        //     LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '6%', y: 50+'%'})
+        // );
+        // outputLine.color = 'black';
+        // outputLine.path = 'straight';
+        // outputLine.position();
 
     }
 
@@ -589,12 +595,14 @@ class Display {
 
         //TODO: x values should also be variable
         for(let i = 0; i < demo.selectedInput.length; i++) {
+            let xposition = 6;
+            // if(i !== 0 && i !== demo.selectedInput.length-1)
+            //     xposition = 3;
             demo.weightLines[i] = new LeaderLine(
                 LeaderLine.pointAnchor(selections.rows[i].cells[0], {x: '110%', y: '50%'}),
-                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '6%', y: percents[i]+'%'})
+                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: xposition+'%', y: percents[i]+'%'})
             );
 
-            //TODO: some color to indicate that weight is incorrect? (if it's not a valid number/weight)
             let splitup = weight_labels[i].textContent.split(" ")
             let num = splitup[splitup.length-1]
             if(!demo.stringToValidFloat(num)[1]) {
@@ -1045,12 +1053,12 @@ class Demo {
 
     insertWeightCol(n) {
         let parentElement = document.getElementById("input-link-text");
-        demo.weights.splice(n-1, 0, 0); //add a weight
+        demo.weights.splice(n, 0, 0); //add a weight
         let wDiv = document.createElement('div');
         wDiv.id = `weight-${n+1}`;
         wDiv.className = "weight_label";
         wDiv.innerHTML = `<text fill="black" class="weights">w<sub>${n+1}</sub> =</text> <text contenteditable="true" onkeypress="if (keyCode == 13) return false;" id="w${n+1}" fill="black" class="weights">0</text>`;
-        parentElement.insertBefore(wDiv, parentElement.children[n-1]);
+        parentElement.insertBefore(wDiv, parentElement.children[n+1]);
         const weightText = document.getElementById(`w${n+1}`);
         dataOp.makeEditable(weightText);
         this.updateWeightUI(parentElement);
@@ -1149,9 +1157,11 @@ class Demo {
     }
 
     removeAllWeightCol() {
-        for(let i = 0; i < demo.weights.length; i++) {
-            this.removeWeightCol(0);
-        }
+        let parentElement = document.getElementById("input-link-text");
+        parentElement.innerHTML = ""
+        // for(let i = demo.weights.length-1; i <= 0; i--) {
+        //     this.removeWeightCol(i);
+        // }
     }
     // add new row at specific location on button click
     insertCol(button){
@@ -1344,8 +1354,8 @@ function uploadJson(text) {
     }
 
     let parentElement = document.getElementById("input-link-text");
-    for (let c = parentElement.children.length; c < inputs.data[0]?.length; c++) {
-        demo.insertWeightCol(0);
+    for (let c = 0; c < inputs.data[0]?.length; c++) {
+        demo.insertWeightCol(c);
     }
 
     demo.weights = dict["weight"];
@@ -1389,6 +1399,9 @@ function uploadJson(text) {
         display.checkDesiredOutput(output, desired);
     }
     display.handleHoverExit();
+
+    display.outputLine.position();
+
 }
 
 async function uploadFile(event) {
