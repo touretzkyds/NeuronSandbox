@@ -47,22 +47,22 @@ class DataOperator {
     }
 
     removeDataCol(dataObj, n=1, pos){
-        for(var r = 0; r < dataObj.data.length; r++) {
+        for(let r = 0; r < dataObj.data.length; r++) {
             dataObj.data[r].splice(n, 1);
             //dataObj.weights[r].splice(n, 1);
         }
         dataObj.cols--;
     }
 
-    createBinaryData(dim){
+    createBinaryData(dim) {
         let binaryArray = [];
-        for (let i=0; i<2**dim; i++){
+        for (let i = 0; i < 2**dim; i++){
             binaryArray[i] = [];
             let binaryString = i.toString(2);
             while(binaryString.length < dim) {
                 binaryString = "0" + binaryString;
             }
-            for( let j = 0; j < binaryString.length; j++ ) {
+            for(let j = 0; j < binaryString.length; j++ ) {
                 binaryArray[i][j] = Number(binaryString.substring(j, j+1));
             }
         }
@@ -96,9 +96,9 @@ class DataOperator {
         let table = tableObj.table;
         // skip header row and button column of table, start from 1
         let start = table === outputTable? 1 : 2;
-        let row = start;
-        for (let n = table.rows.length; row < n; row++) {
-            for (let c = 1, m = table.rows[row].cells.length; c < m; c++) {
+        //let row = start;
+        for (let row = start; row < table.rows.length; row++) {
+            for (let c = 1 ; c < table.rows[row].cells.length; c++) {
                 const cell = table.rows[row].cells[c];
                 cell.innerHTML = dataObj.data[row-start][c-1];
             }
@@ -110,33 +110,31 @@ class DataOperator {
         let table = tableObj.table;
         // skip header row and button column of table, start from 1
         let start = 1;
-        let row = start;
-        for (let n = table.rows.length; row < n; row++) {
-                const cell = table.rows[row].cells[2];
-                cell.innerHTML = desiredOutput.data[row-1];
+        //let row = start;
+        for(let row = start; row < table.rows.length; row++) {
+            const cell = table.rows[row].cells[2];
+            cell.innerHTML = desiredOutput.data[row-1];
         }
-        //console.log("updateTableFromData, data = " + dataObj.data);
     }
 
-    updateDesiredOutput(dataObj, tableObj) {
-        let table = tableObj.table;
-        let start = 1;
-        let r = start;
-        for (let n = table.rows.length; r < n; r++) {
-            let c = 2;
-            const cell = table.rows[r].cells[c];
-            const rawValue = cell.innerHTML;
-            const [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
-            display.highlightInvalidText(cell, isValid);
-            dataObj[r-start] = parsedValue;
-        }
-        console.log("updateDesiredOutput, data = " + dataObj);
-    }
+    // updateDesiredOutput(dataObj, tableObj) {
+    //     let table = tableObj.table;
+    //     let start = 1;
+    //     let r = start;
+    //     for (let n = table.rows.length; r < n; r++) {
+    //         let c = 2;
+    //         const cell = table.rows[r].cells[c];
+    //         const rawValue = cell.innerHTML;
+    //         const [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
+    //         display.highlightInvalidText(cell, isValid);
+    //         dataObj[r-start] = parsedValue;
+    //     }
+    //     console.log("updateDesiredOutput, data = " + dataObj);
+    // }
 
     // make editable and update demo on edit
     makeEditable(textbox, editable = true){ // TODO: Move from dataOp to displayOp
         textbox.contentEditable = editable;
-
 
         // add event listener to update demo with table changes
         // add a class to textbox to keep track of an eventlistener already being added
@@ -170,7 +168,7 @@ class Table {
 
     // initialize table from data array
     // add edit buttons and hover features if table is input table
-    initializeTable(dataObj, tblId){
+    initializeTable(dataObj, tblId) {
         let table = document.getElementById(tblId);
         // allow user to edit input table header (#11)
         for (let c=1; c<table.rows[0].cells.length; c++){
@@ -179,11 +177,11 @@ class Table {
         }
         // add data rows to table
         let array = dataObj.data;
-        for(let r=0; r<array.length; r++){
+        for(let r=0; r<array.length; r++) {
             let newRow = table.insertRow(table.length);
             // update displayed selections on hover
             this.makeHoverable(newRow, tblId);
-            for(let c=0; c<array[r].length; c++){
+            for(let c=0; c<array[r].length; c++) {
                 let cell = newRow.insertCell(c);
                 cell.innerHTML = array[r][c];
                 if (this.isEditable) {
@@ -192,7 +190,7 @@ class Table {
             }
         }
         // on exiting table, display initial values again (#3)
-        table.addEventListener("mouseleave", function(event){
+        table.addEventListener("mouseleave", function(event) {
             display.hovering = false;
             display.hoverInput(this, tblId, "exit");
         });
@@ -206,7 +204,7 @@ class Table {
     }
 
     // show table values hovered over in selection panel
-    makeHoverable(row, tblId){
+    makeHoverable(row, tblId) {
         row.addEventListener("mouseenter", function(event){
             display.hovering = true;
             display.hoverInput(this, tblId, "enter");
@@ -218,7 +216,7 @@ class Table {
     }
 
     // update table from data array
-    updateTable(){
+    updateTable() {
         // skip header row of table, start from 1
         for (let r = 1, n = this.numRows + 1; r < n; r++) {
             for (let c = 0, m = this.numCols; c < m; c++) {
@@ -239,15 +237,16 @@ class Table {
             cell.innerHTML = content;
             return;
         }
-        for (var r = 0, n = this.table.rows.length; r < n; r++) {
+        for (let r = 0, n = this.table.rows.length; r < n; r++) {
             // skip header row of table
             if (r>0){
-                var cell = this.table.rows[r].insertCell(0);
+                let cell = this.table.rows[r].insertCell(0);
                 cell.innerHTML = content;
             }
         }
     }
 
+    //create +/- buttons for adding columns to input table
     createColumnButtons(all=true, columnNum=null){ // TODO: change function to operate on one col at a time
         const content = '<div class="column-buttons-container" >' +
             '<button class="invisible-button button">–</button>' +
@@ -261,7 +260,6 @@ class Table {
             this.makeHoverable(newRow, "input-table");
             newRow.insertCell(0);
         }
-
 
         if (columnNum){
             let cell = this.table.rows[0].insertCell(columnNum);
@@ -283,14 +281,14 @@ class Table {
         }
     }
 
-    // insert row at given position and add editable attributes/ cells if reqd.
+    // insert row at given position and add editable attributes/ cells if required.
     insertTableRow(r, makeEditable = true){
         console.log("insertTableRow, trying to add new row at row=" + r);
         let newRow = this.table.insertRow(r);
         this.makeHoverable(newRow, this.tblId);
         for (let c = 0; c < this.numCols; c++) {
             let cell = newRow.insertCell(c);
-            cell.innerHTML = 0;
+            cell.innerText = 0;
             cell.classList.add("animation");
             if (this.isEditable && makeEditable){
                 dataOp.makeEditable(cell);
@@ -305,11 +303,19 @@ class Table {
         this.numRows++;
         //animation
         $(".animation").each(function () {
-            $(this).css('animation-delay',0.2 +'s');
+            let style = $(this).attr('style');
+            if(style)
+            {
+                style += '; animation-delay: 0.2s;'
+                $(this).attr('style',style);
+            }
+            else
+                $(this).css('animation-delay',0.2 +'s');
             $(this).classList?.remove("animation");
         });
     }
 
+    //finds available indices for variables
     findAvailableIndex()
     {
         const headerCells = document.getElementById("input-table").rows[1].cells;
@@ -348,7 +354,7 @@ class Table {
         let tuple = this.findAvailableIndex();
         let newCol  = tuple[0];
         let newNameIndex = tuple[1];
-        if(newCol < 0  || newNameIndex < 0)
+        if (newCol < 0 || newNameIndex < 0)
             return;
         let th = document.createElement('th'); //column
         th.innerHTML = "<div class=\"input-content\">" + "x<sub>" + newNameIndex + "</sub>" + "</div>";
@@ -359,7 +365,7 @@ class Table {
 
         for (let r = 0; r < this.numRows; r++) { //skip column buttons + row headers
             let cell = this.table.rows[r+2].insertCell(c);
-            cell.innerHTML = 0;
+            cell.innerText = 0;
             cell.classList.add("animation");
             if (this.isEditable){
                 dataOp.makeEditable(cell);
@@ -368,10 +374,16 @@ class Table {
         this.createColumnButtons(false, this.numCols + 1);
         //this.createColumnButtons(false, 0);
         this.numCols++;
-
         //animation
         $(".animation").each(function () {
-            $(this).css('animation-delay',0.2 +'s');
+            let style = $(this).attr('style');
+            if(style)
+            {
+                style += '; animation-delay: 0.2s;'
+                $(this).attr('style',style);
+            }
+            else
+                $(this).css('animation-delay',0.2 +'s');
             $(this).classList?.remove("animation");
         });
 
@@ -411,7 +423,7 @@ class Table {
 
 // perceptron: holds a data object, weights, threshold
 class Perceptron {
-    constructor(dataObj, weights, threshold){
+    constructor(dataObj, weights, threshold) {
         this.dataObj = dataObj;
         this.inputData = dataObj.data;
         this.weights = weights;
@@ -419,14 +431,14 @@ class Perceptron {
     }
 
     // simple float operations give precision problems (#6)
-    correctPrecision(val){
+    correctPrecision(val) {
         // do arbitrary large num multiplication since precision error occurs at consistent decimal place
         val = Math.round(val * 10000) / 10000;
         return val;
     }
 
     // compute combination column of output table
-    computeAffineOutput(){
+    computeAffineOutput() {
         this.affineOutput = new Array(this.dataObj.rows).fill(0);
         for (let r=0; r<this.dataObj.rows; ++r){
             for (let c=0; c<this.dataObj.cols; ++c){
@@ -545,14 +557,6 @@ class Display {
         //$( ".weight" ).draggable();
         $( ".draggable" ).draggable();
 
-        // let outputLine = new LeaderLine(
-        //     LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '110%', y: '50%'}),
-        //     LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '6%', y: 50+'%'})
-        // );
-        // outputLine.color = 'black';
-        // outputLine.path = 'straight';
-        // outputLine.position();
-
     }
 
     displayWeightFromData(wID, idx){
@@ -584,8 +588,7 @@ class Display {
         }
     }
 
-    updateSelectedInput()
-    {
+    updateSelectedInput() {
         if(!demo.selectedInput)
             return;
         let selections = document.getElementById("selected-inputs");
@@ -631,23 +634,6 @@ class Display {
                     startX += intervalX;
                 }
         }
-        // if(length === 2)
-        //     percentsX = [0, 0]
-        // else if(length === 3)
-        //     percentsX = [0, -2, 0]
-        // else if(length === 4)
-        //     percentsX = [0, -0.5, -4, -3.5]
-        // else {
-        //     for(let i = 0; i < Math.floor(length/2); i++) {
-        //         percentsX.push(startX);
-        //         startX -= intervalX;
-        //     }
-        //     startX += intervalX;
-        //     for(let i = Math.floor(length/2); i < length; i++) {
-        //         percentsX.push(startX);
-        //         startX += intervalX;
-        //     }
-        // }
         console.log("x percentages: " + percentsX)
 
 
@@ -744,7 +730,7 @@ class Display {
     }
 
     // set display panel output
-    displaySelectedOutput(){
+    displaySelectedOutput() {
         // replace variable names in selected output display with values on hover (#3)
         let table = document.getElementById("selected-output");
         //console.log("displaySelectedOutput, selections = " + table.outerHTML);
@@ -759,7 +745,7 @@ class Display {
         return tblId === "input-table";
     }
     // respond to user hovering over table
-    hoverInput(row, tblId, mode){
+    hoverInput(row, tblId, mode) {
         let rowIdx = row.rowIndex || 0;
         if(!this.isInputTable(tblId)) //output table, convert to corresponding input row index
             rowIdx += 1;
@@ -805,7 +791,7 @@ class Display {
         //demo.selectedInput = demo.inputData[rowIdx];
         //demo.selectedOutput = perceptron.outputData[rowIdx];
         for (let r=0; r<selections.rows.length; r++) {
-            if (this.hovering){
+            if (this.hovering) {
                 selections.rows[r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</div>`;
                 console.log(demo.selectedInput[r])
                 //draws line
@@ -816,7 +802,7 @@ class Display {
                 );
                 demo.lines[r].setOptions({startSocket: 'right', endSocket: 'left'});
             }
-            else{
+            else {
                 selections.rows[r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</div>`;
             }
         }
@@ -832,7 +818,7 @@ class Display {
         // reset displayed output to default
         demo.selectedOutput = demo.defaultSelectedOutput;
 
-        if(isOdd) { //if odd reset color to gray
+        if (isOdd) { //if odd reset color to gray
             if(inputRow)
                 inputRow.style.background = "#f2f2f2"; //color gray
             if(outputRow)
@@ -994,7 +980,7 @@ class Display {
     }
 
 // update display panel
-    updateDisplay(){
+    updateDisplay() {
         //this.displaySelectedInput();
         this.updateSelectedInput();
         this.displaySelectedOutput();
@@ -1003,7 +989,7 @@ class Display {
     }
 
     //highlight invalid inputs, reset as soon as they are valid (#6)
-    highlightInvalidText(cell, isValid){
+    highlightInvalidText(cell, isValid) {
         if (!isValid){
             cell.style.backgroundColor = "pink";
         }
@@ -1012,7 +998,7 @@ class Display {
         }
     }
 
-    initializeButtonHover(tableObj){
+    initializeButtonHover(tableObj) {
         // hide all at initialization
         const buttonRows = document.getElementsByClassName("row-buttons-container");
         buttonRows.forEach(element => {
@@ -1032,7 +1018,7 @@ class Display {
 }
 
 class Demo {
-    constructor(){
+    constructor() {
         // initialize parameters for the first time
         this.setDefaultValues();
     }
@@ -1060,16 +1046,16 @@ class Demo {
     }
 
     // calculate row to insert at, from html button address
-    getRowLocation(button){
+    getRowLocation(button) {
         return button.parentNode.parentNode.parentNode.rowIndex + 1;
     }
 
-    getColLocation(button){
+    getColLocation(button) {
         return button.parentNode.parentNode.cellIndex;
     }
 
     // add new row at specific location on button click
-    insertRow(button){
+    insertRow(button) {
         const r = this.getRowLocation(button);
         inputTable.insertTableRow(r);
         dataOp.insertDataRow(inputs, r-2);
@@ -1244,7 +1230,7 @@ class Demo {
 
 
     // remove row at specific location on button click
-    removeCol(button){
+    removeCol(button) {
         const c = this.getColLocation(button) - 1;
         if(inputTable.numCols <= 1) {
             alert("Cannot remove all inputs!")
@@ -1296,7 +1282,12 @@ class Demo {
         perceptron.updateThreshold();
         perceptron.computeOutputs();
         // TODO: ineffecient 2 steps, update step needed:
-        outputs.update(perceptron.outputData);
+        //outputs.update(perceptron.outputData);
+        for(let i = 0; i < perceptron.outputData.length; i++) {
+            for(let j = 0; j < perceptron.outputData[0].length-1; j++ ) {
+                outputs.data[i][j] = perceptron.outputData[i][j]
+            }
+        }
         outputTable.dataObj = outputs;
         outputTable.updateTable();
         display.updateDisplay();
