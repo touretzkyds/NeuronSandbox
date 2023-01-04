@@ -530,6 +530,7 @@ class Display {
             td1.style.fontWeight = 'normal';
 
             td2.style.fontWeight = 'bold';
+            td2.style.backgroundColor = '#f8ffcf'
             //td2.classList.add("bold-td");
 
             console.log(td2)
@@ -611,6 +612,9 @@ class Display {
         let intervalX = 1/length
         let startX = 0
         switch(length) {
+            case 1:
+                percentsX = [-3]
+                break
             case 2:
                 percentsX = [0, 0]
                 break
@@ -830,7 +834,9 @@ class Display {
             if(outputRow)
                 outputRow.style.background = "none";
         }
+        this.createOutputTableColors();
         this.updateSelectedInput();
+
     }
 
     getHeaderRowVals(headerRowVals) {
@@ -914,6 +920,7 @@ class Display {
         {
             demo.weightLines[i].position();
         }
+        display.createOutputTableColors();
     }
 
     UpdateOutputToggle() {
@@ -932,6 +939,7 @@ class Display {
         for(let i = 0; i < demo.weightLines.length; i++) {
             demo.weightLines[i].position();
         }
+        display.createOutputTableColors();
     }
 
     UpdateBinaryToggle() {
@@ -949,6 +957,7 @@ class Display {
                 }
             }
         }
+        display.createOutputTableColors();
     }
 
     checkDesiredOutput(output, desired) {
@@ -1467,6 +1476,7 @@ function uploadJson(text) {
     display.handleHoverExit();
 
     display.outputLine.position();
+    display.createOutputTableColors();
 
 }
 
