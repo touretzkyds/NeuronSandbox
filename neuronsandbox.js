@@ -1426,13 +1426,22 @@ function uploadJson(text) {
 
     demo.inputData = dict["input"];
     inputs = new Data(demo.inputData);
-    outputs = new Data(perceptron.outputData);
-    for (let i = 0; i < desiredOutputs.rows; i++) {
-        outputs.data[i][2] = desiredOutputs.data[i];
-    }
+    // outputs = new Data(perceptron.outputData);
+    // //outputs.data.rows = desiredOutputs.rows;
+    // for (let i = 0; i < desiredOutputs.rows; i++) {
+    //     outputs.data[i][2] = parseInt(desiredOutputs.data[i]);
+    // }
     dataOp.updateTableFromData(inputs, inputTable);
     perceptron = new Perceptron(inputs, demo.weights, demo.threshold);
     perceptron.setWeightsUI();
+    perceptron.computeOutputs();
+
+    outputs = new Data(perceptron.outputData);
+    //outputs.data.rows = desiredOutputs.rows;
+    for (let i = 0; i < desiredOutputs.rows; i++) {
+        outputs.data[i][2] = parseInt(desiredOutputs.data[i]);
+    }
+
     display.displayThresholdFromData(perceptron);
     //document.getElementById('InputToggle').checked = dict["input-toggle-checked"];
     document.getElementById('InputToggle').checked = false;
