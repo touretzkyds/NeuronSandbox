@@ -291,7 +291,7 @@ class Table {
         for (let c = 0; c < this.numCols; c++) {
             let cell = newRow.insertCell(c);
             cell.innerHTML = 0;
-            cell.className = "animation";
+            cell.classList.add("animation");
             if (this.isEditable && makeEditable){
                 dataOp.makeEditable(cell);
             }
@@ -306,36 +306,52 @@ class Table {
         //animation
         $(".animation").each(function () {
             $(this).css('animation-delay',0.2 +'s');
-            $(this).className="";
+            $(this).classList?.remove("animation");
         });
     }
 
-    findAvailableVariable()
+    findAvailableIndex()
     {
-        let i = 1;
         const headerCells = document.getElementById("input-table").rows[1].cells;
-        for(; i < 1024; i++) {
-            let found = false;
+        let index = -1;
+        let nameIndex = -1;
+        for(let i = 1; i < 10; i++) {
+            let foundIndex = false;
+            let foundNameIndex = false;
             for (let c = 1; c < headerCells.length; c++) {
                 let headerInput = headerCells[c];
                 if (headerInput.id === ("tblinput" + i))
                 {
-                    found = true;
-                    break;
+                    foundIndex = true;
+                }
+                let match = headerInput.innerText.match(/\d$/);
+                if(match && match[0] === (''+i)) {
+                    foundNameIndex = true;
                 }
             }
-            if(!found)
-                return i;
+            if(index < 0 && !foundIndex) {
+                index = i;
+            }
+            if(nameIndex < 0 && !foundNameIndex) {
+                nameIndex = i;
+            }
+
+            if(index > 0 && nameIndex > 0 )
+            {
+                return [index, nameIndex];
+            }
         }
-        return -1;
+        return [-1, -1];
     }
 
     insertTableCol(c){
-        let newCol = this.findAvailableVariable();
-        if(newCol < 0 )
+        let tuple = this.findAvailableIndex();
+        let newCol  = tuple[0];
+        let newNameIndex = tuple[1];
+        if(newCol < 0  || newNameIndex < 0)
             return;
         let th = document.createElement('th'); //column
-        th.innerHTML = "<div class=\"input-content\">" + "x<sub>" + newCol + "</sub>" + "</div>";
+        th.innerHTML = "<div class=\"input-content\">" + "x<sub>" + newNameIndex + "</sub>" + "</div>";
         th.setAttribute("id", `tblinput${newCol}`);
         dataOp.makeEditable(th);
 
@@ -344,7 +360,7 @@ class Table {
         for (let r = 0; r < this.numRows; r++) { //skip column buttons + row headers
             let cell = this.table.rows[r+2].insertCell(c);
             cell.innerHTML = 0;
-            cell.className = "animation";
+            cell.classList.add("animation");
             if (this.isEditable){
                 dataOp.makeEditable(cell);
             }
@@ -356,7 +372,7 @@ class Table {
         //animation
         $(".animation").each(function () {
             $(this).css('animation-delay',0.2 +'s');
-            $(this).className="";
+            $(this).classList?.remove("animation");
         });
 
         let cols = []
@@ -489,8 +505,26 @@ class Display {
         this.outputLine.color = 'black';
         this.outputLine.path = 'straight';
         this.outputLine.position();
+        this.createOutputTableColors();
     }
 
+    createOutputTableColors() {
+        const outputTable = document.getElementById("output-table");
+        let n = outputTable.rows.length;
+        for (let i = 1; i < n; i++) {
+            let tr = outputTable.rows[i];
+            let td1 = tr.cells[0];
+            let td2 = tr.cells[1];
+            td1.style.fontWeight = 'normal';
+
+            td2.style.fontWeight = 'bold';
+            //td2.classList.add("bold-td");
+
+            console.log(td2)
+            console.log("fontWeight" + td2.style.fontWeight)
+
+        }
+    }
     initializeDisplay(){
         // make weights and threshold editable on initialization
 
@@ -567,19 +601,71 @@ class Display {
         //empties lines array
         demo.weightLines = []
 
-        let percents = [];
-        let interval = 16/demo.selectedInput.length
-        let start = 42;
-        if(demo.selectedInput.length === 2)
-            percents = [42, 58]
-        else if(demo.selectedInput.length === 3)
-            percents = [42, 50, 58]
-        else if(demo.selectedInput.length === 1)
-            percents = [50]
+        const length = demo.selectedInput.length
+
+        //percentage values for weight lines for x-axis
+        let percentsX = []
+        let intervalX = 1/length
+        let startX = 0
+        switch(length) {
+            case 2:
+                percentsX = [0, 0]
+                break
+            case 3:
+                percentsX = [0, -2.5, 0]
+                break
+            case 4:
+                percentsX = [0, -4, -4.5, -3.5]
+                break
+            case 5:
+                percentsX = [0, -3, -5, -5, -4]
+                break
+            default:
+                for(let i = 0; i < Math.floor(length/2); i++) {
+                    percentsX.push(startX);
+                    startX -= intervalX;
+                }
+                startX += intervalX;
+                for(let i = Math.floor(length/2); i < length; i++) {
+                    percentsX.push(startX);
+                    startX += intervalX;
+                }
+        }
+        // if(length === 2)
+        //     percentsX = [0, 0]
+        // else if(length === 3)
+        //     percentsX = [0, -2, 0]
+        // else if(length === 4)
+        //     percentsX = [0, -0.5, -4, -3.5]
+        // else {
+        //     for(let i = 0; i < Math.floor(length/2); i++) {
+        //         percentsX.push(startX);
+        //         startX -= intervalX;
+        //     }
+        //     startX += intervalX;
+        //     for(let i = Math.floor(length/2); i < length; i++) {
+        //         percentsX.push(startX);
+        //         startX += intervalX;
+        //     }
+        // }
+        console.log("x percentages: " + percentsX)
+
+
+        //percentage values for weight lines for y-axis
+        let percentsY = [];
+        let intervalY = 16/length
+        let startY = 42;
+        if(length === 1)
+            percentsY = [50]
+        else if(length === 2)
+            percentsY = [42, 58]
+        else if(length === 3)
+            percentsY = [42, 50, 58]
+
         else {
-            for(let i = 0; i < demo.selectedInput.length; i++ ) {
-                percents.push(start);
-                start += interval;
+            for(let i = 0; i < length; i++ ) {
+                percentsY.push(startY);
+                startY += intervalY;
             }
         }
 
@@ -595,12 +681,12 @@ class Display {
 
         //TODO: x values should also be variable
         for(let i = 0; i < demo.selectedInput.length; i++) {
-            let xposition = 6;
+            let xposition = 6+ percentsX[i]
             // if(i !== 0 && i !== demo.selectedInput.length-1)
             //     xposition = 3;
             demo.weightLines[i] = new LeaderLine(
                 LeaderLine.pointAnchor(selections.rows[i].cells[0], {x: '110%', y: '50%'}),
-                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: xposition+'%', y: percents[i]+'%'})
+                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: xposition+'%', y: percentsY[i]+'%'})
             );
 
             let splitup = weight_labels[i].textContent.split(" ")
@@ -936,28 +1022,7 @@ class Display {
         buttonColumns.forEach(element => {
             element.style.display = "none";
         });
-        // show when hovering over table
-        /*  tableObj.table.addEventListener("mouseenter", function(event){
-              const buttonRows = document.getElementsByClassName("row-buttons-container");
-              buttonRows.forEach(element => {
-                  element.style.display = "flex";
-              });
-              const buttonColumns = document.getElementsByClassName("column-buttons-container");
-              buttonColumns.forEach(element => {
-                  element.style.display = "flex";
-              });
-              display.updateDisplay();
-          });*/
-        // hide when hover out
         tableObj.table.addEventListener("mouseleave", function(event){
-            /* const buttonRows = document.getElementsByClassName("row-buttons-container");
-             buttonRows.forEach(element => {
-                 element.style.display = "none";
-             });
-             const buttonColumns = document.getElementsByClassName("column-buttons-container");
-             buttonColumns.forEach(element => {
-                 element.style.display = "none";
-             });*/
             display.updateDisplay();
         });
     }
@@ -1235,6 +1300,7 @@ class Demo {
         outputTable.dataObj = outputs;
         outputTable.updateTable();
         display.updateDisplay();
+        display.outputLine.position();
     }
 
     // convert to valid inputs for processing and keep track of invalid parts of input
@@ -1435,6 +1501,7 @@ perceptron.displayPerceptron();
 const display = new Display();
 display.updateDisplay();
 uploadFromUrl("SampleModel.json");
+display.createOutputTableColors();
 
 document.addEventListener("DOMContentLoaded", () => {
     demo.main().catch(e => console.error(e));
@@ -1442,12 +1509,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 $('#InputToggle').change(function() { //toggle edit
     display.UpdateInputToggle();
+    display.outputLine.position();
 });
 
 $('#OutputToggle').change(function() { //toggle output
     display.UpdateOutputToggle();
+    display.outputLine.position();
 });
 
 $('#BinaryToggle').change(function() { //toggle output
     display.UpdateBinaryToggle();
+    display.outputLine.position();
 });
