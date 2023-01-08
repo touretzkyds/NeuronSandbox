@@ -763,7 +763,7 @@ class Display {
         //console.log("displaySelectedOutput, selectedOutput = " + demo.selectedOutput);
         for (let r=0; r<table.rows.length; r++){
             let cell = table.rows[r].cells[0];
-            cell.innerHTML = `${demo.selectedOutput[1]}`;
+            cell.innerHTML = `<mark>${demo.selectedOutput[1]}</mark>`;
         }
     }
 

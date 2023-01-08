@@ -496,6 +496,11 @@ h1 {
     font-size: 25px;
 }
 
+mark {
+    background-color: #f8ffcf;
+    color: black;
+}
+
 
 /*input[type="file"] {*/
 /*    display: none;*/
