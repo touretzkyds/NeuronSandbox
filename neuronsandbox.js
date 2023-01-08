@@ -103,7 +103,7 @@ class DataOperator {
                 cell.innerHTML = dataObj.data[row-start][c-1];
             }
         }
-        console.log("updateTableFromData, data = " + dataObj.data);
+        //console.log("updateTableFromData, data = " + dataObj.data);
     }
 
     updateTableFromDesired(desiredOutput, tableObj){ //TODO: make more efficient by passing specific location to update
@@ -283,7 +283,7 @@ class Table {
 
     // insert row at given position and add editable attributes/ cells if required.
     insertTableRow(r, makeEditable = true){
-        console.log("insertTableRow, trying to add new row at row=" + r);
+        //console.log("insertTableRow, trying to add new row at row=" + r);
         let newRow = this.table.insertRow(r);
         this.makeHoverable(newRow, this.tblId);
         for (let c = 0; c < this.numCols; c++) {
@@ -511,7 +511,7 @@ class Display {
         this.hovering = false;
         this.initializeDisplay();
         this.outputLine = new LeaderLine(
-            LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '110%', y: '50%'}),
+            LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '99%', y: '50%'}),
             LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '-50%', y: 50+'%'})
         );
         this.outputLine.color = 'black';
@@ -530,11 +530,9 @@ class Display {
             td1.style.fontWeight = 'normal';
 
             td2.style.fontWeight = 'bold';
-            td2.style.backgroundColor = '#f8ffcf'
+            td2.style.background = '#f8ffcf'
             //td2.classList.add("bold-td");
 
-            console.log(td2)
-            console.log("fontWeight" + td2.style.fontWeight)
 
         }
     }
@@ -557,6 +555,32 @@ class Display {
         //$( ".weight_label" ).draggable();
         //$( ".weight" ).draggable();
         $( ".draggable" ).draggable();
+
+    }
+
+    alignTables() {
+        let adjustment = 0
+        let maxHeight = 0
+        const headerCells = document.getElementById("input-table").rows[1].cells;
+        for (let c = 1; c < headerCells.length; c++) {
+            let headerInput = headerCells[c];
+            if (headerInput.id.startsWith("tblinput")) {
+                let heightOfTH = headerInput.offsetHeight
+                if(heightOfTH > maxHeight)
+                    maxHeight = heightOfTH
+            }
+            else
+                console.log("missing input")
+        }
+        //based on the header's height, we adjust the output table
+        //let adjustment = 0
+        if(maxHeight > 115)
+            adjustment = 50*maxHeight/100
+
+
+        console.log("max height: " + maxHeight)
+
+        document.getElementById("output-table").style.marginTop = adjustment + "px";
 
     }
 
@@ -583,7 +607,6 @@ class Display {
         // got rid of equation below neuron diagram
         // replace variable names in selected inputs display with values on hover (#3)
         const selections = document.getElementById("selected-inputs");
-        //console.log("displaySelectedInput, selections = " + selections.outerHTML);
         for (let r=0; r<selections.rows.length; r++){
             selections.rows[r].cells[0].innerHTML = demo.selectedInput[r];
         }
@@ -638,7 +661,6 @@ class Display {
                     startX += intervalX;
                 }
         }
-        console.log("x percentages: " + percentsX)
 
 
         //percentage values for weight lines for y-axis
@@ -753,7 +775,7 @@ class Display {
         let rowIdx = row.rowIndex || 0;
         if(!this.isInputTable(tblId)) //output table, convert to corresponding input row index
             rowIdx += 1;
-        console.log(`hoverInput tblId=${tblId },input row=${rowIdx}, mode=${mode}`);
+        //console.log(`hoverInput tblId=${tblId },input row=${rowIdx}, mode=${mode}`);
         if(rowIdx < 2) //headers, or leave
         {
             this.handleHoverExit();
@@ -768,11 +790,15 @@ class Display {
             // update the active inputs and outputs to display in perceptron diagram
             demo.selectedInput = inputs.data[rowIdx-2];
             demo.selectedOutput = outputs.data[rowIdx-2];
-            console.log("enter: set demo.selectedInput =" + demo.selectedInput);
-            console.log("enter: set demo.selectedOutput =" + demo.selectedOutput);
+            //console.log("enter: set demo.selectedInput =" + demo.selectedInput);
+            //console.log("enter: set demo.selectedOutput =" + demo.selectedOutput);
             // highlight input and output rows corresponding to the hovered input row
             inputRow.style.background = "lightblue";
-            outputRow.style.background = "lightblue";
+            console.log(outputRow.children)
+            for(let i = 0; i < outputRow.children.length; i++) {
+                outputRow.children[i].style.background = "lightblue";
+            }
+
             //console.log("enter: set outputRow =" + outputRow);
         }
         else {
@@ -797,7 +823,7 @@ class Display {
         for (let r=0; r<selections.rows.length; r++) {
             if (this.hovering) {
                 selections.rows[r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</div>`;
-                console.log(demo.selectedInput[r])
+                //console.log(demo.selectedInput[r])
                 //draws line
                 demo.lines[r] = new LeaderLine(
                     LeaderLine.pointAnchor(inputRow.children[r+1], {x: '70%', y: '50%'}),
@@ -825,17 +851,26 @@ class Display {
         if (isOdd) { //if odd reset color to gray
             if(inputRow)
                 inputRow.style.background = "#f2f2f2"; //color gray
-            if(outputRow)
-                outputRow.style.background = "#f2f2f2"; //color gray
+            if(outputRow) {
+                for(let i = 0; i < outputRow.children.length; i++) {
+                    outputRow.children[i].style.background = "#f2f2f2"; //color gray
+                }
+            }
+
         }
         else {
             if(inputRow)
                 inputRow.style.background = "none";
-            if(outputRow)
-                outputRow.style.background = "none";
+            if(outputRow) {
+                for(let i = 0; i < outputRow.children.length; i++) {
+                    outputRow.children[i].style.background = "none";
+                }
+            }
+
         }
         this.createOutputTableColors();
         this.updateSelectedInput();
+
 
     }
 
@@ -883,7 +918,6 @@ class Display {
     }
 
     UpdateInputToggle() {
-        console.log("In update input toggle");
         let checkbox = document.getElementById("InputToggle");
 
         this.updateSelectedInput();
@@ -940,11 +974,11 @@ class Display {
             demo.weightLines[i].position();
         }
         display.createOutputTableColors();
+        display.outputLine.position();
     }
 
     UpdateBinaryToggle() {
         let checkbox = document.getElementById("BinaryToggle");
-        console.log("checkbox binary: " + checkbox);
         if(checkbox.checked) {
             setupGenerateTruthTable();
         }
@@ -995,6 +1029,7 @@ class Display {
         this.displaySelectedOutput();
         this.UpdateInputToggle();
         this.UpdateOutputToggle();
+        this.alignTables();
     }
 
     //highlight invalid inputs, reset as soon as they are valid (#6)
@@ -1260,12 +1295,11 @@ class Demo {
         else{
             this.mode = "binary";
         }
-        console.log('mode set as', this.mode)
+        //console.log('mode set as', this.mode)
     }
 
     // update entire demo
     update(sender = undefined){
-        console.log("in overall update function")
         if(sender && sender.tagName === 'TH') { //header changed
 
             //update selected input so it update immediately
@@ -1275,7 +1309,6 @@ class Demo {
         }
         let bEditOutput = false;
         if(sender && sender.closest('table')?.id == "output-table") { //must be the desired output cell, no need to calculate
-            console.log("clicked the desired output cell");
             bEditOutput = true;
             display.checkDesiredOutput(sender.previousSibling, sender);
             //dataOp.updateDesiredOutput(demo.desiredOutput, outputTable);
@@ -1283,7 +1316,6 @@ class Demo {
         }
         dataOp.updateDataFromTable(inputs, inputTable);
         if(document.getElementById("OutputToggle").checked) {
-            console.log("checking output")
             dataOp.updateDataFromTable(outputs, outputTable);
         }
 
@@ -1301,6 +1333,7 @@ class Demo {
         outputTable.updateTable();
         display.updateDisplay();
         display.outputLine.position();
+        display.alignTables()
     }
 
     // convert to valid inputs for processing and keep track of invalid parts of input
@@ -1335,12 +1368,12 @@ async function downloadFile() {
     });
 
     let table = document.getElementById("output-table");
-    console.log(table);
+    //console.log(table);
     for(let i = 1; i < table.rows.length; i++ ) {
         let tr = table.rows[i];
         let td = tr.cells[2];
         desiredOutputs.data[i-1] = td.innerHTML;
-        console.log("desired output: " + desiredOutputs.data[i-1]);
+        //console.log("desired output: " + desiredOutputs.data[i-1]);
     }
     desiredOutputs.rows = table.rows.length-1;
 
