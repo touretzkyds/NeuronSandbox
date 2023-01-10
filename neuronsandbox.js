@@ -151,6 +151,11 @@ class DataOperator {
                 }
             });
         }
+
+        if(editable) {
+          //console.log("child: " + textbox.children[0])
+        }
+
     }
 }
 
@@ -530,7 +535,8 @@ class Display {
             td1.style.fontWeight = 'normal';
 
             td2.style.fontWeight = 'bold';
-            td2.style.background = '#f8ffcf'
+            if(td2.style.background !== '#ffbfcb') //error
+                td2.style.background = '#f8ffcf'
             //td2.classList.add("bold-td");
 
 
@@ -772,29 +778,31 @@ class Display {
     }
     // respond to user hovering over table
     hoverInput(row, tblId, mode) {
+        const isOutputToggleChecked = document.getElementById("OutputToggle").checked
         let rowIdx = row.rowIndex || 0;
         if(!this.isInputTable(tblId)) //output table, convert to corresponding input row index
             rowIdx += 1;
         //console.log(`hoverInput tblId=${tblId },input row=${rowIdx}, mode=${mode}`);
+
+        const inputRow = document.querySelector(`#input-table > tbody > tr:nth-child(${rowIdx+1})`)
+        //let outputRowIndex = (rowIdx <= 0) ? 1 : rowIdx;
+        let outputRowIndex = rowIdx - 1;
+        const outputRow = document.querySelector(`#output-table > tbody > tr:nth-child(${outputRowIndex + 1})`)
+
         if(rowIdx < 2) //headers, or leave
         {
             this.handleHoverExit();
             return;
         }
 
-        const inputRow = document.querySelector(`#input-table > tbody > tr:nth-child(${rowIdx+1})`)
-        //let outputRowIndex = (rowIdx <= 0) ? 1 : rowIdx;
-        let outputRowIndex = rowIdx - 1;
-        const outputRow = document.querySelector(`#output-table > tbody > tr:nth-child(${outputRowIndex + 1})`)
         if (mode === "enter"){
             // update the active inputs and outputs to display in perceptron diagram
             demo.selectedInput = inputs.data[rowIdx-2];
             demo.selectedOutput = outputs.data[rowIdx-2];
             //console.log("enter: set demo.selectedInput =" + demo.selectedInput);
-            //console.log("enter: set demo.selectedOutput =" + demo.selectedOutput);
+            console.log("enter: set demo.selectedOutput =" + demo.selectedOutput);
             // highlight input and output rows corresponding to the hovered input row
             inputRow.style.background = "lightblue";
-            console.log(outputRow.children)
             for(let i = 0; i < outputRow.children.length; i++) {
                 outputRow.children[i].style.background = "lightblue";
             }
@@ -802,10 +810,19 @@ class Display {
             //console.log("enter: set outputRow =" + outputRow);
         }
         else {
-            if(rowIdx % 2 === 0)
+            if(rowIdx % 2 === 0) {
                 this.handleHoverExit(inputRow, outputRow );
-            else
+                if(isOutputToggleChecked)
+                    this.checkDesiredOutput(outputRow.children[1], outputRow.children[2])
+
+            }
+
+            else {
                 this.handleHoverExit(inputRow, outputRow, true ); //if it is odd, reset to gray
+                if(isOutputToggleChecked)
+                    this.checkDesiredOutput(outputRow.children[1], outputRow.children[2])
+            }
+
 
         }
         //this.displaySelectedInput();
@@ -863,12 +880,13 @@ class Display {
                 inputRow.style.background = "none";
             if(outputRow) {
                 for(let i = 0; i < outputRow.children.length; i++) {
-                    outputRow.children[i].style.background = "none";
+                    outputRow.children[0].style.background = "none";
+                    this.checkDesiredOutput(outputRow.children[1], outputRow.children[2])
                 }
             }
 
         }
-        this.createOutputTableColors();
+        //this.createOutputTableColors();
         this.updateSelectedInput();
 
 
@@ -935,6 +953,7 @@ class Display {
             });
             //document.getElementById("generateTruthTable").disabled = true;
             document.getElementById("output-table").style.marginTop = "0px";
+            document.getElementById("FanfareToggleBody").hidden = true;
         } else {
             $("#input-table tr:first").show();
             $("#input-table tr td:nth-child(1)").show();
@@ -948,6 +967,7 @@ class Display {
             });
             //document.getElementById("generateTruthTable").disabled = false;
             document.getElementById("output-table").style.marginTop = "50px";
+            document.getElementById("FanfareToggleBody").hidden = false;
         }
 
         for(let i = 0; i < demo.weightLines.length; i++)
@@ -962,6 +982,7 @@ class Display {
         display.showDesiredOutput(checkbox.checked);
         let outputCol = document.getElementById("output-table");
         let n = outputCol.rows.length;
+        display.createOutputTableColors();
 
         for(let i = 1; i < n; i++) {
             //var tr = outputCol.rows[i];
@@ -973,7 +994,7 @@ class Display {
         for(let i = 0; i < demo.weightLines.length; i++) {
             demo.weightLines[i].position();
         }
-        display.createOutputTableColors();
+
         display.outputLine.position();
     }
 
@@ -1015,10 +1036,13 @@ class Display {
         display.highlightInvalidText(desired, isValid);
 
         if (outputParsedValue !== parsedValue && document.getElementById("OutputToggle").checked) {
-            output.style.backgroundColor = "#ffbfcb"; //pink (error)
+            output.style.background = "#ffbfcb"; //pink (error)
+            //return false
         }
         else {
-            output.style.removeProperty('background-color');
+            //output.style.removeProperty('background-color');
+            output.style.background = "#f8ffcf"
+            //return true
         }
     }
 
@@ -1035,7 +1059,7 @@ class Display {
     //highlight invalid inputs, reset as soon as they are valid (#6)
     highlightInvalidText(cell, isValid) {
         if (!isValid){
-            cell.style.backgroundColor = "pink";
+            cell.style.background = "pink";
         }
         else{
             cell.style.removeProperty('background-color');
@@ -1308,7 +1332,7 @@ class Demo {
             demo.selectedInput = headerRowVals;
         }
         let bEditOutput = false;
-        if(sender && sender.closest('table')?.id == "output-table") { //must be the desired output cell, no need to calculate
+        if(sender && sender.closest('table')?.id === "output-table") { //must be the desired output cell, no need to calculate
             bEditOutput = true;
             display.checkDesiredOutput(sender.previousSibling, sender);
             //dataOp.updateDesiredOutput(demo.desiredOutput, outputTable);
@@ -1477,6 +1501,7 @@ function uploadJson(text) {
     perceptron = new Perceptron(inputs, demo.weights, demo.threshold);
     perceptron.setWeightsUI();
     perceptron.computeOutputs();
+    display.createOutputTableColors();
 
     outputs = new Data(perceptron.outputData);
     //outputs.data.rows = desiredOutputs.rows;
@@ -1509,7 +1534,7 @@ function uploadJson(text) {
     display.handleHoverExit();
 
     display.outputLine.position();
-    display.createOutputTableColors();
+
 
 }
 
