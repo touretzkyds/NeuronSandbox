@@ -501,6 +501,10 @@ mark {
     color: black;
 }
 
+.congrats {
+    flex: 1;
+    font-size: 40px;
+}
 
 
 /*input[type="file"] {*/

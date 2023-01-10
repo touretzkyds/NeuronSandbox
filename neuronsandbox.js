@@ -142,21 +142,73 @@ class DataOperator {
             textbox.classList.add("edit-handler")
             textbox.addEventListener("focusout", function(event){
                 demo.update(this);
+                console.log("changed!")
+                let outputTable = document.getElementById("output-table")
+                let tableRows = outputTable.rows.length
+                let isCorrect = true;
+                for(let i = 1; i < tableRows; i++) {
+                    let cells = outputTable.rows.item(i).cells
+                    let output = cells.item(1).innerText;
+                    let desired = cells.item(2).innerText;
+                    if(output !== desired) {
+                        isCorrect = false
+                        break
+                    }
+
+                }
+
+                let fanfareToggleChecked = document.getElementById("FanfareToggle").checked
+                let fanfareHidden =  document.getElementById("congrats-msg").hidden
+                let outputToggleChecked = document.getElementById("OutputToggle").checked
+                if(fanfareToggleChecked && outputToggleChecked) {
+                    if(fanfareHidden) {
+                        if(isCorrect) {
+                            alert("Congrats! You reached the desired output!")
+                            document.getElementById("congrats-msg").hidden = false;
+                            display.outputLine.position()
+                            for(let i = 0; i < demo.weightLines.length; i++)
+                            {
+                                demo.weightLines[i].position();
+                            }
+
+                        }
+                        else {
+                            document.getElementById("congrats-msg").hidden = true;
+                            display.outputLine.position()
+                            for(let i = 0; i < demo.weightLines.length; i++)
+                            {
+                                demo.weightLines[i].position();
+                            }
+                        }
+
+                    }
+                    else { //congrats not hidden, but could have possibly made incorrect
+                        if(!isCorrect) {
+                            document.getElementById("congrats-msg").hidden = true;
+                            display.outputLine.position()
+                            for(let i = 0; i < demo.weightLines.length; i++)
+                            {
+                                demo.weightLines[i].position();
+                            }
+
+                        }
+
+                    }
+                }
+
+
             });
 
             textbox.addEventListener("keydown", function(event){
                 if (event.keyCode === 13 || event.keyCode === 27) {
                     textbox.blur(); // focus out of text box
                     demo.update(this);
+
                 }
             });
         }
-
-        if(editable) {
-          //console.log("child: " + textbox.children[0])
-        }
-
     }
+
 }
 
 // displays and manipulates HTML table, holds data object
@@ -564,6 +616,14 @@ class Display {
 
     }
 
+    checkCorrectness(tableData) {
+        let rows = tableData.rows;
+        for(let i = 0; i < rows; i++) {
+            if(tableData.data[i][1] !== tableData.data[i][2]) //the actual output and desired output do not match
+                return false
+        }
+        return true
+    }
     alignTables() {
         let adjustment = 0
         let maxHeight = 0
@@ -800,7 +860,7 @@ class Display {
             demo.selectedInput = inputs.data[rowIdx-2];
             demo.selectedOutput = outputs.data[rowIdx-2];
             //console.log("enter: set demo.selectedInput =" + demo.selectedInput);
-            console.log("enter: set demo.selectedOutput =" + demo.selectedOutput);
+            //console.log("enter: set demo.selectedOutput =" + demo.selectedOutput);
             // highlight input and output rows corresponding to the hovered input row
             inputRow.style.background = "lightblue";
             for(let i = 0; i < outputRow.children.length; i++) {
@@ -938,8 +998,8 @@ class Display {
     UpdateInputToggle() {
         let checkbox = document.getElementById("InputToggle");
 
+        //display.createOutputTableColors();
         this.updateSelectedInput();
-
         if (!checkbox.checked) {
             $("#input-table tr:first").hide();
             $("#input-table tr td:nth-child(1)").hide();
@@ -974,7 +1034,7 @@ class Display {
         {
             demo.weightLines[i].position();
         }
-        display.createOutputTableColors();
+
     }
 
     UpdateOutputToggle() {
@@ -984,12 +1044,24 @@ class Display {
         let n = outputCol.rows.length;
         display.createOutputTableColors();
 
+        let isCorrect = true;
+
         for(let i = 1; i < n; i++) {
             //var tr = outputCol.rows[i];
             let output = outputCol.rows[i].cells[1];
             let desired = outputCol.rows[i].cells[2];
-            this.checkDesiredOutput(output, desired);
+
+            let currCorrect = this.checkDesiredOutput(output, desired);
+            if(!currCorrect)
+                isCorrect = false;
         }
+
+        // if(checkbox.checked) {
+        //     let fanfareToggleChecked = document.getElementById("FanfareToggle")
+        //     if(!isCorrect && fanfareToggleChecked) {
+        //         alert("Congrats! Desired outputs reached!")
+        //     }
+        // }
 
         for(let i = 0; i < demo.weightLines.length; i++) {
             demo.weightLines[i].position();
@@ -1000,6 +1072,7 @@ class Display {
 
     UpdateBinaryToggle() {
         let checkbox = document.getElementById("BinaryToggle");
+        display.createOutputTableColors();
         if(checkbox.checked) {
             setupGenerateTruthTable();
         }
@@ -1012,7 +1085,7 @@ class Display {
                 }
             }
         }
-        display.createOutputTableColors();
+
     }
 
     checkDesiredOutput(output, desired) {
@@ -1037,12 +1110,12 @@ class Display {
 
         if (outputParsedValue !== parsedValue && document.getElementById("OutputToggle").checked) {
             output.style.background = "#ffbfcb"; //pink (error)
-            //return false
+            return false
         }
         else {
             //output.style.removeProperty('background-color');
             output.style.background = "#f8ffcf"
-            //return true
+            return true
         }
     }
 
@@ -1054,6 +1127,7 @@ class Display {
         this.UpdateInputToggle();
         this.UpdateOutputToggle();
         this.alignTables();
+
     }
 
     //highlight invalid inputs, reset as soon as they are valid (#6)
@@ -1358,6 +1432,10 @@ class Demo {
         display.updateDisplay();
         display.outputLine.position();
         display.alignTables()
+        //let isCorrect = display.checkCorrectness(outputs)
+        //console.log("isCorrect: " + isCorrect)
+        display.outputLine.position()
+
     }
 
     // convert to valid inputs for processing and keep track of invalid parts of input
