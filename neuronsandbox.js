@@ -1189,10 +1189,10 @@ class Display {
         let checkbox = document.getElementById("FanfareToggle")
         if(!checkbox.checked) {
             document.getElementById("congrats-msg").hidden = true;
+            display.outputLine.position()
         } else {
             display.checkForSuccess()
         }
-
     }
 
     checkDesiredOutput(output, desired) {
@@ -1413,11 +1413,11 @@ class Demo {
                 child.style = "left:" + -20 + "%;" + "top:" + top + "%;";
                 child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>`;
             }
-             let child = parentElement.children[1];
-             const left = -40;
-             const top = 10 + 17.5
-             child.style = "left:" + left + "%;" + "top:" + top + "%;";
-             child.innerHTML = `<text>w<sub>${2}</sub> =</text> <text contenteditable="true" id="w${2}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[1]}</text>`;
+            let child = parentElement.children[1];
+            const left = -40;
+            const top = 10 + 17.5
+            child.style = "left:" + left + "%;" + "top:" + top + "%;";
+            child.innerHTML = `<text>w<sub>${2}</sub> =</text> <text contenteditable="true" id="w${2}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[1]}</text>`;
 
             let child1 = parentElement.children[2];
             const left1 = -80;
@@ -1782,4 +1782,9 @@ $('#BinaryToggle').change(function() { //toggle output
 $('#FanfareToggle').change(function() { //toggle output
     display.UpdateFanfareToggle();
     display.outputLine.position();
+    for(let i = 0; i < demo.weightLines.length; i++)
+    {
+        demo.weightLines[i].position();
+    }
+
 });
