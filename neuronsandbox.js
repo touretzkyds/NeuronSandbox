@@ -100,7 +100,8 @@ class DataOperator {
         for (let row = start; row < table.rows.length; row++) {
             for (let c = 1 ; c < table.rows[row].cells.length; c++) {
                 const cell = table.rows[row].cells[c];
-                cell.innerHTML = `<span>`+dataObj.data[row-start][c-1]+`</span>`;
+                //cell.innerHTML = `<span>`+dataObj.data[row-start][c-1]+`</span>`;
+                cell.innerText = dataObj.data[row-start][c-1];
             }
         }
         //console.log("updateTableFromData, data = " + dataObj.data);
@@ -136,12 +137,13 @@ class DataOperator {
     makeEditable(textbox, editable = true){ // TODO: Move from dataOp to displayOp
         textbox.contentEditable = editable;
 
-        if(editable && textbox.children && textbox.children[0]) {
-            textbox.children[0].classList.add("editable-border")
-        }
-        else if (!editable && textbox.children && textbox.classList.contains("editable-border")) {
-            textbox.classList.remove("editable-border")
-        }
+
+        // if(editable && textbox.children && textbox.children[0]) {
+        //     textbox.children[0].classList.add("editable-border")
+        // }
+        // else if (!editable && textbox.children && textbox.classList.contains("editable-border")) {
+        //     textbox.classList.remove("editable-border")
+        // }
 
         // add event listener to update demo with table changes
         // add a class to textbox to keep track of an eventlistener already being added
@@ -353,6 +355,7 @@ class Table {
         for (let c = 0; c < this.numCols; c++) {
             let cell = newRow.insertCell(c);
             cell.innerHTML = `<span>0</span>`
+            //cell.innerText = 0;
             cell.classList.add("animation");
             if (this.isEditable && makeEditable){
                 dataOp.makeEditable(cell);
@@ -377,6 +380,7 @@ class Table {
                 $(this).css('animation-delay',0.2 +'s');
             $(this).classList?.remove("animation");
         });
+        display.createInputTableEditBorder()
     }
 
     //finds available indices for variables
@@ -429,6 +433,7 @@ class Table {
 
         for (let r = 0; r < this.numRows; r++) { //skip column buttons + row headers
             let cell = this.table.rows[r+2].insertCell(c);
+            cell.innerHTML = `<span>0</span>`
             cell.innerText = 0;
             cell.classList.add("animation");
             if (this.isEditable){
@@ -454,6 +459,7 @@ class Table {
         let cols = []
         display.getHeaderRowVals(cols);
         this.defaultSelectedInput = cols;
+        display.createInputTableEditBorder()
     }
 
     removeTableCol(c){
@@ -582,6 +588,7 @@ class Display {
         this.outputLine.path = 'straight';
         this.outputLine.position();
         this.createOutputTableColors();
+        this.createInputTableEditBorder();
     }
 
     createOutputTableColors() {
@@ -600,6 +607,38 @@ class Display {
 
 
         }
+    }
+
+    createInputTableEditBorder() {
+        const inputTable = document.getElementById("input-table")
+
+        let checkbox = document.getElementById("BinaryToggle");
+        let editable = false
+        if(!checkbox.checked)
+            editable = true
+        let n = inputTable.rows.length;
+        for (let i = 2; i < n; i++) {
+            let tr = inputTable.rows[i];
+            for(let j = 1; j < tr.cells.length; j++) {
+                let textbox = tr.cells[j]
+                //textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
+                if(editable) {
+                    if(textbox.children.length === 0) {
+                        textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
+                    }
+                    textbox.children[0].classList.add("editable-border")
+                }
+                else {
+                    if(textbox.children.length === 0) {
+                        textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
+                    }
+                    textbox.children[0].classList.remove("editable-border")
+                }
+
+            }
+        }
+
+
     }
     initializeDisplay(){
         // make weights and threshold editable on initialization
@@ -1080,6 +1119,7 @@ class Display {
     UpdateBinaryToggle() {
         let checkbox = document.getElementById("BinaryToggle");
         display.createOutputTableColors();
+
         if(checkbox.checked) {
             setupGenerateTruthTable();
         }
@@ -1092,6 +1132,7 @@ class Display {
                 }
             }
         }
+        display.createInputTableEditBorder();
 
     }
 
@@ -1619,6 +1660,7 @@ function uploadJson(text) {
     display.handleHoverExit();
 
     display.outputLine.position();
+    display.createInputTableEditBorder();
 
 
 }
@@ -1655,6 +1697,7 @@ const display = new Display();
 display.updateDisplay();
 uploadFromUrl("SampleModel.json");
 display.createOutputTableColors();
+display.createInputTableEditBorder();
 
 document.addEventListener("DOMContentLoaded", () => {
     demo.main().catch(e => console.error(e));
