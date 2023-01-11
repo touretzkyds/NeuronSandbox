@@ -147,64 +147,13 @@ class DataOperator {
 
         // add event listener to update demo with table changes
         // add a class to textbox to keep track of an eventlistener already being added
+        let showAlert = false;
         if (!textbox.classList.contains("edit-handler")) {
             textbox.classList.add("edit-handler")
             textbox.addEventListener("focusout", function(event){
                 demo.update(this);
                 console.log("changed!")
-                let outputTable = document.getElementById("output-table")
-                let tableRows = outputTable.rows.length
-                let isCorrect = true;
-                for(let i = 1; i < tableRows; i++) {
-                    let cells = outputTable.rows.item(i).cells
-                    let output = cells.item(1).innerText;
-                    let desired = cells.item(2).innerText;
-                    if(output !== desired) {
-                        isCorrect = false
-                        break
-                    }
-
-                }
-
-                let fanfareToggleChecked = document.getElementById("FanfareToggle").checked
-                let fanfareHidden =  document.getElementById("congrats-msg").hidden
-                let outputToggleChecked = document.getElementById("OutputToggle").checked
-                if(fanfareToggleChecked && outputToggleChecked) {
-                    if(fanfareHidden) {
-                        if(isCorrect) {
-                            alert("Congrats! You reached the desired output!")
-                            document.getElementById("congrats-msg").hidden = false;
-                            display.outputLine.position()
-                            for(let i = 0; i < demo.weightLines.length; i++)
-                            {
-                                demo.weightLines[i].position();
-                            }
-
-                        }
-                        else {
-                            document.getElementById("congrats-msg").hidden = true;
-                            display.outputLine.position()
-                            for(let i = 0; i < demo.weightLines.length; i++)
-                            {
-                                demo.weightLines[i].position();
-                            }
-                        }
-
-                    }
-                    else { //congrats not hidden, but could have possibly made incorrect
-                        if(!isCorrect) {
-                            document.getElementById("congrats-msg").hidden = true;
-                            display.outputLine.position()
-                            for(let i = 0; i < demo.weightLines.length; i++)
-                            {
-                                demo.weightLines[i].position();
-                            }
-
-                        }
-
-                    }
-                }
-
+                display.checkForSuccess()
 
             });
 
@@ -349,6 +298,11 @@ class Table {
 
     // insert row at given position and add editable attributes/ cells if required.
     insertTableRow(r, makeEditable = true){
+
+        if(document.getElementById("BinaryToggle").checked)
+            makeEditable = false
+        else
+            makeEditable = true
         //console.log("insertTableRow, trying to add new row at row=" + r);
         let newRow = this.table.insertRow(r);
         this.makeHoverable(newRow, this.tblId);
@@ -419,6 +373,11 @@ class Table {
     }
 
     insertTableCol(c){
+        let makeEditable = true
+
+        if(document.getElementById("BinaryToggle").checked)
+            makeEditable = false
+
         let tuple = this.findAvailableIndex();
         let newCol  = tuple[0];
         let newNameIndex = tuple[1];
@@ -639,6 +598,88 @@ class Display {
         }
 
 
+    }
+
+    createOutputTableEditBorder() {
+        const outputTable = document.getElementById("output-table")
+
+        let checkbox = document.getElementById("BinaryToggle");
+        let editable = false
+        if(!checkbox.checked)
+            editable = true
+        let n = outputTable.rows.length;
+        for (let i = 1; i < n; i++) {
+            let tr = outputTable.rows[i];
+            let textbox = tr.cells[2]
+            if(editable) {
+                if(textbox.children.length === 0) {
+                    textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
+                }
+                textbox.children[0].classList.add("editable-border")
+            }
+            else {
+                if(textbox.children.length === 0) {
+                    textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
+                }
+                textbox.children[0].classList.remove("editable-border")
+            }
+        }
+
+
+    }
+
+    checkForSuccess() {
+        let outputTable = document.getElementById("output-table")
+        let tableRows = outputTable.rows.length
+        let isCorrect = true;
+        for(let i = 1; i < tableRows; i++) {
+            let cells = outputTable.rows.item(i).cells
+            let output = cells.item(1).innerText;
+            let desired = cells.item(2).innerText;
+            if(output !== desired) {
+                isCorrect = false
+                break
+            }
+
+        }
+        let fanfareToggleChecked = document.getElementById("FanfareToggle").checked
+        let fanfareHidden =  document.getElementById("congrats-msg").hidden
+        let outputToggleChecked = document.getElementById("OutputToggle").checked
+        if(fanfareToggleChecked && outputToggleChecked) {
+            if(fanfareHidden) {
+                if(isCorrect) {
+                    alert("Congrats! You reached the desired output!")
+                    document.getElementById("congrats-msg").hidden = false;
+                    display.outputLine.position()
+                    for(let i = 0; i < demo.weightLines.length; i++)
+                    {
+                        demo.weightLines[i].position();
+                    }
+
+                }
+                else {
+                    document.getElementById("congrats-msg").hidden = true;
+                    display.outputLine.position()
+                    for(let i = 0; i < demo.weightLines.length; i++)
+                    {
+                        demo.weightLines[i].position();
+                    }
+                }
+
+            }
+            else { //congrats not hidden, but could have possibly made incorrect
+                if(!isCorrect) {
+                    document.getElementById("congrats-msg").hidden = true;
+                    display.outputLine.position()
+                    for(let i = 0; i < demo.weightLines.length; i++)
+                    {
+                        demo.weightLines[i].position();
+                    }
+
+                }
+
+            }
+        }
     }
     initializeDisplay(){
         // make weights and threshold editable on initialization
@@ -1136,6 +1177,16 @@ class Display {
 
     }
 
+    UpdateFanfareToggle() {
+        let checkbox = document.getElementById("FanfareToggle")
+        if(!checkbox.checked) {
+            document.getElementById("congrats-msg").hidden = true;
+        } else {
+            display.checkForSuccess()
+        }
+
+    }
+
     checkDesiredOutput(output, desired) {
         //TODO: do extra testing with the regex and make changes if necessary
 
@@ -1147,9 +1198,9 @@ class Display {
         const desiredInt = desired.innerText;
         let [parsedValue, isValid] = demo.stringToValidFloat(desiredInt);
 
-        if(parsedValue === 1.0) desired.innerText = '1';
-        if(parsedValue === 0.0) desired.innerText = '0';
-        if(desiredInt.match(regex)) desired.innerText = '1';
+        if(parsedValue === 1.0) desired.innerHTML = '<span class="editable-border">1</span>';
+        if(parsedValue === 0.0) desired.innerHTML = '<span class="editable-border">0</span>';
+        if(desiredInt.match(regex)) desired.innerHTML = '<span class="editable-border">1</span>';
         //console.log("parsed: " + parsedValue);
         if(parsedValue !== 1 && parsedValue !== 0 ) {
             isValid = false;
@@ -1204,6 +1255,7 @@ class Display {
     }
     showDesiredOutput (show) {
         outputTable.showColumn(2, show, show);
+        display.createOutputTableEditBorder()
     }
 }
 
@@ -1711,9 +1763,15 @@ $('#InputToggle').change(function() { //toggle edit
 $('#OutputToggle').change(function() { //toggle output
     display.UpdateOutputToggle();
     display.outputLine.position();
+    display.checkForSuccess()
 });
 
 $('#BinaryToggle').change(function() { //toggle output
     display.UpdateBinaryToggle();
+    display.outputLine.position();
+});
+
+$('#FanfareToggle').change(function() { //toggle output
+    display.UpdateFanfareToggle();
     display.outputLine.position();
 });

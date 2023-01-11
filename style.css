@@ -479,7 +479,7 @@ h1 {
 .user-input-wrp .floating-label {
     position: absolute;
     pointer-events: none;
-    top: 18px;
+    top: 10px;
     left: 10px;
     Color: #808080;
     transition: 0.2s ease all;
