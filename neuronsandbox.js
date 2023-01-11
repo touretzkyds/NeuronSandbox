@@ -137,26 +137,34 @@ class DataOperator {
     makeEditable(textbox, editable = true){ // TODO: Move from dataOp to displayOp
         textbox.contentEditable = editable;
 
-
-        // if(editable && textbox.children && textbox.children[0]) {
-        //     textbox.children[0].classList.add("editable-border")
-        // }
-        // else if (!editable && textbox.children && textbox.classList.contains("editable-border")) {
-        //     textbox.classList.remove("editable-border")
-        // }
-
-        // add event listener to update demo with table changes
-        // add a class to textbox to keep track of an eventlistener already being added
-        let showAlert = false;
+        let text;
         if (!textbox.classList.contains("edit-handler")) {
             textbox.classList.add("edit-handler")
             textbox.addEventListener("focusout", function(event){
                 demo.update(this);
                 console.log("changed!")
                 display.checkForSuccess()
+                text = textbox.innerText
+                if(text && this?.tagName !== 'TH' && this.parentNode?.tagName !== 'TH') {
+                    textbox.innerHTML = `<span class="editable-border">` + text + `</span>`
+                }
 
             });
-
+            // textbox.addEventListener("input", function(event) {
+            //     let target = event.target,
+            //         position = target.selectionStart; // Capture initial position
+            //
+            //     text = textbox.innerText
+            //     if(text && this?.tagName !== 'TH' && this.parentNode?.tagName !== 'TH') {
+            //         textbox.innerHTML = `<span class="editable-border">` + text + `</span>`
+            //     }
+            //
+            //
+            //     target.value = target.value.replace(/\s/g, '');  // This triggers the cursor to move.
+            //
+            //     target.selectionEnd = position;
+            //
+            // })
             textbox.addEventListener("keydown", function(event){
                 if (event.keyCode === 13 || event.keyCode === 27) {
                     textbox.blur(); // focus out of text box
