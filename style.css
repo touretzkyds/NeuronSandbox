@@ -506,6 +506,11 @@ mark {
     font-size: 40px;
 }
 
+.editable-border {
+    border-style:solid;
+    border-color: gray;
+}
+
 
 /*input[type="file"] {*/
 /*    display: none;*/

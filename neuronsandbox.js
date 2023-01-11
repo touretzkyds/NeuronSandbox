@@ -79,7 +79,7 @@ class DataOperator {
         for (let n = table.rows.length; row < n; row++) {
             for (let c = startCol, m = table.rows[row].cells.length; c < m; c++) {
                 const cell = table.rows[row].cells[c];
-                const rawValue = cell.innerHTML;
+                const rawValue = cell.innerText;
                 let [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
                 if(table.id === 'output-table' && c === 2 && (parsedValue !== 1 || parsedValue !== 0) ) {
                     isValid = false;
@@ -100,7 +100,7 @@ class DataOperator {
         for (let row = start; row < table.rows.length; row++) {
             for (let c = 1 ; c < table.rows[row].cells.length; c++) {
                 const cell = table.rows[row].cells[c];
-                cell.innerHTML = dataObj.data[row-start][c-1];
+                cell.innerHTML = `<span>`+dataObj.data[row-start][c-1]+`</span>`;
             }
         }
         //console.log("updateTableFromData, data = " + dataObj.data);
@@ -113,7 +113,7 @@ class DataOperator {
         //let row = start;
         for(let row = start; row < table.rows.length; row++) {
             const cell = table.rows[row].cells[2];
-            cell.innerHTML = desiredOutput.data[row-1];
+            cell.innerText = desiredOutput.data[row-1];
         }
     }
 
@@ -135,6 +135,13 @@ class DataOperator {
     // make editable and update demo on edit
     makeEditable(textbox, editable = true){ // TODO: Move from dataOp to displayOp
         textbox.contentEditable = editable;
+
+        if(editable && textbox.children && textbox.children[0]) {
+            textbox.children[0].classList.add("editable-border")
+        }
+        else if (!editable && textbox.children && textbox.classList.contains("editable-border")) {
+            textbox.classList.remove("editable-border")
+        }
 
         // add event listener to update demo with table changes
         // add a class to textbox to keep track of an eventlistener already being added
@@ -240,7 +247,7 @@ class Table {
             this.makeHoverable(newRow, tblId);
             for(let c=0; c<array[r].length; c++) {
                 let cell = newRow.insertCell(c);
-                cell.innerHTML = array[r][c];
+                cell.innerHTML = `<span>`+array[r][c]+`</span>`;
                 if (this.isEditable) {
                     dataOp.makeEditable(cell);
                 }
@@ -278,7 +285,7 @@ class Table {
         for (let r = 1, n = this.numRows + 1; r < n; r++) {
             for (let c = 0, m = this.numCols; c < m; c++) {
                 const arrayValue = this.dataObj.data[r-1][c];
-                this.table.rows[r].cells[c].innerHTML = arrayValue;
+                this.table.rows[r].cells[c].innerText = arrayValue;
             }
         }
     }
@@ -345,7 +352,7 @@ class Table {
         this.makeHoverable(newRow, this.tblId);
         for (let c = 0; c < this.numCols; c++) {
             let cell = newRow.insertCell(c);
-            cell.innerText = 0;
+            cell.innerHTML = `<span>0</span>`
             cell.classList.add("animation");
             if (this.isEditable && makeEditable){
                 dataOp.makeEditable(cell);
@@ -929,9 +936,9 @@ class Display {
             if(inputRow)
                 inputRow.style.background = "#f2f2f2"; //color gray
             if(outputRow) {
-                for(let i = 0; i < outputRow.children.length; i++) {
-                    outputRow.children[i].style.background = "#f2f2f2"; //color gray
-                }
+                outputRow.children[0].style.background =  "#f2f2f2"
+                outputRow.children[1].style.background = "#f8ffcf"
+                outputRow.children[2].style.background =  "#f2f2f2"
             }
 
         }
@@ -1093,15 +1100,15 @@ class Display {
 
         const regex = '/^0*1?$/gm'; //detects trailing zeros
 
-        const outputInt = output.innerHTML;
+        const outputInt = output.innerText;
         let [outputParsedValue, outputIsValid] = demo.stringToValidFloat(outputInt);
 
-        const desiredInt = desired.innerHTML;
+        const desiredInt = desired.innerText;
         let [parsedValue, isValid] = demo.stringToValidFloat(desiredInt);
 
-        if(parsedValue === 1.0) desired.innerHTML = '1';
-        if(parsedValue === 0.0) desired.innerHTML = '0';
-        if(desiredInt.match(regex)) desired.innerHTML = '1';
+        if(parsedValue === 1.0) desired.innerText = '1';
+        if(parsedValue === 0.0) desired.innerText = '0';
+        if(desiredInt.match(regex)) desired.innerText = '1';
         //console.log("parsed: " + parsedValue);
         if(parsedValue !== 1 && parsedValue !== 0 ) {
             isValid = false;
@@ -1474,7 +1481,7 @@ async function downloadFile() {
     for(let i = 1; i < table.rows.length; i++ ) {
         let tr = table.rows[i];
         let td = tr.cells[2];
-        desiredOutputs.data[i-1] = td.innerHTML;
+        desiredOutputs.data[i-1] = td.innerText;
         //console.log("desired output: " + desiredOutputs.data[i-1]);
     }
     desiredOutputs.rows = table.rows.length-1;
