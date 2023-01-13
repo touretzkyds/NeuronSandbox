@@ -20,6 +20,15 @@ h1 {
     margin-right: auto;
 }
 
+article {
+    text-align: center;
+    font-size: 50px; /*fix white space*/
+}
+article > section {
+    font-size: 16px;
+    display: inline-block;
+}
+
 .top-table {
     width: 20%;
     padding: 0;
@@ -259,7 +268,6 @@ h1 {
 .custom-th {
     width: 7vw;
     line-height: 5vh !important;
-    overflow-wrap: break-word;
 }
 .output-th {
     width: 2vw !important;

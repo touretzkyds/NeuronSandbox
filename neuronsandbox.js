@@ -144,17 +144,27 @@ class DataOperator {
                 demo.update(this);
                 console.log("changed!")
                 display.checkForSuccess()
+
+                //check if it is a table input or desired output. If not, do not add span boxes
                 text = textbox.innerText
-                if(text && this?.tagName !== 'TH' && this.parentNode?.tagName !== 'TH') {
-                    textbox.innerHTML = `<span class="editable-border">` + text + `</span>`
+                let identify = this?.id
+                const regex = '/^w[0-9]+$/gm'; //detects weight labels "w1, w2, ..."
+                if(identify) {
+                    if(identify !== "th1" && new RegExp(regex).test(identify)) { //checks if not threshold, or any of the weight textboxes
+                        if(text && this?.tagName !== 'TH' && this.parentNode?.tagName !== 'TH') {
+                            textbox.innerHTML = `<span class="editable-border">` + text + `</span>`
+                        }
+                    }
                 }
+
+
 
             });
             // textbox.addEventListener("input", function(event) {
             //     let target = event.target,
             //         position = target.selectionStart; // Capture initial position
             //
-            //     text = textbox.innerText
+            //      text = textbox.innerText
             //     if(text && this?.tagName !== 'TH' && this.parentNode?.tagName !== 'TH') {
             //         textbox.innerHTML = `<span class="editable-border">` + text + `</span>`
             //     }
@@ -745,6 +755,46 @@ class Display {
 
     }
 
+    adjustSelectedInputFontSize() {
+        let maxLength = 0;
+
+        const headerCells = document.getElementById("input-table").rows[1].cells;
+        for (let c = 1; c < headerCells.length; c++) {
+            let headerInput = headerCells[c];
+            if (headerInput.id.startsWith("tblinput")) {
+                let length = headerInput.innerText.length
+                if(length > maxLength)
+                    maxLength = length
+            }
+            else
+                console.log("missing input")
+        }
+
+        let newFontSize;
+        if(maxLength <= 10) {
+            newFontSize = 50;
+        }
+        else if(maxLength >= 30){
+            newFontSize = 30;
+        }
+        else {
+            newFontSize = 50 - (maxLength-10)
+        }
+
+        console.log("fontSize: " + newFontSize)
+        const selections = document.getElementById("selected-inputs");
+        for (let r=0; r<selections.rows.length; r++){
+            selections.rows[r].cells[0].style.fontSize = newFontSize + "px"
+        }
+
+        for(let i = 0; i < demo.weightLines.length; i++)
+        {
+            demo.weightLines[i].position();
+        }
+
+
+    }
+
     displayWeightFromData(wID, idx){
         let weight = document.getElementById(wID);
         if(!weight) {
@@ -1234,6 +1284,7 @@ class Display {
         this.UpdateInputToggle();
         this.UpdateOutputToggle();
         this.alignTables();
+        this.adjustSelectedInputFontSize()
 
     }
 
@@ -1540,6 +1591,7 @@ class Demo {
         display.updateDisplay();
         display.outputLine.position();
         display.alignTables()
+        display.adjustSelectedInputFontSize()
         //let isCorrect = display.checkCorrectness(outputs)
         //console.log("isCorrect: " + isCorrect)
         display.outputLine.position()
