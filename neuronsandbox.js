@@ -148,33 +148,44 @@ class DataOperator {
                 //check if it is a table input or desired output. If not, do not add span boxes
                 text = textbox.innerText
                 let identify = this?.id
-                const regex = '/^w[0-9]+$/gm'; //detects weight labels "w1, w2, ..."
-                if(identify) {
-                    if(identify !== "th1" && new RegExp(regex).test(identify)) { //checks if not threshold, or any of the weight textboxes
-                        if(text && this?.tagName !== 'TH' && this.parentNode?.tagName !== 'TH') {
-                            textbox.innerHTML = `<span class="editable-border">` + text + `</span>`
-                        }
+                //const regex = '/^w[0-9]+$/gm'; //detects weight labels "w1, w2, ..."
+                if(identify !== "th1" && !(new RegExp('^w[0-9]+$', 'gm').test(identify))) { //checks if not threshold, or any of the weight textboxes
+                    if(text && this?.tagName !== 'TH' && this.parentNode?.tagName !== 'TH') {
+                        textbox.innerHTML = `<span class="editable-border">` + text + `</span>`
                     }
                 }
 
 
 
             });
-            // textbox.addEventListener("input", function(event) {
-            //     let target = event.target,
-            //         position = target.selectionStart; // Capture initial position
-            //
-            //      text = textbox.innerText
-            //     if(text && this?.tagName !== 'TH' && this.parentNode?.tagName !== 'TH') {
-            //         textbox.innerHTML = `<span class="editable-border">` + text + `</span>`
-            //     }
-            //
-            //
-            //     target.value = target.value.replace(/\s/g, '');  // This triggers the cursor to move.
-            //
-            //     target.selectionEnd = position;
-            //
-            // })
+            textbox.addEventListener("input", function(event) {
+
+                let text = textbox.innerText
+                let identify = this?.id
+                //const regex = '/^w[0-9]+$/gm'; //detects weight labels "w1, w2, ..."
+                if(identify !== "th1" && !(new RegExp('^w[0-9]+$', 'gm').test(identify))) { //checks if not threshold, or any of the weight textboxes
+                    if(text && this?.tagName !== 'TH' && this.parentNode?.tagName !== 'TH') {
+                        textbox.innerHTML = `<span class="editable-border">` + text + `</span>`
+                    }
+                }
+
+                let target = event.target;
+                let caretPos = target.innerText.length
+                console.log("caret should be at: " + caretPos)
+                //target.setSelectionRange(caretPos+1, caretPos+1);
+                let range = document.createRange()
+                let sel = window.getSelection()
+
+
+                range.setStart(target, 1)
+                //range.setEnd(target.childNodes[target.childNodes.length-1], caretPos);
+                range.collapse(true)
+
+                sel.removeAllRanges()
+                sel.addRange(range)
+
+
+            })
             textbox.addEventListener("keydown", function(event){
                 if (event.keyCode === 13 || event.keyCode === 27) {
                     textbox.blur(); // focus out of text box
