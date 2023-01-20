@@ -136,13 +136,33 @@ class DataOperator {
     // make editable and update demo on edit
     makeEditable(textbox, editable = true){ // TODO: Move from dataOp to displayOp
         textbox.contentEditable = editable;
+        // add event listener to update demo with table changes
+        // add a class to textbox to keep track of an eventlistener already being added
+        console.log(textbox)
+        if (!textbox.classList.contains("edit-handler")) {
+            textbox.classList.add("edit-handler")
+            //console.trace()
+            textbox.addEventListener("focusout", function(event){
+                demo.update(this);
+            });
+            textbox.addEventListener("keydown", function(event){
+                if (event.keyCode === 13 || event.keyCode === 27) {
+                    textbox.blur(); // focus out of text box
+                    demo.update(this);
+                }
+            });
+        }
+    }
+
+    makeEditable2(textbox, editable = true){ // TODO: Move from dataOp to displayOp
+        textbox.contentEditable = editable;
 
         let text;
         if (!textbox.classList.contains("edit-handler")) {
             textbox.classList.add("edit-handler")
+            console.log(textbox)
             textbox.addEventListener("focusout", function(event){
                 demo.update(this);
-                console.log("changed!")
                 display.checkForSuccess()
 
                 //check if it is a table input or desired output. If not, do not add span boxes
@@ -154,28 +174,26 @@ class DataOperator {
                         textbox.innerHTML = `<span class="editable-border">` + text + `</span>`
                     }
                 }
-
-
-
+                if(textbox.innerText.length === 0)
+                    textbox.innerHTML = `<span class="editable-border">` + 0 + `</span>`
             });
             textbox.addEventListener("input", function(event) {
 
                 let text = textbox.innerText
                 let identify = this?.id
                 //const regex = '/^w[0-9]+$/gm'; //detects weight labels "w1, w2, ..."
-                if(identify !== "th1" && !(new RegExp('^w[0-9]+$', 'gm').test(identify))) { //checks if not threshold, or any of the weight textboxes
-                    if(text && this?.tagName !== 'TH' && this.parentNode?.tagName !== 'TH') {
+                if (identify !== "th1" && !(new RegExp('^w[0-9]+$', 'gm').test(identify))) { //checks if not threshold, or any of the weight textboxes
+                    if (text && this?.tagName !== 'TH' && this.parentNode?.tagName !== 'TH') {
                         textbox.innerHTML = `<span class="editable-border">` + text + `</span>`
                     }
                 }
 
                 let target = event.target;
                 let caretPos = target.innerText.length
-                console.log("caret should be at: " + caretPos)
+                //console.log("caret should be at: " + caretPos)
                 //target.setSelectionRange(caretPos+1, caretPos+1);
                 let range = document.createRange()
                 let sel = window.getSelection()
-
 
                 range.setStart(target, 1)
                 //range.setEnd(target.childNodes[target.childNodes.length-1], caretPos);
@@ -183,7 +201,6 @@ class DataOperator {
 
                 sel.removeAllRanges()
                 sel.addRange(range)
-
 
             })
             textbox.addEventListener("keydown", function(event){
@@ -227,9 +244,9 @@ class Table {
             this.makeHoverable(newRow, tblId);
             for(let c=0; c<array[r].length; c++) {
                 let cell = newRow.insertCell(c);
-                cell.innerHTML = `<span>`+array[r][c]+`</span>`;
+                cell.innerHTML = `<span class="editable-border">`+array[r][c]+`</span>`;
                 if (this.isEditable) {
-                    dataOp.makeEditable(cell);
+                    dataOp.makeEditable(cell.firstChild);
                 }
             }
         }
@@ -337,11 +354,11 @@ class Table {
         this.makeHoverable(newRow, this.tblId);
         for (let c = 0; c < this.numCols; c++) {
             let cell = newRow.insertCell(c);
-            cell.innerHTML = `<span>0</span>`
+            cell.innerHTML = `<span class="editable-border">0</span>`
             //cell.innerText = 0;
             cell.classList.add("animation");
             if (this.isEditable && makeEditable){
-                dataOp.makeEditable(cell);
+                dataOp.makeEditable(cell.firstChild);
             }
             else {
                 cell.contentEditable = false;
@@ -421,11 +438,10 @@ class Table {
 
         for (let r = 0; r < this.numRows; r++) { //skip column buttons + row headers
             let cell = this.table.rows[r+2].insertCell(c);
-            cell.innerHTML = `<span>0</span>`
-            cell.innerText = 0;
+            cell.innerHTML = `<span class="editable-border">0</span>`
             cell.classList.add("animation");
             if (this.isEditable){
-                dataOp.makeEditable(cell);
+                dataOp.makeEditable(cell.firstChild);
             }
         }
         this.createColumnButtons(false, this.numCols + 1);
@@ -472,7 +488,13 @@ class Table {
         for (let r = startingRow; r < this.numRows + 1; r++) {
             const cells = this.table.rows[r].cells;
             if(r !== 0) {
-                dataOp.makeEditable(cells[columnNum], editable);
+                if(cells[columnNum].querySelector(".editable-border")) {
+                    console.log("cell: " + cells[columnNum].firstChild)
+                    dataOp.makeEditable(cells[columnNum].firstChild, editable);
+                }
+                else {
+                    dataOp.makeEditable(cells[columnNum], editable);
+                }
             }
             cells[columnNum].style.display = visible? "block" : "none";
         }
@@ -615,12 +637,14 @@ class Display {
                         textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
                     }
                     textbox.children[0].classList.add("editable-border")
+                    dataOp.makeEditable(textbox.firstChild)
                 }
                 else {
                     if(textbox.children.length === 0) {
                         textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
                     }
                     textbox.children[0].classList.remove("editable-border")
+                    dataOp.makeEditable(textbox.firstChild, false)
                 }
 
             }
@@ -760,7 +784,7 @@ class Display {
             adjustment = 50*maxHeight/100
 
 
-        console.log("max height: " + maxHeight)
+        //console.log("max height: " + maxHeight)
 
         document.getElementById("output-table").style.marginTop = adjustment + "px";
 
@@ -792,7 +816,7 @@ class Display {
             newFontSize = 50 - (maxLength-10)
         }
 
-        console.log("fontSize: " + newFontSize)
+        //console.log("fontSize: " + newFontSize)
         const selections = document.getElementById("selected-inputs");
         for (let r=0; r<selections.rows.length; r++){
             selections.rows[r].cells[0].style.fontSize = newFontSize + "px"
@@ -1238,7 +1262,7 @@ class Display {
                 for (let c = 1, m = inputTable.table.rows[r].cells.length; c < m; c++) {
                     const cell = inputTable.table.rows[r].cells[c];
                     //cell.innerHTML = Object.values(truthData[r - 2])[(c-1)].toString();
-                    dataOp.makeEditable(cell);
+                    dataOp.makeEditable(cell.firstChild);
                 }
             }
         }
@@ -1267,9 +1291,19 @@ class Display {
         const desiredInt = desired.innerText;
         let [parsedValue, isValid] = demo.stringToValidFloat(desiredInt);
 
-        if(parsedValue === 1.0) desired.innerHTML = '<span class="editable-border">1</span>';
-        if(parsedValue === 0.0) desired.innerHTML = '<span class="editable-border">0</span>';
-        if(desiredInt.match(regex)) desired.innerHTML = '<span class="editable-border">1</span>';
+        if(parsedValue === 1.0)  {
+            desired.innerHTML = '<span class="editable-border">1</span>';
+            dataOp.makeEditable(desired.firstChild, true);
+        }
+
+        if(parsedValue === 0.0) {
+            desired.innerHTML = '<span class="editable-border">0</span>';
+            dataOp.makeEditable(desired.firstChild, true);
+        }
+        if(desiredInt.match(regex)) {
+            desired.innerHTML = '<span class="editable-border">1</span>';
+            dataOp.makeEditable(desired.firstChild, true);
+        }
         //console.log("parsed: " + parsedValue);
         if(parsedValue !== 1 && parsedValue !== 0 ) {
             isValid = false;
@@ -1325,7 +1359,7 @@ class Display {
     }
     showDesiredOutput (show) {
         outputTable.showColumn(2, show, show);
-        display.createOutputTableEditBorder()
+        //display.createOutputTableEditBorder()
     }
 }
 

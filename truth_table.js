@@ -19,7 +19,7 @@ function writeTruthTable(truthData) {
         for (let c = 1, m = inputTable.table.rows[r].cells.length; c < m; c++) {
             const cell = inputTable.table.rows[r].cells[c];
             //cell.innerHTML = Object.values(truthData[r - 2])[(c-1)].toString();
-            cell.innerHTML = truthData[r-2][c-1];
+            cell.innerHTML = `<span>`+truthData[r-2][c-1]+'</span>';
 
         }
     }
