@@ -143,6 +143,7 @@ class DataOperator {
             textbox.classList.add("edit-handler")
             //console.trace()
             textbox.addEventListener("focusout", function(event){
+                display.checkForSuccess()
                 demo.update(this);
             });
             textbox.addEventListener("keydown", function(event){
@@ -1391,6 +1392,41 @@ class Demo {
         this.desiredOutput = [0, 0, 0, 0];
     }
 
+    hasNoSolution() {
+        //uses perceptron learning rule
+        let outputData = perceptron.outputData;
+        //second column is output
+        let adjustedWeights = this.weights; //these weights will be adjusted throughout
+        //iterate through inputs 20 times, if still not correct then we assume no solution
+        for(let i = 0; i < 20; i++) {
+            let hasSolution = true
+            for(let j = 0; j < this.inputData.length; j++) {
+                let actualOutput = outputData[j][1]
+                let desiredOutput = outputData[j][2]
+                if(actualOutput < desiredOutput) {
+                    hasSolution = false
+                    for(let k = 0; k < adjustedWeights.length; k++) {
+                        adjustedWeights[k] += this.inputData[j][k]
+                    }
+                }
+                if(actualOutput > desiredOutput) {
+                    hasSolution = false
+                    for(let k = 0; k < adjustedWeights.length; k++) {
+                        adjustedWeights[k] -= this.inputData[j][k]
+                    }
+                }
+
+            }
+            if(hasSolution)
+                return
+        }
+        alert("this desired output cannot be achieved!")
+
+
+
+
+    }
+
     // calculate row to insert at, from html button address
     getRowLocation(button) {
         return button.parentNode.parentNode.parentNode.rowIndex + 1;
@@ -1612,6 +1648,7 @@ class Demo {
         let bEditOutput = false;
         if(sender && sender.closest('table')?.id === "output-table") { //must be the desired output cell, no need to calculate
             bEditOutput = true;
+            //console.log(sender.previousSibling)
             display.checkDesiredOutput(sender.previousSibling, sender);
             //dataOp.updateDesiredOutput(demo.desiredOutput, outputTable);
             return;
@@ -1796,6 +1833,9 @@ function uploadJson(text) {
     //document.getElementById('InputToggle').checked = dict["input-toggle-checked"];
     document.getElementById('InputToggle').checked = false;
     document.getElementById('OutputToggle').checked = dict["output-toggle-checked"];
+    if(document.getElementById('OutputToggle').checked)
+        demo.hasNoSolution()
+
     display.handleHoverExit();
     demo.update();
     let headerRows = dict["input-header"];
@@ -1868,7 +1908,8 @@ $('#InputToggle').change(function() { //toggle edit
 $('#OutputToggle').change(function() { //toggle output
     display.UpdateOutputToggle();
     display.outputLine.position();
-    display.checkForSuccess()
+    display.checkForSuccess();
+    demo.hasNoSolution();
 });
 
 $('#BinaryToggle').change(function() { //toggle output
