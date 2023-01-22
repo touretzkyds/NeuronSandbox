@@ -793,17 +793,18 @@ class Display {
 
     adjustSelectedInputFontSize() {
         let maxLength = 0;
+        let maxHeaderIndex = 0;
 
         const headerCells = document.getElementById("input-table").rows[1].cells;
         for (let c = 1; c < headerCells.length; c++) {
             let headerInput = headerCells[c];
             if (headerInput.id.startsWith("tblinput")) {
                 let length = headerInput.innerText.length
-                if(length > maxLength)
+                if(length > maxLength) {
                     maxLength = length
+                    maxHeaderIndex = c;
+                }
             }
-            else
-                console.log("missing input")
         }
 
         let newFontSize;
@@ -1393,6 +1394,8 @@ class Demo {
     }
 
     hasNoSolution() {
+        if(!document.getElementById("OutputToggle").checked)
+            return
         //uses perceptron learning rule
         let outputData = perceptron.outputData;
         //second column is output
