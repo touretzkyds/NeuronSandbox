@@ -267,7 +267,8 @@ article > section {
 
 .custom-th {
     width: 7vw;
-    line-height: 5vh !important;
+    height: 7vw;
+    line-height: 2.5em !important;
 }
 
 .input-table-th {

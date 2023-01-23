@@ -135,13 +135,15 @@ class DataOperator {
 
     // make editable and update demo on edit
     makeEditable(textbox, editable = true){ // TODO: Move from dataOp to displayOp
+        if(textbox.id === "activation" || textbox.id === "output" || textbox.id === "desired")
+            return
         textbox.contentEditable = editable;
         // add event listener to update demo with table changes
         // add a class to textbox to keep track of an eventlistener already being added
         console.log(textbox)
         if (!textbox.classList.contains("edit-handler")) {
             textbox.classList.add("edit-handler");
-            if(this?.tagName !== 'TH') {
+            if(textbox.id.startsWith("tblinput")) {
                 if(!textbox.classList.contains("input-table-th"))
                     textbox.classList.add("input-table-th");
             }
@@ -253,6 +255,7 @@ class Table {
                 if (this.isEditable) {
                     dataOp.makeEditable(cell.firstChild);
                 }
+
             }
         }
         // on exiting table, display initial values again (#3)
@@ -501,7 +504,19 @@ class Table {
                     dataOp.makeEditable(cells[columnNum], editable);
                 }
             }
+
+
             cells[columnNum].style.display = visible? "block" : "none";
+
+
+
+            let desiredOutput = document.getElementById("desired");
+            desiredOutput.contentEditable = false;
+            if(desiredOutput.classList.contains("edit-handler"))
+                desiredOutput.classList.remove("edit-handler");
+            if(!desiredOutput.classList.contains("custom-th"))
+                desiredOutput.classList.add("custom-th");
+
         }
     }
 }
