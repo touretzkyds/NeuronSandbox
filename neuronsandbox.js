@@ -1401,10 +1401,14 @@ class Demo {
         //second column is output
         let adjustedWeights = this.weights; //these weights will be adjusted throughout
         //iterate through inputs 20 times, if still not correct then we assume no solution
-        for(let i = 0; i < 20; i++) {
+        for(let i = 0; i < 100; i++) {
             let hasSolution = true
             for(let j = 0; j < this.inputData.length; j++) {
-                let actualOutput = outputData[j][1]
+                let input = this.inputData[j];
+                let actualOutput = 0
+                for(let w = 0; w < adjustedWeights; w++) {
+                    actualOutput += input[w]*adjustedWeights[w]
+                }
                 let desiredOutput = outputData[j][2]
                 if(actualOutput < desiredOutput) {
                     hasSolution = false
