@@ -140,7 +140,11 @@ class DataOperator {
         // add a class to textbox to keep track of an eventlistener already being added
         console.log(textbox)
         if (!textbox.classList.contains("edit-handler")) {
-            textbox.classList.add("edit-handler")
+            textbox.classList.add("edit-handler");
+            if(this?.tagName !== 'TH') {
+                if(!textbox.classList.contains("input-table-th"))
+                    textbox.classList.add("input-table-th");
+            }
             //console.trace()
             textbox.addEventListener("focusout", function(event){
                 display.checkForSuccess()
@@ -781,11 +785,14 @@ class Display {
         }
         //based on the header's height, we adjust the output table
         //let adjustment = 0
-        if(maxHeight > 115)
+        if(maxHeight >= 94) {
+            adjustment = 37*maxHeight/100
+        }
+        else if(maxHeight > 115) {
             adjustment = 50*maxHeight/100
+        }
 
-
-        //console.log("max height: " + maxHeight)
+        console.log("max height: " + maxHeight)
 
         document.getElementById("output-table").style.marginTop = adjustment + "px";
 
@@ -798,31 +805,40 @@ class Display {
         const headerCells = document.getElementById("input-table").rows[1].cells;
         for (let c = 1; c < headerCells.length; c++) {
             let headerInput = headerCells[c];
+            let newFontSize;
             if (headerInput.id.startsWith("tblinput")) {
                 let length = headerInput.innerText.length
-                if(length > maxLength) {
-                    maxLength = length
-                    maxHeaderIndex = c;
+
+                if(length <= 10) {
+                    newFontSize = 40;
+                }
+                else if(length >= 30){
+                    newFontSize = 30;
+                }
+                else {
+                    newFontSize = 40 - (length-10)
                 }
             }
+            const selections = document.getElementById("selected-inputs");
+            selections.rows[c-1].cells[0].style.fontSize = newFontSize + "px"
         }
-
-        let newFontSize;
-        if(maxLength <= 10) {
-            newFontSize = 50;
-        }
-        else if(maxLength >= 30){
-            newFontSize = 30;
-        }
-        else {
-            newFontSize = 50 - (maxLength-10)
-        }
-
-        //console.log("fontSize: " + newFontSize)
-        const selections = document.getElementById("selected-inputs");
-        for (let r=0; r<selections.rows.length; r++){
-            selections.rows[r].cells[0].style.fontSize = newFontSize + "px"
-        }
+        //
+        // let newFontSize;
+        // if(maxLength <= 10) {
+        //     newFontSize = 40;
+        // }
+        // else if(maxLength >= 30){
+        //     newFontSize = 30;
+        // }
+        // else {
+        //     newFontSize = 40 - (maxLength-10)
+        // }
+        //
+        // //console.log("fontSize: " + newFontSize)
+        // const selections = document.getElementById("selected-inputs");
+        // for (let r=0; r<selections.rows.length; r++){
+        //     selections.rows[r].cells[0].style.fontSize = newFontSize + "px"
+        // }
 
         for(let i = 0; i < demo.weightLines.length; i++)
         {
@@ -1001,6 +1017,7 @@ class Display {
         $( ".draggable" ).draggable();
         //$( ".weight_label" ).draggable();
         //$( ".weight" ).draggable();
+        this.adjustSelectedInputFontSize();
     }
 
     // set display panel output
@@ -1034,6 +1051,7 @@ class Display {
         if(rowIdx < 2) //headers, or leave
         {
             this.handleHoverExit();
+            display.adjustSelectedInputFontSize();
             return;
         }
 
@@ -1048,6 +1066,7 @@ class Display {
             for(let i = 0; i < outputRow.children.length; i++) {
                 outputRow.children[i].style.background = "lightblue";
             }
+            display.adjustSelectedInputFontSize();
 
             //console.log("enter: set outputRow =" + outputRow);
         }
@@ -1130,6 +1149,8 @@ class Display {
         }
         //this.createOutputTableColors();
         this.updateSelectedInput();
+        display.adjustSelectedInputFontSize();
+        console.log("im here")
 
 
     }
@@ -1650,6 +1671,7 @@ class Demo {
             //update selected input so it update immediately
             let headerRowVals = [];
             display.getHeaderRowVals(headerRowVals);
+            display.adjustSelectedInputFontSize();
             demo.selectedInput = headerRowVals;
         }
         let bEditOutput = false;

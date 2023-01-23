@@ -269,6 +269,12 @@ article > section {
     width: 7vw;
     line-height: 5vh !important;
 }
+
+.input-table-th {
+    width: 7vw;
+    height: 5vw;
+    line-height: 1.7em !important;
+}
 .output-th {
     width: 2vw !important;
 }
