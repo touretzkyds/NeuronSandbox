@@ -517,6 +517,7 @@ class Table {
             if(!desiredOutput.classList.contains("custom-th"))
                 desiredOutput.classList.add("custom-th");
 
+
         }
     }
 }
@@ -800,16 +801,27 @@ class Display {
         }
         //based on the header's height, we adjust the output table
         //let adjustment = 0
-        if(maxHeight >= 94) {
+        let additionalFactor = 0;
+        if(document.getElementById("OutputToggle").checked) {
+            additionalFactor = -27;
+        }
+
+        if(maxHeight >= 72) {
+            adjustment = 30*maxHeight/100
+        }
+        else if(maxHeight >= 94) {
             adjustment = 37*maxHeight/100
         }
         else if(maxHeight > 115) {
             adjustment = 50*maxHeight/100
         }
+        else {
+            adjustment = 7;
+        }
 
         console.log("max height: " + maxHeight)
 
-        document.getElementById("output-table").style.marginTop = adjustment + "px";
+        document.getElementById("output-table").style.marginTop = adjustment + additionalFactor + "px";
 
     }
 
@@ -1129,6 +1141,7 @@ class Display {
                 selections.rows[r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</div>`;
             }
         }
+        display.alignTables()
     }
 
     handleHoverExit(inputRow, outputRow, isOdd = false) {
@@ -1165,7 +1178,7 @@ class Display {
         //this.createOutputTableColors();
         this.updateSelectedInput();
         display.adjustSelectedInputFontSize();
-        console.log("im here")
+        display.alignTables();
 
 
     }
@@ -1263,6 +1276,13 @@ class Display {
         display.createOutputTableColors();
 
         let isCorrect = true;
+
+        if(checkbox.checked) {
+            document.getElementById("output-table").style.marginTop = "-20px";
+        }
+        else {
+            document.getElementById("output-table").style.marginTop = "7px";
+        }
 
         for(let i = 1; i < n; i++) {
             //var tr = outputCol.rows[i];
@@ -1902,6 +1922,7 @@ function uploadJson(text) {
 
     display.outputLine.position();
     display.createInputTableEditBorder();
+    display.alignTables();
 
 
 }

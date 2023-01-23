@@ -266,9 +266,10 @@ article > section {
 }
 
 .custom-th {
+    line-height: 7vh !important;
     width: 7vw;
-    height: 7vw;
-    line-height: 2.5em !important;
+    overflow-wrap: break-word;
+    font-size: 20px;
 }
 
 .input-table-th {
