@@ -1282,6 +1282,7 @@ class Display {
         }
         else {
             document.getElementById("output-table").style.marginTop = "7px";
+            document.getElementById("congrats-msg").hidden = true;
         }
 
         for(let i = 1; i < n; i++) {
