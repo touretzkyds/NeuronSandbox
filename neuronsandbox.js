@@ -147,6 +147,8 @@ class DataOperator {
                 if(!textbox.classList.contains("input-table-th"))
                     textbox.classList.add("input-table-th");
             }
+            if(textbox.innerText.length === 0)
+                textbox.innerHTML = `<span class="editable-border">` + 0 + `</span>`
             //console.trace()
             textbox.addEventListener("focusout", function(event){
                 display.checkForSuccess()
@@ -1088,6 +1090,7 @@ class Display {
             demo.selectedOutput = outputs.data[rowIdx-2];
             //console.log("enter: set demo.selectedInput =" + demo.selectedInput);
             //console.log("enter: set demo.selectedOutput =" + demo.selectedOutput);
+
             // highlight input and output rows corresponding to the hovered input row
             inputRow.style.background = "lightblue";
             for(let i = 0; i < outputRow.children.length; i++) {
@@ -1451,33 +1454,42 @@ class Demo {
     }
 
     hasNoSolution() {
+        //TODO: add the bias/threshold, treat it as input, input will always be one
         if(!document.getElementById("OutputToggle").checked)
             return
         //uses perceptron learning rule
         let outputData = perceptron.outputData;
         //second column is output
-        let adjustedWeights = this.weights; //these weights will be adjusted throughout
+        let adjustedWeights = []; //these weights will be adjusted throughout
+        for(let i = 0; i < this.weights.length; i++) {
+            adjustedWeights.push(this.weights[i])
+        }
+        adjustedWeights.push(this.threshold * -1);
         //iterate through inputs 20 times, if still not correct then we assume no solution
         for(let i = 0; i < 100; i++) {
             let hasSolution = true
             for(let j = 0; j < this.inputData.length; j++) {
                 let input = this.inputData[j];
                 let actualOutput = 0
-                for(let w = 0; w < adjustedWeights; w++) {
+                for(let w = 0; w < adjustedWeights.length-1; w++) {
                     actualOutput += input[w]*adjustedWeights[w]
                 }
+                actualOutput += adjustedWeights[adjustedWeights.length-1];
+                actualOutput = actualOutput > this.threshold ? 1 : 0
                 let desiredOutput = outputData[j][2]
                 if(actualOutput < desiredOutput) {
                     hasSolution = false
-                    for(let k = 0; k < adjustedWeights.length; k++) {
+                    for(let k = 0; k < adjustedWeights.length-1; k++) {
                         adjustedWeights[k] += this.inputData[j][k]
                     }
+                    adjustedWeights[adjustedWeights.length-1]++;
                 }
                 if(actualOutput > desiredOutput) {
                     hasSolution = false
-                    for(let k = 0; k < adjustedWeights.length; k++) {
+                    for(let k = 0; k < adjustedWeights.length-1; k++) {
                         adjustedWeights[k] -= this.inputData[j][k]
                     }
+                    adjustedWeights[adjustedWeights.length-1]--;
                 }
 
             }
