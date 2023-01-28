@@ -153,6 +153,14 @@ class DataOperator {
             textbox.addEventListener("focusout", function(event){
                 display.checkForSuccess()
                 demo.update(this);
+
+                let identify = this?.id
+                if (identify !== "th1" && !(new RegExp('^w[0-9]+$', 'gm').test(identify))) { //checks if not threshold, or any of the weight textboxes
+                    if (this?.tagName !== 'TH' && this.parentNode?.tagName !== 'TH') {
+                        if(!textbox.innerHTML)
+                            textbox.innerHTML = 0;
+                    }
+                }
             });
             textbox.addEventListener("keydown", function(event){
                 if (event.keyCode === 13 || event.keyCode === 27) {
@@ -1493,10 +1501,16 @@ class Demo {
                 }
 
             }
-            if(hasSolution)
+            if(hasSolution) {
+                document.getElementById("unlearnable-msg").hidden = true;
                 return
+            }
+
         }
-        alert("this desired output cannot be achieved!")
+        document.getElementById("unlearnable-msg").hidden = false;
+
+
+        //alert("this desired output cannot be achieved!")
 
 
 

@@ -256,6 +256,7 @@ article > section {
     min-width: 5vw;
     overflow-wrap: break-word;
     font-size: 25px;
+
 }
 
 .table th {
@@ -524,7 +525,12 @@ mark {
 
 .editable-border {
     border-style:solid;
+    display: inline-block;
     border-color: gray;
+    margin: auto;
+    height: 1em;
+    line-height: 1em;
+
 }
 
 span {
