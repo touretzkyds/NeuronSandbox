@@ -2016,5 +2016,6 @@ $('#FanfareToggle').change(function() { //toggle output
     {
         demo.weightLines[i].position();
     }
+    document.getElementById("popup").classList.toggle('active');
 
 });
