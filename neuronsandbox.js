@@ -81,7 +81,7 @@ class DataOperator {
                 const cell = table.rows[row].cells[c];
                 const rawValue = cell.innerText;
                 let [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
-                if(table.id === 'output-table' && c === 2 && (parsedValue !== 1 || parsedValue !== 0) ) {
+                if(table.id === 'output-table' && c === 2 && (parsedValue !== 1 && parsedValue !== 0) ) {
                     isValid = false;
                 }
                 display.highlightInvalidText(cell, isValid);
@@ -922,6 +922,7 @@ class Display {
         {
             let newRow = selections.insertRow(i);
             let newCell = newRow.insertCell(0);
+            //newCell.innerHTML = `<div class=\"input-content\">${demo.selectedInput[i]}</div>`;
             newCell.innerHTML = `<div class=\"input-content\">${demo.selectedInput[i]}</div>`;
         }
         //removes lines when not hovered
@@ -1466,7 +1467,10 @@ class Demo {
         if(!document.getElementById("OutputToggle").checked)
             return
         //uses perceptron learning rule
-        let outputData = perceptron.outputData;
+        dataOp.updateDataFromTable(outputs, outputTable);
+        //uses perceptron learning rule
+        //let outputData = perceptron.outputData;
+        let outputData = outputs.data;
         //second column is output
         let adjustedWeights = []; //these weights will be adjusted throughout
         for(let i = 0; i < this.weights.length; i++) {

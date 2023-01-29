@@ -223,6 +223,12 @@
 
     <body>
         <div id="popup">
-            <b>Winner!</b>
+            <b id="winner-msg">Winner!</b>
+            <button id="keep-playing-btn" onclick="toggle()">Keep Playing</button>
         </div>
+    <script type="text/javascript">
+        function toggle() {
+            document.getElementById("popup").classList.toggle('active');
+        }
+    </script>
     </body>
