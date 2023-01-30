@@ -170,8 +170,9 @@ class DataOperator {
                 textbox.innerHTML = `<span class="editable-border">` + 0 + `</span>`
             //console.trace()
             textbox.addEventListener("focusout", function(event){
-                display.checkForSuccess()
                 demo.update(this);
+                display.checkForSuccess()
+
 
                 let identify = this?.id
                 if (identify !== "th1" && !(new RegExp('^w[0-9]+$', 'gm').test(identify))) { //checks if not threshold, or any of the weight textboxes
