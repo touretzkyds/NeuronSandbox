@@ -69,6 +69,24 @@ class DataOperator {
         return binaryArray;
     }
 
+    updateDataFromTableNoDisplay(dataObj, tableObj) {
+        let table = tableObj.table;
+        // skip header row and button column of table, start from 1
+        let start = (table.id === 'output-table')? 1 : 2;
+        let startCol = (table.id === 'output-table')? 0 : 1;
+        let row = start;
+        for (let n = table.rows.length; row < n; row++) {
+            for (let c = startCol, m = table.rows[row].cells.length; c < m; c++) {
+                const cell = table.rows[row].cells[c];
+                const rawValue = cell.innerText;
+                let [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
+                if(table.id === 'output-table' && c === 2 && (parsedValue !== 1 && parsedValue !== 0) ) {
+                    isValid = false;
+                }
+                dataObj.data[row-start][c-startCol] = parsedValue;
+            }
+        }
+    }
     // update data from table when user changes entry
     updateDataFromTable(dataObj, tableObj){ //TODO: make more efficient by passing specific location to update
         let table = tableObj.table;
@@ -88,6 +106,7 @@ class DataOperator {
                 dataObj.data[row-start][c-startCol] = parsedValue;
             }
         }
+        display.createOutputTableColors()
         //console.log("updateDataFromTable, data = " + dataObj.data);
         // do not update table, let user see what they have typed wrong (#6)
     }
@@ -732,8 +751,9 @@ class Display {
         if(fanfareToggleChecked && outputToggleChecked) {
             if(fanfareHidden) {
                 if(isCorrect) {
-                    alert("Congrats! You reached the desired output!")
-                    document.getElementById("congrats-msg").hidden = false;
+                    if(!document.getElementById("popup").classList.contains("active"))
+                        document.getElementById("popup").classList.toggle('active');
+                    //document.getElementById("congrats-msg").hidden = false;
                     display.outputLine.position()
                     for(let i = 0; i < demo.weightLines.length; i++)
                     {
@@ -1344,7 +1364,7 @@ class Display {
     UpdateFanfareToggle() {
         let checkbox = document.getElementById("FanfareToggle")
         if(!checkbox.checked) {
-            document.getElementById("congrats-msg").hidden = true;
+            //document.getElementById("congrats-msg").hidden = true;
             display.outputLine.position()
         } else {
             display.checkForSuccess()
@@ -1467,7 +1487,7 @@ class Demo {
         if(!document.getElementById("OutputToggle").checked)
             return
         //uses perceptron learning rule
-        dataOp.updateDataFromTable(outputs, outputTable);
+        dataOp.updateDataFromTableNoDisplay(outputs, outputTable);
         //uses perceptron learning rule
         //let outputData = perceptron.outputData;
         let outputData = outputs.data;
@@ -2020,6 +2040,5 @@ $('#FanfareToggle').change(function() { //toggle output
     {
         demo.weightLines[i].position();
     }
-    document.getElementById("popup").classList.toggle('active');
 
 });
