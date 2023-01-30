@@ -1948,8 +1948,6 @@ function uploadJson(text) {
     //document.getElementById('InputToggle').checked = dict["input-toggle-checked"];
     document.getElementById('InputToggle').checked = false;
     document.getElementById('OutputToggle').checked = dict["output-toggle-checked"];
-    if(document.getElementById('OutputToggle').checked)
-        demo.hasNoSolution()
 
     display.handleHoverExit();
     demo.update();
@@ -1974,6 +1972,9 @@ function uploadJson(text) {
     display.outputLine.position();
     display.createInputTableEditBorder();
     display.alignTables();
+
+    if(document.getElementById('OutputToggle').checked)
+        demo.hasNoSolution()
 
 
 }
