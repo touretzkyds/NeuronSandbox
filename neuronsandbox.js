@@ -191,6 +191,8 @@ class DataOperator {
             //console.trace()
             textbox.addEventListener("focusout", function(event){  
                 demo.update(this);
+                if(document.getElementById('OutputToggle').checked)
+                    demo.hasNoSolution()
                 display.checkForSuccess()
                 let identify = this?.id
                 if (identify !== "th1" && !(new RegExp('^w[0-9]+$', 'gm').test(identify))) { //checks if not threshold, or any of the weight textboxes
@@ -668,34 +670,6 @@ class Display {
                     dataOp.makeEditable(textbox.firstChild, false)
                 }
 
-            }
-        }
-
-
-    }
-
-    createOutputTableEditBorder() {
-        const outputTable = document.getElementById("output-table")
-
-        let checkbox = document.getElementById("BinaryToggle");
-        let editable = false
-        if(!checkbox.checked)
-            editable = true
-        let n = outputTable.rows.length;
-        for (let i = 1; i < n; i++) {
-            let tr = outputTable.rows[i];
-            let textbox = tr.cells[2]
-            if(editable) {
-                if(textbox.children.length === 0) {
-                    textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
-                }
-                textbox.children[0].classList.add("editable-border")
-            }
-            else {
-                if(textbox.children.length === 0) {
-                    textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
-                }
-                textbox.children[0].classList.remove("editable-border")
             }
         }
 
@@ -1651,12 +1625,14 @@ class Demo {
                              <i class="close-icon fas fa-times"></i>
                              <input type="checkbox" id="checkbox_weight_editable${n+1}"> Editable
                            </div>
-                           <i id="weight_toggleBtn${n+1}" class="fas fa-info-circle"></i>
+                           <i id="weight_toggleBtn${n+1}" style="display: inline-block" class="fas fa-info-circle"></i>
       `;
 
         parentElement.insertBefore(wDiv, parentElement.children[n+1]);
         const weightText = document.getElementById(`w${n+1}`);
         dataOp.makeEditable(weightText);
+        let checkbox = document.getElementById(`checkbox_weight_editable${n+1}`);
+        checkbox.checked = true;
         this.updateWeightUI(parentElement);
     }
 
@@ -1667,14 +1643,6 @@ class Demo {
             let child = parentElement.children[0];
             const top = 40;
             child.style = "top:" + top + "%;";
-            child.innerHTML = `<text>w<sub>${1}</sub> =</text> <text id="w${1}" 
-                               onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[0]}</text>
-                                <div id="weight_div${1}" class="weight_popup" style="display:none">
-                                    <i class="close-icon fas fa-times"></i>
-                                    <input type="checkbox" id="checkbox_weight_editable${1}"> Editable
-                                </div>
-                           <i id="weight_toggleBtn${1}" class="fas fa-info-circle"></i>
-                           `;
             addEditOption(0);
         }
         else if(childCount === 3) {
@@ -1685,27 +1653,11 @@ class Demo {
                 let child = parentElement.children[i];
                 let top = Math.floor(first + i * interval);
                 child.style = "left:" + -20 + "%;" + "top:" + top + "%;";
-                child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" 
-                                  onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>
-                                  <div id="weight_div${i+1}" class="weight_popup" style="display:none">
-                                     <i class="close-icon fas fa-times"></i>
-                                     <input type="checkbox" id="checkbox_weight_editable${i + 1}"> Editable
-                                   </div>
-                                   <i id="weight_toggleBtn${i + 1}" class="fas fa-info-circle"></i>
-                           `;
                 addEditOption(i);
             }
             let child = parentElement.children[1];
             const top = 38;
             child.style = "left: -20%;" +  "top:" + top + "%;";
-            // child.innerHTML = `<text>w<sub>${2}</sub> =</text> <text contenteditable="true" id="w${2}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[1]}</text>
-            //                   <div id="weight_div${2}" class="weight_popup" style="display:none">
-            //                       <i class="close-icon fas fa-times"></i>
-            //                       <input type="checkbox" id="checkbox_weight_editable${2}"> Editable
-            //                    </div>
-            //                    <i id="weight_toggleBtn${2}" class="fas fa-info-circle"></i>
-            //                   `;
-
         }
         else if(childCount === 4) {
             let first = 10;
@@ -1716,14 +1668,6 @@ class Demo {
                 let top = Math.floor(first + i * interval);
                 //child.style = "left:" + -10 + "%;";
                 child.style = "left:" + -50 + "%;" + "top:" + top + "%;";
-                // child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}"
-                //                    onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>
-                //                    <div id="weight_div${i + 1}" class="weight_popup" style="display:none">
-                //                         <i class="close-icon fas fa-times"></i>
-                //                         <input type="checkbox" id="checkbox_weight_editable${i + 1}"> Editable
-                //                    </div>
-                //                    <i id="weight_toggleBtn${i + 1}" class="fas fa-info-circle"></i>
-                //                 `;
                 addEditOption(i);
             }
 
@@ -1736,50 +1680,20 @@ class Demo {
                 let child = parentElement.children[i];
                 let top = Math.floor(first + i * interval);
                 child.style = "left:" + -20 + "%;" + "top:" + top + "%;";
-                child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>
-                                    <div id="weight_div${i + 1}" class="weight_popup" style="display:none">
-                                        <i class="close-icon fas fa-times"></i>
-                                        <input type="checkbox" id="checkbox_weight_editable${i + 1}"> Editable
-                                   </div>
-                                   <i id="weight_toggleBtn${i + 1}" class="fas fa-info-circle"></i>
-                `;
                 addEditOption(i);
             }
             let child = parentElement.children[1];
             const left = -40;
             const top = 10 + 17.5
             child.style = "left:" + left + "%;" + "top:" + top + "%;";
-            // child.innerHTML = `<text>w<sub>${2}</sub> =</text> <text contenteditable="true" id="w${2}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[1]}</text>
-            //                         <div id="weight_div${2}" class="weight_popup" style="display:none">
-            //                             <i class="close-icon fas fa-times"></i>
-            //                             <input type="checkbox" id="checkbox_weight_editable${2}"> Editable
-            //                         </div>
-            //                         <i id="weight_toggleBtn${2}" class="fas fa-info-circle"></i>
-            //    `;
-
-
             let child1 = parentElement.children[2];
             const left1 = -80;
             const top1 = 10 + 17.5*2 - 5
             child1.style = "left:" + left1 + "%;" + "top:" + top1 + "%;";
-            // child1.innerHTML = `<text>w<sub>${3}</sub> =</text> <text contenteditable="true" id="w${3}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[2]}</text>
-            //                      <div id="weight_div${3}" class="weight_popup" style="display:none">
-            //                             <i class="close-icon fas fa-times"></i>
-            //                             <input type="checkbox" id="checkbox_weight_editable${3}"> Editable
-            //                         </div>
-            //                         <i id="weight_toggleBtn${3}" class="fas fa-info-circle"></i>
-            //                     `;
-
             let child2 = parentElement.children[3];
             const left2 = -40;
             const top2 = 10 + 17.5*2 + 8
             child2.style = "left:" + left2 + "%;" + "top:" + top2 + "%;";
-            // child2.innerHTML = `<text>w<sub>${4}</sub> =</text> <text contenteditable="true" id="w${4}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[3]}</text>
-            //                     <div id="weight_div${4}" class="weight_popup" style="display:none">
-            //                        <i class="close-icon fas fa-times"></i>
-            //                        <input type="checkbox" id="checkbox_weight_editable${4}"> Editable
-            //                     </div>
-            //                     <i id="weight_toggleBtn${4}" class="fas fa-info-circle"></i>`;
         }
         else {
             let first = 20;
@@ -1789,13 +1703,6 @@ class Demo {
                 let child = parentElement.children[i];
                 let top = Math.floor(first + i * interval);
                 child.style = "top:" + top + "%;";
-                child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>
-                                    <div id="weight_div${i+1}" class="weight_popup" style="display:none">
-                                        <i class="close-icon fas fa-times"></i>
-                                        <input type="checkbox" id="checkbox_weight_editable${i + 1}"> Editable
-                                    </div>
-                                    <i id="weight_toggleBtn${i + 1}" class="fas fa-info-circle"></i>
-                                 `;
                 addEditOption(i);
             }
         }
@@ -2017,14 +1924,15 @@ function addEditOption(c) {
         //toggleBtn.classList.toggle("fa-caret-square-down");
         //toggleBtn.classList.toggle("fa-caret-square-up");
     };
-    toggleBtn.addEventListener("click", weightButtonHandler);
-
+    //toggleBtn.addEventListener("click", weightButtonHandler);
+    toggleBtn.onclick = weightButtonHandler;
     let weightCheckboxHandler = function () {
         const textbox = document.getElementById(`w${c + 1}`);
         textbox.contentEditable = this.checked;
         dataOp.makeEditable(textbox, this.checked);
     };
-    document.getElementById(`checkbox_weight_editable${c + 1}`).addEventListener("change", weightCheckboxHandler);
+    const checkBox = document.getElementById(`checkbox_weight_editable${c + 1}`);
+    checkBox.onchange = weightCheckboxHandler;
 }
 
 function setupCloseButtons() {
@@ -2191,7 +2099,7 @@ $('#BinaryToggle').change(function() { //toggle output
 });
 
 function PlaySound() {
-    document.getElementById("popup").classList.toggle('active');
+    //document.getElementById("popup").classList.toggle('active');
     const audio = document.getElementById("hooray_sound");
     if (audio) {
         audio.play();
@@ -2205,7 +2113,6 @@ $('#FanfareToggle').change(function() { //toggle output
     {
         demo.weightLines[i].position();
     }
-    PlaySound();
 });
 
 

@@ -417,6 +417,7 @@ article > section {
 .weight_label {
     font-size: 2vw;
     position: absolute;
+    white-space: nowrap;
 }
 
 .animation{
@@ -557,6 +558,7 @@ span {
     visibility: hidden;
     opacity: 0;
     transition: 0.5s;
+    font-size: 50px;
 }
 
 #popup.active {
@@ -622,7 +624,7 @@ span {
     height: 50px;
     position:absolute;
     bottom: 10px;
-    left: 10px;
+    left: 171px;
     background-color: #0095ff;
     border: 1px solid transparent;
     border-radius: 3px;
