@@ -7,7 +7,8 @@
 
         <link rel="stylesheet" href="slider.css" />
         <link rel="stylesheet" href="style.css" />
-        <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+        <!-- <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
         <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
         <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
         <script src="https://pixijs.download/release/pixi.js"></script>
@@ -222,11 +223,15 @@
     </head>
 
     <body>
-        <div id="popup">
-            <b id="winner-msg">Winner!</b>
+        <div id="popup" class="popup">
+            <b>Winner!</b>
             <button id="keep-playing-btn" onclick="toggle()">Keep Playing</button>
+            <audio id="hooray_sound">
+                <source src="hooray.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
         </div>
-    <script type="text/javascript">
+        <script type="text/javascript">
         function toggle() {
             document.getElementById("popup").classList.toggle('active');
         }

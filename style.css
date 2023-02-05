@@ -166,6 +166,7 @@ article > section {
     background-color: #f2f2f2;
 }
 
+/*
 #w1{
     padding:0.5vw;
     border: solid;
@@ -179,6 +180,7 @@ article > section {
     border-color: gray;
     background-color: #f2f2f2;
 }
+*/
 
 #line{
     stroke-width:2px;
@@ -337,6 +339,10 @@ article > section {
     text-align: right;
 }
 
+#selected-inputs{
+    min-width: 100px;
+}
+
 .input-content {
     display: inline;
 }
@@ -404,8 +410,6 @@ article > section {
 
 .weights {
     padding:0.5vw;
-    border: solid;
-    border-color: gray;
     font-size: 2vw;
     background-color: #f2f2f2;
 }
@@ -528,7 +532,7 @@ mark {
     display: inline-block;
     border-color: gray;
     margin: auto;
-    height: 1em;
+    /*height: 1em;*/
     line-height: 1em;
 
 }
@@ -560,6 +564,44 @@ span {
     opacity: 1;
     transition: 0.5s;
 }
+
+.weight_popup {
+    text-align: center;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 50px;
+    padding: 20px;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, .3);
+    background: #fff;
+    z-index : 10;
+    visibility: hidden;
+    opacity: 0;
+    transition: 0.5s;
+}
+
+.weight_popup.active {
+    visibility: visible;
+    opacity: 1;
+    transition: 0.5s;
+}
+
+.close-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/*
+.fa-info-circle {
+    position: absolute;
+    top: 0;
+    right: 0;
+}*/
 
 #winner-msg {
     font-size: 70px;

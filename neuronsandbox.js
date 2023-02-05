@@ -13,6 +13,19 @@ class Data {
     }
 }
 
+class VariableData {
+    constructor(my_name, my_html, my_weight_editable) {
+        this.update(my_name, my_html,my_weight_editable);
+    }
+
+    update(my_name, my_html, my_weight_editable) {
+        this.name = my_name;
+        this.html = my_html;
+        this.weight_editable = my_weight_editable;
+    }
+}
+
+
 class DesiredOutputData {
     constructor(desired) {
         this.update(desired);
@@ -160,20 +173,25 @@ class DataOperator {
         // add event listener to update demo with table changes
         // add a class to textbox to keep track of an eventlistener already being added
         console.log(textbox)
-        if (!textbox.classList.contains("edit-handler")) {
+        if (editable && !textbox.classList.contains("edit-handler")) {
             textbox.classList.add("edit-handler");
             if(textbox.id.startsWith("tblinput")) {
                 if(!textbox.classList.contains("input-table-th"))
                     textbox.classList.add("input-table-th");
             }
             if(textbox.innerText.length === 0)
-                textbox.innerHTML = `<span class="editable-border">` + 0 + `</span>`
+            {
+                if(editable)
+                    textbox.innerHTML = `<span class="editable-border">` + 0 + `</span>`
+                else
+                    textbox.innerHTML = `<span>` + 0 + `</span>`
+            }
+
+
             //console.trace()
-            textbox.addEventListener("focusout", function(event){
+            textbox.addEventListener("focusout", function(event){  
                 demo.update(this);
                 display.checkForSuccess()
-
-
                 let identify = this?.id
                 if (identify !== "th1" && !(new RegExp('^w[0-9]+$', 'gm').test(identify))) { //checks if not threshold, or any of the weight textboxes
                     if (this?.tagName !== 'TH' && this.parentNode?.tagName !== 'TH') {
@@ -189,64 +207,17 @@ class DataOperator {
                 }
             });
         }
-    }
-
-    makeEditable2(textbox, editable = true){ // TODO: Move from dataOp to displayOp
-        textbox.contentEditable = editable;
-
-        let text;
-        if (!textbox.classList.contains("edit-handler")) {
-            textbox.classList.add("edit-handler")
-            console.log(textbox)
-            textbox.addEventListener("focusout", function(event){
-                demo.update(this);
-                display.checkForSuccess()
-
-                //check if it is a table input or desired output. If not, do not add span boxes
-                text = textbox.innerText
-                let identify = this?.id
-                //const regex = '/^w[0-9]+$/gm'; //detects weight labels "w1, w2, ..."
-                if(identify !== "th1" && !(new RegExp('^w[0-9]+$', 'gm').test(identify))) { //checks if not threshold, or any of the weight textboxes
-                    if(text && this?.tagName !== 'TH' && this.parentNode?.tagName !== 'TH') {
-                        textbox.innerHTML = `<span class="editable-border">` + text + `</span>`
-                    }
-                }
-                if(textbox.innerText.length === 0)
-                    textbox.innerHTML = `<span class="editable-border">` + 0 + `</span>`
-            });
-            textbox.addEventListener("input", function(event) {
-
-                let text = textbox.innerText
-                let identify = this?.id
-                //const regex = '/^w[0-9]+$/gm'; //detects weight labels "w1, w2, ..."
-                if (identify !== "th1" && !(new RegExp('^w[0-9]+$', 'gm').test(identify))) { //checks if not threshold, or any of the weight textboxes
-                    if (text && this?.tagName !== 'TH' && this.parentNode?.tagName !== 'TH') {
-                        textbox.innerHTML = `<span class="editable-border">` + text + `</span>`
-                    }
-                }
-
-                let target = event.target;
-                let caretPos = target.innerText.length
-                //console.log("caret should be at: " + caretPos)
-                //target.setSelectionRange(caretPos+1, caretPos+1);
-                let range = document.createRange()
-                let sel = window.getSelection()
-
-                range.setStart(target, 1)
-                //range.setEnd(target.childNodes[target.childNodes.length-1], caretPos);
-                range.collapse(true)
-
-                sel.removeAllRanges()
-                sel.addRange(range)
-
-            })
-            textbox.addEventListener("keydown", function(event){
-                if (event.keyCode === 13 || event.keyCode === 27) {
-                    textbox.blur(); // focus out of text box
-                    demo.update(this);
-
-                }
-            });
+        if(editable) {
+            if(textbox.nodeName !== "TH" && !textbox.classList.contains("editable-border"))
+                textbox.classList.add("editable-border");
+            if(textbox.nodeName !== "TH" && !textbox.classList.contains("edit-handler"))
+                textbox.classList.add("edit-handler");
+        }
+        else {
+            if(textbox.classList.contains("editable-border"))
+                textbox.classList.remove("editable-border");
+            if(textbox.classList.contains("edit-handler"))
+                textbox.classList.remove("edit-handler");
         }
     }
 
@@ -285,7 +256,6 @@ class Table {
                 if (this.isEditable) {
                     dataOp.makeEditable(cell.firstChild);
                 }
-
             }
         }
         // on exiting table, display initial values again (#3)
@@ -621,7 +591,7 @@ class Perceptron {
         for (let i=0; i<demo.weights.length; i++){
             const cell = document.getElementById(`w${i+1}`);
             if(cell) {
-                dataOp.makeEditable(cell);
+                //dataOp.makeEditable(cell);
                 const [parsedValue, isValid] = demo.stringToValidFloat(cell.innerHTML);
                 display.highlightInvalidText(cell, isValid);
                 this.weights[i] = parsedValue;
@@ -752,6 +722,7 @@ class Display {
         if(fanfareToggleChecked && outputToggleChecked) {
             if(fanfareHidden) {
                 if(isCorrect) {
+                    PlaySound();
                     if(!document.getElementById("popup").classList.contains("active"))
                         document.getElementById("popup").classList.toggle('active');
                     //document.getElementById("congrats-msg").hidden = false;
@@ -760,7 +731,6 @@ class Display {
                     {
                         demo.weightLines[i].position();
                     }
-
                 }
                 else {
                     document.getElementById("congrats-msg").hidden = true;
@@ -792,7 +762,7 @@ class Display {
         demo.weights.map((w, idx) => {
             this.displayWeightFromData(`w${idx+1}`, idx);
             const weight = document.getElementById(`w${idx+1}`);
-            dataOp.makeEditable(weight);
+            //dataOp.makeEditable(weight);
         });
         this.displayThresholdFromData(perceptron);
         const threshold = document.getElementById(`th${1}`);
@@ -1024,7 +994,7 @@ class Display {
                 LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: xposition+'%', y: percentsY[i]+'%'})
             );
 
-            let splitup = weight_labels[i].textContent.split(" ")
+            let splitup = weight_labels[i].children[1].textContent.split(" ")
             let num = splitup[splitup.length-1]
             if(!demo.stringToValidFloat(num)[1]) {
                 demo.weightLines[i].color = '#ffbfcb'
@@ -1056,7 +1026,7 @@ class Display {
             let child = parentElement.children[i]
             let text = child.textContent
 
-            let splitup = child.textContent.split(" ")
+            let splitup = child.children[1].textContent.split(" ")
             let num = splitup[splitup.length-1]
 
             let numConvertedArray = demo.stringToValidFloat(num)
@@ -1239,6 +1209,56 @@ class Display {
         }
     }
 
+    getHeaderRowVariables(headerRowVals) {
+        const headerCells = document.getElementById("input-table").rows[1].cells;
+        for (let c = 1; c < headerCells.length; c++) {
+            //var headerInput = document.getElementById(`tblinput${c}`);
+            let headerInput = headerCells[c];
+            //var headerInput = document.querySelector(`#input-table> tbody > tr:nth-child(${2}) > td:nth-child(${c} > div:nth-child(${1}))`);
+            if (headerInput.id.startsWith("tblinput")) {
+                /*if(headerInput.children[0]) {
+                    headerRowVals.push(headerInput.children[0].innerHTML);
+                }
+                else*/
+
+                let headerInputHtml = headerInput.innerHTML;
+                if(!headerInputHtml.length) {
+                    headerInputHtml = "<br>";
+                }
+                let weightCheckbox = document.getElementById(`checkbox_weight_editable${c}`);
+                headerRowVals.push(new VariableData(headerInput.innerText, headerInputHtml, weightCheckbox.checked));
+            }
+            else
+                console.log("missing input")
+        }
+    }
+
+    setHeaderRowVariables (headerRowVals) {
+        const headerCells = document.getElementById("input-table").rows[1].cells;
+        if(headerCells) {
+            for (let c = 1; c < headerCells.length; c++) {
+                //var headerInput = document.getElementById(`tblinput${c}`);
+                let headerInput = headerCells[c];
+                //var headerInput = document.querySelector(`#input-table> tbody > tr:nth-child(${2}) > td:nth-child(${c} > div:nth-child(${1}))`);
+                if (headerInput.id.startsWith("tblinput")) {
+                    /*if(headerInput.children[0]) {
+                        headerRowVals.push(headerInput.children[0].innerHTML);
+                    }
+                    else*/
+                    headerInput.innerHTML = headerRowVals[c-1].html;
+                    //set the checkbox for weight editable
+                    let weightCheckbox = document.getElementById(`checkbox_weight_editable${c}`);
+                    weightCheckbox.checked = headerRowVals[c-1].weight_editable;
+                    weightCheckbox.dispatchEvent(new Event("change"));
+                }
+                else {
+                    console.log("missing input")
+                }
+            }
+        }
+
+    }
+
     setHeaderRowVals (headerRowVals) {
         const headerCells = document.getElementById("input-table").rows[1].cells;
         for (let c = 1; c < headerCells.length; c++) {
@@ -1298,12 +1318,13 @@ class Display {
         {
             demo.weightLines[i].position();
         }
-
+        this.UpdateOutputToggle()
     }
 
     UpdateOutputToggle() {
         let checkbox = document.getElementById("OutputToggle");
-        display.showDesiredOutput(checkbox.checked);
+        let checkboxEditable = document.getElementById("InputToggle");
+        display.showDesiredOutput(checkbox.checked, checkboxEditable.checked);
         let outputCol = document.getElementById("output-table");
         let n = outputCol.rows.length;
         display.createOutputTableColors();
@@ -1377,6 +1398,9 @@ class Display {
 
         const regex = '/^0*1?$/gm'; //detects trailing zeros
 
+        let checkboxEdit = document.getElementById("InputToggle");
+        let editable = checkboxEdit.checked;
+
         const outputInt = output.innerText;
         let [outputParsedValue, outputIsValid] = demo.stringToValidFloat(outputInt);
 
@@ -1384,17 +1408,32 @@ class Display {
         let [parsedValue, isValid] = demo.stringToValidFloat(desiredInt);
 
         if(parsedValue === 1.0)  {
-            desired.innerHTML = '<span class="editable-border">1</span>';
-            dataOp.makeEditable(desired.firstChild, true);
+            if(editable) {
+                desired.innerHTML = '<span class="editable-border">1</span>';
+            }
+            else {
+                desired.innerHTML = '<span>1</span>';
+            }
+            dataOp.makeEditable(desired.firstChild, editable);
         }
 
         if(parsedValue === 0.0) {
-            desired.innerHTML = '<span class="editable-border">0</span>';
-            dataOp.makeEditable(desired.firstChild, true);
+            if(editable) {
+                desired.innerHTML = '<span class="editable-border">0</span>';
+            }
+            else {
+                desired.innerHTML = '<span>0</span>';
+            }
+            dataOp.makeEditable(desired.firstChild, editable);
         }
         if(desiredInt.match(regex)) {
-            desired.innerHTML = '<span class="editable-border">1</span>';
-            dataOp.makeEditable(desired.firstChild, true);
+            if(editable) {
+                desired.innerHTML = '<span class="editable-border">1</span>';
+            }
+            else {
+                desired.innerHTML = '<span>1</span>';
+            }
+            dataOp.makeEditable(desired.firstChild, editable);
         }
         //console.log("parsed: " + parsedValue);
         if(parsedValue !== 1 && parsedValue !== 0 ) {
@@ -1449,8 +1488,8 @@ class Display {
             display.updateDisplay();
         });
     }
-    showDesiredOutput (show) {
-        outputTable.showColumn(2, show, show);
+    showDesiredOutput (show, editable) {
+        outputTable.showColumn(2, show, editable);
         //display.createOutputTableEditBorder()
     }
 }
@@ -1605,7 +1644,16 @@ class Demo {
         let wDiv = document.createElement('div');
         wDiv.id = `weight-${n+1}`;
         wDiv.className = "weight_label";
-        wDiv.innerHTML = `<text fill="black" class="weights">w<sub>${n+1}</sub> =</text> <text contenteditable="true" onkeypress="if (keyCode == 13) return false;" id="w${n+1}" fill="black" class="weights">0</text>`;
+
+        wDiv.innerHTML = `<text fill="black" class="weights">w<sub>${n+1}</sub> =</text> <text contenteditable="true" 
+                            onkeypress="if (keyCode == 13) return false;" id="w${n+1}" fill="black" class="weights">0</text>
+                           <div id="weight_div${n+1}" class="weight_popup" style="display:none">
+                             <i class="close-icon fas fa-times"></i>
+                             <input type="checkbox" id="checkbox_weight_editable${n+1}"> Editable
+                           </div>
+                           <i id="weight_toggleBtn${n+1}" class="fas fa-info-circle"></i>
+      `;
+
         parentElement.insertBefore(wDiv, parentElement.children[n+1]);
         const weightText = document.getElementById(`w${n+1}`);
         dataOp.makeEditable(weightText);
@@ -1619,7 +1667,15 @@ class Demo {
             let child = parentElement.children[0];
             const top = 40;
             child.style = "top:" + top + "%;";
-            child.innerHTML = `<text>w<sub>${1}</sub> =</text> <text contenteditable="true" id="w${1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[0]}</text>`;
+            child.innerHTML = `<text>w<sub>${1}</sub> =</text> <text id="w${1}" 
+                               onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[0]}</text>
+                                <div id="weight_div${1}" class="weight_popup" style="display:none">
+                                    <i class="close-icon fas fa-times"></i>
+                                    <input type="checkbox" id="checkbox_weight_editable${1}"> Editable
+                                </div>
+                           <i id="weight_toggleBtn${1}" class="fas fa-info-circle"></i>
+                           `;
+            addEditOption(0);
         }
         else if(childCount === 3) {
             let first = 20;
@@ -1629,12 +1685,26 @@ class Demo {
                 let child = parentElement.children[i];
                 let top = Math.floor(first + i * interval);
                 child.style = "left:" + -20 + "%;" + "top:" + top + "%;";
-                child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>`;
+                child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" 
+                                  onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>
+                                  <div id="weight_div${i+1}" class="weight_popup" style="display:none">
+                                     <i class="close-icon fas fa-times"></i>
+                                     <input type="checkbox" id="checkbox_weight_editable${i + 1}"> Editable
+                                   </div>
+                                   <i id="weight_toggleBtn${i + 1}" class="fas fa-info-circle"></i>
+                           `;
+                addEditOption(i);
             }
             let child = parentElement.children[1];
             const top = 38;
             child.style = "left: -20%;" +  "top:" + top + "%;";
-            child.innerHTML = `<text>w<sub>${2}</sub> =</text> <text contenteditable="true" id="w${2}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[1]}</text>`;
+            // child.innerHTML = `<text>w<sub>${2}</sub> =</text> <text contenteditable="true" id="w${2}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[1]}</text>
+            //                   <div id="weight_div${2}" class="weight_popup" style="display:none">
+            //                       <i class="close-icon fas fa-times"></i>
+            //                       <input type="checkbox" id="checkbox_weight_editable${2}"> Editable
+            //                    </div>
+            //                    <i id="weight_toggleBtn${2}" class="fas fa-info-circle"></i>
+            //                   `;
 
         }
         else if(childCount === 4) {
@@ -1646,7 +1716,15 @@ class Demo {
                 let top = Math.floor(first + i * interval);
                 //child.style = "left:" + -10 + "%;";
                 child.style = "left:" + -50 + "%;" + "top:" + top + "%;";
-                child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>`;
+                // child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}"
+                //                    onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>
+                //                    <div id="weight_div${i + 1}" class="weight_popup" style="display:none">
+                //                         <i class="close-icon fas fa-times"></i>
+                //                         <input type="checkbox" id="checkbox_weight_editable${i + 1}"> Editable
+                //                    </div>
+                //                    <i id="weight_toggleBtn${i + 1}" class="fas fa-info-circle"></i>
+                //                 `;
+                addEditOption(i);
             }
 
         }
@@ -1658,25 +1736,50 @@ class Demo {
                 let child = parentElement.children[i];
                 let top = Math.floor(first + i * interval);
                 child.style = "left:" + -20 + "%;" + "top:" + top + "%;";
-                child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>`;
+                child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>
+                                    <div id="weight_div${i + 1}" class="weight_popup" style="display:none">
+                                        <i class="close-icon fas fa-times"></i>
+                                        <input type="checkbox" id="checkbox_weight_editable${i + 1}"> Editable
+                                   </div>
+                                   <i id="weight_toggleBtn${i + 1}" class="fas fa-info-circle"></i>
+                `;
+                addEditOption(i);
             }
             let child = parentElement.children[1];
             const left = -40;
             const top = 10 + 17.5
             child.style = "left:" + left + "%;" + "top:" + top + "%;";
-            child.innerHTML = `<text>w<sub>${2}</sub> =</text> <text contenteditable="true" id="w${2}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[1]}</text>`;
+            // child.innerHTML = `<text>w<sub>${2}</sub> =</text> <text contenteditable="true" id="w${2}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[1]}</text>
+            //                         <div id="weight_div${2}" class="weight_popup" style="display:none">
+            //                             <i class="close-icon fas fa-times"></i>
+            //                             <input type="checkbox" id="checkbox_weight_editable${2}"> Editable
+            //                         </div>
+            //                         <i id="weight_toggleBtn${2}" class="fas fa-info-circle"></i>
+            //    `;
+
 
             let child1 = parentElement.children[2];
             const left1 = -80;
             const top1 = 10 + 17.5*2 - 5
             child1.style = "left:" + left1 + "%;" + "top:" + top1 + "%;";
-            child1.innerHTML = `<text>w<sub>${3}</sub> =</text> <text contenteditable="true" id="w${3}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[2]}</text>`;
+            // child1.innerHTML = `<text>w<sub>${3}</sub> =</text> <text contenteditable="true" id="w${3}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[2]}</text>
+            //                      <div id="weight_div${3}" class="weight_popup" style="display:none">
+            //                             <i class="close-icon fas fa-times"></i>
+            //                             <input type="checkbox" id="checkbox_weight_editable${3}"> Editable
+            //                         </div>
+            //                         <i id="weight_toggleBtn${3}" class="fas fa-info-circle"></i>
+            //                     `;
 
             let child2 = parentElement.children[3];
             const left2 = -40;
             const top2 = 10 + 17.5*2 + 8
             child2.style = "left:" + left2 + "%;" + "top:" + top2 + "%;";
-            child2.innerHTML = `<text>w<sub>${4}</sub> =</text> <text contenteditable="true" id="w${4}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[3]}</text>`;
+            // child2.innerHTML = `<text>w<sub>${4}</sub> =</text> <text contenteditable="true" id="w${4}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[3]}</text>
+            //                     <div id="weight_div${4}" class="weight_popup" style="display:none">
+            //                        <i class="close-icon fas fa-times"></i>
+            //                        <input type="checkbox" id="checkbox_weight_editable${4}"> Editable
+            //                     </div>
+            //                     <i id="weight_toggleBtn${4}" class="fas fa-info-circle"></i>`;
         }
         else {
             let first = 20;
@@ -1686,10 +1789,17 @@ class Demo {
                 let child = parentElement.children[i];
                 let top = Math.floor(first + i * interval);
                 child.style = "top:" + top + "%;";
-                child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>`;
+                child.innerHTML = `<text>w<sub>${i + 1}</sub> =</text> <text contenteditable="true" id="w${i + 1}" onkeypress="if (keyCode == 13) return false;" fill="black" class="weights">${demo.weights[i]}</text>
+                                    <div id="weight_div${i+1}" class="weight_popup" style="display:none">
+                                        <i class="close-icon fas fa-times"></i>
+                                        <input type="checkbox" id="checkbox_weight_editable${i + 1}"> Editable
+                                    </div>
+                                    <i id="weight_toggleBtn${i + 1}" class="fas fa-info-circle"></i>
+                                 `;
+                addEditOption(i);
             }
-
         }
+        setupCloseButtons();
     }
 
     removeWeightCol(n) {
@@ -1813,9 +1923,14 @@ class Demo {
 async function downloadFile() {
     let inputToggleChecked=document.getElementById("InputToggle").checked;
     let outputToggleChecked=document.getElementById("OutputToggle").checked;
+    let fanfareToggleChecked = document.getElementById("FanfareToggle").checked;
     //console.log("in download: "+  demo.inputData);
-    let headerRows = [];
-    display.getHeaderRowVals(headerRows);
+    // let headerRows = [];
+    // display.getHeaderRowVals(headerRows);
+
+    let headerRowVariables = [];
+    display.getHeaderRowVariables(headerRowVariables);
+
     let modelname = document.getElementById("fname").innerText
     //if(modelname.length == 0)  modelname = "model"
 
@@ -1850,7 +1965,9 @@ async function downloadFile() {
         "desired-output": desiredOutputs,
         "input-toggle-checked" : inputToggleChecked,
         "output-toggle-checked" : outputToggleChecked,
-        "input-header": headerRows,
+        "fanfare-toggle-checked": fanfareToggleChecked,
+        "input-header-vars" : headerRowVariables,
+        //"input-header": headerRows,
     };
 
 
@@ -1889,6 +2006,38 @@ async function uploadFileCombined(event) {
         fileInput.value = '';
         fileInput.click();
     }
+}
+
+function addEditOption(c) {
+    const toggleBtn = document.getElementById(`weight_toggleBtn${c + 1}`);
+    let weightButtonHandler = function () {
+        const weightDiv = document.getElementById(`weight_div${c + 1}`);
+        weightDiv.style.display = weightDiv.style.display === "none" ? "block" : "none";
+        weightDiv.classList.toggle("active");
+        //toggleBtn.classList.toggle("fa-caret-square-down");
+        //toggleBtn.classList.toggle("fa-caret-square-up");
+    };
+    toggleBtn.addEventListener("click", weightButtonHandler);
+
+    let weightCheckboxHandler = function () {
+        const textbox = document.getElementById(`w${c + 1}`);
+        textbox.contentEditable = this.checked;
+        dataOp.makeEditable(textbox, this.checked);
+    };
+    document.getElementById(`checkbox_weight_editable${c + 1}`).addEventListener("change", weightCheckboxHandler);
+}
+
+function setupCloseButtons() {
+    let closeIcons = document.querySelectorAll('.close-icon');
+
+    closeIcons.forEach(function (closeIcon) {
+        closeIcon.addEventListener('click', function () {
+            const popup = this.parentElement;
+            popup.style.display = 'none';
+            if (popup.classList.contains("active"))
+                popup.classList.remove("active");
+        });
+    });
 }
 
 function uploadJson(text) {
@@ -1949,13 +2098,20 @@ function uploadJson(text) {
     //document.getElementById('InputToggle').checked = dict["input-toggle-checked"];
     document.getElementById('InputToggle').checked = false;
     document.getElementById('OutputToggle').checked = dict["output-toggle-checked"];
+    document.getElementById("FanfareToggle").checked = dict["fanfare-toggle-checked"];
 
     display.handleHoverExit();
     demo.update();
-    let headerRows = dict["input-header"];
-    if(headerRows?.length) {
-        display.setHeaderRowVals(headerRows);
+    // let headerRows = dict["input-header"];
+    // if(headerRows?.length) {
+    //     display.setHeaderRowVals(headerRows);
+    // }
+
+    let headerRowVars = dict["input-header-vars"];
+    if(headerRowVars?.length) {
+        display.setHeaderRowVariables(headerRowVars);
     }
+
     dataOp.updateTableFromDesired(desiredOutputs, outputTable);
 
     let outputCol = document.getElementById("output-table");
@@ -1976,8 +2132,7 @@ function uploadJson(text) {
 
     if(document.getElementById('OutputToggle').checked)
         demo.hasNoSolution()
-
-
+    setupCloseButtons();
 }
 
 async function uploadFile(event) {
@@ -2035,6 +2190,14 @@ $('#BinaryToggle').change(function() { //toggle output
     display.outputLine.position();
 });
 
+function PlaySound() {
+    document.getElementById("popup").classList.toggle('active');
+    const audio = document.getElementById("hooray_sound");
+    if (audio) {
+        audio.play();
+    }
+}
+
 $('#FanfareToggle').change(function() { //toggle output
     display.UpdateFanfareToggle();
     display.outputLine.position();
@@ -2042,5 +2205,8 @@ $('#FanfareToggle').change(function() { //toggle output
     {
         demo.weightLines[i].position();
     }
-
+    PlaySound();
 });
+
+
+
