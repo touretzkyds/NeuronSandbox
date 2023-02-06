@@ -1615,7 +1615,7 @@ class Demo {
         wDiv.id = `weight-${n+1}`;
         wDiv.className = "weight_label";
 
-        wDiv.innerHTML = `<text fill="black" class="weights">w<sub>${n+1}</sub> =</text> <text contenteditable="true" 
+        wDiv.innerHTML = `<text fill="black">w<sub>${n+1}</sub> =</text> <text contenteditable="true" 
                             onkeypress="if (keyCode == 13) return false;" id="w${n+1}" fill="black" class="weights">0</text>
                            <div id="weight_div${n+1}" class="weight_popup" style="display:none">
                              <i class="close-icon fas fa-times"></i>
