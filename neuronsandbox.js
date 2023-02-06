@@ -186,12 +186,13 @@ class DataOperator {
                     textbox.innerHTML = `<span>` + 0 + `</span>`
             }
 
+            if(document.getElementById('OutputToggle').checked)
+                demo.hasNoSolution()
+
 
             //console.trace()
             textbox.addEventListener("focusout", function(event){  
                 demo.update(this);
-                if(document.getElementById('OutputToggle').checked)
-                    demo.hasNoSolution()
                 display.checkForSuccess()
                 let identify = this?.id
                 if (identify !== "th1" && !(new RegExp('^w[0-9]+$', 'gm').test(identify))) { //checks if not threshold, or any of the weight textboxes
