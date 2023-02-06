@@ -172,7 +172,6 @@ class DataOperator {
         textbox.contentEditable = editable;
         // add event listener to update demo with table changes
         // add a class to textbox to keep track of an eventlistener already being added
-        console.log(textbox)
         if (editable && !textbox.classList.contains("edit-handler")) {
             textbox.classList.add("edit-handler");
             if(textbox.id.startsWith("tblinput")) {
@@ -499,7 +498,6 @@ class Table {
             const cells = this.table.rows[r].cells;
             if(r !== 0) {
                 if(cells[columnNum].querySelector(".editable-border")) {
-                    console.log("cell: " + cells[columnNum].firstChild)
                     dataOp.makeEditable(cells[columnNum].firstChild, editable);
                 }
                 else {
@@ -793,8 +791,6 @@ class Display {
         else {
             adjustment = 7;
         }
-
-        console.log("max height: " + maxHeight)
 
         document.getElementById("output-table").style.marginTop = adjustment + additionalFactor + "px";
 
@@ -1636,6 +1632,19 @@ class Demo {
         this.updateWeightUI(parentElement);
     }
 
+    showWeightToggle(show) {
+        let parentElement = document.getElementById("input-link-text");
+        let weightElement = parentElement.children;
+        for(let i = 0; i < weightElement.length; i++) {
+            let toggleBtn = weightElement[i].children[3]
+            if(!show)
+                toggleBtn.style.display = 'none';
+            else
+                toggleBtn.style.display = 'inline-block';
+            console.log(weightElement[i].children[3].innerHTML);
+        }
+    }
+
     updateWeightUI(parentElement) {
         //TODO: make code less messy
         let childCount = parentElement.children.length;
@@ -2041,6 +2050,8 @@ function uploadJson(text) {
     if(document.getElementById('OutputToggle').checked)
         demo.hasNoSolution()
     setupCloseButtons();
+
+    demo.showWeightToggle(false);
 }
 
 async function uploadFile(event) {
@@ -2084,6 +2095,8 @@ document.addEventListener("DOMContentLoaded", () => {
 $('#InputToggle').change(function() { //toggle edit
     display.UpdateInputToggle();
     display.outputLine.position();
+    const show = document.getElementById("InputToggle").checked;
+        demo.showWeightToggle(show);
 });
 
 $('#OutputToggle').change(function() { //toggle output
