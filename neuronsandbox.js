@@ -500,9 +500,9 @@ class Table {
                 if(cells[columnNum].querySelector(".editable-border")) {
                     dataOp.makeEditable(cells[columnNum].firstChild, editable);
                 }
-                else {
-                    dataOp.makeEditable(cells[columnNum], editable);
-                }
+                // else {
+                //     dataOp.makeEditable(cells[columnNum], editable);
+                // }
             }
 
 
