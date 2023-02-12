@@ -161,9 +161,6 @@ article > section {
 #th1{
     position: relative;
     padding: 0px 2px;
-    border: solid;
-    border-color: gray;
-    background-color: #f2f2f2;
 }
 
 /*
@@ -268,20 +265,22 @@ article > section {
     font-size: 20px;
 }
 
-.custom-th {
-    line-height: 7vh !important;
-    width: 7vw;
-    overflow-wrap: break-word;
-    font-size: 20px;
+.output-th {
+    width: 7vw !important;
+    height: 7vw;
+    line-height: 1.7em !important;
 }
 
-.input-table-th {
+#input-table th {
     width: 7vw;
     height: 5vw;
     line-height: 1.7em !important;
 }
-.output-th {
+
+#output-table th {
     width: 2vw !important;
+    height: 5vw;
+    line-height: 1.7em !important;
 }
 
 .table tr {
@@ -573,8 +572,8 @@ span {
     top: 40%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 200px;
-    height: 50px;
+    width: 250px;
+    height: 80px;
     padding: 20px;
     box-shadow: 0 5px 30px rgba(0, 0, 0, .3);
     background: #fff;

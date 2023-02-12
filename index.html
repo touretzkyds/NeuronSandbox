@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -175,7 +175,12 @@
                                 <div class="circle center">
                                     <div id="threshold-text" class="center">
                                         <text>∑> </text>
-                                        <text contenteditable="true" id="th1"></text>
+                                        <text id="th1"></text>
+                                        <div id="threshold-div" class="weight_popup" style="display:none">
+                                            <i class="close-icon fas fa-times"></i>
+                                            <input type="checkbox" id="checkbox_threshold_editable"> Editable </input>
+                                        </div>
+                                        <i id="threshold_toggleBtn" style="display: inline-block" class="fas fa-info-circle"></i>
                                     </div>
                                 </div>
                             </div>

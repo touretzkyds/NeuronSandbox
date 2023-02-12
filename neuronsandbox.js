@@ -507,18 +507,12 @@ class Table {
             }
 
 
-            cells[columnNum].style.display = visible? "block" : "none";
-
-
+            cells[columnNum].style.display = visible? "table-cell" : "none";
 
             let desiredOutput = document.getElementById("desired");
             desiredOutput.contentEditable = false;
             if(desiredOutput.classList.contains("edit-handler"))
                 desiredOutput.classList.remove("edit-handler");
-            if(!desiredOutput.classList.contains("custom-th"))
-                desiredOutput.classList.add("custom-th");
-
-
         }
     }
 }
@@ -623,6 +617,26 @@ class Display {
         this.createInputTableEditBorder();
     }
 
+    alignTables() {
+        let maxHeight = 0
+
+        const headerCells = document.getElementById("input-table").rows[1].cells;
+        for (let c = 1; c < headerCells.length; c++) {
+            let headerInput = headerCells[c];
+            if (headerInput.id.startsWith("tblinput")) {
+
+                let heightOfTH = headerInput.offsetHeight
+                //let heightOfTH = parseInt(heightOfTHtext.substring(0, heightOfTHtext.length-2))
+                if(heightOfTH > maxHeight)
+                    maxHeight = heightOfTH
+            }
+            else
+                console.log("missing input")
+        }
+        const outputHeaderCells = document.getElementById("output-table").rows[0].cells;
+        outputHeaderCells[0].style.height = maxHeight + 'px';
+    }
+
     createOutputTableColors() {
         const outputTable = document.getElementById("output-table");
         let n = outputTable.rows.length;
@@ -674,7 +688,6 @@ class Display {
 
 
     }
-
     checkForSuccess() {
         let outputTable = document.getElementById("output-table")
         let tableRows = outputTable.rows.length
@@ -738,8 +751,8 @@ class Display {
             //dataOp.makeEditable(weight);
         });
         this.displayThresholdFromData(perceptron);
-        const threshold = document.getElementById(`th${1}`);
-        dataOp.makeEditable(threshold);
+        //const threshold = document.getElementById(`th${1}`);
+        //dataOp.makeEditable(threshold);
         //this.displaySelectedInput();
         this.updateSelectedInput();
         this.displaySelectedOutput();
@@ -758,43 +771,6 @@ class Display {
                 return false
         }
         return true
-    }
-    alignTables() {
-        let adjustment = 0
-        let maxHeight = 0
-        const headerCells = document.getElementById("input-table").rows[1].cells;
-        for (let c = 1; c < headerCells.length; c++) {
-            let headerInput = headerCells[c];
-            if (headerInput.id.startsWith("tblinput")) {
-                let heightOfTH = headerInput.offsetHeight
-                if(heightOfTH > maxHeight)
-                    maxHeight = heightOfTH
-            }
-            else
-                console.log("missing input")
-        }
-        //based on the header's height, we adjust the output table
-        //let adjustment = 0
-        let additionalFactor = 0;
-        if(document.getElementById("OutputToggle").checked) {
-            additionalFactor = -27;
-        }
-
-        if(maxHeight >= 72) {
-            adjustment = 30*maxHeight/100
-        }
-        else if(maxHeight >= 94) {
-            adjustment = 37*maxHeight/100
-        }
-        else if(maxHeight > 115) {
-            adjustment = 50*maxHeight/100
-        }
-        else {
-            adjustment = 7;
-        }
-
-        document.getElementById("output-table").style.marginTop = adjustment + additionalFactor + "px";
-
     }
 
     adjustSelectedInputFontSize() {
@@ -1152,9 +1128,7 @@ class Display {
         //this.createOutputTableColors();
         this.updateSelectedInput();
         display.adjustSelectedInputFontSize();
-        display.alignTables();
-
-
+        display.alignTables()
     }
 
     getHeaderRowVals(headerRowVals) {
@@ -1281,7 +1255,7 @@ class Display {
                 element.style.display = "flex";
             });
             //document.getElementById("generateTruthTable").disabled = false;
-            document.getElementById("output-table").style.marginTop = "50px";
+            document.getElementById("output-table").style.marginTop = "40px";
             document.getElementById("FanfareToggleBody").hidden = false;
         }
 
@@ -1302,13 +1276,13 @@ class Display {
 
         let isCorrect = true;
 
-        if(checkbox.checked) {
-            document.getElementById("output-table").style.marginTop = "-20px";
-        }
-        else {
-            document.getElementById("output-table").style.marginTop = "7px";
-            document.getElementById("congrats-msg").hidden = true;
-        }
+        // if(checkbox.checked) {
+        //     document.getElementById("output-table").style.marginTop = "-20px";
+        // }
+        // else {
+        //     document.getElementById("output-table").style.marginTop = "7px";
+        //     document.getElementById("congrats-msg").hidden = true;
+        // }
 
         for(let i = 1; i < n; i++) {
             //var tr = outputCol.rows[i];
@@ -1430,8 +1404,8 @@ class Display {
         this.displaySelectedOutput();
         this.UpdateInputToggle();
         this.UpdateOutputToggle();
-        this.alignTables();
         this.adjustSelectedInputFontSize()
+        this.alignTables()
 
     }
 
@@ -1644,6 +1618,11 @@ class Demo {
                 toggleBtn.style.display = 'inline-block';
             console.log(weightElement[i].children[3].innerHTML);
         }
+        let thresholdToggleBtn = document.getElementById("threshold_toggleBtn");
+        if(!show)
+            thresholdToggleBtn.style.display = 'none';
+        else
+            thresholdToggleBtn.style.display = 'inline-block';
     }
 
     updateWeightUI(parentElement) {
@@ -1874,16 +1853,20 @@ async function downloadFile() {
     document.getElementById("fname").textContent = newName
 
     demo.threshold = perceptron.threshold;
+    let binaryToggleChecked = document.getElementById("BinaryToggle").checked;
+    let thresholdToggleChecked = document.getElementById("checkbox_threshold_editable").checked;
     let dict = {
         "model-name" : newName,
         "input": demo.inputData,
         "weight": demo.weights,
         "threshold": demo.threshold,
+        "threshold-editable" : thresholdToggleChecked,
         "desired-output": desiredOutputs,
         "input-toggle-checked" : inputToggleChecked,
         "output-toggle-checked" : outputToggleChecked,
         "fanfare-toggle-checked": fanfareToggleChecked,
         "input-header-vars" : headerRowVariables,
+        "binaryToggleChecked" : binaryToggleChecked
         //"input-header": headerRows,
     };
 
@@ -1895,7 +1878,7 @@ async function downloadFile() {
     await writableStream.close();
 }
 
-function uploadFromUrl(url) {
+function uploadFromUrl(url) { //TODO: doesn't work if running from hard drive
     fetch(url, {
         mode: "no-cors",
         method: "GET",
@@ -1939,10 +1922,47 @@ function addEditOption(c) {
     let weightCheckboxHandler = function () {
         const textbox = document.getElementById(`w${c + 1}`);
         textbox.contentEditable = this.checked;
+        if(this.checked) {
+            if(!textbox.classList.contains("weights")) {
+                textbox.classList.add("weights");
+            }
+        }
+        else {
+            if(textbox.classList.contains("weights")) {
+                textbox.classList.remove("weights");
+            }
+        }
         dataOp.makeEditable(textbox, this.checked);
     };
     const checkBox = document.getElementById(`checkbox_weight_editable${c + 1}`);
     checkBox.onchange = weightCheckboxHandler;
+}
+
+function addThresholdEditOption() {
+    const toggleBtn = document.getElementById(`threshold_toggleBtn`);
+    let thresholdButtonHandler = function () {
+        const thresholdDiv = document.getElementById(`threshold-div`);
+        thresholdDiv.style.display = thresholdDiv.style.display === "none" ? "block" : "none";
+        thresholdDiv.classList.toggle("active");
+    };
+    toggleBtn.onclick = thresholdButtonHandler;
+    let thresholdCheckboxHandler = function () {
+        const textbox = document.getElementById(`th1`);
+        textbox.contentEditable = this.checked;
+        if(this.checked) {
+            if(!textbox.classList.contains("weights")) {
+                textbox.classList.add("weights");
+            }
+        }
+        else {
+            if(textbox.classList.contains("weights")) {
+                textbox.classList.remove("weights");
+            }
+        }
+        dataOp.makeEditable(textbox, this.checked);
+    };
+    const checkBox = document.getElementById(`checkbox_threshold_editable`);
+    checkBox.onchange = thresholdCheckboxHandler;
 }
 
 function setupCloseButtons() {
@@ -2052,7 +2072,14 @@ function uploadJson(text) {
         demo.hasNoSolution()
     setupCloseButtons();
 
+
     demo.showWeightToggle(false);
+    document.getElementById("BinaryToggle").checked = dict["binaryToggleChecked"];
+    display.UpdateBinaryToggle();
+    addThresholdEditOption();
+    let thresholdCheckbox = document.getElementById("checkbox_threshold_editable");
+    thresholdCheckbox.checked = dict["threshold-editable"];
+    thresholdCheckbox.dispatchEvent(new Event("change"));
 }
 
 async function uploadFile(event) {
@@ -2088,6 +2115,7 @@ display.updateDisplay();
 uploadFromUrl("SampleModel.json");
 display.createOutputTableColors();
 display.createInputTableEditBorder();
+addThresholdEditOption();
 
 document.addEventListener("DOMContentLoaded", () => {
     demo.main().catch(e => console.error(e));
