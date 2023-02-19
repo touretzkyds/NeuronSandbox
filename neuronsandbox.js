@@ -50,7 +50,7 @@ class DataOperator {
         dataObj.rows--;
     }
 
-    insertDataCol(dataObj, n=1, pos){
+    insertDataCol(dataObj, n=1){
         const cols = Array(dataObj.rows).fill(0);
         for(let r = 0; r < dataObj.data.length; r++) {
             dataObj.data[r].splice(n, 0, cols[r]);
@@ -575,16 +575,20 @@ class Perceptron {
     }
 
     setWeightsUI() {
+        let childNodes = document.getElementById("input-link-text").childNodes;
         for (let i = 0; i < demo.weights.length; i++){
-            const cell = document.getElementById(`w${i+1}`);
+            //const cell = document.getElementById(`w${i+1}`);
+            const cell = childNodes[i].childNodes[2];
             if(cell) {
                 cell.innerHTML = this.weights[i];
             }
         }
     }
     updateWeightsFromUI(){
+        let childNodes = document.getElementById("input-link-text").childNodes;
         for (let i=0; i<demo.weights.length; i++){
-            const cell = document.getElementById(`w${i+1}`);
+            //const cell = document.getElementById(`w${i+1}`);
+            const cell = childNodes[i].childNodes[2];
             if(cell) {
                 //dataOp.makeEditable(cell);
                 const [parsedValue, isValid] = demo.stringToValidFloat(cell.innerHTML);
@@ -674,6 +678,9 @@ class Display {
                     }
                     textbox.children[0].classList.add("editable-border")
                     dataOp.makeEditable(textbox.firstChild)
+                    while (textbox.children.length > 1) {
+                        textbox.removeChild(textbox.children[1]);
+                    }
                 }
                 else {
                     if(textbox.children.length === 0) {
@@ -681,8 +688,12 @@ class Display {
                     }
                     textbox.children[0].classList.remove("editable-border")
                     dataOp.makeEditable(textbox.firstChild, false)
-                }
 
+                    let image = "<img id='image' src='0_image.svg' alt='0_Image' width='32' height='32'>";
+                    if(textbox.innerText === "1")
+                        image = "<img id='image' src='1_image.svg' alt='1_Image' width='32' height='32'>";
+                    textbox.innerHTML += image;
+                }
             }
         }
 
@@ -1583,26 +1594,38 @@ class Demo {
         if(needUpdate) demo.update();
     }
 
+    generateUniqueID(prefix) {
+        let count = 1;
+        let id;
+        do {
+            id = prefix + count;
+            count++;
+        } while (document.getElementById(id) !== null);
+        return count - 1;
+    }
+
     insertWeightCol(n) {
         let parentElement = document.getElementById("input-link-text");
         demo.weights.splice(n, 0, 0); //add a weight
         let wDiv = document.createElement('div');
-        wDiv.id = `weight-${n+1}`;
+        //wDiv.id = `weight-${n+1}`;
+        let unique_id = this.generateUniqueID("weight-");
+        wDiv.id = `weight-${unique_id}`;
         wDiv.className = "weight_label";
 
-        wDiv.innerHTML = `<text fill="black">w<sub>${n+1}</sub> =</text> <text contenteditable="true" 
-                            onkeypress="if (keyCode == 13) return false;" id="w${n+1}" fill="black" class="weights">0</text>
-                           <div id="weight_div${n+1}" class="weight_popup" style="display:none">
+        wDiv.innerHTML = `<text fill="black">w<sub>${unique_id}</sub> =</text> <text contenteditable="true" 
+                            onkeypress="if (keyCode == 13) return false;" id="w${unique_id}" fill="black" class="weights">0</text>
+                           <div id="weight_div${unique_id}" class="weight_popup" style="display:none">
                              <i class="close-icon fas fa-times"></i>
-                             <input type="checkbox" id="checkbox_weight_editable${n+1}"> Editable
+                             <input type="checkbox" id="checkbox_weight_editable${unique_id}"> Editable
                            </div>
-                           <i id="weight_toggleBtn${n+1}" style="display: inline-block" class="fas fa-info-circle"></i>
+                           <i id="weight_toggleBtn${unique_id}" style="display: inline-block" class="fas fa-info-circle"></i>
       `;
 
-        parentElement.insertBefore(wDiv, parentElement.children[n+1]);
-        const weightText = document.getElementById(`w${n+1}`);
+        parentElement.insertBefore(wDiv, parentElement.children[n]);
+        const weightText = document.getElementById(`w${unique_id}`);
         dataOp.makeEditable(weightText);
-        let checkbox = document.getElementById(`checkbox_weight_editable${n+1}`);
+        let checkbox = document.getElementById(`checkbox_weight_editable${unique_id}`);
         checkbox.checked = true;
         this.updateWeightUI(parentElement);
     }
@@ -1719,8 +1742,8 @@ class Demo {
     }
     // add new row at specific location on button click
     insertCol(button){
-        if(inputTable.numCols >= 8) {
-            alert("Cannot have more than 8 inputs!")
+        if(inputTable.numCols >= 5) {
+            alert("Cannot have more than 5 inputs!")
             return;
         }
         const c = this.getColLocation(button);
@@ -1728,6 +1751,7 @@ class Demo {
         dataOp.insertDataCol(inputs, c);
         this.insertWeightCol(c);
         display.handleHoverExit();
+        perceptron.updateWeightsFromUI();
         demo.update(); //TODO: check if efficient
     }
 
