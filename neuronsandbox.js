@@ -688,16 +688,55 @@ class Display {
                     }
                     textbox.children[0].classList.remove("editable-border")
                     dataOp.makeEditable(textbox.firstChild, false)
+                    while (textbox.children.length > 1) {
+                        textbox.removeChild(textbox.children[1]);
+                    }
+                    const img = document.createElement("img");
 
-                    let image = "<img id='image' src='0_image.svg' alt='0_Image' width='32' height='32'>";
-                    if(textbox.innerText === "1")
-                        image = "<img id='image' src='1_image.svg' alt='1_Image' width='32' height='32'>";
-                    textbox.innerHTML += image;
+                    if(textbox.innerText === "1") {
+                        img.alt = "1_Image";
+                        const imageKey = JSON.stringify({column: j, value: img.alt});
+                        if(imageKey in dictImageMapping) {
+                            let image_src = localStorage.getItem(dictImageMapping[imageKey]);
+                            if(image_src === null) {
+                                img.src = "1_image.svg";
+                            }
+                            else {
+                                img.src = image_src;
+                            }
+                        }
+                        else {
+                            img.src = "1_image.svg";
+                        }
+
+
+                    }
+                    else {
+                        img.alt = "0_Image";
+                        const imageKey = JSON.stringify({column: j, value: img.alt});
+                        if(imageKey in dictImageMapping) {
+                            let image_src = localStorage.getItem(dictImageMapping[imageKey]);
+                            if(image_src === null) {
+                                img.src = "0_image.svg";
+                            }
+                            else {
+                                img.src = image_src;
+                            }
+                        }
+                        else {
+                            img.src = "0_image.svg";
+                        }
+                    }
+                    img.width = 32;
+                    img.height = 32;
+                    img.classList.add("myimage");
+                    textbox.appendChild(img);
                 }
             }
         }
-
-
+        if(!editable) {
+            setImageEditOptions();
+        }
     }
     checkForSuccess() {
         let outputTable = document.getElementById("output-table")
@@ -1742,8 +1781,8 @@ class Demo {
     }
     // add new row at specific location on button click
     insertCol(button){
-        if(inputTable.numCols >= 5) {
-            alert("Cannot have more than 5 inputs!")
+        if (inputTable.numCols >= 5) {
+            alert("Cannot have more than 8 inputs!")
             return;
         }
         const c = this.getColLocation(button);
@@ -1759,7 +1798,7 @@ class Demo {
     // remove row at specific location on button click
     removeCol(button) {
         const c = this.getColLocation(button) - 1;
-        if(inputTable.numCols <= 1) {
+        if (inputTable.numCols <= 1) {
             alert("Cannot remove all inputs!")
             return;
         }
@@ -1783,7 +1822,7 @@ class Demo {
 
     // update entire demo
     update(sender = undefined){
-        if(sender && sender.tagName === 'TH') { //header changed
+        if (sender && sender.tagName === 'TH') { //header changed
 
             //update selected input so it update immediately
             let headerRowVals = [];
@@ -1792,7 +1831,7 @@ class Demo {
             demo.selectedInput = headerRowVals;
         }
         let bEditOutput = false;
-        if(sender && sender.closest('table')?.id === "output-table") { //must be the desired output cell, no need to calculate
+        if (sender && sender.closest('table')?.id === "output-table") { //must be the desired output cell, no need to calculate
             bEditOutput = true;
             //console.log(sender.previousSibling)
             display.checkDesiredOutput(sender.previousSibling, sender);
@@ -1800,7 +1839,7 @@ class Demo {
             return;
         }
         dataOp.updateDataFromTable(inputs, inputTable);
-        if(document.getElementById("OutputToggle").checked) {
+        if (document.getElementById("OutputToggle").checked) {
             dataOp.updateDataFromTable(outputs, outputTable);
         }
 
@@ -1855,10 +1894,10 @@ async function downloadFile() {
     //if(modelname.length == 0)  modelname = "model"
 
     const handle = await showSaveFilePicker({
-        suggestedName: modelname + '.json',
+        suggestedName: modelname + '.zip',
         types: [{
             description: 'Neuron Sandbox model',
-            accept: {'application/json': ['.json']},
+            accept: {'application/zip': ['.zip']},
         }],
     });
 
@@ -1873,7 +1912,7 @@ async function downloadFile() {
     desiredOutputs.rows = table.rows.length-1;
 
     //dataOp.updateDataFromTable(outputs, outputTable);
-    let newName = handle.name.substring(0, handle.name.length - 5)
+    let newName = handle.name.substring(0, handle.name.length - 4)
     document.getElementById("fname").textContent = newName
 
     demo.threshold = perceptron.threshold;
@@ -1894,12 +1933,48 @@ async function downloadFile() {
         //"input-header": headerRows,
     };
 
-
-
     const blob = new Blob([JSON.stringify(dict)]);
+    // Create a new JSZip instance
+    const zip = new JSZip();
+    // Add the file to the zip archive
+    zip.file("model.json", blob);
+    zip.file("ImageMapping.json", new Blob([JSON.stringify(dictImageMapping)]))
+
+    for (const key in dictImageMapping) {
+        let keyStorage = dictImageMapping[key];
+        console.log("localstorage key:" + key);
+        const dataURLImage = localStorage.getItem(keyStorage);
+        if(dataURLImage !== null) {
+            // Convert the data URL to an array buffer
+            const response = await fetch(dataURLImage);
+            const arrayBuffer = await response.arrayBuffer();
+            // Add the file to the zip archive
+            zip.file(keyStorage, arrayBuffer);
+        }
+    }
+    // Generate the zip file as a data URL
+    const zipData = await zip.generateAsync({ type: "blob" });
     const writableStream = await handle.createWritable();
-    await writableStream.write(blob);
+    await writableStream.write(zipData);
     await writableStream.close();
+}
+
+function uploadFromZipUrl(url) { //TODO: doesn't work if running from hard drive
+    fetch(url, {
+        mode: "no-cors",
+        method: "GET",
+        headers: {
+            accept: '*/zip',
+        }
+    })
+        .then(res => res.blob())
+        .then(blob => {
+            //console.log('Downloaded this JSON! ', text);
+            uploadZip(blob);
+        })
+        .catch(err => {
+            throw err
+        });
 }
 
 function uploadFromUrl(url) { //TODO: doesn't work if running from hard drive
@@ -1907,7 +1982,7 @@ function uploadFromUrl(url) { //TODO: doesn't work if running from hard drive
         mode: "no-cors",
         method: "GET",
         headers: {
-            accept: '*/*',
+            accept: '*/zip',
         }
     })
         .then(res => res.text())
@@ -1923,7 +1998,7 @@ function uploadFromUrl(url) { //TODO: doesn't work if running from hard drive
 async function uploadFileCombined(event) {
     let url = document.getElementById("url").value;
     if(url) {
-        uploadFromUrl(url);
+        uploadFromZipUrl(url);
     }
     else {
         const fileInput = document.getElementById('upload-file');
@@ -1989,6 +2064,36 @@ function addThresholdEditOption() {
     checkBox.onchange = thresholdCheckboxHandler;
 }
 
+
+
+function handleImageClick(img, col) {
+    //check if we are in edit mode
+    if(document.getElementById("InputToggle").checked) {
+        currentImageType = img.alt;
+        currentColumn = col;
+        document.getElementById("upload-image_file").click();
+    }
+}
+
+function setImageEditOptions() {
+    let images = document.querySelectorAll(`.myimage`);
+    images.forEach((image) => {
+        //console.log(image);
+        let tdElement = image;
+        while (tdElement && tdElement.tagName !== 'TD') {
+            tdElement = tdElement.parentNode;
+        }
+        let imageButtonHandler = function () {
+            //make the dialog box visible
+            handleImageClick(this, tdElement.cellIndex);
+        };
+        //toggleBtn.addEventListener("click", weightButtonHandler);
+        image.onclick = imageButtonHandler;
+
+    });
+}
+
+
 function setupCloseButtons() {
     let closeIcons = document.querySelectorAll('.close-icon');
 
@@ -1998,6 +2103,43 @@ function setupCloseButtons() {
             popup.style.display = 'none';
             if (popup.classList.contains("active"))
                 popup.classList.remove("active");
+        });
+    });
+}
+
+function uploadZip(zipFile) {
+    // Assume the zip file is stored in a variable called "zipFile" and is a binary string
+    localStorage.clear();
+    const zip = new JSZip();
+    let jsonModelContent = ""
+    zip.loadAsync(zipFile).then(function (zip) {
+        // Iterate over each file in the zip
+        zip.forEach(function (relativePath, zipEntry) {
+            // Get the content of the file
+            if(relativePath === "ImageMapping.json") {
+                zipEntry.async('text').then(function (content) {
+                    console.log(content);
+                    dictImageMapping = JSON.parse(content);
+                });
+            }
+            else if(relativePath.endsWith(".json")) {
+                zipEntry.async('text').then(function (content) {
+                    console.log(content);
+                    jsonModelContent = content;
+                    uploadJson(jsonModelContent);
+                });
+            }
+            else {
+                zipEntry.async("arraybuffer").then(function (content) {
+                    //save to localStorage
+                    const binaryString = String.fromCharCode.apply(null, new Uint8Array(content));
+                    const base64String = btoa(binaryString);
+                    // Use the binary content in the arrayBuffer
+                    const dataURL = `data:image/png;base64,${base64String}`;
+                    localStorage.setItem(relativePath, dataURL);
+                    display.createInputTableEditBorder();
+                });
+            }
         });
     });
 }
@@ -2111,9 +2253,34 @@ async function uploadFile(event) {
     if (!file) {
         return;
     }
-    const text = await file.text();
-    uploadJson(text);
+    const fileReader = new FileReader();
+    fileReader.readAsArrayBuffer(file);
+    fileReader.onload = (event) => {
+        const blob = event.target.result;
+        uploadZip(blob);
+        // Use the file buffer as needed
+    };
 }
+
+async function uploadImageFile(event) {
+    const file = event.target.files.item(0)
+    if (!file) {
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const arrayBuffer = event.target.result;
+        const binaryString = String.fromCharCode.apply(null, new Uint8Array(arrayBuffer));
+        const base64String = btoa(binaryString);
+        // Use the binary content in the arrayBuffer
+        const dataURL = `data:image/png;base64,${base64String}`;
+        dictImageMapping[JSON.stringify({column: currentColumn, value: currentImageType})] = file.name;
+        localStorage.setItem(file.name, dataURL);
+        display.createInputTableEditBorder();
+    };
+    reader.readAsArrayBuffer(file);
+}
+
 
 window.onload = function(){
     console.log("window loaded")
@@ -2124,6 +2291,9 @@ window.onload = function(){
 
 // initialize all classes
 const demo = new Demo();
+var currentImageType = "";
+var currentColumn = -1;
+var dictImageMapping = {}
 let inputs = new Data(demo.inputData);
 let desiredOutputs = new Data(demo.desiredOutput);
 const dataOp = new DataOperator();
@@ -2136,10 +2306,13 @@ dataOp.createBinaryData(2);
 perceptron.displayPerceptron();
 const display = new Display();
 display.updateDisplay();
-uploadFromUrl("SampleModel.json");
+//uploadFromUrl("SampleModel.json");
+uploadFromZipUrl("SampleModel.zip");
 display.createOutputTableColors();
 display.createInputTableEditBorder();
 addThresholdEditOption();
+
+
 
 document.addEventListener("DOMContentLoaded", () => {
     demo.main().catch(e => console.error(e));

@@ -14,6 +14,7 @@
         <script src="https://pixijs.download/release/pixi.js"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
         <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
         <script src="leader_line.min.js"></script>
         <script src = "truth_table.js"></script>
 
@@ -85,7 +86,8 @@
 
                     <!--                            <input type="button"  class="custom-btn myButton" id="loadFileJson" value="Upload Model" onclick="document.getElementById('upload-file').click();"> </input>-->
 
-                    <input id="upload-file" style="display:none;" type="file" accept="application/JSON" onchange="console.log('event = ', event); uploadFile(event)"/>
+                    <input id="upload-file" style="display:none;" type="file" accept="application/zip" onchange="console.log('event = ', event); uploadFile(event)"/>
+                    <input id="upload-image_file" style="display:none;" type="file" accept="image/png" onchange="console.log('event = ', event); uploadImageFile(event)"/>
                 </th>
                 <th>
                     <a style = "margin-top: 19%" href="#" id="downloadFile" role="button" onclick="downloadFile();" class="custom-btn myButton"><i class="fa fa-download" aria-hidden="true"></i> Save Model</a>
