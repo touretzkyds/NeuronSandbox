@@ -191,7 +191,7 @@ class DataOperator {
 
 
             //console.trace()
-            textbox.addEventListener("focusout", function(event){  
+            textbox.addEventListener("focusout", function(event){
                 demo.update(this);
                 display.checkForSuccess()
                 let identify = this?.id
@@ -473,6 +473,24 @@ class Table {
         let cols = []
         display.getHeaderRowVals(cols);
         this.defaultSelectedInput = cols;
+        //update the image mapping
+        for(let col = c; col < this.numCols; col++)
+        {
+            const imageKey_0 = JSON.stringify({column: col, value: "0_Image"});
+            if(imageKey_0 in dictImageMapping) {
+                let value = dictImageMapping[imageKey_0];
+                const newImageKey = JSON.stringify({column: col+1, value: "0_Image"});
+                dictImageMapping[newImageKey] = value;
+                delete dictImageMapping[imageKey_0];
+            }
+            const imageKey_1 = JSON.stringify({column: col, value: "1_Image"});
+            if(imageKey_1 in dictImageMapping) {
+                let value = dictImageMapping[imageKey_1];
+                const newImageKey = JSON.stringify({column: col+1, value: "1_Image"});
+                dictImageMapping[newImageKey] = value;
+                delete dictImageMapping[imageKey_1];
+            }
+        }
         display.createInputTableEditBorder()
     }
 
@@ -487,6 +505,27 @@ class Table {
         let cols = []
         display.getHeaderRowVals(cols);
         this.defaultSelectedInput = cols;
+        //delete the current mapping if exists
+        delete dictImageMapping[JSON.stringify({column: c+1, value: "0_Image"})];
+        delete dictImageMapping[JSON.stringify({column: c+1, value: "1_Image"})];
+        //shift the column image mapping to the left
+        for(let col = c+2; col <= this.numCols + 1; col++)
+        {
+            const imageKey_0 = JSON.stringify({column: col, value: "0_Image"});
+            if(imageKey_0 in dictImageMapping) {
+                let value = dictImageMapping[imageKey_0];
+                const newImageKey = JSON.stringify({column: col-1, value: "0_Image"});
+                dictImageMapping[newImageKey] = value;
+                delete dictImageMapping[imageKey_0];
+            }
+            const imageKey_1 = JSON.stringify({column: col, value: "1_Image"});
+            if(imageKey_1 in dictImageMapping) {
+                let value = dictImageMapping[imageKey_1];
+                const newImageKey = JSON.stringify({column: col-1, value: "1_Image"});
+                dictImageMapping[newImageKey] = value;
+                delete dictImageMapping[imageKey_1];
+            }
+        }
     }
 
     removeTableRow(r){
@@ -1220,8 +1259,12 @@ class Display {
                 if(!headerInputHtml.length) {
                     headerInputHtml = "<br>";
                 }
-                let weightCheckbox = document.getElementById(`checkbox_weight_editable${c}`);
-                headerRowVals.push(new VariableData(headerInput.innerText, headerInputHtml, weightCheckbox.checked));
+                //we cannot use the getElementByID since the ID will not be accurate when deleting cols
+                let weight_parent = document.getElementById(`input-link-text`);
+                let divNode = weight_parent.childNodes[c-1];
+                const checkbox = divNode.querySelector('input[type="checkbox"]');
+                //let weightCheckbox = document.getElementById(`checkbox_weight_editable${c}`);
+                headerRowVals.push(new VariableData(headerInput.innerText, headerInputHtml, checkbox.checked));
             }
             else
                 console.log("missing input")
@@ -1242,7 +1285,10 @@ class Display {
                     else*/
                     headerInput.innerHTML = headerRowVals[c-1].html;
                     //set the checkbox for weight editable
-                    let weightCheckbox = document.getElementById(`checkbox_weight_editable${c}`);
+                    let weight_parent = document.getElementById(`input-link-text`);
+                    let divNode = weight_parent.childNodes[c-1];
+                    const weightCheckbox = divNode.querySelector('input[type="checkbox"]');
+                    //let weightCheckbox = document.getElementById(`checkbox_weight_editable${c}`);
                     weightCheckbox.checked = headerRowVals[c-1].weight_editable;
                     weightCheckbox.dispatchEvent(new Event("change"));
                 }
@@ -1782,7 +1828,7 @@ class Demo {
     // add new row at specific location on button click
     insertCol(button){
         if (inputTable.numCols >= 5) {
-            alert("Cannot have more than 8 inputs!")
+            alert("Cannot have more than 5 inputs!")
             return;
         }
         const c = this.getColLocation(button);
@@ -1791,6 +1837,8 @@ class Demo {
         this.insertWeightCol(c);
         display.handleHoverExit();
         perceptron.updateWeightsFromUI();
+        if(document.getElementById("BinaryToggle").checked)
+            display.UpdateBinaryToggle();
         demo.update(); //TODO: check if efficient
     }
 
@@ -1806,6 +1854,8 @@ class Demo {
         dataOp.removeDataCol(inputs, c);
         this.removeWeightCol(c);
         display.handleHoverExit();
+        if(document.getElementById("BinaryToggle").checked)
+            display.UpdateBinaryToggle();
         demo.update(); //TODO: check if efficient
     }
 
@@ -2008,18 +2058,22 @@ async function uploadFileCombined(event) {
 }
 
 function addEditOption(c) {
-    const toggleBtn = document.getElementById(`weight_toggleBtn${c + 1}`);
+    //cannot use getElementById since it is not accurate
+    let weight_parent = document.getElementById(`input-link-text`);
+    let divNode = weight_parent.childNodes[c];
+    const toggleBtn = divNode.querySelector('.fa-info-circle');
+    //const toggleBtn = document.getElementById(`weight_toggleBtn${c + 1}`);
     let weightButtonHandler = function () {
-        const weightDiv = document.getElementById(`weight_div${c + 1}`);
+        //const weightDiv = document.getElementById(`weight_div${c + 1}`);
+        const weightDiv = this.parentNode.querySelector(`.weight_popup`);
         weightDiv.style.display = weightDiv.style.display === "none" ? "block" : "none";
         weightDiv.classList.toggle("active");
-        //toggleBtn.classList.toggle("fa-caret-square-down");
-        //toggleBtn.classList.toggle("fa-caret-square-up");
     };
     //toggleBtn.addEventListener("click", weightButtonHandler);
     toggleBtn.onclick = weightButtonHandler;
     let weightCheckboxHandler = function () {
-        const textbox = document.getElementById(`w${c + 1}`);
+        //const textbox = document.getElementById(`w${c + 1}`);
+        const textbox = divNode.querySelector(`.weights`);
         textbox.contentEditable = this.checked;
         if(this.checked) {
             if(!textbox.classList.contains("weights")) {
@@ -2033,7 +2087,8 @@ function addEditOption(c) {
         }
         dataOp.makeEditable(textbox, this.checked);
     };
-    const checkBox = document.getElementById(`checkbox_weight_editable${c + 1}`);
+    const checkBox = divNode.querySelector('input[type="checkbox"]');
+    //const checkBox = document.getElementById(`checkbox_weight_editable${c + 1}`);
     checkBox.onchange = weightCheckboxHandler;
 }
 
@@ -2083,12 +2138,16 @@ function setImageEditOptions() {
         while (tdElement && tdElement.tagName !== 'TD') {
             tdElement = tdElement.parentNode;
         }
-        let imageButtonHandler = function () {
+        let imageMenuHandler = function (event) {
             //make the dialog box visible
-            handleImageClick(this, tdElement.cellIndex);
+            if(document.getElementById("InputToggle").checked) {
+                event.preventDefault();
+                showMenu(event, this, tdElement.cellIndex)
+            }
+            //handleImageClick(this, tdElement.cellIndex);
         };
         //toggleBtn.addEventListener("click", weightButtonHandler);
-        image.onclick = imageButtonHandler;
+        image.oncontextmenu = imageMenuHandler;
 
     });
 }
@@ -2132,7 +2191,7 @@ function uploadZip(zipFile) {
             else {
                 zipEntry.async("arraybuffer").then(function (content) {
                     //save to localStorage
-                    const binaryString = String.fromCharCode.apply(null, new Uint8Array(content));
+                    const binaryString = arrayBufferToString(content, 1024)
                     const base64String = btoa(binaryString);
                     // Use the binary content in the arrayBuffer
                     const dataURL = `data:image/png;base64,${base64String}`;
@@ -2142,6 +2201,18 @@ function uploadZip(zipFile) {
             }
         });
     });
+}
+function arrayBufferToString(arrayBuffer, chunkSize) {
+    var result = '';
+    var uint8Array = new Uint8Array(arrayBuffer);
+    var len = uint8Array.length;
+
+    for (var i = 0; i < len; i += chunkSize) {
+        var chunk = uint8Array.subarray(i, i + chunkSize);
+        result += String.fromCharCode.apply(null, chunk);
+    }
+
+    return result;
 }
 
 function uploadJson(text) {
@@ -2270,7 +2341,7 @@ async function uploadImageFile(event) {
     const reader = new FileReader();
     reader.onload = function(event) {
         const arrayBuffer = event.target.result;
-        const binaryString = String.fromCharCode.apply(null, new Uint8Array(arrayBuffer));
+        const binaryString = arrayBufferToString(arrayBuffer, 1024);
         const base64String = btoa(binaryString);
         // Use the binary content in the arrayBuffer
         const dataURL = `data:image/png;base64,${base64String}`;
@@ -2322,7 +2393,7 @@ $('#InputToggle').change(function() { //toggle edit
     display.UpdateInputToggle();
     display.outputLine.position();
     const show = document.getElementById("InputToggle").checked;
-        demo.showWeightToggle(show);
+    demo.showWeightToggle(show);
 });
 
 $('#OutputToggle').change(function() { //toggle output
@@ -2354,5 +2425,43 @@ $('#FanfareToggle').change(function() { //toggle output
     }
 });
 
+function showMenu(event, img, col) {
+    if(document.getElementById("InputToggle").checked) {
+        currentImageType = img.alt;
+        currentColumn = col;
+        const menu = document.getElementById("popup-menu");
+        menu.style.display = "block";
+        var rect = img.getBoundingClientRect();
+        menu.style.top = rect.top + window.pageYOffset + event.offsetY + "px";
+        menu.style.left = rect.left + window.pageXOffset + event.offsetX + "px";
+        document.addEventListener('click', handleClickOutsideContextMenu);
+    }
+}
+
+function menuItemClicked(item) {
+    let menu = document.getElementById("popup-menu");
+    menu.style.display = "none";
+    switch (item) {
+        case 1:
+            const fileInput = document.getElementById('upload-image_file');
+            fileInput.value = '';
+            fileInput.click();
+            break;
+        case 2:
+            delete dictImageMapping[JSON.stringify({column: currentColumn, value: currentImageType})];
+            display.createInputTableEditBorder();
+            break;
+        default:
+        // Do something when an invalid menu item is clicked
+    }
+}
+
+function handleClickOutsideContextMenu(e) {
+    let myContextMenu = document.getElementById("popup-menu");
+    if (!myContextMenu.contains(e.target)) {
+        myContextMenu.style.display = 'none';
+        document.removeEventListener('click', handleClickOutsideContextMenu);
+    }
+}
 
 
