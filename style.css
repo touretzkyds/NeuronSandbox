@@ -695,6 +695,14 @@ span {
     background-color: #f1f1f1;
 }
 
+.text-success {
+    color: green;
+}
+
+.text-danger {
+    color: red;
+}
+
 /*input[type="file"] {*/
 /*    display: none;*/
 /*}*/

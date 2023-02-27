@@ -191,7 +191,7 @@ class DataOperator {
 
 
             //console.trace()
-            textbox.addEventListener("focusout", function(event){
+            textbox.addEventListener("focusout", function(event){  
                 demo.update(this);
                 display.checkForSuccess()
                 let identify = this?.id
@@ -474,7 +474,7 @@ class Table {
         display.getHeaderRowVals(cols);
         this.defaultSelectedInput = cols;
         //update the image mapping
-        for(let col = c; col < this.numCols; col++)
+        for(let col = this.numCols; col >= c; col--)
         {
             const imageKey_0 = JSON.stringify({column: col, value: "0_Image"});
             if(imageKey_0 in dictImageMapping) {
@@ -2147,7 +2147,8 @@ function setImageEditOptions() {
             //handleImageClick(this, tdElement.cellIndex);
         };
         //toggleBtn.addEventListener("click", weightButtonHandler);
-        image.oncontextmenu = imageMenuHandler;
+        //image.oncontextmenu = imageMenuHandler;
+        image.onclick = imageMenuHandler;
 
     });
 }
@@ -2363,6 +2364,7 @@ window.onload = function(){
 // initialize all classes
 const demo = new Demo();
 var currentImageType = "";
+var currentImage;
 var currentColumn = -1;
 var dictImageMapping = {}
 let inputs = new Data(demo.inputData);
@@ -2393,7 +2395,7 @@ $('#InputToggle').change(function() { //toggle edit
     display.UpdateInputToggle();
     display.outputLine.position();
     const show = document.getElementById("InputToggle").checked;
-    demo.showWeightToggle(show);
+        demo.showWeightToggle(show);
 });
 
 $('#OutputToggle').change(function() { //toggle output
@@ -2427,6 +2429,7 @@ $('#FanfareToggle').change(function() { //toggle output
 
 function showMenu(event, img, col) {
     if(document.getElementById("InputToggle").checked) {
+        currentImage = img;
         currentImageType = img.alt;
         currentColumn = col;
         const menu = document.getElementById("popup-menu");
@@ -2458,7 +2461,7 @@ function menuItemClicked(item) {
 
 function handleClickOutsideContextMenu(e) {
     let myContextMenu = document.getElementById("popup-menu");
-    if (!myContextMenu.contains(e.target)) {
+    if (!myContextMenu.contains(e.target) && !currentImage.contains(e.target)) {
         myContextMenu.style.display = 'none';
         document.removeEventListener('click', handleClickOutsideContextMenu);
     }
