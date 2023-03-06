@@ -680,6 +680,9 @@ span {
 
 .edit-toggle i {
     display: none;
+    font-size: 18px;
+    opacity: 0.8;
+    transition: opacity 0.3s ease-in-out;
 }
 
 .edit-toggle-on i.fa-pencil-alt {
@@ -692,6 +695,42 @@ span {
     color: red;
 }
 
+.edit-toggle-off .fa-pencil-alt {
+    opacity: 1;
+}
+
+.edit-toggle-off .fa-lock {
+    opacity: 0.5;
+}
+
+.edit-toggle-on .fa-pencil-alt {
+    opacity: 0.5;
+}
+
+.edit-toggle-on .fa-lock {
+    opacity: 1;
+}
+
+.edit-toggle:hover .fa-pencil-alt,
+.edit-toggle:hover .fa-lock {
+    opacity: 1;
+}
+
+.edit-toggle-off:hover .fa-lock {
+    opacity: 1;
+}
+
+.edit-toggle-on:hover .fa-pencil-alt {
+    opacity: 1;
+}
+
+.edit-toggle-off:hover .fa-lock {
+    opacity: 1;
+}
+
+.edit-toggle-on:hover .fa-lock {
+    opacity: 1;
+}
 
 /*input[type="file"] {*/
 /*    display: none;*/
