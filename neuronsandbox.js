@@ -917,7 +917,7 @@ class Display {
         if(!weight) {
             let wDiv = document.createElement('div');
             wDiv.id = `weight-${idx+1}`;
-            wDiv.innerHTML = `<text fill="black" class="weights">w<sub>${idx+1}</sub> =</text> <text contenteditable="true" onkeypress="if (keyCode == 13) return false;" id="w${idx+1}" fill="black" class="weights"></text>`;
+            wDiv.innerHTML = `<text fill="black" class="weight-edit-text weights">w<sub>${idx+1}</sub> =</text> <text contenteditable="true" onkeypress="if (keyCode == 13) return false;" id="w${idx+1}" fill="black" class="weights"></text>`;
             document.getElementById("input-link-text").appendChild(wDiv);
             weight = document.getElementById(wID);
         }
@@ -1262,9 +1262,10 @@ class Display {
                 //we cannot use the getElementByID since the ID will not be accurate when deleting cols
                 let weight_parent = document.getElementById(`input-link-text`);
                 let divNode = weight_parent.childNodes[c-1];
-                const checkbox = divNode.querySelector('input[type="checkbox"]');
+                let editToggle = divNode.querySelector('.edit-toggle');
+                //const checkbox = divNode.querySelector('input[type="checkbox"]');
                 //let weightCheckbox = document.getElementById(`checkbox_weight_editable${c}`);
-                headerRowVals.push(new VariableData(headerInput.innerText, headerInputHtml, checkbox.checked));
+                headerRowVals.push(new VariableData(headerInput.innerText, headerInputHtml, editToggle.classList.contains("edit-toggle-on")));
             }
             else
                 console.log("missing input")
@@ -1287,17 +1288,23 @@ class Display {
                     //set the checkbox for weight editable
                     let weight_parent = document.getElementById(`input-link-text`);
                     let divNode = weight_parent.childNodes[c-1];
-                    const weightCheckbox = divNode.querySelector('input[type="checkbox"]');
+                    const editToggle = divNode.querySelector('.edit-toggle');
                     //let weightCheckbox = document.getElementById(`checkbox_weight_editable${c}`);
-                    weightCheckbox.checked = headerRowVals[c-1].weight_editable;
-                    weightCheckbox.dispatchEvent(new Event("change"));
+                    if(headerRowVals[c-1].weight_editable) {
+                        editToggle.classList.add("edit-toggle-off"); //reversed
+                        editToggle.classList.remove("edit-toggle-on");
+                    }
+                    else {
+                        editToggle.classList.add("edit-toggle-on"); //reversed
+                        editToggle.classList.remove("edit-toggle-off");
+                    }
+                    editToggle.dispatchEvent(new Event("click"));
                 }
                 else {
                     console.log("missing input")
                 }
             }
         }
-
     }
 
     setHeaderRowVals (headerRowVals) {
@@ -1436,7 +1443,8 @@ class Display {
 
     checkDesiredOutput(output, desired) {
         //TODO: do extra testing with the regex and make changes if necessary
-
+        if(!output)
+            return
         const regex = '/^0*1?$/gm'; //detects trailing zeros
 
         let checkboxEdit = document.getElementById("InputToggle");
@@ -1697,21 +1705,17 @@ class Demo {
         let unique_id = this.generateUniqueID("weight-");
         wDiv.id = `weight-${unique_id}`;
         wDiv.className = "weight_label";
-
         wDiv.innerHTML = `<text fill="black">w<sub>${unique_id}</sub> =</text> <text contenteditable="true" 
-                            onkeypress="if (keyCode == 13) return false;" id="w${unique_id}" fill="black" class="weights">0</text>
-                           <div id="weight_div${unique_id}" class="weight_popup" style="display:none">
-                             <i class="close-icon fas fa-times"></i>
-                             <input type="checkbox" id="checkbox_weight_editable${unique_id}"> Editable
-                           </div>
-                           <i id="weight_toggleBtn${unique_id}" style="display: inline-block" class="fas fa-info-circle"></i>
+                            onkeypress="if (keyCode == 13) return false;" id="w${unique_id}" fill="black" class="weight-edit-text weights">0</text>
+                           <span class="edit-toggle edit-toggle-off">
+                              <i class="fas fa-pencil-alt"></i>
+                              <i class="fas fa-lock"></i>
+                           </span>
       `;
 
         parentElement.insertBefore(wDiv, parentElement.children[n]);
         const weightText = document.getElementById(`w${unique_id}`);
         dataOp.makeEditable(weightText);
-        let checkbox = document.getElementById(`checkbox_weight_editable${unique_id}`);
-        checkbox.checked = true;
         this.updateWeightUI(parentElement);
     }
 
@@ -1719,12 +1723,12 @@ class Demo {
         let parentElement = document.getElementById("input-link-text");
         let weightElement = parentElement.children;
         for(let i = 0; i < weightElement.length; i++) {
-            let toggleBtn = weightElement[i].children[3]
+            let toggleBtn = weightElement[i].children[2]
             if(!show)
                 toggleBtn.style.display = 'none';
             else
                 toggleBtn.style.display = 'inline-block';
-            console.log(weightElement[i].children[3].innerHTML);
+            console.log(weightElement[i].children[2].innerHTML);
         }
         let thresholdToggleBtn = document.getElementById("threshold_toggleBtn");
         if(!show)
@@ -1967,7 +1971,8 @@ async function downloadFile() {
 
     demo.threshold = perceptron.threshold;
     let binaryToggleChecked = document.getElementById("BinaryToggle").checked;
-    let thresholdToggleChecked = document.getElementById("checkbox_threshold_editable").checked;
+    //let thresholdToggleChecked = document.getElementById("checkbox_threshold_editable").checked;
+    let thresholdToggleChecked = document.getElementById("threshold_toggleBtn").classList.contains("edit-toggle-on");
     let dict = {
         "model-name" : newName,
         "input": demo.inputData,
@@ -2061,21 +2066,21 @@ function addEditOption(c) {
     //cannot use getElementById since it is not accurate
     let weight_parent = document.getElementById(`input-link-text`);
     let divNode = weight_parent.childNodes[c];
-    const toggleBtn = divNode.querySelector('.fa-info-circle');
-    //const toggleBtn = document.getElementById(`weight_toggleBtn${c + 1}`);
+    const toggleBtn = divNode.querySelector('.edit-toggle');
     let weightButtonHandler = function () {
-        //const weightDiv = document.getElementById(`weight_div${c + 1}`);
-        const weightDiv = this.parentNode.querySelector(`.weight_popup`);
-        weightDiv.style.display = weightDiv.style.display === "none" ? "block" : "none";
-        weightDiv.classList.toggle("active");
-    };
-    //toggleBtn.addEventListener("click", weightButtonHandler);
-    toggleBtn.onclick = weightButtonHandler;
-    let weightCheckboxHandler = function () {
-        //const textbox = document.getElementById(`w${c + 1}`);
-        const textbox = divNode.querySelector(`.weights`);
-        textbox.contentEditable = this.checked;
-        if(this.checked) {
+        if(toggleBtn.classList.contains("edit-toggle-on"))
+        {
+            toggleBtn.classList.add("edit-toggle-off");
+            toggleBtn.classList.remove("edit-toggle-on")
+        }
+        else {
+            toggleBtn.classList.remove("edit-toggle-off");
+            toggleBtn.classList.add("edit-toggle-on")
+        }
+        let editable = toggleBtn.classList.contains("edit-toggle-on");
+        const textbox = divNode.querySelector(`.weight-edit-text`);
+        textbox.contentEditable = editable;
+        if(editable) {
             if(!textbox.classList.contains("weights")) {
                 textbox.classList.add("weights");
             }
@@ -2085,25 +2090,27 @@ function addEditOption(c) {
                 textbox.classList.remove("weights");
             }
         }
-        dataOp.makeEditable(textbox, this.checked);
+        dataOp.makeEditable(textbox, editable);
     };
-    const checkBox = divNode.querySelector('input[type="checkbox"]');
-    //const checkBox = document.getElementById(`checkbox_weight_editable${c + 1}`);
-    checkBox.onchange = weightCheckboxHandler;
+    toggleBtn.onclick = weightButtonHandler;
 }
 
 function addThresholdEditOption() {
     const toggleBtn = document.getElementById(`threshold_toggleBtn`);
     let thresholdButtonHandler = function () {
-        const thresholdDiv = document.getElementById(`threshold-div`);
-        thresholdDiv.style.display = thresholdDiv.style.display === "none" ? "block" : "none";
-        thresholdDiv.classList.toggle("active");
-    };
-    toggleBtn.onclick = thresholdButtonHandler;
-    let thresholdCheckboxHandler = function () {
+        if(toggleBtn.classList.contains("edit-toggle-on"))
+        {
+            toggleBtn.classList.add("edit-toggle-off");
+            toggleBtn.classList.remove("edit-toggle-on")
+        }
+        else {
+            toggleBtn.classList.remove("edit-toggle-off");
+            toggleBtn.classList.add("edit-toggle-on")
+        }
         const textbox = document.getElementById(`th1`);
-        textbox.contentEditable = this.checked;
-        if(this.checked) {
+        let editable = toggleBtn.classList.contains("edit-toggle-on");
+        textbox.contentEditable = editable;
+        if(editable) {
             if(!textbox.classList.contains("weights")) {
                 textbox.classList.add("weights");
             }
@@ -2113,10 +2120,9 @@ function addThresholdEditOption() {
                 textbox.classList.remove("weights");
             }
         }
-        dataOp.makeEditable(textbox, this.checked);
+        dataOp.makeEditable(textbox, editable);
     };
-    const checkBox = document.getElementById(`checkbox_threshold_editable`);
-    checkBox.onchange = thresholdCheckboxHandler;
+    toggleBtn.onclick = thresholdButtonHandler;
 }
 
 
@@ -2148,7 +2154,7 @@ function setImageEditOptions() {
         };
         //toggleBtn.addEventListener("click", weightButtonHandler);
         //image.oncontextmenu = imageMenuHandler;
-        image.onclick = imageMenuHandler;
+        image.onmouseover = imageMenuHandler;
 
     });
 }
@@ -2310,14 +2316,31 @@ function uploadJson(text) {
         demo.hasNoSolution()
     setupCloseButtons();
 
-
     demo.showWeightToggle(false);
     document.getElementById("BinaryToggle").checked = dict["binaryToggleChecked"];
     display.UpdateBinaryToggle();
     addThresholdEditOption();
-    let thresholdCheckbox = document.getElementById("checkbox_threshold_editable");
-    thresholdCheckbox.checked = dict["threshold-editable"];
-    thresholdCheckbox.dispatchEvent(new Event("change"));
+    const thresholdToggle = document.getElementById("threshold_toggleBtn");
+    if(dict["binaryToggleChecked"])
+    {
+        thresholdToggle.style.display = 'inline-block';
+    }
+    else{
+        thresholdToggle.style.display = "none";
+    }
+    if(dict["threshold-editable"])
+    {
+        thresholdToggle.classList.remove("edit-toggle-on"); //reversed here since we will dispatch a click event
+        thresholdToggle.classList.add("edit-toggle-off");
+    }
+    else
+    {
+        thresholdToggle.classList.remove("edit-toggle-off"); //reversed here since we will dispatch a click event
+        thresholdToggle.classList.add("edit-toggle-on");
+    }
+    thresholdToggle.dispatchEvent(new Event("click"));
+
+
 }
 
 async function uploadFile(event) {
@@ -2386,9 +2409,27 @@ display.createInputTableEditBorder();
 addThresholdEditOption();
 
 
+function addTooltips()
+{
+    tippy('#BinarySwitch', {
+        content: 'restrict inputs to binary',
+        className: 'my-tooltip-class'
+    });
+
+    tippy('#InputSwitch', {
+        content: 'edit model',
+        className: 'my-tooltip-class'
+    });
+
+    tippy('#FanfareSwitch', {
+        content: 'celebrate when correct answer reached',
+        className: 'my-tooltip-class'
+    });
+}
 
 document.addEventListener("DOMContentLoaded", () => {
     demo.main().catch(e => console.error(e));
+    addTooltips();
 });
 
 $('#InputToggle').change(function() { //toggle edit

@@ -14,7 +14,10 @@
         <script src="https://pixijs.download/release/pixi.js"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
         <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+        <script src="https://unpkg.com/@popperjs/core@2"></script>
+        <script src="https://unpkg.com/tippy.js@6"></script>
         <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
         <script src="leader_line.min.js"></script>
         <script src = "truth_table.js"></script>
 
@@ -47,7 +50,7 @@
                 <!--                        </th>-->
                 <th>
                     <label>Binary</label>
-                    <label class="switch">
+                    <label id="BinarySwitch" class="switch">
                         <input type="checkbox" id="BinaryToggle">
                         <span class="slider round"></span>
                     </label>
@@ -55,7 +58,7 @@
                 <!--<th> <button class="custom-btn myButton" id="editButton">Edit</button></th>-->
                 <th>
                     <label>Edit</label>
-                    <label class="switch">
+                    <label id="InputSwitch" class="switch">
                         <input type="checkbox" id="InputToggle">
                         <span class="slider round"></span>
                     </label>
@@ -63,7 +66,7 @@
 
                 <th hidden id="FanfareToggleBody">
                     <label>Fanfare</label>
-                    <label class="switch">
+                    <label id="FanfareSwitch" class="switch">
                         <input type="checkbox" id="FanfareToggle">
                         <span class="slider round"></span>
                     </label>
@@ -185,11 +188,10 @@
                                     <div id="threshold-text" class="center">
                                         <text>∑> </text>
                                         <text id="th1"></text>
-                                        <div id="threshold-div" class="weight_popup" style="display:none">
-                                            <i class="close-icon fas fa-times"></i>
-                                            <input type="checkbox" id="checkbox_threshold_editable"> Editable </input>
-                                        </div>
-                                        <i id="threshold_toggleBtn" style="display: inline-block" class="fas fa-info-circle"></i>
+                                        <span id = "threshold_toggleBtn" class="edit-toggle edit-toggle-off">
+                                          <i class="fas fa-pencil-alt"></i>
+                                          <i class="fas fa-lock"></i>
+                                        </span>
                                     </div>
                                 </div>
                             </div>

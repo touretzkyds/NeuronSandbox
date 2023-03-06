@@ -443,44 +443,6 @@ article > section {
     border: 2px solid red;
 }
 
-.tooltip {
-    position: relative;
-    display: inline-block;
-}
-
-.tooltip .tooltiptext {
-    visibility: hidden;
-    width: 120px;
-    background: #1877F2;
-    color: #ffffff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px 0;
-    position: absolute;
-    z-index: 1;
-    bottom: 125%;
-    left: 50%;
-    margin-left: -60px;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.tooltip .tooltiptext::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: #1877F2 transparent transparent transparent;
-}
-
-.tooltip:hover .tooltiptext {
-    visibility: visible;
-    opacity: 1;
-}
-
 /* Position the label so that it is initially hidden */
 .user-input-wrp {
     position: relative;
@@ -702,6 +664,34 @@ span {
 .text-danger {
     color: red;
 }
+
+.tippy-box {
+    background-color: #FFFFE0;
+    color: #000000;
+}
+
+.tippy-arrow {
+    /*background-color: #FFFFE0 !important;*/
+    /*border-color: lightyellow !important;*/
+    /*border-top-color: #FFFFE0;*/
+    /*border-bottom-color: #FFFFE0;*/
+    display: none;
+}
+
+.edit-toggle i {
+    display: none;
+}
+
+.edit-toggle-on i.fa-pencil-alt {
+    display: inline-block;
+    color: green;
+}
+
+.edit-toggle-off i.fa-lock {
+    display: inline-block;
+    color: red;
+}
+
 
 /*input[type="file"] {*/
 /*    display: none;*/
