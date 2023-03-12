@@ -1353,13 +1353,10 @@ class Display {
             document.getElementById("FanfareToggleBody").hidden = true;
         } else {
             $("#input-table tr:first").show();
-            if(!checkboxBinary.checked)
-                $("#input-table tr td:nth-child(1)").show();
-            else
-                $("#input-table tr td:nth-child(1)").hide();
+            $("#input-table tr td:nth-child(1)").show();
             const buttonRows = document.getElementsByClassName("row-buttons-container");
             buttonRows.forEach(element => {
-                element.style.display = "flex";
+                element.style.display = checkboxBinary.checked? "none" : "flex";
             });
             const buttonColumns = document.getElementsByClassName("column-buttons-container");
             buttonColumns.forEach(element => {
@@ -1419,11 +1416,11 @@ class Display {
         display.outputLine.position();
     }
 
-    UpdateBinaryToggle() {
+    UpdateBinaryToggle(columnChanged) {
         let checkbox = document.getElementById("BinaryToggle");
         display.createOutputTableColors();
         if(checkbox.checked) {
-            setupGenerateTruthTable();
+            setupGenerateTruthTable(columnChanged);
         }
         else { //leave table how it is, but make contenteditable
             for (let r = 2, n = inputTable.table.rows.length; r < n; r++) {
@@ -1849,7 +1846,7 @@ class Demo {
         display.handleHoverExit();
         perceptron.updateWeightsFromUI();
         if(document.getElementById("BinaryToggle").checked)
-            display.UpdateBinaryToggle();
+            display.UpdateBinaryToggle(true);
         demo.update(); //TODO: check if efficient
     }
 
@@ -1866,7 +1863,7 @@ class Demo {
         this.removeWeightCol(c);
         display.handleHoverExit();
         if(document.getElementById("BinaryToggle").checked)
-            display.UpdateBinaryToggle();
+            display.UpdateBinaryToggle(true);
         demo.update(); //TODO: check if efficient
     }
 
@@ -2327,7 +2324,7 @@ function uploadJson(text) {
 
     demo.showWeightToggle(false);
     document.getElementById("BinaryToggle").checked = dict["binaryToggleChecked"];
-    display.UpdateBinaryToggle();
+    display.UpdateBinaryToggle(false);
     addThresholdEditOption();
     const thresholdToggle = document.getElementById("threshold_toggleBtn");
     if(dict["binaryToggleChecked"])
@@ -2456,7 +2453,7 @@ $('#OutputToggle').change(function() { //toggle output
 });
 
 $('#BinaryToggle').change(function() { //toggle output
-    display.UpdateBinaryToggle();
+    display.UpdateBinaryToggle(false);
     display.outputLine.position();
 });
 

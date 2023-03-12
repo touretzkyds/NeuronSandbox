@@ -15,7 +15,7 @@ function restoreDesiredValues( desired_values)
     }
 }
 
-function setupGenerateTruthTable() {
+function setupGenerateTruthTable(columnChanged) {
     vars = []
     // document.getElementById('generateTruthTable').addEventListener('click', ()=>{
         //save desired value before update
@@ -23,7 +23,8 @@ function setupGenerateTruthTable() {
         var truthData = dataOp.createBinaryData(inputTable.numCols);
         demo.removeAllInputDataRows(false);
         writeTruthTable(truthData);
-        restoreDesiredValues(desire_values);
+        if(!columnChanged)
+            restoreDesiredValues(desire_values);
         //restore desired value
     // });
 }
