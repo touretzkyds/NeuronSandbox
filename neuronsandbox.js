@@ -558,10 +558,11 @@ class Table {
 
 // perceptron: holds a data object, weights, threshold
 class Perceptron {
-    constructor(dataObj, weights, threshold) {
+    constructor(dataObj, weights, threshold, weight_labels) {
         this.dataObj = dataObj;
         this.inputData = dataObj.data;
         this.weights = weights;
+        this.weightLabels = weight_labels;
         this.threshold = threshold;
     }
 
@@ -620,11 +621,14 @@ class Perceptron {
             const cell = childNodes[i].childNodes[2];
             if(cell) {
                 cell.innerHTML = this.weights[i];
+                if(this.weightLabels)
+                    childNodes[i].childNodes[0].innerText = this.weightLabels[i];
             }
         }
     }
     updateWeightsFromUI(){
         let childNodes = document.getElementById("input-link-text").childNodes;
+        this.weightLabels = [];
         for (let i=0; i<demo.weights.length; i++){
             //const cell = document.getElementById(`w${i+1}`);
             const cell = childNodes[i].childNodes[2];
@@ -633,6 +637,7 @@ class Perceptron {
                 const [parsedValue, isValid] = demo.stringToValidFloat(cell.innerHTML);
                 display.highlightInvalidText(cell, isValid);
                 this.weights[i] = parsedValue;
+                this.weightLabels.push(childNodes[i].childNodes[0].innerText);
             }
         }
     }
@@ -1329,7 +1334,7 @@ class Display {
 
     UpdateInputToggle() {
         let checkbox = document.getElementById("InputToggle");
-
+        let checkboxBinary = document.getElementById(("BinaryToggle"));
         //display.createOutputTableColors();
         this.updateSelectedInput();
         if (!checkbox.checked) {
@@ -1348,7 +1353,10 @@ class Display {
             document.getElementById("FanfareToggleBody").hidden = true;
         } else {
             $("#input-table tr:first").show();
-            $("#input-table tr td:nth-child(1)").show();
+            if(!checkboxBinary.checked)
+                $("#input-table tr td:nth-child(1)").show();
+            else
+                $("#input-table tr td:nth-child(1)").hide();
             const buttonRows = document.getElementsByClassName("row-buttons-container");
             buttonRows.forEach(element => {
                 element.style.display = "flex";
@@ -1414,7 +1422,6 @@ class Display {
     UpdateBinaryToggle() {
         let checkbox = document.getElementById("BinaryToggle");
         display.createOutputTableColors();
-
         if(checkbox.checked) {
             setupGenerateTruthTable();
         }
@@ -1428,7 +1435,7 @@ class Display {
             }
         }
         display.createInputTableEditBorder();
-
+        this.UpdateInputToggle();
     }
 
     UpdateFanfareToggle() {
@@ -1973,10 +1980,12 @@ async function downloadFile() {
     let binaryToggleChecked = document.getElementById("BinaryToggle").checked;
     //let thresholdToggleChecked = document.getElementById("checkbox_threshold_editable").checked;
     let thresholdToggleChecked = document.getElementById("threshold_toggleBtn").classList.contains("edit-toggle-on");
+
     let dict = {
         "model-name" : newName,
         "input": demo.inputData,
         "weight": demo.weights,
+        "weight_labels": perceptron.weightLabels,
         "threshold": demo.threshold,
         "threshold-editable" : thresholdToggleChecked,
         "desired-output": desiredOutputs,
@@ -2265,7 +2274,7 @@ function uploadJson(text) {
     //     outputs.data[i][2] = parseInt(desiredOutputs.data[i]);
     // }
     dataOp.updateTableFromData(inputs, inputTable);
-    perceptron = new Perceptron(inputs, demo.weights, demo.threshold);
+    perceptron = new Perceptron(inputs, demo.weights, demo.threshold, dict["weight_labels"]);
     perceptron.setWeightsUI();
     perceptron.computeOutputs();
     display.createOutputTableColors();
@@ -2394,7 +2403,7 @@ let inputs = new Data(demo.inputData);
 let desiredOutputs = new Data(demo.desiredOutput);
 const dataOp = new DataOperator();
 const inputTable = new Table(inputs, "input-table", true);
-let perceptron = new Perceptron(inputs, demo.weights, demo.threshold);
+let perceptron = new Perceptron(inputs, demo.weights, demo.threshold, null);
 perceptron.computeOutputs();
 let outputs = new Data(perceptron.outputData);
 const outputTable = new Table(outputs, "output-table", false);
@@ -2475,6 +2484,16 @@ function showMenu(event, img, col) {
         currentColumn = col;
         const menu = document.getElementById("popup-menu");
         menu.style.display = "block";
+        const imageKey_0 = JSON.stringify({column: col, value: img.alt});
+        if(imageKey_0 in dictImageMapping) { //existing image
+            document.querySelector(".existing_image_menu").style.display = "block";
+            document.querySelector(".new_image_menu").style.display = "none";
+        }
+        else {
+            document.querySelector(".existing_image_menu").style.display = "none";
+            document.querySelector(".new_image_menu").style.display = "block";
+        }
+
         var rect = img.getBoundingClientRect();
         menu.style.top = rect.top + window.pageYOffset + event.offsetY + "px";
         menu.style.left = rect.left + window.pageXOffset + event.offsetX + "px";
