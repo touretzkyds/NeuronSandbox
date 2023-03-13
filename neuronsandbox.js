@@ -191,7 +191,7 @@ class DataOperator {
 
 
             //console.trace()
-            textbox.addEventListener("focusout", function(event){  
+            textbox.addEventListener("focusout", function(event){
                 demo.update(this);
                 display.checkForSuccess()
                 let identify = this?.id
@@ -2327,7 +2327,7 @@ function uploadJson(text) {
     display.UpdateBinaryToggle(false);
     addThresholdEditOption();
     const thresholdToggle = document.getElementById("threshold_toggleBtn");
-    if(dict["binaryToggleChecked"])
+    if(dict["binaryToggleChecked"] && document.getElementById('InputToggle').checked)
     {
         thresholdToggle.style.display = 'inline-block';
     }
@@ -2345,8 +2345,6 @@ function uploadJson(text) {
         thresholdToggle.classList.add("edit-toggle-on");
     }
     thresholdToggle.dispatchEvent(new Event("click"));
-
-
 }
 
 async function uploadFile(event) {
@@ -2442,7 +2440,7 @@ $('#InputToggle').change(function() { //toggle edit
     display.UpdateInputToggle();
     display.outputLine.position();
     const show = document.getElementById("InputToggle").checked;
-        demo.showWeightToggle(show);
+    demo.showWeightToggle(show);
 });
 
 $('#OutputToggle').change(function() { //toggle output
