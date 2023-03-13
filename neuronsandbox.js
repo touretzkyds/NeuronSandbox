@@ -766,6 +766,12 @@ class Display {
                     img.width = 32;
                     img.height = 32;
                     img.classList.add("myimage");
+                    if (document.getElementById("InputToggle").checked)
+                        img.classList.add("editable-border")
+                    else {
+                        if (img.classList.contains("editable-border"))
+                            img.classList.remove("editable-border")
+                    }
                     textbox.appendChild(img);
                 }
             }
@@ -2427,6 +2433,7 @@ $('#InputToggle').change(function() { //toggle edit
     display.outputLine.position();
     const show = document.getElementById("InputToggle").checked;
     demo.showWeightToggle(show);
+    display.createInputTableEditBorder()
 });
 
 $('#OutputToggle').change(function() { //toggle output
