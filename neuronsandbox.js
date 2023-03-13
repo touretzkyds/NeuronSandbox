@@ -2058,10 +2058,17 @@ async function uploadFileCombined(event) {
         uploadFromZipUrl(url);
     }
     else {
-        const fileInput = document.getElementById('upload-file');
-        fileInput.value = '';
-        fileInput.click();
+        // const fileInput = document.getElementById('upload-file');
+        // fileInput.value = '';
+        // fileInput.click();
+        alert("No URL provided.")
     }
+}
+
+async function uploadFileComputer(event) {
+    const fileInput = document.getElementById('upload-file');
+    fileInput.value = '';
+    fileInput.click();
 }
 
 function addEditOption(c) {
