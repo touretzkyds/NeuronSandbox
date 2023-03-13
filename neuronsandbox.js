@@ -1705,8 +1705,8 @@ class Demo {
         let unique_id = this.generateUniqueID("weight-");
         wDiv.id = `weight-${unique_id}`;
         wDiv.className = "weight_label";
-        wDiv.innerHTML = `<text fill="black">w<sub>${unique_id}</sub> =</text> <text contenteditable="true" 
-                            onkeypress="if (keyCode == 13) return false;" id="w${unique_id}" fill="black" class="weight-edit-text weights">0</text>
+        wDiv.innerHTML = `<text fill="black">w<sub>${unique_id}</sub> =</text> <text contenteditable="false" 
+                            onkeypress="if (keyCode == 13) return false;" id="w${unique_id}" fill="black" class="weight-edit-text">0</text>
                            <span class="edit-toggle edit-toggle-off">
                               <i class="fas fa-pencil-alt"></i>
                               <i class="fas fa-lock"></i>
@@ -1715,7 +1715,7 @@ class Demo {
 
         parentElement.insertBefore(wDiv, parentElement.children[n]);
         const weightText = document.getElementById(`w${unique_id}`);
-        dataOp.makeEditable(weightText);
+        //dataOp.makeEditable(weightText);
         this.updateWeightUI(parentElement);
     }
 
