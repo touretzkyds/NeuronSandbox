@@ -52,7 +52,7 @@ class DataOperator {
 
     insertDataCol(dataObj, n=1){
         const cols = Array(dataObj.rows).fill(0);
-        for(let r = 0; r < dataObj.data.length; r++) {
+        for (let r = 0; r < dataObj.data.length; r++) {
             dataObj.data[r].splice(n, 0, cols[r]);
             //dataObj.weights[r].splice(n,0,0);
         }
@@ -60,7 +60,7 @@ class DataOperator {
     }
 
     removeDataCol(dataObj, n=1, pos){
-        for(let r = 0; r < dataObj.data.length; r++) {
+        for (let r = 0; r < dataObj.data.length; r++) {
             dataObj.data[r].splice(n, 1);
             //dataObj.weights[r].splice(n, 1);
         }
@@ -72,10 +72,10 @@ class DataOperator {
         for (let i = 0; i < 2**dim; i++){
             binaryArray[i] = [];
             let binaryString = i.toString(2);
-            while(binaryString.length < dim) {
+            while (binaryString.length < dim) {
                 binaryString = "0" + binaryString;
             }
-            for(let j = 0; j < binaryString.length; j++ ) {
+            for (let j = 0; j < binaryString.length; j++ ) {
                 binaryArray[i][j] = Number(binaryString.substring(j, j+1));
             }
         }
@@ -93,7 +93,7 @@ class DataOperator {
                 const cell = table.rows[row].cells[c];
                 const rawValue = cell.innerText;
                 let [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
-                if(table.id === 'output-table' && c === 2 && (parsedValue !== 1 && parsedValue !== 0) ) {
+                if (table.id === 'output-table' && c === 2 && (parsedValue !== 1 && parsedValue !== 0) ) {
                     isValid = false;
                 }
                 dataObj.data[row-start][c-startCol] = parsedValue;
@@ -112,7 +112,7 @@ class DataOperator {
                 const cell = table.rows[row].cells[c];
                 const rawValue = cell.innerText;
                 let [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
-                if(table.id === 'output-table' && c === 2 && (parsedValue !== 1 && parsedValue !== 0) ) {
+                if (table.id === 'output-table' && c === 2 && (parsedValue !== 1 && parsedValue !== 0) ) {
                     isValid = false;
                 }
                 display.highlightInvalidText(cell, isValid);
@@ -144,7 +144,7 @@ class DataOperator {
         // skip header row and button column of table, start from 1
         let start = 1;
         //let row = start;
-        for(let row = start; row < table.rows.length; row++) {
+        for (let row = start; row < table.rows.length; row++) {
             const cell = table.rows[row].cells[2];
             cell.innerText = desiredOutput.data[row-1];
         }
@@ -167,37 +167,37 @@ class DataOperator {
 
     // make editable and update demo on edit
     makeEditable(textbox, editable = true){ // TODO: Move from dataOp to displayOp
-        if(textbox.id === "activation" || textbox.id === "output" || textbox.id === "desired")
+        if (textbox.id === "activation" || textbox.id === "output" || textbox.id === "desired")
             return
         textbox.contentEditable = editable;
         // add event listener to update demo with table changes
         // add a class to textbox to keep track of an eventlistener already being added
         if (editable && !textbox.classList.contains("edit-handler")) {
             textbox.classList.add("edit-handler");
-            if(textbox.id.startsWith("tblinput")) {
-                if(!textbox.classList.contains("input-table-th"))
+            if (textbox.id.startsWith("tblinput")) {
+                if (!textbox.classList.contains("input-table-th"))
                     textbox.classList.add("input-table-th");
             }
-            if(textbox.innerText.length === 0)
+            if (textbox.innerText.length === 0)
             {
-                if(editable)
+                if (editable)
                     textbox.innerHTML = `<span class="editable-border">` + 0 + `</span>`
                 else
                     textbox.innerHTML = `<span>` + 0 + `</span>`
             }
 
-            if(document.getElementById('OutputToggle').checked)
-                demo.hasNoSolution()
+            if (document.getElementById('OutputToggle').checked)
+                demo.hasNoSolution();
 
 
             //console.trace()
             textbox.addEventListener("focusout", function(event){
                 demo.update(this);
-                display.checkForSuccess()
+                display.checkForSuccess();
                 let identify = this?.id
                 if (identify !== "th1" && !(new RegExp('^w[0-9]+$', 'gm').test(identify))) { //checks if not threshold, or any of the weight textboxes
                     if (this?.tagName !== 'TH' && this.parentNode?.tagName !== 'TH') {
-                        if(!textbox.innerHTML)
+                        if (!textbox.innerHTML)
                             textbox.innerHTML = 0;
                     }
                 }
@@ -209,16 +209,16 @@ class DataOperator {
                 }
             });
         }
-        if(editable) {
-            if(textbox.nodeName !== "TH" && !textbox.classList.contains("editable-border"))
+        if (editable) {
+            if (textbox.nodeName !== "TH" && !textbox.classList.contains("editable-border"))
                 textbox.classList.add("editable-border");
-            if(textbox.nodeName !== "TH" && !textbox.classList.contains("edit-handler"))
+            if (textbox.nodeName !== "TH" && !textbox.classList.contains("edit-handler"))
                 textbox.classList.add("edit-handler");
         }
         else {
-            if(textbox.classList.contains("editable-border"))
+            if (textbox.classList.contains("editable-border"))
                 textbox.classList.remove("editable-border");
-            if(textbox.classList.contains("edit-handler"))
+            if (textbox.classList.contains("edit-handler"))
                 textbox.classList.remove("edit-handler");
         }
     }
@@ -248,11 +248,11 @@ class Table {
         }
         // add data rows to table
         let array = dataObj.data;
-        for(let r=0; r<array.length; r++) {
+        for (let r=0; r<array.length; r++) {
             let newRow = table.insertRow(table.length);
             // update displayed selections on hover
             this.makeHoverable(newRow, tblId);
-            for(let c=0; c<array[r].length; c++) {
+            for (let c=0; c<array[r].length; c++) {
                 let cell = newRow.insertCell(c);
                 cell.innerHTML = `<span class="editable-border">`+array[r][c]+`</span>`;
                 if (this.isEditable) {
@@ -325,21 +325,18 @@ class Table {
             '<button class="row-button button" onclick="demo.insertCol(this)">+</button>' +
             '</div>';
         let newRow = this.table.rows[0];
-        if(all)
-        {
+        if (all) {
             newRow = this.table.insertRow(0);
             this.makeHoverable(newRow, "input-table");
             newRow.insertCell(0);
         }
-
-        if (columnNum){
+        if (columnNum) {
             let cell = this.table.rows[0].insertCell(columnNum);
             cell.innerHTML = content;
             return;
         }
-        else
-        {
-            for(let j = 1; j <= this.numCols; j++)
+        else {
+            for (let j = 1; j <= this.numCols; j++)
             {
                 let cell = this.table.rows[0].insertCell(j);
                 cell.innerHTML = content;
@@ -355,7 +352,7 @@ class Table {
     // insert row at given position and add editable attributes/ cells if required.
     insertTableRow(r, makeEditable = true){
 
-        if(document.getElementById("BinaryToggle").checked)
+        if (document.getElementById("BinaryToggle").checked)
             makeEditable = false
         else
             makeEditable = true
@@ -381,7 +378,7 @@ class Table {
         //animation
         $(".animation").each(function () {
             let style = $(this).attr('style');
-            if(style)
+            if (style)
             {
                 style += '; animation-delay: 0.2s;'
                 $(this).attr('style',style);
@@ -399,28 +396,27 @@ class Table {
         const headerCells = document.getElementById("input-table").rows[1].cells;
         let index = -1;
         let nameIndex = -1;
-        for(let i = 1; i < 10; i++) {
+        for (let i = 1; i < 10; i++) {
             let foundIndex = false;
             let foundNameIndex = false;
             for (let c = 1; c < headerCells.length; c++) {
                 let headerInput = headerCells[c];
-                if (headerInput.id === ("tblinput" + i))
-                {
+                if (headerInput.id === ("tblinput" + i)) {
                     foundIndex = true;
                 }
                 let match = headerInput.innerText.match(/\d$/);
-                if(match && match[0] === (''+i)) {
+                if (match && match[0] === (''+i)) {
                     foundNameIndex = true;
                 }
             }
-            if(index < 0 && !foundIndex) {
+            if (index < 0 && !foundIndex) {
                 index = i;
             }
-            if(nameIndex < 0 && !foundNameIndex) {
+            if (nameIndex < 0 && !foundNameIndex) {
                 nameIndex = i;
             }
 
-            if(index > 0 && nameIndex > 0 )
+            if (index > 0 && nameIndex > 0 )
             {
                 return [index, nameIndex];
             }
@@ -431,7 +427,7 @@ class Table {
     insertTableCol(c){
         let makeEditable = true
 
-        if(document.getElementById("BinaryToggle").checked)
+        if (document.getElementById("BinaryToggle").checked)
             makeEditable = false
 
         let tuple = this.findAvailableIndex();
@@ -460,7 +456,7 @@ class Table {
         //animation
         $(".animation").each(function () {
             let style = $(this).attr('style');
-            if(style)
+            if (style)
             {
                 style += '; animation-delay: 0.2s;'
                 $(this).attr('style',style);
@@ -474,17 +470,17 @@ class Table {
         display.getHeaderRowVals(cols);
         this.defaultSelectedInput = cols;
         //update the image mapping
-        for(let col = this.numCols; col >= c; col--)
+        for (let col = this.numCols; col >= c; col--)
         {
             const imageKey_0 = JSON.stringify({column: col, value: "0_Image"});
-            if(imageKey_0 in dictImageMapping) {
+            if (imageKey_0 in dictImageMapping) {
                 let value = dictImageMapping[imageKey_0];
                 const newImageKey = JSON.stringify({column: col+1, value: "0_Image"});
                 dictImageMapping[newImageKey] = value;
                 delete dictImageMapping[imageKey_0];
             }
             const imageKey_1 = JSON.stringify({column: col, value: "1_Image"});
-            if(imageKey_1 in dictImageMapping) {
+            if (imageKey_1 in dictImageMapping) {
                 let value = dictImageMapping[imageKey_1];
                 const newImageKey = JSON.stringify({column: col+1, value: "1_Image"});
                 dictImageMapping[newImageKey] = value;
@@ -495,9 +491,6 @@ class Table {
     }
 
     removeTableCol(c){
-        // if(c < 1){
-        //     return
-        // }
         for (let r = 0; r < this.numRows + 2; r++) { //skip column buttons + row headers
             this.table.rows[r]?.deleteCell(c+1);
         }
@@ -509,17 +502,16 @@ class Table {
         delete dictImageMapping[JSON.stringify({column: c+1, value: "0_Image"})];
         delete dictImageMapping[JSON.stringify({column: c+1, value: "1_Image"})];
         //shift the column image mapping to the left
-        for(let col = c+2; col <= this.numCols + 1; col++)
-        {
+        for (let col = c+2; col <= this.numCols + 1; col++) {
             const imageKey_0 = JSON.stringify({column: col, value: "0_Image"});
-            if(imageKey_0 in dictImageMapping) {
+            if (imageKey_0 in dictImageMapping) {
                 let value = dictImageMapping[imageKey_0];
                 const newImageKey = JSON.stringify({column: col-1, value: "0_Image"});
                 dictImageMapping[newImageKey] = value;
                 delete dictImageMapping[imageKey_0];
             }
             const imageKey_1 = JSON.stringify({column: col, value: "1_Image"});
-            if(imageKey_1 in dictImageMapping) {
+            if (imageKey_1 in dictImageMapping) {
                 let value = dictImageMapping[imageKey_1];
                 const newImageKey = JSON.stringify({column: col-1, value: "1_Image"});
                 dictImageMapping[newImageKey] = value;
@@ -536,8 +528,8 @@ class Table {
     showColumn(columnNum, visible=true, editable=true, startingRow = 0) { //output table (desired)
         for (let r = startingRow; r < this.numRows + 1; r++) {
             const cells = this.table.rows[r].cells;
-            if(r !== 0) {
-                if(cells[columnNum].querySelector(".editable-border")) {
+            if (r !== 0) {
+                if (cells[columnNum].querySelector(".editable-border")) {
                     dataOp.makeEditable(cells[columnNum].firstChild, editable);
                 }
                 // else {
@@ -550,7 +542,7 @@ class Table {
 
             let desiredOutput = document.getElementById("desired");
             desiredOutput.contentEditable = false;
-            if(desiredOutput.classList.contains("edit-handler"))
+            if (desiredOutput.classList.contains("edit-handler"))
                 desiredOutput.classList.remove("edit-handler");
         }
     }
@@ -619,9 +611,9 @@ class Perceptron {
         for (let i = 0; i < demo.weights.length; i++){
             //const cell = document.getElementById(`w${i+1}`);
             const cell = childNodes[i].childNodes[2];
-            if(cell) {
+            if (cell) {
                 cell.innerHTML = this.weights[i];
-                if(this.weightLabels)
+                if (this.weightLabels)
                     childNodes[i].childNodes[0].innerText = this.weightLabels[i];
             }
         }
@@ -632,7 +624,7 @@ class Perceptron {
         for (let i=0; i<demo.weights.length; i++){
             //const cell = document.getElementById(`w${i+1}`);
             const cell = childNodes[i].childNodes[2];
-            if(cell) {
+            if (cell) {
                 //dataOp.makeEditable(cell);
                 const [parsedValue, isValid] = demo.stringToValidFloat(cell.innerHTML);
                 display.highlightInvalidText(cell, isValid);
@@ -675,7 +667,7 @@ class Display {
 
                 let heightOfTH = headerInput.offsetHeight
                 //let heightOfTH = parseInt(heightOfTHtext.substring(0, heightOfTHtext.length-2))
-                if(heightOfTH > maxHeight)
+                if (heightOfTH > maxHeight)
                     maxHeight = heightOfTH
             }
             else
@@ -695,7 +687,7 @@ class Display {
             td1.style.fontWeight = 'normal';
 
             td2.style.fontWeight = 'bold';
-            if(td2.style.background !== '#ffbfcb') //error
+            if (td2.style.background !== '#ffbfcb') //error
                 td2.style.background = '#f8ffcf'
             //td2.classList.add("bold-td");
 
@@ -708,16 +700,16 @@ class Display {
 
         let checkbox = document.getElementById("BinaryToggle");
         let editable = false
-        if(!checkbox.checked)
+        if (!checkbox.checked)
             editable = true
         let n = inputTable.rows.length;
         for (let i = 2; i < n; i++) {
             let tr = inputTable.rows[i];
-            for(let j = 1; j < tr.cells.length; j++) {
+            for (let j = 1; j < tr.cells.length; j++) {
                 let textbox = tr.cells[j]
                 //textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
-                if(editable) {
-                    if(textbox.children.length === 0) {
+                if (editable) {
+                    if (textbox.children.length === 0) {
                         textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
                     }
                     textbox.children[0].classList.add("editable-border")
@@ -727,7 +719,7 @@ class Display {
                     }
                 }
                 else {
-                    if(textbox.children.length === 0) {
+                    if (textbox.children.length === 0) {
                         textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
                     }
                     textbox.children[0].classList.remove("editable-border")
@@ -737,12 +729,12 @@ class Display {
                     }
                     const img = document.createElement("img");
 
-                    if(textbox.innerText === "1") {
+                    if (textbox.innerText === "1") {
                         img.alt = "1_Image";
                         const imageKey = JSON.stringify({column: j, value: img.alt});
-                        if(imageKey in dictImageMapping) {
+                        if (imageKey in dictImageMapping) {
                             let image_src = localStorage.getItem(dictImageMapping[imageKey]);
-                            if(image_src === null) {
+                            if (image_src === null) {
                                 img.src = "1_image.svg";
                             }
                             else {
@@ -758,9 +750,9 @@ class Display {
                     else {
                         img.alt = "0_Image";
                         const imageKey = JSON.stringify({column: j, value: img.alt});
-                        if(imageKey in dictImageMapping) {
+                        if (imageKey in dictImageMapping) {
                             let image_src = localStorage.getItem(dictImageMapping[imageKey]);
-                            if(image_src === null) {
+                            if (image_src === null) {
                                 img.src = "0_image.svg";
                             }
                             else {
@@ -778,7 +770,7 @@ class Display {
                 }
             }
         }
-        if(!editable) {
+        if (!editable) {
             setImageEditOptions();
         }
     }
@@ -786,11 +778,11 @@ class Display {
         let outputTable = document.getElementById("output-table")
         let tableRows = outputTable.rows.length
         let isCorrect = true;
-        for(let i = 1; i < tableRows; i++) {
+        for (let i = 1; i < tableRows; i++) {
             let cells = outputTable.rows.item(i).cells
             let output = cells.item(1).innerText;
             let desired = cells.item(2).innerText;
-            if(output !== desired) {
+            if (output !== desired) {
                 isCorrect = false
                 break
             }
@@ -799,15 +791,15 @@ class Display {
         let fanfareToggleChecked = document.getElementById("FanfareToggle").checked
         let fanfareHidden =  document.getElementById("congrats-msg").hidden
         let outputToggleChecked = document.getElementById("OutputToggle").checked
-        if(fanfareToggleChecked && outputToggleChecked) {
-            if(fanfareHidden) {
-                if(isCorrect) {
+        if (fanfareToggleChecked && outputToggleChecked) {
+            if (fanfareHidden) {
+                if (isCorrect) {
                     PlaySound();
-                    if(!document.getElementById("popup").classList.contains("active"))
+                    if (!document.getElementById("popup").classList.contains("active"))
                         document.getElementById("popup").classList.toggle('active');
                     //document.getElementById("congrats-msg").hidden = false;
                     display.outputLine.position()
-                    for(let i = 0; i < demo.weightLines.length; i++)
+                    for (let i = 0; i < demo.weightLines.length; i++)
                     {
                         demo.weightLines[i].position();
                     }
@@ -815,7 +807,7 @@ class Display {
                 else {
                     document.getElementById("congrats-msg").hidden = true;
                     display.outputLine.position()
-                    for(let i = 0; i < demo.weightLines.length; i++)
+                    for (let i = 0; i < demo.weightLines.length; i++)
                     {
                         demo.weightLines[i].position();
                     }
@@ -823,10 +815,10 @@ class Display {
 
             }
             else { //congrats not hidden, but could have possibly made incorrect
-                if(!isCorrect) {
+                if (!isCorrect) {
                     document.getElementById("congrats-msg").hidden = true;
                     display.outputLine.position()
-                    for(let i = 0; i < demo.weightLines.length; i++)
+                    for (let i = 0; i < demo.weightLines.length; i++)
                     {
                         demo.weightLines[i].position();
                     }
@@ -860,8 +852,8 @@ class Display {
 
     checkCorrectness(tableData) {
         let rows = tableData.rows;
-        for(let i = 0; i < rows; i++) {
-            if(tableData.data[i][1] !== tableData.data[i][2]) //the actual output and desired output do not match
+        for (let i = 0; i < rows; i++) {
+            if (tableData.data[i][1] !== tableData.data[i][2]) //the actual output and desired output do not match
                 return false
         }
         return true
@@ -878,10 +870,10 @@ class Display {
             if (headerInput.id.startsWith("tblinput")) {
                 let length = headerInput.innerText.length
 
-                if(length <= 10) {
+                if (length <= 10) {
                     newFontSize = 40;
                 }
-                else if(length >= 30){
+                else if (length >= 30){
                     newFontSize = 30;
                 }
                 else {
@@ -909,7 +901,7 @@ class Display {
         //     selections.rows[r].cells[0].style.fontSize = newFontSize + "px"
         // }
 
-        for(let i = 0; i < demo.weightLines.length; i++)
+        for (let i = 0; i < demo.weightLines.length; i++)
         {
             demo.weightLines[i].position();
         }
@@ -919,7 +911,7 @@ class Display {
 
     displayWeightFromData(wID, idx){
         let weight = document.getElementById(wID);
-        if(!weight) {
+        if (!weight) {
             let wDiv = document.createElement('div');
             wDiv.id = `weight-${idx+1}`;
             wDiv.innerHTML = `<text fill="black" class="weight-edit-text weights">w<sub>${idx+1}</sub> =</text> <text contenteditable="true" onkeypress="if (keyCode == 13) return false;" id="w${idx+1}" fill="black" class="weights"></text>`;
@@ -946,11 +938,11 @@ class Display {
     }
 
     updateSelectedInput() {
-        if(!demo.selectedInput)
+        if (!demo.selectedInput)
             return;
         let selections = document.getElementById("selected-inputs");
         selections.innerHTML = "";
-        for(let i = 0; i < demo.selectedInput.length; i++)
+        for (let i = 0; i < demo.selectedInput.length; i++)
         {
             let newRow = selections.insertRow(i);
             let newCell = newRow.insertCell(0);
@@ -985,12 +977,12 @@ class Display {
                 percentsX = [0, -3, -5, -5, -4]
                 break
             default:
-                for(let i = 0; i < Math.floor(length/2); i++) {
+                for (let i = 0; i < Math.floor(length/2); i++) {
                     percentsX.push(startX);
                     startX -= intervalX;
                 }
                 startX += intervalX;
-                for(let i = Math.floor(length/2); i < length; i++) {
+                for (let i = Math.floor(length/2); i < length; i++) {
                     percentsX.push(startX);
                     startX += intervalX;
                 }
@@ -1001,15 +993,15 @@ class Display {
         let percentsY = [];
         let intervalY = 16/length
         let startY = 42;
-        if(length === 1)
+        if (length === 1)
             percentsY = [50]
-        else if(length === 2)
+        else if (length === 2)
             percentsY = [42, 58]
-        else if(length === 3)
+        else if (length === 3)
             percentsY = [42, 50, 58]
 
         else {
-            for(let i = 0; i < length; i++ ) {
+            for (let i = 0; i < length; i++ ) {
                 percentsY.push(startY);
                 startY += intervalY;
             }
@@ -1026,7 +1018,7 @@ class Display {
         let weight_labels = document.getElementById("input-link-text").children;
 
         //TODO: x values should also be variable
-        for(let i = 0; i < demo.selectedInput.length; i++) {
+        for (let i = 0; i < demo.selectedInput.length; i++) {
             let xposition = 6+ percentsX[i]
             // if(i !== 0 && i !== demo.selectedInput.length-1)
             //     xposition = 3;
@@ -1037,23 +1029,23 @@ class Display {
 
             let splitup = weight_labels[i].children[1].textContent.split(" ")
             let num = splitup[splitup.length-1]
-            if(!demo.stringToValidFloat(num)[1]) {
+            if (!demo.stringToValidFloat(num)[1]) {
                 demo.weightLines[i].color = '#ffbfcb'
                 demo.weightLines[i].path = 'straight'
                 demo.weightLines[i].position();
             }
             else {
-                if(demo.stringToValidFloat(num)[0] === 0)
+                if (demo.stringToValidFloat(num)[0] === 0)
                     demo.weightLines[i].color = 'blue';
-                else if(demo.stringToValidFloat(num)[0] < 0)
+                else if (demo.stringToValidFloat(num)[0] < 0)
                     demo.weightLines[i].color = '#c91a0e';
                 else
                     demo.weightLines[i].color = 'black';
                 demo.weightLines[i].path = 'straight';
                 demo.weightLines[i].position();
-                if(demo.stringToValidFloat(num)[1]) { //value is a valid number
+                if (demo.stringToValidFloat(num)[1]) { //value is a valid number
                     let line_size = ((new_max-new_min)*(Math.abs(demo.stringToValidFloat(num)[0])-min))/(max-min)+new_min
-                    if(line_size >= 10.0)
+                    if (line_size >= 10.0)
                         line_size = 10.0;
                     demo.weightLines[i].size = line_size;
                 }
@@ -1071,7 +1063,7 @@ class Display {
             let num = splitup[splitup.length-1]
 
             let numConvertedArray = demo.stringToValidFloat(num)
-            if(!numConvertedArray[1]) { //if weight is invalid
+            if (!numConvertedArray[1]) { //if weight is invalid
                 child.style.color = '#fc496b'
             }
             else {
@@ -1109,7 +1101,7 @@ class Display {
     hoverInput(row, tblId, mode) {
         const isOutputToggleChecked = document.getElementById("OutputToggle").checked
         let rowIdx = row.rowIndex || 0;
-        if(!this.isInputTable(tblId)) //output table, convert to corresponding input row index
+        if (!this.isInputTable(tblId)) //output table, convert to corresponding input row index
             rowIdx += 1;
         //console.log(`hoverInput tblId=${tblId },input row=${rowIdx}, mode=${mode}`);
 
@@ -1118,7 +1110,7 @@ class Display {
         let outputRowIndex = rowIdx - 1;
         const outputRow = document.querySelector(`#output-table > tbody > tr:nth-child(${outputRowIndex + 1})`)
 
-        if(rowIdx < 2) //headers, or leave
+        if (rowIdx < 2) //headers, or leave
         {
             this.handleHoverExit();
             display.adjustSelectedInputFontSize();
@@ -1134,7 +1126,7 @@ class Display {
 
             // highlight input and output rows corresponding to the hovered input row
             inputRow.style.background = "lightblue";
-            for(let i = 0; i < outputRow.children.length; i++) {
+            for (let i = 0; i < outputRow.children.length; i++) {
                 outputRow.children[i].style.background = "lightblue";
             }
             display.adjustSelectedInputFontSize();
@@ -1142,16 +1134,16 @@ class Display {
             //console.log("enter: set outputRow =" + outputRow);
         }
         else {
-            if(rowIdx % 2 === 0) {
+            if (rowIdx % 2 === 0) {
                 this.handleHoverExit(inputRow, outputRow );
-                if(isOutputToggleChecked)
+                if (isOutputToggleChecked)
                     this.checkDesiredOutput(outputRow.children[1], outputRow.children[2])
 
             }
 
             else {
                 this.handleHoverExit(inputRow, outputRow, true ); //if it is odd, reset to gray
-                if(isOutputToggleChecked)
+                if (isOutputToggleChecked)
                     this.checkDesiredOutput(outputRow.children[1], outputRow.children[2])
             }
 
@@ -1199,9 +1191,9 @@ class Display {
         demo.selectedOutput = demo.defaultSelectedOutput;
 
         if (isOdd) { //if odd reset color to gray
-            if(inputRow)
+            if (inputRow)
                 inputRow.style.background = "#f2f2f2"; //color gray
-            if(outputRow) {
+            if (outputRow) {
                 outputRow.children[0].style.background =  "#f2f2f2"
                 outputRow.children[1].style.background = "#f8ffcf"
                 outputRow.children[2].style.background =  "#f2f2f2"
@@ -1209,10 +1201,10 @@ class Display {
 
         }
         else {
-            if(inputRow)
+            if (inputRow)
                 inputRow.style.background = "none";
-            if(outputRow) {
-                for(let i = 0; i < outputRow.children.length; i++) {
+            if (outputRow) {
+                for (let i = 0; i < outputRow.children.length; i++) {
                     outputRow.children[0].style.background = "none";
                     this.checkDesiredOutput(outputRow.children[1], outputRow.children[2])
                 }
@@ -1238,7 +1230,7 @@ class Display {
                 else*/
 
                 let headerInputHtml = headerInput.innerHTML;
-                if(!headerInputHtml.length) {
+                if (!headerInputHtml.length) {
                     headerInputHtml = "<br>";
                 }
                 headerRowVals.push(headerInputHtml);
@@ -1261,7 +1253,7 @@ class Display {
                 else*/
 
                 let headerInputHtml = headerInput.innerHTML;
-                if(!headerInputHtml.length) {
+                if (!headerInputHtml.length) {
                     headerInputHtml = "<br>";
                 }
                 //we cannot use the getElementByID since the ID will not be accurate when deleting cols
@@ -1279,7 +1271,7 @@ class Display {
 
     setHeaderRowVariables (headerRowVals) {
         const headerCells = document.getElementById("input-table").rows[1].cells;
-        if(headerCells) {
+        if (headerCells) {
             for (let c = 1; c < headerCells.length; c++) {
                 //var headerInput = document.getElementById(`tblinput${c}`);
                 let headerInput = headerCells[c];
@@ -1295,7 +1287,7 @@ class Display {
                     let divNode = weight_parent.childNodes[c-1];
                     const editToggle = divNode.querySelector('.edit-toggle');
                     //let weightCheckbox = document.getElementById(`checkbox_weight_editable${c}`);
-                    if(headerRowVals[c-1].weight_editable) {
+                    if (headerRowVals[c-1].weight_editable) {
                         editToggle.classList.add("edit-toggle-off"); //reversed
                         editToggle.classList.remove("edit-toggle-on");
                     }
@@ -1367,8 +1359,7 @@ class Display {
             document.getElementById("FanfareToggleBody").hidden = false;
         }
 
-        for(let i = 0; i < demo.weightLines.length; i++)
-        {
+        for (let i = 0; i < demo.weightLines.length; i++) {
             demo.weightLines[i].position();
         }
         this.UpdateOutputToggle()
@@ -1392,13 +1383,13 @@ class Display {
         //     document.getElementById("congrats-msg").hidden = true;
         // }
 
-        for(let i = 1; i < n; i++) {
+        for (let i = 1; i < n; i++) {
             //var tr = outputCol.rows[i];
             let output = outputCol.rows[i].cells[1];
             let desired = outputCol.rows[i].cells[2];
 
             let currCorrect = this.checkDesiredOutput(output, desired);
-            if(!currCorrect)
+            if (!currCorrect)
                 isCorrect = false;
         }
 
@@ -1409,7 +1400,7 @@ class Display {
         //     }
         // }
 
-        for(let i = 0; i < demo.weightLines.length; i++) {
+        for (let i = 0; i < demo.weightLines.length; i++) {
             demo.weightLines[i].position();
         }
 
@@ -1419,7 +1410,7 @@ class Display {
     UpdateBinaryToggle(columnChanged) {
         let checkbox = document.getElementById("BinaryToggle");
         display.createOutputTableColors();
-        if(checkbox.checked) {
+        if (checkbox.checked) {
             setupGenerateTruthTable(columnChanged);
         }
         else { //leave table how it is, but make contenteditable
@@ -1437,7 +1428,7 @@ class Display {
 
     UpdateFanfareToggle() {
         let checkbox = document.getElementById("FanfareToggle")
-        if(!checkbox.checked) {
+        if (!checkbox.checked) {
             //document.getElementById("congrats-msg").hidden = true;
             display.outputLine.position()
         } else {
@@ -1447,7 +1438,7 @@ class Display {
 
     checkDesiredOutput(output, desired) {
         //TODO: do extra testing with the regex and make changes if necessary
-        if(!output)
+        if (!output)
             return
         const regex = '/^0*1?$/gm'; //detects trailing zeros
 
@@ -1460,8 +1451,8 @@ class Display {
         const desiredInt = desired.innerText;
         let [parsedValue, isValid] = demo.stringToValidFloat(desiredInt);
 
-        if(parsedValue === 1.0)  {
-            if(editable) {
+        if (parsedValue === 1.0)  {
+            if (editable) {
                 desired.innerHTML = '<span class="editable-border">1</span>';
             }
             else {
@@ -1470,8 +1461,8 @@ class Display {
             dataOp.makeEditable(desired.firstChild, editable);
         }
 
-        if(parsedValue === 0.0) {
-            if(editable) {
+        if (parsedValue === 0.0) {
+            if (editable) {
                 desired.innerHTML = '<span class="editable-border">0</span>';
             }
             else {
@@ -1479,8 +1470,8 @@ class Display {
             }
             dataOp.makeEditable(desired.firstChild, editable);
         }
-        if(desiredInt.match(regex)) {
-            if(editable) {
+        if (desiredInt.match(regex)) {
+            if (editable) {
                 desired.innerHTML = '<span class="editable-border">1</span>';
             }
             else {
@@ -1489,7 +1480,7 @@ class Display {
             dataOp.makeEditable(desired.firstChild, editable);
         }
         //console.log("parsed: " + parsedValue);
-        if(parsedValue !== 1 && parsedValue !== 0 ) {
+        if (parsedValue !== 1 && parsedValue !== 0 ) {
             isValid = false;
         }
         display.highlightInvalidText(desired, isValid);
@@ -1522,7 +1513,7 @@ class Display {
         if (!isValid){
             cell.style.background = "pink";
         }
-        else{
+        else {
             cell.style.removeProperty('background-color');
         }
     }
@@ -1576,8 +1567,7 @@ class Demo {
     }
 
     hasNoSolution() {
-        //TODO: add the bias/threshold, treat it as input, input will always be one
-        if(!document.getElementById("OutputToggle").checked)
+        if (!document.getElementById("OutputToggle").checked)
             return
         //uses perceptron learning rule
         dataOp.updateDataFromTableNoDisplay(outputs, outputTable);
@@ -1586,39 +1576,39 @@ class Demo {
         let outputData = outputs.data;
         //second column is output
         let adjustedWeights = []; //these weights will be adjusted throughout
-        for(let i = 0; i < this.weights.length; i++) {
+        for (let i = 0; i < this.weights.length; i++) {
             adjustedWeights.push(this.weights[i])
         }
         adjustedWeights.push(this.threshold * -1);
         //iterate through inputs 20 times, if still not correct then we assume no solution
-        for(let i = 0; i < 100; i++) {
+        for (let i = 0; i < 100; i++) {
             let hasSolution = true
-            for(let j = 0; j < this.inputData.length; j++) {
+            for (let j = 0; j < this.inputData.length; j++) {
                 let input = this.inputData[j];
                 let actualOutput = 0
-                for(let w = 0; w < adjustedWeights.length-1; w++) {
+                for (let w = 0; w < adjustedWeights.length-1; w++) {
                     actualOutput += input[w]*adjustedWeights[w]
                 }
                 actualOutput += adjustedWeights[adjustedWeights.length-1];
                 actualOutput = actualOutput > this.threshold ? 1 : 0
                 let desiredOutput = outputData[j][2]
-                if(actualOutput < desiredOutput) {
+                if (actualOutput < desiredOutput) {
                     hasSolution = false
-                    for(let k = 0; k < adjustedWeights.length-1; k++) {
+                    for (let k = 0; k < adjustedWeights.length-1; k++) {
                         adjustedWeights[k] += this.inputData[j][k]
                     }
                     adjustedWeights[adjustedWeights.length-1]++;
                 }
-                if(actualOutput > desiredOutput) {
+                if (actualOutput > desiredOutput) {
                     hasSolution = false
-                    for(let k = 0; k < adjustedWeights.length-1; k++) {
+                    for (let k = 0; k < adjustedWeights.length-1; k++) {
                         adjustedWeights[k] -= this.inputData[j][k]
                     }
                     adjustedWeights[adjustedWeights.length-1]--;
                 }
 
             }
-            if(hasSolution) {
+            if (hasSolution) {
                 document.getElementById("unlearnable-msg").hidden = true;
                 return
             }
@@ -1658,7 +1648,7 @@ class Demo {
         dataOp.insertDataRow(inputs, r-2);
         outputTable.insertTableRow(r-1);
         dataOp.insertDataRow(outputs, r-2);
-        if(needUpdate)
+        if (needUpdate)
             demo.update();
     }
 
@@ -1675,20 +1665,20 @@ class Demo {
     }
 
     removeAllInputDataCols(needUpdate = true) {
-        while( inputTable.numCols > 1) {
+        while ( inputTable.numCols > 1) {
             inputTable.removeTableCol(1);
         }
-        if(needUpdate) demo.update();
+        if (needUpdate) demo.update();
     }
 
     removeAllInputDataRows(needUpdate = true) {
-        while( inputTable.numRows > 0) {
+        while ( inputTable.numRows > 0) {
             inputTable.removeTableRow(2);
             dataOp.removeDataRow(inputs, 0);
             outputTable.removeTableRow(1);
             dataOp.removeDataRow(outputs, 0);
         }
-        if(needUpdate) demo.update();
+        if (needUpdate) demo.update();
     }
 
     generateUniqueID(prefix) {
@@ -1726,16 +1716,16 @@ class Demo {
     showWeightToggle(show) {
         let parentElement = document.getElementById("input-link-text");
         let weightElement = parentElement.children;
-        for(let i = 0; i < weightElement.length; i++) {
+        for (let i = 0; i < weightElement.length; i++) {
             let toggleBtn = weightElement[i].children[2]
-            if(!show)
+            if (!show)
                 toggleBtn.style.display = 'none';
             else
                 toggleBtn.style.display = 'inline-block';
             console.log(weightElement[i].children[2].innerHTML);
         }
         let thresholdToggleBtn = document.getElementById("threshold_toggleBtn");
-        if(!show)
+        if (!show)
             thresholdToggleBtn.style.display = 'none';
         else
             thresholdToggleBtn.style.display = 'inline-block';
@@ -1744,13 +1734,13 @@ class Demo {
     updateWeightUI(parentElement) {
         //TODO: make code less messy
         let childCount = parentElement.children.length;
-        if(childCount === 1) {
+        if (childCount === 1) {
             let child = parentElement.children[0];
             const top = 40;
             child.style = "top:" + top + "%;";
             addEditOption(0);
         }
-        else if(childCount === 3) {
+        else if (childCount === 3) {
             let first = 20;
             let last = 70;
             let interval = (last - first) / (childCount - 1);
@@ -1764,7 +1754,7 @@ class Demo {
             const top = 38;
             child.style = "left: -20%;" +  "top:" + top + "%;";
         }
-        else if(childCount === 4) {
+        else if (childCount === 4) {
             let first = 10;
             let last = 80;
             let interval = (last - first) / (childCount - 1);
@@ -1777,7 +1767,7 @@ class Demo {
             }
 
         }
-        else if(childCount === 5) {
+        else if (childCount === 5) {
             let first = 10;
             let last = 80;
             let interval = (last - first) / (childCount - 1);
@@ -1819,7 +1809,7 @@ class Demo {
         let parentElement = document.getElementById("input-link-text");
         //let child = document.getElementById(`weight-${n+1}`);
         let child = parentElement.children[n];
-        if(child && parentElement)
+        if (child && parentElement)
         {
             parentElement.removeChild(child);
         }
@@ -1845,7 +1835,7 @@ class Demo {
         this.insertWeightCol(c);
         display.handleHoverExit();
         perceptron.updateWeightsFromUI();
-        if(document.getElementById("BinaryToggle").checked)
+        if (document.getElementById("BinaryToggle").checked)
             display.UpdateBinaryToggle(true);
         demo.update(); //TODO: check if efficient
     }
@@ -1862,7 +1852,7 @@ class Demo {
         dataOp.removeDataCol(inputs, c);
         this.removeWeightCol(c);
         display.handleHoverExit();
-        if(document.getElementById("BinaryToggle").checked)
+        if (document.getElementById("BinaryToggle").checked)
             display.UpdateBinaryToggle(true);
         demo.update(); //TODO: check if efficient
     }
@@ -1872,7 +1862,7 @@ class Demo {
         if (this.mode==="binary"){
             this.mode = "regular";
         }
-        else{
+        else {
             this.mode = "binary";
         }
         //console.log('mode set as', this.mode)
@@ -1906,8 +1896,8 @@ class Demo {
         perceptron.computeOutputs();
         // TODO: ineffecient 2 steps, update step needed:
         //outputs.update(perceptron.outputData);
-        for(let i = 0; i < perceptron.outputData.length; i++) {
-            for(let j = 0; j < perceptron.outputData[0].length-1; j++ ) {
+        for (let i = 0; i < perceptron.outputData.length; i++) {
+            for (let j = 0; j < perceptron.outputData[0].length-1; j++ ) {
                 outputs.data[i][j] = perceptron.outputData[i][j]
             }
         }
@@ -1961,7 +1951,7 @@ async function downloadFile() {
 
     let table = document.getElementById("output-table");
     //console.log(table);
-    for(let i = 1; i < table.rows.length; i++ ) {
+    for (let i = 1; i < table.rows.length; i++ ) {
         let tr = table.rows[i];
         let td = tr.cells[2];
         desiredOutputs.data[i-1] = td.innerText;
@@ -2005,7 +1995,7 @@ async function downloadFile() {
         let keyStorage = dictImageMapping[key];
         console.log("localstorage key:" + key);
         const dataURLImage = localStorage.getItem(keyStorage);
-        if(dataURLImage !== null) {
+        if (dataURLImage !== null) {
             // Convert the data URL to an array buffer
             const response = await fetch(dataURLImage);
             const arrayBuffer = await response.arrayBuffer();
@@ -2058,7 +2048,7 @@ function uploadFromUrl(url) { //TODO: doesn't work if running from hard drive
 
 async function uploadFileCombined(event) {
     let url = document.getElementById("url").value;
-    if(url) {
+    if (url) {
         uploadFromZipUrl(url);
     }
     else {
@@ -2074,8 +2064,7 @@ function addEditOption(c) {
     let divNode = weight_parent.childNodes[c];
     const toggleBtn = divNode.querySelector('.edit-toggle');
     let weightButtonHandler = function () {
-        if(toggleBtn.classList.contains("edit-toggle-on"))
-        {
+        if (toggleBtn.classList.contains("edit-toggle-on")) {
             toggleBtn.classList.add("edit-toggle-off");
             toggleBtn.classList.remove("edit-toggle-on")
         }
@@ -2086,13 +2075,13 @@ function addEditOption(c) {
         let editable = toggleBtn.classList.contains("edit-toggle-on");
         const textbox = divNode.querySelector(`.weight-edit-text`);
         textbox.contentEditable = editable;
-        if(editable) {
-            if(!textbox.classList.contains("weights")) {
+        if (editable) {
+            if (!textbox.classList.contains("weights")) {
                 textbox.classList.add("weights");
             }
         }
         else {
-            if(textbox.classList.contains("weights")) {
+            if (textbox.classList.contains("weights")) {
                 textbox.classList.remove("weights");
             }
         }
@@ -2104,8 +2093,7 @@ function addEditOption(c) {
 function addThresholdEditOption() {
     const toggleBtn = document.getElementById(`threshold_toggleBtn`);
     let thresholdButtonHandler = function () {
-        if(toggleBtn.classList.contains("edit-toggle-on"))
-        {
+        if (toggleBtn.classList.contains("edit-toggle-on")) {
             toggleBtn.classList.add("edit-toggle-off");
             toggleBtn.classList.remove("edit-toggle-on")
         }
@@ -2116,13 +2104,13 @@ function addThresholdEditOption() {
         const textbox = document.getElementById(`th1`);
         let editable = toggleBtn.classList.contains("edit-toggle-on");
         textbox.contentEditable = editable;
-        if(editable) {
-            if(!textbox.classList.contains("weights")) {
+        if (editable) {
+            if (!textbox.classList.contains("weights")) {
                 textbox.classList.add("weights");
             }
         }
         else {
-            if(textbox.classList.contains("weights")) {
+            if (textbox.classList.contains("weights")) {
                 textbox.classList.remove("weights");
             }
         }
@@ -2135,7 +2123,7 @@ function addThresholdEditOption() {
 
 function handleImageClick(img, col) {
     //check if we are in edit mode
-    if(document.getElementById("InputToggle").checked) {
+    if (document.getElementById("InputToggle").checked) {
         currentImageType = img.alt;
         currentColumn = col;
         document.getElementById("upload-image_file").click();
@@ -2152,7 +2140,7 @@ function setImageEditOptions() {
         }
         let imageMenuHandler = function (event) {
             //make the dialog box visible
-            if(document.getElementById("InputToggle").checked) {
+            if (document.getElementById("InputToggle").checked) {
                 event.preventDefault();
                 showMenu(event, this, tdElement.cellIndex)
             }
@@ -2188,13 +2176,13 @@ function uploadZip(zipFile) {
         // Iterate over each file in the zip
         zip.forEach(function (relativePath, zipEntry) {
             // Get the content of the file
-            if(relativePath === "ImageMapping.json") {
+            if (relativePath === "ImageMapping.json") {
                 zipEntry.async('text').then(function (content) {
                     console.log(content);
                     dictImageMapping = JSON.parse(content);
                 });
             }
-            else if(relativePath.endsWith(".json")) {
+            else if (relativePath.endsWith(".json")) {
                 zipEntry.async('text').then(function (content) {
                     console.log(content);
                     jsonModelContent = content;
@@ -2296,7 +2284,7 @@ function uploadJson(text) {
     // }
 
     let headerRowVars = dict["input-header-vars"];
-    if(headerRowVars?.length) {
+    if (headerRowVars?.length) {
         display.setHeaderRowVariables(headerRowVars);
     }
 
@@ -2305,7 +2293,7 @@ function uploadJson(text) {
     let outputCol = document.getElementById("output-table");
     let outputTableLength = outputCol.rows.length;
 
-    for(let i = 1; i < outputTableLength; i++)
+    for (let i = 1; i < outputTableLength; i++)
     {
         //var tr = outputCol.rows[i];
         let output = outputCol.rows[i].cells[1];
@@ -2318,7 +2306,7 @@ function uploadJson(text) {
     display.createInputTableEditBorder();
     display.alignTables();
 
-    if(document.getElementById('OutputToggle').checked)
+    if (document.getElementById('OutputToggle').checked)
         demo.hasNoSolution()
     setupCloseButtons();
 
@@ -2327,20 +2315,18 @@ function uploadJson(text) {
     display.UpdateBinaryToggle(false);
     addThresholdEditOption();
     const thresholdToggle = document.getElementById("threshold_toggleBtn");
-    if(dict["binaryToggleChecked"] && document.getElementById('InputToggle').checked)
+    if (dict["binaryToggleChecked"] && document.getElementById('InputToggle').checked)
     {
         thresholdToggle.style.display = 'inline-block';
     }
-    else{
+    else {
         thresholdToggle.style.display = "none";
     }
-    if(dict["threshold-editable"])
-    {
+    if (dict["threshold-editable"]) {
         thresholdToggle.classList.remove("edit-toggle-on"); //reversed here since we will dispatch a click event
         thresholdToggle.classList.add("edit-toggle-off");
     }
-    else
-    {
+    else {
         thresholdToggle.classList.remove("edit-toggle-off"); //reversed here since we will dispatch a click event
         thresholdToggle.classList.add("edit-toggle-on");
     }
@@ -2466,21 +2452,21 @@ function PlaySound() {
 $('#FanfareToggle').change(function() { //toggle output
     display.UpdateFanfareToggle();
     display.outputLine.position();
-    for(let i = 0; i < demo.weightLines.length; i++)
+    for (let i = 0; i < demo.weightLines.length; i++)
     {
         demo.weightLines[i].position();
     }
 });
 
 function showMenu(event, img, col) {
-    if(document.getElementById("InputToggle").checked) {
+    if (document.getElementById("InputToggle").checked) {
         currentImage = img;
         currentImageType = img.alt;
         currentColumn = col;
         const menu = document.getElementById("popup-menu");
         menu.style.display = "block";
         const imageKey_0 = JSON.stringify({column: col, value: img.alt});
-        if(imageKey_0 in dictImageMapping) { //existing image
+        if (imageKey_0 in dictImageMapping) { //existing image
             document.querySelector(".existing_image_menu").style.display = "block";
             document.querySelector(".new_image_menu").style.display = "none";
         }
