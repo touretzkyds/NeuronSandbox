@@ -698,9 +698,10 @@ class Display {
     createInputTableEditBorder() {
         const inputTable = document.getElementById("input-table")
 
-        let checkbox = document.getElementById("BinaryToggle");
+        let binaryCheckbox = document.getElementById("BinaryToggle");
+        let editCheckbox = document.getElementById("InputToggle");
         let editable = false
-        if (!checkbox.checked)
+        if (!binaryCheckbox.checked)
             editable = true
         let n = inputTable.rows.length;
         for (let i = 2; i < n; i++) {
@@ -717,6 +718,7 @@ class Display {
                     while (textbox.children.length > 1) {
                         textbox.removeChild(textbox.children[1]);
                     }
+
                 }
                 else {
                     if (textbox.children.length === 0) {
@@ -727,6 +729,7 @@ class Display {
                     while (textbox.children.length > 1) {
                         textbox.removeChild(textbox.children[1]);
                     }
+
                     const img = document.createElement("img");
 
                     if (textbox.innerText === "1") {
@@ -776,8 +779,13 @@ class Display {
                 }
             }
         }
-        if (!editable) {
+        if (!editable && editCheckbox.checked)
+        {
             setImageEditOptions();
+        }
+        else
+        {
+            hideImages();
         }
     }
     checkForSuccess() {
@@ -1705,9 +1713,9 @@ class Demo {
         let unique_id = this.generateUniqueID("weight-");
         wDiv.id = `weight-${unique_id}`;
         wDiv.className = "weight_label";
-        wDiv.innerHTML = `<text fill="black">w<sub>${unique_id}</sub> =</text> <text contenteditable="false" 
-                            onkeypress="if (keyCode == 13) return false;" id="w${unique_id}" fill="black" class="weight-edit-text">0</text>
-                           <span class="edit-toggle edit-toggle-off">
+        wDiv.innerHTML = `<text fill="black">w<sub>${unique_id}</sub> =</text> <text contenteditable="true" 
+                            onkeypress="if (keyCode == 13) return false;" id="w${unique_id}" fill="black" class="weight-edit-text weights">0</text>
+                           <span class="edit-toggle edit-toggle-on">
                               <i class="fas fa-pencil-alt"></i>
                               <i class="fas fa-lock"></i>
                            </span>
@@ -1715,7 +1723,7 @@ class Demo {
 
         parentElement.insertBefore(wDiv, parentElement.children[n]);
         const weightText = document.getElementById(`w${unique_id}`);
-        //dataOp.makeEditable(weightText);
+        dataOp.makeEditable(weightText);
         this.updateWeightUI(parentElement);
     }
 
@@ -2143,10 +2151,18 @@ function handleImageClick(img, col) {
     }
 }
 
+function hideImages() {
+    let images = document.querySelectorAll(`.myimage`);
+    images.forEach((image) => {
+        image.style.display = "none";
+    });
+}
+
 function setImageEditOptions() {
     let images = document.querySelectorAll(`.myimage`);
     images.forEach((image) => {
         //console.log(image);
+        image.style.display = "inline-block";
         let tdElement = image;
         while (tdElement && tdElement.tagName !== 'TD') {
             tdElement = tdElement.parentNode;
@@ -2182,39 +2198,45 @@ function setupCloseButtons() {
 
 function uploadZip(zipFile) {
     // Assume the zip file is stored in a variable called "zipFile" and is a binary string
-    localStorage.clear();
-    const zip = new JSZip();
-    let jsonModelContent = ""
-    zip.loadAsync(zipFile).then(function (zip) {
-        // Iterate over each file in the zip
-        zip.forEach(function (relativePath, zipEntry) {
-            // Get the content of the file
-            if (relativePath === "ImageMapping.json") {
-                zipEntry.async('text').then(function (content) {
-                    console.log(content);
-                    dictImageMapping = JSON.parse(content);
-                });
-            }
-            else if (relativePath.endsWith(".json")) {
-                zipEntry.async('text').then(function (content) {
-                    console.log(content);
-                    jsonModelContent = content;
-                    uploadJson(jsonModelContent);
-                });
-            }
-            else {
-                zipEntry.async("arraybuffer").then(function (content) {
-                    //save to localStorage
-                    const binaryString = arrayBufferToString(content, 1024)
-                    const base64String = btoa(binaryString);
-                    // Use the binary content in the arrayBuffer
-                    const dataURL = `data:image/png;base64,${base64String}`;
-                    localStorage.setItem(relativePath, dataURL);
-                    display.createInputTableEditBorder();
-                });
-            }
+    try {
+        localStorage.clear();
+        const zip = new JSZip();
+        let jsonModelContent = ""
+        zip.loadAsync(zipFile).then(function (zip) {
+            // Iterate over each file in the zip
+            zip.forEach(function (relativePath, zipEntry) {
+                // Get the content of the file
+                if (relativePath === "ImageMapping.json") {
+                    zipEntry.async('text').then(function (content) {
+                        console.log(content);
+                        dictImageMapping = JSON.parse(content);
+                    });
+                }
+                else if (relativePath.endsWith(".json")) {
+                    zipEntry.async('text').then(function (content) {
+                        console.log(content);
+                        jsonModelContent = content;
+                        uploadJson(jsonModelContent);
+                    });
+                }
+                else {
+                    zipEntry.async("arraybuffer").then(function (content) {
+                        //save to localStorage
+                        const binaryString = arrayBufferToString(content, 1024)
+                        const base64String = btoa(binaryString);
+                        // Use the binary content in the arrayBuffer
+                        const dataURL = `data:image/png;base64,${base64String}`;
+                        localStorage.setItem(relativePath, dataURL);
+                        display.createInputTableEditBorder();
+                    });
+                }
+            });
         });
-    });
+    }
+    catch (e)
+    {
+        alert("An error occurred when loading model: " + e.message);
+    }
 }
 function arrayBufferToString(arrayBuffer, chunkSize) {
     var result = '';
@@ -2367,14 +2389,23 @@ async function uploadImageFile(event) {
     }
     const reader = new FileReader();
     reader.onload = function(event) {
-        const arrayBuffer = event.target.result;
-        const binaryString = arrayBufferToString(arrayBuffer, 1024);
-        const base64String = btoa(binaryString);
-        // Use the binary content in the arrayBuffer
-        const dataURL = `data:image/png;base64,${base64String}`;
-        dictImageMapping[JSON.stringify({column: currentColumn, value: currentImageType})] = file.name;
-        localStorage.setItem(file.name, dataURL);
-        display.createInputTableEditBorder();
+        try {
+            const arrayBuffer = event.target.result;
+            const binaryString = arrayBufferToString(arrayBuffer, 1024);
+            const base64String = btoa(binaryString);
+            // Use the binary content in the arrayBuffer
+            const dataURL = `data:image/png;base64,${base64String}`;
+            dictImageMapping[JSON.stringify({column: currentColumn, value: currentImageType})] = file.name;
+            localStorage.setItem(file.name, dataURL);
+            display.createInputTableEditBorder();
+        }
+        catch (e)
+        {
+            alert("An error occurred: " + e.message);
+            localStorage.removeItem(file.name);
+            delete dictImageMapping[JSON.stringify({column: currentColumn, value: currentImageType})];
+        }
+
     };
     reader.readAsArrayBuffer(file);
 }
