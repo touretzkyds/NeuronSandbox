@@ -1528,10 +1528,10 @@ class Display {
             // cell.style.background = "pink";
             let n = parseInt(cell.innerText);
             if(n > 0) {
-                cell.innerHTML = '<span class="editable-border">1</span>';
+                cell.innerHTML = 1;
             }
             else {
-                cell.innerHTML = '<span class="editable-border">0</span>';
+                cell.innerHTML = 0;
             }
 
         }
