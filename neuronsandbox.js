@@ -785,7 +785,7 @@ class Display {
         }
         else
         {
-            hideImages();
+            hideCameraImages();
         }
     }
     checkForSuccess() {
@@ -1525,7 +1525,15 @@ class Display {
     //highlight invalid inputs, reset as soon as they are valid (#6)
     highlightInvalidText(cell, isValid) {
         if (!isValid){
-            cell.style.background = "pink";
+            // cell.style.background = "pink";
+            let n = parseInt(cell.innerText);
+            if(n > 0) {
+                cell.innerHTML = '<span class="editable-border">1</span>';
+            }
+            else {
+                cell.innerHTML = '<span class="editable-border">0</span>';
+            }
+
         }
         else {
             cell.style.removeProperty('background-color');
@@ -2024,22 +2032,25 @@ async function downloadFile() {
     await writableStream.close();
 }
 
-function uploadFromZipUrl(url) { //TODO: doesn't work if running from hard drive
-    fetch(url, {
-        mode: "no-cors",
-        method: "GET",
-        headers: {
-            accept: '*/zip',
-        }
-    })
-        .then(res => res.blob())
-        .then(blob => {
-            //console.log('Downloaded this JSON! ', text);
-            uploadZip(blob);
-        })
-        .catch(err => {
-            throw err
+async function uploadFromZipUrl(url) {
+    try {
+        const response = await fetch(url, {
+            mode: "no-cors",
+            method: "GET",
+            headers: {
+                accept: "*/zip",
+            },
         });
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch zip file");
+        }
+
+        const blob = await response.blob();
+        await uploadZip(blob);
+    } catch (err) {
+        alert("An error occurred when loading model: " + err.message);
+    }
 }
 
 function uploadFromUrl(url) { //TODO: doesn't work if running from hard drive
@@ -2151,10 +2162,11 @@ function handleImageClick(img, col) {
     }
 }
 
-function hideImages() {
+function hideCameraImages() {
     let images = document.querySelectorAll(`.myimage`);
     images.forEach((image) => {
-        image.style.display = "none";
+        if(image.src.endsWith("1_image.svg") || image.src.endsWith("0_image.svg"))
+            image.style.display = "none";
     });
 }
 
