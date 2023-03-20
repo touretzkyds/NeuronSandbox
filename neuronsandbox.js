@@ -1525,15 +1525,7 @@ class Display {
     //highlight invalid inputs, reset as soon as they are valid (#6)
     highlightInvalidText(cell, isValid) {
         if (!isValid){
-            // cell.style.background = "pink";
-            let n = parseInt(cell.innerText);
-            if(n > 0) {
-                cell.innerHTML = '<span class="editable-border">1</span>';
-            }
-            else {
-                cell.innerHTML = '<span class="editable-border">0</span>';
-            }
-
+            cell.style.background = "pink";
         }
         else {
             cell.style.removeProperty('background-color');
@@ -2043,7 +2035,7 @@ async function uploadFromZipUrl(url) {
         });
 
         if (!response.ok) {
-            throw new Error("Failed to fetch zip file");
+            throw new Error("Failed to fetch zip file. Please enter valid URL.");
         }
 
         const blob = await response.blob();
@@ -2413,7 +2405,7 @@ async function uploadImageFile(event) {
         }
         catch (e)
         {
-            alert("An error occurred: " + e.message);
+            alert("An error occurred: " + e.message + " Try uploading a smaller image.");
             localStorage.removeItem(file.name);
             delete dictImageMapping[JSON.stringify({column: currentColumn, value: currentImageType})];
         }
