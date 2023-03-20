@@ -1525,7 +1525,15 @@ class Display {
     //highlight invalid inputs, reset as soon as they are valid (#6)
     highlightInvalidText(cell, isValid) {
         if (!isValid){
-            cell.style.background = "pink";
+            // cell.style.background = "pink";
+            let n = parseInt(cell.innerText);
+            if(n > 0) {
+                cell.innerHTML = '<span class="editable-border">1</span>';
+            }
+            else {
+                cell.innerHTML = '<span class="editable-border">0</span>';
+            }
+
         }
         else {
             cell.style.removeProperty('background-color');
