@@ -1528,10 +1528,11 @@ class Display {
             // cell.style.background = "pink";
             let n = parseInt(cell.innerText);
             if(n > 0) {
-                cell.innerHTML = 1;
+                //cell.innerText = 1;
+                cell.innerHTML = cell.innerHTML.replace(cell.innerText, "1")
             }
             else {
-                cell.innerHTML = 0;
+                cell.innerHTML = cell.innerHTML.replace(cell.innerText, "0")
             }
 
         }
