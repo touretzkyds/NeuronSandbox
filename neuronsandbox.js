@@ -2043,7 +2043,7 @@ async function uploadFromZipUrl(url) {
         });
 
         if (!response.ok) {
-            throw new Error("Failed to fetch zip file. Please enter valid URL.");
+            throw new Error("Please enter valid URL.");
         }
 
         const blob = await response.blob();
@@ -2413,7 +2413,7 @@ async function uploadImageFile(event) {
         }
         catch (e)
         {
-            alert("An error occurred: " + e.message + " Try uploading a smaller image.");
+            alert("An error occurred: Try uploading a smaller image.");
             localStorage.removeItem(file.name);
             delete dictImageMapping[JSON.stringify({column: currentColumn, value: currentImageType})];
         }
