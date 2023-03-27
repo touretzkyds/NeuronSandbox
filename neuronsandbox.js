@@ -2209,13 +2209,13 @@ function setupCloseButtons() {
     });
 }
 
-function uploadZip(zipFile) {
+async function uploadZip(zipFile) {
     // Assume the zip file is stored in a variable called "zipFile" and is a binary string
     try {
         localStorage.clear();
-        const zip = new JSZip();
+        const zipObj = new JSZip();
         let jsonModelContent = ""
-        zip.loadAsync(zipFile).then(function (zip) {
+        await zipObj.loadAsync(zipFile).then(function (zip) {
             // Iterate over each file in the zip
             zip.forEach(function (relativePath, zipEntry) {
                 // Get the content of the file
@@ -2244,11 +2244,14 @@ function uploadZip(zipFile) {
                     });
                 }
             });
+        }).catch(function (error)
+        {
+            alert("An error occurred when loading model: Please enter valid URL.");
         });
     }
     catch (e)
     {
-        alert("An error occurred when loading model: " + e.message);
+        alert("An error occurred when loading model: Please enter valid URL");
     }
 }
 function arrayBufferToString(arrayBuffer, chunkSize) {
