@@ -388,6 +388,7 @@ class Table {
             $(this).classList?.remove("animation");
         });
         display.createInputTableEditBorder()
+        display.createOutputTableEditBorder();
     }
 
     //finds available indices for variables
@@ -472,22 +473,23 @@ class Table {
         //update the image mapping
         for (let col = this.numCols; col >= c; col--)
         {
-            const imageKey_0 = JSON.stringify({column: col, value: "0_Image"});
+            const imageKey_0 = JSON.stringify({table_name: "input-table", column: col, value: "0_Image"});
             if (imageKey_0 in dictImageMapping) {
                 let value = dictImageMapping[imageKey_0];
-                const newImageKey = JSON.stringify({column: col+1, value: "0_Image"});
+                const newImageKey = JSON.stringify({table_name: "input-table", column: col+1, value: "0_Image"});
                 dictImageMapping[newImageKey] = value;
                 delete dictImageMapping[imageKey_0];
             }
-            const imageKey_1 = JSON.stringify({column: col, value: "1_Image"});
+            const imageKey_1 = JSON.stringify({table_name: "input-table", column: col, value: "1_Image"});
             if (imageKey_1 in dictImageMapping) {
                 let value = dictImageMapping[imageKey_1];
-                const newImageKey = JSON.stringify({column: col+1, value: "1_Image"});
+                const newImageKey = JSON.stringify({table_name: "input-table", column: col+1, value: "1_Image"});
                 dictImageMapping[newImageKey] = value;
                 delete dictImageMapping[imageKey_1];
             }
         }
         display.createInputTableEditBorder()
+        display.createOutputTableEditBorder();
     }
 
     removeTableCol(c){
@@ -499,21 +501,21 @@ class Table {
         display.getHeaderRowVals(cols);
         this.defaultSelectedInput = cols;
         //delete the current mapping if exists
-        delete dictImageMapping[JSON.stringify({column: c+1, value: "0_Image"})];
-        delete dictImageMapping[JSON.stringify({column: c+1, value: "1_Image"})];
+        delete dictImageMapping[JSON.stringify({table_name: "input-table", column: c+1, value: "0_Image"})];
+        delete dictImageMapping[JSON.stringify({table_name: "input-table", column: c+1, value: "1_Image"})];
         //shift the column image mapping to the left
         for (let col = c+2; col <= this.numCols + 1; col++) {
-            const imageKey_0 = JSON.stringify({column: col, value: "0_Image"});
+            const imageKey_0 = JSON.stringify({table_name: "input-table", column: col, value: "0_Image"});
             if (imageKey_0 in dictImageMapping) {
                 let value = dictImageMapping[imageKey_0];
-                const newImageKey = JSON.stringify({column: col-1, value: "0_Image"});
+                const newImageKey = JSON.stringify({table_name: "input-table", column: col-1, value: "0_Image"});
                 dictImageMapping[newImageKey] = value;
                 delete dictImageMapping[imageKey_0];
             }
-            const imageKey_1 = JSON.stringify({column: col, value: "1_Image"});
+            const imageKey_1 = JSON.stringify({table_name: "input-table", column: col, value: "1_Image"});
             if (imageKey_1 in dictImageMapping) {
                 let value = dictImageMapping[imageKey_1];
-                const newImageKey = JSON.stringify({column: col-1, value: "1_Image"});
+                const newImageKey = JSON.stringify({table_name: "input-table", column: col-1, value: "1_Image"});
                 dictImageMapping[newImageKey] = value;
                 delete dictImageMapping[imageKey_1];
             }
@@ -655,6 +657,7 @@ class Display {
         this.outputLine.position();
         this.createOutputTableColors();
         this.createInputTableEditBorder();
+        this.createOutputTableEditBorder();
     }
 
     alignTables() {
@@ -692,6 +695,103 @@ class Display {
             //td2.classList.add("bold-td");
 
 
+        }
+    }
+
+    createOutputTableEditBorder() {
+        return;
+
+        const outputTable = document.getElementById("output-table")
+        let binaryCheckbox = document.getElementById("BinaryToggle");
+        let editCheckbox = document.getElementById("InputToggle");
+        let nonBinaryMode = false
+        if (!binaryCheckbox.checked)
+            nonBinaryMode = true
+        let n = outputTable.rows.length;
+        for (let i = 1; i < n; i++) {
+            let tr = outputTable.rows[i];
+            for (let j = 1; j < tr.cells.length; j++) {
+                let textbox = tr.cells[j]
+                //textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
+                if (nonBinaryMode) {
+                    if (textbox.children.length === 0) {
+                        textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
+                    }
+                    if(j == 2) { //desired output
+                        textbox.children[0].classList.add("editable-border")
+                        dataOp.makeEditable(textbox.firstChild)
+                    }
+
+                    while (textbox.children.length > 1) {
+                        textbox.removeChild(textbox.children[1]);
+                    }
+                }
+                else {
+                    if (textbox.children.length === 0) {
+                        textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
+                    }
+                    textbox.children[0].classList.remove("editable-border")
+                    if(j == 2)
+                    {
+                        dataOp.makeEditable(textbox.firstChild, false)
+                    }
+                    while (textbox.children.length > 1) {
+                        textbox.removeChild(textbox.children[1]);
+                    }
+
+                    const img = document.createElement("img");
+                    if (textbox.innerText === "1") {
+                        img.alt = "1_Image";
+                        const imageKey = JSON.stringify({table_name: 'output-table', column: j, value: img.alt});
+                        if (imageKey in dictImageMapping) {
+                            let image_src = localStorage.getItem(dictImageMapping[imageKey]);
+                            if (image_src === null) {
+                                img.src = "1_image.svg";
+                            }
+                            else {
+                                img.src = image_src;
+                            }
+                        }
+                        else {
+                            img.src = "1_image.svg";
+                        }
+                    }
+                    else {
+                        img.alt = "0_Image";
+                        const imageKey = JSON.stringify({table_name: 'output-table', column: j, value: img.alt});
+                        if (imageKey in dictImageMapping) {
+                            let image_src = localStorage.getItem(dictImageMapping[imageKey]);
+                            if (image_src === null) {
+                                img.src = "0_image.svg";
+                            }
+                            else {
+                                img.src = image_src;
+                            }
+                        }
+                        else {
+                            img.src = "0_image.svg";
+                        }
+                    }
+                    img.width = 32;
+                    img.height = 32;
+                    img.classList.add("myimage");
+                    if (document.getElementById("InputToggle").checked)
+                        img.classList.add("editable-border")
+                    else {
+                        if (img.classList.contains("editable-border"))
+                            img.classList.remove("editable-border")
+                    }
+                    textbox.appendChild(img);
+                }
+            }
+        }
+        if (!nonBinaryMode && editCheckbox.checked)
+        {
+            setImageEditOptions();
+        }
+        else
+        {
+            hideCameraImages();
         }
     }
 
@@ -734,7 +834,7 @@ class Display {
 
                     if (textbox.innerText === "1") {
                         img.alt = "1_Image";
-                        const imageKey = JSON.stringify({column: j, value: img.alt});
+                        const imageKey = JSON.stringify({table_name: "input-table", column: j, value: img.alt});
                         if (imageKey in dictImageMapping) {
                             let image_src = localStorage.getItem(dictImageMapping[imageKey]);
                             if (image_src === null) {
@@ -752,7 +852,7 @@ class Display {
                     }
                     else {
                         img.alt = "0_Image";
-                        const imageKey = JSON.stringify({column: j, value: img.alt});
+                        const imageKey = JSON.stringify({table_name: "input-table", column: j, value: img.alt});
                         if (imageKey in dictImageMapping) {
                             let image_src = localStorage.getItem(dictImageMapping[imageKey]);
                             if (image_src === null) {
@@ -1192,6 +1292,7 @@ class Display {
             }
         }
         display.alignTables()
+        display.createOutputTableEditBorder();
     }
 
     handleHoverExit(inputRow, outputRow, isOdd = false) {
@@ -1228,7 +1329,8 @@ class Display {
         //this.createOutputTableColors();
         this.updateSelectedInput();
         display.adjustSelectedInputFontSize();
-        display.alignTables()
+        display.alignTables();
+        display.createOutputTableEditBorder();
     }
 
     getHeaderRowVals(headerRowVals) {
@@ -1419,6 +1521,7 @@ class Display {
         }
 
         display.outputLine.position();
+        display.createOutputTableEditBorder();
     }
 
     UpdateBinaryToggle(columnChanged) {
@@ -1437,6 +1540,7 @@ class Display {
             }
         }
         display.createInputTableEditBorder();
+        display.createOutputTableEditBorder();
         this.UpdateInputToggle();
     }
 
@@ -1508,6 +1612,7 @@ class Display {
             output.style.background = "#f8ffcf"
             return true
         }
+        display.createOutputTableEditBorder();
     }
 
 // update display panel
@@ -1592,6 +1697,8 @@ class Demo {
     hasNoSolution() {
         if (!document.getElementById("OutputToggle").checked)
             return
+        if(isLoading)
+            return;
         //uses perceptron learning rule
         dataOp.updateDataFromTableNoDisplay(outputs, outputTable);
         //uses perceptron learning rule
@@ -1933,7 +2040,7 @@ class Demo {
         //let isCorrect = display.checkCorrectness(outputs)
         //console.log("isCorrect: " + isCorrect)
         display.outputLine.position()
-
+        display.createOutputTableEditBorder();
     }
 
     // convert to valid inputs for processing and keep track of invalid parts of input
@@ -2035,6 +2142,13 @@ async function downloadFile() {
 
 async function uploadFromZipUrl(url) {
     try {
+        const urlRegex = /[\w\.\/&]+\.zip$/i;
+        if(!urlRegex.test(url)) {
+            alert("Please enter a valid URL ends with zip extension");
+            isLoading = false;
+            return;
+        }
+
         const response = await fetch(url, {
             mode: "no-cors",
             method: "GET",
@@ -2050,7 +2164,7 @@ async function uploadFromZipUrl(url) {
         const blob = await response.blob();
         await uploadZip(blob);
     } catch (err) {
-        alert("An error occurred when loading model: " + err.message);
+        alert("An error occurred when loading model: Please enter valid URL.");
     }
 }
 
@@ -2152,17 +2266,6 @@ function addThresholdEditOption() {
     toggleBtn.onclick = thresholdButtonHandler;
 }
 
-
-
-function handleImageClick(img, col) {
-    //check if we are in edit mode
-    if (document.getElementById("InputToggle").checked) {
-        currentImageType = img.alt;
-        currentColumn = col;
-        document.getElementById("upload-image_file").click();
-    }
-}
-
 function hideCameraImages() {
     let images = document.querySelectorAll(`.myimage`);
     images.forEach((image) => {
@@ -2183,8 +2286,9 @@ function setImageEditOptions() {
         let imageMenuHandler = function (event) {
             //make the dialog box visible
             if (document.getElementById("InputToggle").checked) {
+                let table = tdElement.closest('table');
                 event.preventDefault();
-                showMenu(event, this, tdElement.cellIndex)
+                showMenu(event, this, tdElement.cellIndex, table)
             }
             //handleImageClick(this, tdElement.cellIndex);
         };
@@ -2241,6 +2345,7 @@ async function uploadZip(zipFile) {
                         const dataURL = `data:image/png;base64,${base64String}`;
                         localStorage.setItem(relativePath, dataURL);
                         display.createInputTableEditBorder();
+                        display.createOutputTableEditBorder();
                     });
                 }
             });
@@ -2270,6 +2375,7 @@ function arrayBufferToString(arrayBuffer, chunkSize) {
 function uploadJson(text) {
     if (!text)
         return;
+    isLoading = true;
     demo.removeAllInputDataRows(false);
     demo.removeAllInputDataCols(false);
     demo.removeAllWeightCol();
@@ -2355,6 +2461,7 @@ function uploadJson(text) {
 
     display.outputLine.position();
     display.createInputTableEditBorder();
+    display.createOutputTableEditBorder();
     display.alignTables();
 
     if (document.getElementById('OutputToggle').checked)
@@ -2382,6 +2489,7 @@ function uploadJson(text) {
         thresholdToggle.classList.add("edit-toggle-on");
     }
     thresholdToggle.dispatchEvent(new Event("click"));
+    isLoading = false;
 }
 
 async function uploadFile(event) {
@@ -2403,27 +2511,81 @@ async function uploadImageFile(event) {
     if (!file) {
         return;
     }
-    const reader = new FileReader();
-    reader.onload = function(event) {
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    // const reader = new FileReader();
+    // reader.onload = function() {
+    //     const image = new Image();
+    //     image.onload = () => {
+    //         // Resize the image to 32x32 using the canvas
+    //         canvas.width = 32;
+    //         canvas.height = 32;
+    //         ctx.drawImage(image, 0, 0, 32, 32);
+    //         let dataURL = canvas.toDataURL("image/png", 0.9);
+    //         dictImageMapping[JSON.stringify({table_name: currentTable, column: currentColumn, value: currentImageType})] = file.name;
+    //         localStorage.setItem(file.name, dataURL);
+    //         display.createInputTableEditBorder();
+    //         display.createOutputTableEditBorder();
+    //     };
+    //     image.src = reader.result;
+    // };
+    // reader.readAsDataURL(file);
+
+
+    //Load the image file into an image object
+    const img = new Image();
+    img.onload = () => {
         try {
-            const arrayBuffer = event.target.result;
-            const binaryString = arrayBufferToString(arrayBuffer, 1024);
-            const base64String = btoa(binaryString);
-            // Use the binary content in the arrayBuffer
-            const dataURL = `data:image/png;base64,${base64String}`;
-            dictImageMapping[JSON.stringify({column: currentColumn, value: currentImageType})] = file.name;
+            // Resize the image to 32x32 using the canvas
+            canvas.width = 32;
+            canvas.height = 32;
+            ctx.drawImage(img, 0, 0, 32, 32);
+            let dataURL = canvas.toDataURL("image/png", 0.9);
+            dictImageMapping[JSON.stringify({table_name: currentTable, column: currentColumn, value: currentImageType})] = file.name;
             localStorage.setItem(file.name, dataURL);
             display.createInputTableEditBorder();
+            display.createOutputTableEditBorder();
         }
         catch (e)
         {
-            alert("An error occurred: Try uploading a smaller image.");
+            alert("An error occurred: Try uploading a smaller image or convert the image file to a valid type (.bmp, .gif, .jpg, .jpeg, .png, .webp).");
             localStorage.removeItem(file.name);
-            delete dictImageMapping[JSON.stringify({column: currentColumn, value: currentImageType})];
+            delete dictImageMapping[JSON.stringify({table_name: currentTable, column: currentColumn, value: currentImageType})];
         }
-
     };
-    reader.readAsArrayBuffer(file);
+    img.onerror = function() {
+        console.log('Error loading image');
+        console.log('Image URL:', img.src);
+        console.log('Image dimensions:', img.naturalWidth, 'x', img.naturalHeight);
+        alert("An error occurred: Try uploading a smaller image or convert the image file to a valid type (.bmp, .gif, .jpg, .jpeg, .png, .webp).");
+        localStorage.removeItem(file.name);
+        delete dictImageMapping[JSON.stringify({table_name: currentTable, column: currentColumn, value: currentImageType})];
+    };
+    img.src = URL.createObjectURL(file);
+
+    // const reader = new FileReader();
+    // reader.onload = function(event) {
+    //     try {
+    //         const arrayBuffer = event.target.result;
+    //         const binaryString = arrayBufferToString(arrayBuffer, 1024);
+    //         const base64String = btoa(binaryString);
+    //         // Use the binary content in the arrayBuffer
+    //         const dataURL = `data:image/png;base64,${base64String}`;
+    //         dictImageMapping[JSON.stringify({table_name: currentTable, column: currentColumn, value: currentImageType})] = file.name;
+    //         localStorage.setItem(file.name, dataURL);
+    //             display.createInputTableEditBorder();
+    //             display.createOutputTableEditBorder();
+    //     }
+    //     catch (e)
+    //     {
+    //         alert("An error occurred: Try uploading a smaller image.");
+    //         localStorage.removeItem(file.name);
+    //             delete dictImageMapping[JSON.stringify({table_name: currentTable, column: currentColumn, value: currentImageType})];
+    //     }
+    //
+    // };
+    // reader.readAsArrayBuffer(file);
 }
 
 
@@ -2439,7 +2601,9 @@ const demo = new Demo();
 var currentImageType = "";
 var currentImage;
 var currentColumn = -1;
+var currentTable = "input-table";
 var dictImageMapping = {}
+var isLoading = false;
 let inputs = new Data(demo.inputData);
 let desiredOutputs = new Data(demo.desiredOutput);
 const dataOp = new DataOperator();
@@ -2456,6 +2620,7 @@ display.updateDisplay();
 uploadFromZipUrl("SampleModel.zip");
 display.createOutputTableColors();
 display.createInputTableEditBorder();
+display.createOutputTableEditBorder();
 addThresholdEditOption();
 
 
@@ -2487,7 +2652,8 @@ $('#InputToggle').change(function() { //toggle edit
     display.outputLine.position();
     const show = document.getElementById("InputToggle").checked;
     demo.showWeightToggle(show);
-    display.createInputTableEditBorder()
+    display.createInputTableEditBorder();
+    display.createOutputTableEditBorder();
 });
 
 $('#OutputToggle').change(function() { //toggle output
@@ -2519,14 +2685,15 @@ $('#FanfareToggle').change(function() { //toggle output
     }
 });
 
-function showMenu(event, img, col) {
+function showMenu(event, img, col, table) {
     if (document.getElementById("InputToggle").checked) {
         currentImage = img;
         currentImageType = img.alt;
         currentColumn = col;
+        currentTable = table.id;
         const menu = document.getElementById("popup-menu");
         menu.style.display = "block";
-        const imageKey_0 = JSON.stringify({column: col, value: img.alt});
+        const imageKey_0 = JSON.stringify({table_name: currentTable, column: col, value: img.alt});
         if (imageKey_0 in dictImageMapping) { //existing image
             document.querySelector(".existing_image_menu").style.display = "block";
             document.querySelector(".new_image_menu").style.display = "none";
@@ -2553,8 +2720,9 @@ function menuItemClicked(item) {
             fileInput.click();
             break;
         case 2:
-            delete dictImageMapping[JSON.stringify({column: currentColumn, value: currentImageType})];
+            delete dictImageMapping[JSON.stringify({table_name: currentTable, column: currentColumn, value: currentImageType})];
             display.createInputTableEditBorder();
+            display.createOutputTableEditBorder();
             break;
         default:
         // Do something when an invalid menu item is clicked
