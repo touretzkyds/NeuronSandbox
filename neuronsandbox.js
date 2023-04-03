@@ -2555,9 +2555,9 @@ async function uploadImageFile(event) {
         }
     };
     img.onerror = function() {
-        console.log('Error loading image');
-        console.log('Image URL:', img.src);
-        console.log('Image dimensions:', img.naturalWidth, 'x', img.naturalHeight);
+        //console.log('Error loading image');
+        //console.log('Image URL:', img.src);
+        //console.log('Image dimensions:', img.naturalWidth, 'x', img.naturalHeight);
         alert("An error occurred: Try uploading a smaller image or convert the image file to a valid type (.bmp, .gif, .jpg, .jpeg, .png, .webp).");
         localStorage.removeItem(file.name);
         delete dictImageMapping[JSON.stringify({table_name: currentTable, column: currentColumn, value: currentImageType})];
