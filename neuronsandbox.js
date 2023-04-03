@@ -2489,6 +2489,7 @@ function uploadJson(text) {
         thresholdToggle.classList.add("edit-toggle-on");
     }
     thresholdToggle.dispatchEvent(new Event("click"));
+    handleDesiredOutputColumn();
     isLoading = false;
 }
 
@@ -2622,6 +2623,7 @@ display.createOutputTableColors();
 display.createInputTableEditBorder();
 display.createOutputTableEditBorder();
 addThresholdEditOption();
+handleDesiredOutputColumn();
 
 
 function addTooltips()
@@ -2736,5 +2738,27 @@ function handleClickOutsideContextMenu(e) {
         document.removeEventListener('click', handleClickOutsideContextMenu);
     }
 }
+
+function handleDesiredOutputColumn() {
+    let table = document.getElementById('output-table');
+
+    let thirdColumnTds = table.querySelectorAll('tr td:nth-child(3)');
+
+    thirdColumnTds.forEach(function(td) {
+        td.onkeydown = handleKeyDown;
+    });
+
+    function handleKeyDown(event) {
+        if (event.keyCode === 13) {
+            const rawValue = event.target.innerText;
+            let [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
+            if (parsedValue !== 1 && parsedValue !== 0 ) {
+                isValid = false;
+            }
+            display.highlightInvalidText(event.target, isValid);
+        }
+    }
+}
+
 
 
