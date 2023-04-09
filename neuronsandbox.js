@@ -680,6 +680,25 @@ class Display {
         outputHeaderCells[0].style.height = maxHeight + 'px';
     }
 
+    toggleProblemDisplay() {
+        let checked = document.getElementById("InputToggle").checked;
+        let qPrompt = document.getElementById("questionprompt");
+        let qText =  document.getElementById("questiontext");
+        if (checked) { //word problem is now editable
+            qPrompt.hidden = false;
+            //qPrompt.style.display = "block"
+            qPrompt.value= qText.innerText;
+
+            qText.hidden = true;
+        }
+        else {
+            qText.hidden = false;
+            qText.innerText = qPrompt.value;
+
+            qPrompt.hidden = true;
+        }
+    }
+
     createOutputTableColors() {
         const outputTable = document.getElementById("output-table");
         let n = outputTable.rows.length;
@@ -1479,6 +1498,7 @@ class Display {
             demo.weightLines[i].position();
         }
         this.UpdateOutputToggle()
+
     }
 
     UpdateOutputToggle() {
@@ -1522,6 +1542,7 @@ class Display {
 
         display.outputLine.position();
         display.createOutputTableEditBorder();
+        handleDesiredOutputColumn()
     }
 
     UpdateBinaryToggle(columnChanged) {
@@ -2559,7 +2580,7 @@ async function uploadImageFile(event) {
         //console.log('Error loading image');
         //console.log('Image URL:', img.src);
         //console.log('Image dimensions:', img.naturalWidth, 'x', img.naturalHeight);
-        alert("An error occurred: Try uploading a smaller image or convert the image file to a valid type (.bmp, .gif, .jpg, .jpeg, .png, .webp).");
+        alert("This is not a valid image. Valid types are: .bmp, .gif, .jpg, .jpeg, .png, .webp. Apple .HEIC files are not supported.");
         localStorage.removeItem(file.name);
         delete dictImageMapping[JSON.stringify({table_name: currentTable, column: currentColumn, value: currentImageType})];
     };
@@ -2618,12 +2639,13 @@ perceptron.displayPerceptron();
 const display = new Display();
 display.updateDisplay();
 //uploadFromUrl("SampleModel.json");
-uploadFromZipUrl("SampleModel.zip");
+uploadFromZipUrl("Level 1.zip");
 display.createOutputTableColors();
 display.createInputTableEditBorder();
 display.createOutputTableEditBorder();
 addThresholdEditOption();
 handleDesiredOutputColumn();
+loadQuestionsAndModels();
 
 
 function addTooltips()
@@ -2656,6 +2678,7 @@ $('#InputToggle').change(function() { //toggle edit
     demo.showWeightToggle(show);
     display.createInputTableEditBorder();
     display.createOutputTableEditBorder();
+    display.toggleProblemDisplay();
 });
 
 $('#OutputToggle').change(function() { //toggle output
@@ -2758,6 +2781,41 @@ function handleDesiredOutputColumn() {
             display.highlightInvalidText(event.target, isValid);
         }
     }
+}
+function fileExists(url) {
+    let http = new XMLHttpRequest();
+    http.open('HEAD', encodeURIComponent(url), false);
+    http.send();
+    return http.status !== 404;
+}
+function loadQuestionsAndModels() {
+    fetch('questions.json')
+        .then(response => response.json())
+        .then(data => {
+            const dropdown = document.getElementById('problem-list');
+            dropdown.innerHTML = "";
+            data.items.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = item.label;
+                dropdown.appendChild(option);
+            });
+            dropdown.addEventListener('change', event => {
+                const selectedItemId = event.target.value;
+                console.log(`User selected item with ID ${selectedItemId}`);
+                data.items.forEach(item => {
+                    if (item.id.toString() === selectedItemId) {
+                        console.log(`Selected item: ${JSON.stringify(item)}`);
+                        const questiontext = document.getElementById("questiontext");
+                        questiontext.innerText = item.question;
+                        //load the model associated with the question
+                        if (fileExists(item.model_name+".zip")) {
+                            uploadFromZipUrl(encodeURIComponent(item.model_name+".zip"));
+                        }
+                    }
+                });
+            });
+        });
 }
 
 

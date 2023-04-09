@@ -449,7 +449,7 @@ article > section {
     width: 100%;
 }
 .user-input-wrp .inputText{
-    width: 100%;
+    width: 98%;
     outline: none;
     border:none;
     border-bottom: 1px solid #777;
@@ -744,6 +744,15 @@ span {
 
 .input-output-table th, td {
     border-right: 1px solid white;
+}
+
+.button-border {
+    border-style:solid;
+    border-color: lightslategray;
+    margin: auto;
+    line-height: 1em;
+    width: 300px;
+
 }
 
 /*input[type="file"] {*/

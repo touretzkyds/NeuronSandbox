@@ -32,6 +32,26 @@
             </section>
             <section>
                 <b id ="fname" class="model-name">model</b></section>
+            <select name="problem-list" id="problem-list">
+                <option value="p1">Problem 1</option>
+                <option value="p1">Problem 2</option>
+                <option value="p1">Problem 3</option>
+            </select>
+        </article>
+
+        <article>
+                <div id="question">
+                    <h1 style="font-size: 25px">Problem</h1>
+                </div>
+<!--            <div style="width: 400px; height: 100px" class="editable-border">-->
+<!--                <p style="font-size: 20px">this is the word problem</p>-->
+<!--            </div>-->
+            <div>
+                <input hidden style="width: 400px; height: 50px;" type="text" id="questionprompt">
+                <p id="questiontext" style="font-size: 23px">Can I make a peanut butter and jelly sandwich? </p>
+            </div>
+
+
         </article>
 
         <table class = "heading-table">
@@ -73,19 +93,22 @@
                 </th>
 
                 <th>
-                    <div class="user-input-wrp">
-                        <br/>
-                        <input type="text" class="inputText" name="url" id="url" size="160" onkeypress="let keyCode = event.keyCode || event.which; if (keyCode == 13) {uploadFileCombined(); return false;}" required/>
-                        <span class="floating-label">Model URL</span>
+                    <div class="button-border">
+                        <div class="user-input-wrp">
+                            <br/>
+                            <input type="text" class="inputText" name="url" id="url" size="160" onkeypress="let keyCode = event.keyCode || event.which; if (keyCode == 13) {uploadFileCombined(); return false;}" required/>
+                            <span  class="floating-label">Model URL</span>
+                        </div>
+
+                        <!--                            <button for="upload-file" class="custom-btn myButton">-->
+                        <!--                                <i class="fa fa-upload" aria-hidden="true"></i>-->
+                        <!--                                upload file ...-->
+                        <!--                            </button>-->
+                        <a href="javascript:uploadFileCombined();" class="custom-btn myButton">
+                            <i class="fa fa-upload" aria-hidden="true"></i> Load Model from URL
+                        </a>
                     </div>
 
-                    <!--                            <button for="upload-file" class="custom-btn myButton">-->
-                    <!--                                <i class="fa fa-upload" aria-hidden="true"></i>-->
-                    <!--                                upload file ...-->
-                    <!--                            </button>-->
-                    <a href="javascript:uploadFileCombined();" class="custom-btn myButton">
-                        <i class="fa fa-upload" aria-hidden="true"></i> Load Model from URL
-                    </a>
 
                     <!--                            <input type="button"  class="custom-btn myButton" id="loadFileJson" value="Upload Model" onclick="document.getElementById('upload-file').click();"> </input>-->
 
