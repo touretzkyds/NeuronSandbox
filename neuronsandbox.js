@@ -1885,6 +1885,20 @@ class Demo {
     updateWeightUI(parentElement) {
         //TODO: make code less messy
         let childCount = parentElement.children.length;
+        console.log(this.weightLines)
+
+        // const selections = document.getElementById("selected-inputs");
+        // for (let i = 0; i < childCount-1; i++) {
+        //     addEditOption(i);
+        //     let child = parentElement.children[i]
+        //     child.style.position = "absolute";
+        //
+        //     child.style.top = selections.rows[i].cells[0].getBoundingClientRect().top + "px";
+        //     child.style.left = selections.rows[i].cells[0].getBoundingClientRect().left + "px";
+        //
+        // }
+
+
         if (childCount === 1) {
             let child = parentElement.children[0];
             const top = 40;
@@ -2639,7 +2653,7 @@ perceptron.displayPerceptron();
 const display = new Display();
 display.updateDisplay();
 //uploadFromUrl("SampleModel.json");
-uploadFromZipUrl("Level 1.zip");
+uploadFromZipUrl("SampleModel.zip");
 display.createOutputTableColors();
 display.createInputTableEditBorder();
 display.createOutputTableEditBorder();
@@ -2810,7 +2824,18 @@ function loadQuestionsAndModels() {
                         questiontext.innerText = item.question;
                         //load the model associated with the question
                         if (fileExists(item.model_name+".zip")) {
-                            uploadFromZipUrl(encodeURIComponent(item.model_name+".zip"));
+                            uploadFromZipUrl(encodeURIComponent(item.model_name+".zip")).then(()=>
+                                {
+                                    if(item.label !== "Sandbox") {
+                                        document.getElementById("InputToggle").setAttribute("disabled", "true");
+                                        document.getElementById("BinaryToggle").setAttribute("disabled", "true");
+                                    }
+                                    else {
+                                        document.getElementById("InputToggle").removeAttribute("disabled");
+                                        document.getElementById("BinaryToggle").removeAttribute("disabled");
+                                    }
+                                }
+                            )
                         }
                     }
                 });
