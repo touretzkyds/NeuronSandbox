@@ -758,3 +758,12 @@ span {
 /*input[type="file"] {*/
 /*    display: none;*/
 /*}*/
+
+.button-border a {
+    text-decoration: none;
+}
+
+.custom-btn {
+    text-decoration: none;
+    width: 170px;
+}
