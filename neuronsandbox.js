@@ -2838,21 +2838,8 @@ function loadQuestionsAndModels() {
                         //questiontext.innerText = item.question;
                         //load the model associated with the question
                         if (fileExists(item.model_name+".zip")) {
-                            uploadFromZipUrl(encodeURIComponent(item.model_name+".zip")).then(()=>
-                                {
-                                    if(item.label !== "Sandbox") {
-                                        //document.getElementById("binary-slider").style.backgroundColor = "gray";
-                                        document.getElementById("InputToggle").setAttribute("disabled", "true");
-                                        //document.getElementById("edit-slider").style.backgroundColor = "gray";
-                                        document.getElementById("BinaryToggle").setAttribute("disabled", "true");
-                                    }
-                                    else {
-                                        document.getElementById("InputToggle").removeAttribute("disabled");
-                                        document.getElementById("BinaryToggle").removeAttribute("disabled");
+                            uploadFromZipUrl(encodeURIComponent(item.model_name+".zip"));
 
-                                    }
-                                }
-                            )
                         }
                     }
                 });
