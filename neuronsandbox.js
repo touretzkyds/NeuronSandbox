@@ -2133,6 +2133,15 @@ async function downloadFile() {
     //let thresholdToggleChecked = document.getElementById("checkbox_threshold_editable").checked;
     let thresholdToggleChecked = document.getElementById("threshold_toggleBtn").classList.contains("edit-toggle-on");
 
+    const editToggle = document.getElementById("InputToggle").checked;
+    let question = "";
+    if (editToggle) {
+        question = document.getElementById("questionprompt").value;
+    }
+    else {
+        question = document.getElementById("questiontext").innerHTML;
+    }
+
     let dict = {
         "model-name" : newName,
         "input": demo.inputData,
@@ -2145,7 +2154,8 @@ async function downloadFile() {
         "output-toggle-checked" : outputToggleChecked,
         "fanfare-toggle-checked": fanfareToggleChecked,
         "input-header-vars" : headerRowVariables,
-        "binaryToggleChecked" : binaryToggleChecked
+        "binaryToggleChecked" : binaryToggleChecked,
+        "question" : question
         //"input-header": headerRows,
     };
 
@@ -2421,7 +2431,8 @@ function uploadJson(text) {
     demo.weights = []; //clear weight array first, due to the insertWeightCol below
     demo.threshold = dict["threshold"];
     desiredOutputs = dict["desired-output"];
-    document.getElementById('fname').innerText  = dict["model-name"]
+    document.getElementById('fname').innerText  = dict["model-name"];
+    document.getElementById("questiontext").innerText = dict["question"];
 
     inputs = new Data(demo.inputData);
 
@@ -2693,6 +2704,9 @@ $('#InputToggle').change(function() { //toggle edit
     display.createInputTableEditBorder();
     display.createOutputTableEditBorder();
     display.toggleProblemDisplay();
+    for (let i = 0; i < demo.weightLines.length; i++) {
+        demo.weightLines[i].position();
+    }
 });
 
 $('#OutputToggle').change(function() { //toggle output
@@ -2820,19 +2834,22 @@ function loadQuestionsAndModels() {
                 data.items.forEach(item => {
                     if (item.id.toString() === selectedItemId) {
                         console.log(`Selected item: ${JSON.stringify(item)}`);
-                        const questiontext = document.getElementById("questiontext");
-                        questiontext.innerText = item.question;
+                        //const questiontext = document.getElementById("questiontext");
+                        //questiontext.innerText = item.question;
                         //load the model associated with the question
                         if (fileExists(item.model_name+".zip")) {
                             uploadFromZipUrl(encodeURIComponent(item.model_name+".zip")).then(()=>
                                 {
                                     if(item.label !== "Sandbox") {
+                                        //document.getElementById("binary-slider").style.backgroundColor = "gray";
                                         document.getElementById("InputToggle").setAttribute("disabled", "true");
+                                        //document.getElementById("edit-slider").style.backgroundColor = "gray";
                                         document.getElementById("BinaryToggle").setAttribute("disabled", "true");
                                     }
                                     else {
                                         document.getElementById("InputToggle").removeAttribute("disabled");
                                         document.getElementById("BinaryToggle").removeAttribute("disabled");
+
                                     }
                                 }
                             )
