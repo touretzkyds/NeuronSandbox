@@ -791,8 +791,8 @@ class Display {
                             img.src = "0_image.svg";
                         }
                     }
-                    img.width = 32;
-                    img.height = 32;
+                    img.width = 48;
+                    img.height = 48;
                     img.classList.add("myimage");
                     if (document.getElementById("InputToggle").checked)
                         img.classList.add("editable-border")
@@ -885,8 +885,8 @@ class Display {
                             img.src = "0_image.svg";
                         }
                     }
-                    img.width = 32;
-                    img.height = 32;
+                    img.width = 48;
+                    img.height = 48;
                     img.classList.add("myimage");
                     if (document.getElementById("InputToggle").checked)
                         img.classList.add("editable-border")
@@ -2139,7 +2139,7 @@ async function downloadFile() {
         question = document.getElementById("questionprompt").value;
     }
     else {
-        question = document.getElementById("questiontext").innerHTML;
+        question = document.getElementById("questiontext").innerText;
     }
 
     let dict = {
@@ -2433,6 +2433,10 @@ function uploadJson(text) {
     desiredOutputs = dict["desired-output"];
     document.getElementById('fname').innerText  = dict["model-name"];
     document.getElementById("questiontext").innerText = dict["question"];
+    document.getElementById("questionprompt").hidden = true;
+    document.getElementById("questiontext").hidden = false;
+
+
 
     inputs = new Data(demo.inputData);
 
@@ -2584,10 +2588,10 @@ async function uploadImageFile(event) {
     const img = new Image();
     img.onload = () => {
         try {
-            // Resize the image to 32x32 using the canvas
-            canvas.width = 32;
-            canvas.height = 32;
-            ctx.drawImage(img, 0, 0, 32, 32);
+            // Resize the image to 48x48 using the canvas
+            canvas.width = 48;
+            canvas.height = 48;
+            ctx.drawImage(img, 0, 0, 48, 48);
             let dataURL = canvas.toDataURL("image/png", 0.9);
             dictImageMapping[JSON.stringify({table_name: currentTable, column: currentColumn, value: currentImageType})] = file.name;
             localStorage.setItem(file.name, dataURL);
@@ -2664,7 +2668,7 @@ perceptron.displayPerceptron();
 const display = new Display();
 display.updateDisplay();
 //uploadFromUrl("SampleModel.json");
-uploadFromZipUrl("SampleModel.zip");
+uploadFromZipUrl("Problem 1.zip");
 display.createOutputTableColors();
 display.createInputTableEditBorder();
 display.createOutputTableEditBorder();

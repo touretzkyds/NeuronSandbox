@@ -767,3 +767,13 @@ span {
     text-decoration: none;
     width: 170px;
 }
+
+#questiontext {
+    margin: auto;
+    text-align: center;
+    width: 500px;
+}
+
+#qdiv {
+    margin: auto;
+}
