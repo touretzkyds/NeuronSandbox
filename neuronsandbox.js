@@ -628,7 +628,15 @@ class Perceptron {
             const cell = childNodes[i].childNodes[2];
             if (cell) {
                 //dataOp.makeEditable(cell);
+
                 const [parsedValue, isValid] = demo.stringToValidFloat(cell.innerHTML);
+                if(isValid) {
+                    //check for leading zeroes
+                    const regex = '^-?0+[0-9]+$';
+                    if (new RegExp(regex).test(cell.innerHTML)) {
+                        cell.innerHTML = parseInt(cell.innerHTML)
+                    }
+                }
                 display.highlightInvalidText(cell, isValid);
                 this.weights[i] = parsedValue;
                 this.weightLabels.push(childNodes[i].childNodes[0].innerText);
@@ -639,6 +647,13 @@ class Perceptron {
     updateThreshold(){
         const cell = document.getElementById(`th${1}`);
         const [parsedValue, isValid] = demo.stringToValidFloat(cell.innerHTML);
+        if(isValid) {
+            //check for leading zeroes
+            const regex = '^-?0+[0-9]+$';
+            if (new RegExp(regex).test(cell.innerHTML)) {
+                cell.innerHTML = parseInt(cell.innerHTML)
+            }
+        }
         display.highlightInvalidText(cell, isValid);
         this.threshold = parsedValue;
     }
@@ -1585,7 +1600,7 @@ class Display {
         //TODO: do extra testing with the regex and make changes if necessary
         if (!output)
             return
-        const regex = '/^0*1?$/gm'; //detects trailing zeros
+        const regex = '/^0*1?$/gm'; //detects leading zeros
 
         let checkboxEdit = document.getElementById("InputToggle");
         let editable = checkboxEdit.checked;
@@ -1891,19 +1906,6 @@ class Demo {
     updateWeightUI(parentElement) {
         //TODO: make code less messy
         let childCount = parentElement.children.length;
-        console.log(this.weightLines)
-
-        // const selections = document.getElementById("selected-inputs");
-        // for (let i = 0; i < childCount-1; i++) {
-        //     addEditOption(i);
-        //     let child = parentElement.children[i]
-        //     child.style.position = "absolute";
-        //
-        //     child.style.top = selections.rows[i].cells[0].getBoundingClientRect().top + "px";
-        //     child.style.left = selections.rows[i].cells[0].getBoundingClientRect().left + "px";
-        //
-        // }
-
 
         if (childCount === 1) {
             let child = parentElement.children[0];
