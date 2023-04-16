@@ -110,7 +110,7 @@
 
                     <!--                            <input type="button"  class="custom-btn myButton" id="loadFileJson" value="Upload Model" onclick="document.getElementById('upload-file').click();"> </input>-->
 
-                    <input id="upload-file" style="display:none;" type="file" accept="application/zip" onchange="console.log('event = ', event); uploadFile(event)"/>
+                    <input id="upload-file" style="display:none;" type="file" accept=".sandbox" onchange="console.log('event = ', event); uploadFile(event)"/>
                     <input id="upload-image_file" style="display:none;" type="file" accept="image/*" onchange="console.log('event = ', event); uploadImageFile(event)"/>
                 </th>
                 <th>
@@ -276,7 +276,10 @@
     <body>
         <div id="popup" class="popup">
             <b>Winner!</b>
-            <button id="keep-playing-btn" onclick="toggle()">Keep Playing</button>
+            <div class="play-button-container">
+                <button class="playing-btn" id="keep-playing-btn" onclick="toggle()">Keep Playing</button>
+                <button class="playing-btn" id="next-question-btn" onclick="nextQuestion()">Next Question</button>
+            </div>
             <audio id="hooray_sound">
                 <source src="hooray.mp3" type="audio/mpeg">
                 Your browser does not support the audio element.
@@ -286,6 +289,15 @@
         <script type="text/javascript">
         function toggle() {
             document.getElementById("popup").classList.toggle('active');
+        }
+        function nextQuestion() {
+            document.getElementById("popup").classList.toggle('active');
+            const questionDropDown = document.getElementById("problem-list");
+            const selectedIndex = questionDropDown.selectedIndex;
+            const nextIndex = selectedIndex + 1;
+            if(nextIndex < questionDropDown.options.length) {
+                questionDropDown.selectedIndex = nextIndex;
+            }
         }
     </script>
     </body>

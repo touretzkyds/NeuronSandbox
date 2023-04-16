@@ -930,6 +930,12 @@ class Display {
                     PlaySound();
                     if (!document.getElementById("popup").classList.contains("active"))
                         document.getElementById("popup").classList.toggle('active');
+
+                    const questionDropDown = document.getElementById("problem-list");
+                    const selectedIndex = questionDropDown.selectedIndex;
+                    const nextIndex = selectedIndex + 1;
+                    let button = document.getElementById("next-question-btn");
+                    button.style.display = nextIndex < questionDropDown.options.length? "inline-block" : "none";
                     //document.getElementById("congrats-msg").hidden = false;
                     display.outputLine.position()
                     for (let i = 0; i < demo.weightLines.length; i++)
@@ -2107,10 +2113,10 @@ async function downloadFile() {
     //if(modelname.length == 0)  modelname = "model"
 
     const handle = await showSaveFilePicker({
-        suggestedName: modelname + '.zip',
+        suggestedName: modelname + '.sandbox',
         types: [{
             description: 'Neuron Sandbox model',
-            accept: {'application/zip': ['.zip']},
+            accept: {'application/sandbox': ['.sandbox']},
         }],
     });
 
@@ -2187,7 +2193,7 @@ async function downloadFile() {
 
 async function uploadFromZipUrl(url) {
     try {
-        const urlRegex = /[\w\.\/&]+\.zip$/i;
+        const urlRegex = /[\w\.\/&]+\.sandbox$/i;
         if(!urlRegex.test(url)) {
             alert("Please enter a valid URL ends with zip extension");
             isLoading = false;
@@ -2198,7 +2204,7 @@ async function uploadFromZipUrl(url) {
             mode: "no-cors",
             method: "GET",
             headers: {
-                accept: "*/zip",
+                accept: "*/*",
             },
         });
 
@@ -2218,7 +2224,7 @@ function uploadFromUrl(url) { //TODO: doesn't work if running from hard drive
         mode: "no-cors",
         method: "GET",
         headers: {
-            accept: '*/zip',
+            accept: '*/sandbox',
         }
     })
         .then(res => res.text())
@@ -2668,7 +2674,7 @@ perceptron.displayPerceptron();
 const display = new Display();
 display.updateDisplay();
 //uploadFromUrl("SampleModel.json");
-uploadFromZipUrl("Problem 1.zip");
+uploadFromZipUrl("Problem 1.sandbox");
 display.createOutputTableColors();
 display.createInputTableEditBorder();
 display.createOutputTableEditBorder();
@@ -2841,8 +2847,8 @@ function loadQuestionsAndModels() {
                         //const questiontext = document.getElementById("questiontext");
                         //questiontext.innerText = item.question;
                         //load the model associated with the question
-                        if (fileExists(item.model_name+".zip")) {
-                            uploadFromZipUrl(encodeURIComponent(item.model_name+".zip"));
+                        if (fileExists(item.model_name+".sandbox")) {
+                            uploadFromZipUrl(encodeURIComponent(item.model_name+".sandbox"));
 
                         }
                     }
