@@ -935,7 +935,7 @@ class Display {
                     const selectedIndex = questionDropDown.selectedIndex;
                     const nextIndex = selectedIndex + 1;
                     let button = document.getElementById("next-question-btn");
-                    button.style.display = nextIndex < questionDropDown.options.length? "inline-block" : "none";
+                    button.style.display = nextIndex < questionDropDown.options.length - 1 ? "inline-block" : "none";
                     //document.getElementById("congrats-msg").hidden = false;
                     display.outputLine.position()
                     for (let i = 0; i < demo.weightLines.length; i++)

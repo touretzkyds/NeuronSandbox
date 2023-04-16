@@ -585,7 +585,7 @@ span {
     height: 50px;
     position:relative;
     bottom: 10px;
-    horiz-align: center;
+    /*horiz-align: center;*/
     background-color: #0095ff;
     border: 1px solid transparent;
     border-radius: 3px;
