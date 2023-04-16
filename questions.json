@@ -20,7 +20,7 @@
     },
     {
       "id": 0,
-      "label": "Sandbox",
+      "label": "Blank Model",
       "question": "Enter question here!",
       "model_name": "SampleModel"
     }

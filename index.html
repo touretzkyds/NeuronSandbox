@@ -297,6 +297,8 @@
             const nextIndex = selectedIndex + 1;
             if(nextIndex < questionDropDown.options.length) {
                 questionDropDown.selectedIndex = nextIndex;
+                const event = new Event("change");
+                questionDropDown.dispatchEvent(event);
             }
         }
     </script>
