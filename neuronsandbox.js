@@ -616,7 +616,7 @@ class Perceptron {
             if (cell) {
                 cell.innerHTML = this.weights[i];
                 if (this.weightLabels)
-                    childNodes[i].childNodes[0].innerText = this.weightLabels[i];
+                    childNodes[i].childNodes[0].innerHtml = ConvertToWeightSubscript(this.weightLabels[i]);
             }
         }
     }
@@ -657,6 +657,20 @@ class Perceptron {
         display.highlightInvalidText(cell, isValid);
         this.threshold = parsedValue;
     }
+}
+
+function ConvertToWeightSubscript(weightLabel) {
+    if(!weightLabel.match("/baseline-shift/")) {
+        let firstChar = weightLabel.charAt(0);
+        let spaceIndex = weightLabel.indexOf(' ');
+        if(spaceIndex === -1){
+            spaceIndex = weightLabel.length;
+        }
+        let remainder = weightLabel.substring(spaceIndex);
+        let subscriptChars = "<sub>" + weightLabel.substring(1, spaceIndex) + "</sub>";
+        weightLabel = `${firstChar}${subscriptChars}{$remainder}`;
+    }
+    return weightLabel;
 }
 
 class Display {
