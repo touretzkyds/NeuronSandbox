@@ -2198,7 +2198,7 @@ async function uploadFromZipUrl(url) {
     try {
         const urlRegex = /[\w\.\/&]+\.sandbox$/i;
         if(!urlRegex.test(url)) {
-            alert("Please enter a valid URL ends with zip extension");
+            alert("Please enter a valid URL ends with sandbox extension");
             isLoading = false;
             return;
         }
