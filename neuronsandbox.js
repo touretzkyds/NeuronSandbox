@@ -2133,7 +2133,8 @@ async function downloadFile() {
     desiredOutputs.rows = table.rows.length-1;
 
     //dataOp.updateDataFromTable(outputs, outputTable);
-    let newName = handle.name.substring(0, handle.name.length - 4)
+    //let newName = handle.name.substring(0, handle.name.length - 4)
+    let newName = (handle.name).replace(".sandbox", "")
     document.getElementById("fname").textContent = newName
 
     demo.threshold = perceptron.threshold;
