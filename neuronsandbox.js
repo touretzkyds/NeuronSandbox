@@ -712,6 +712,7 @@ class Display {
 
             qPrompt.hidden = true;
         }
+
     }
 
     createOutputTableColors() {
@@ -2720,6 +2721,7 @@ $('#InputToggle').change(function() { //toggle edit
     for (let i = 0; i < demo.weightLines.length; i++) {
         demo.weightLines[i].position();
     }
+    display.outputLine.position()
 });
 
 $('#OutputToggle').change(function() { //toggle output
