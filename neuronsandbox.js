@@ -637,7 +637,8 @@ class Perceptron {
                         cell.innerHTML = parseInt(cell.innerHTML)
                     }
                 }
-                display.highlightInvalidText(cell, isValid);
+               //display.highlightInvalidText(cell, isValid);
+                cell.innerText = parsedValue.toString();
                 this.weights[i] = parsedValue;
                 this.weightLabels.push(childNodes[i].childNodes[0].innerText);
             }
@@ -654,7 +655,8 @@ class Perceptron {
                 cell.innerHTML = parseInt(cell.innerHTML)
             }
         }
-        display.highlightInvalidText(cell, isValid);
+        //display.highlightInvalidText(cell, isValid);
+        cell.innerText = parsedValue.toString();
         this.threshold = parsedValue;
     }
 }
@@ -748,7 +750,7 @@ class Display {
     }
 
     createOutputTableEditBorder() {
-        return;
+        //return;
 
         const outputTable = document.getElementById("output-table")
         let binaryCheckbox = document.getElementById("BinaryToggle");
@@ -2385,6 +2387,11 @@ function setupCloseButtons() {
 async function uploadZip(zipFile) {
     // Assume the zip file is stored in a variable called "zipFile" and is a binary string
     try {
+        let options = document.getElementById("problem-list").options
+        let len = options.length;
+        for (let i = 0; i < len; i++) {
+            options[i].selected = false;
+        }
         localStorage.clear();
         const zipObj = new JSZip();
         let jsonModelContent = ""
@@ -2788,7 +2795,8 @@ function showMenu(event, img, col, table) {
         var rect = img.getBoundingClientRect();
         menu.style.top = rect.top + window.pageYOffset + event.offsetY + "px";
         menu.style.left = rect.left + window.pageXOffset + event.offsetX + "px";
-        document.addEventListener('click', handleClickOutsideContextMenu);
+        //document.addEventListener('click', handleClickOutsideContextMenu);
+        document.addEventListener('mouseout', handleMouseOutsideContextMenu);
     }
 }
 
@@ -2811,11 +2819,11 @@ function menuItemClicked(item) {
     }
 }
 
-function handleClickOutsideContextMenu(e) {
+function handleMouseOutsideContextMenu(e) {
     let myContextMenu = document.getElementById("popup-menu");
     if (!myContextMenu.contains(e.target) && !currentImage.contains(e.target)) {
         myContextMenu.style.display = 'none';
-        document.removeEventListener('click', handleClickOutsideContextMenu);
+        document.removeEventListener('mouseout', handleMouseOutsideContextMenu);
     }
 }
 
