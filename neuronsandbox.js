@@ -88,6 +88,12 @@ class DataOperator {
         let start = (table.id === 'output-table')? 1 : 2;
         let startCol = (table.id === 'output-table')? 0 : 1;
         let row = start;
+        if(dataObj.data.length === 0)
+        {
+            for (let i = 0; i < table.rows.length; i++) {
+                dataObj.data[i] = Array(table.rows[0].cells.length).fill(0);
+            }
+        }
         for (let n = table.rows.length; row < n; row++) {
             for (let c = startCol, m = table.rows[row].cells.length; c < m; c++) {
                 const cell = table.rows[row].cells[c];
@@ -756,7 +762,7 @@ class Display {
         const outputTable = document.getElementById("output-table")
         let binaryCheckbox = document.getElementById("BinaryToggle");
         let editCheckbox = document.getElementById("InputToggle");
-        let nonBinaryMode = false
+        let nonBinaryMode = false;
         if (!binaryCheckbox.checked)
             nonBinaryMode = true
         let n = outputTable.rows.length;
@@ -764,28 +770,26 @@ class Display {
             let tr = outputTable.rows[i];
             for (let j = 1; j < tr.cells.length; j++) {
                 let textbox = tr.cells[j]
-                //textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
-                if (nonBinaryMode) {
-                    if (textbox.children.length === 0) {
-                        textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
-                    }
-                    if(j == 2) { //desired output
-                        textbox.children[0].classList.add("editable-border")
-                        dataOp.makeEditable(textbox.firstChild)
-                    }
-
-                    while (textbox.children.length > 1) {
-                        textbox.removeChild(textbox.children[1]);
-                    }
+                if (textbox.children.length === 0) {
+                    textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
                 }
-                else {
+                if(j == 2) { //desired output
+                    textbox.children[0].classList.add("editable-border")
+                    dataOp.makeEditable(textbox.firstChild, editCheckbox.checked)
+                }
+
+                while (textbox.children.length > 1) {
+                    textbox.removeChild(textbox.children[1]);
+                }
+                //textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
+                if (!nonBinaryMode) {
                     if (textbox.children.length === 0) {
                         textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
                     }
                     textbox.children[0].classList.remove("editable-border")
-                    if(j == 2)
+                    if(j === 2)
                     {
-                        dataOp.makeEditable(textbox.firstChild, false)
+                        dataOp.makeEditable(textbox.firstChild, editCheckbox.checked)
                     }
                     while (textbox.children.length > 1) {
                         textbox.removeChild(textbox.children[1]);
@@ -1939,14 +1943,17 @@ class Demo {
                 weight.style.position = "absolute";
                 if(i === 1) {
                     weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
-                    weight.style.top = (rect.top - dimensions.top + height/5) +'px';
+                    if(height < 200)
+                        weight.style.top = (rect.top - dimensions.top - height/10) +'px';
+                    else
+                        weight.style.top = (rect.top - dimensions.top + height/5) +'px';
                 }
                 else if (i === 0) {
-                    weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
+                    weight.style.left = (rect.left - dimensions.left + 1000)*0.05 +'px';
                     weight.style.top = (rect.top - dimensions.top + height/3) +'px';
                 }
                 else {
-                    weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
+                    weight.style.left = (rect.left - dimensions.left)*0.025 +'px';
                     weight.style.top = (rect.top - dimensions.top + height/3) +'px';
                 }
                 console.log("final: ",i, weight.style.left, weight.style.top)
@@ -1963,7 +1970,10 @@ class Demo {
                 weight.style.position = "absolute";
                 if(i === 1) {
                     weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
-                    weight.style.top = (rect.top - dimensions.top+height/2) +'px';
+                    if(height < 200)
+                        weight.style.top = (rect.top - dimensions.top-height/10) +'px';
+                    else
+                        weight.style.top = (rect.top - dimensions.top+height/7) +'px';
                 }
                 else if (i === 0) {
                     weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
