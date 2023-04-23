@@ -1054,23 +1054,6 @@ class Display {
             const selections = document.getElementById("selected-inputs");
             selections.rows[c-1].cells[0].style.fontSize = newFontSize + "px"
         }
-        //
-        // let newFontSize;
-        // if(maxLength <= 10) {
-        //     newFontSize = 40;
-        // }
-        // else if(maxLength >= 30){
-        //     newFontSize = 30;
-        // }
-        // else {
-        //     newFontSize = 40 - (maxLength-10)
-        // }
-        //
-        // //console.log("fontSize: " + newFontSize)
-        // const selections = document.getElementById("selected-inputs");
-        // for (let r=0; r<selections.rows.length; r++){
-        //     selections.rows[r].cells[0].style.fontSize = newFontSize + "px"
-        // }
 
         for (let i = 0; i < demo.weightLines.length; i++)
         {
@@ -1159,7 +1142,6 @@ class Display {
                 }
         }
 
-
         //percentage values for weight lines for y-axis
         let percentsY = [];
         let intervalY = 16/length
@@ -1177,9 +1159,6 @@ class Display {
                 startY += intervalY;
             }
         }
-
-        //TODO : line.position()
-        //TODO: line.setOptions()
 
         const min = 0.0
         const max = 6.0
@@ -1251,6 +1230,8 @@ class Display {
         //$( ".weight_label" ).draggable();
         //$( ".weight" ).draggable();
         this.adjustSelectedInputFontSize();
+
+
     }
 
     // set display panel output
@@ -1920,9 +1901,65 @@ class Demo {
             thresholdToggleBtn.style.display = 'inline-block';
     }
 
+    adjustWeightPlacement() {
+        let selections = document.getElementById("selected-inputs");
+        let weights = document.getElementById("input-link-text");
+        let dimensions = weights.getBoundingClientRect()
+        console.log("children:" + weights.children.length);
+
+        let length = weights.children.length
+        if(length === 2) {
+            for(let i = 0; i < length; i++) {
+                let elem = selections.rows[i].cells[0];
+                let rect = elem.getBoundingClientRect();
+
+                let weight = weights.children[i];
+                let height = rect.bottom - rect.top
+                weight.style.position = "absolute";
+                if(i === 1) {
+                    weight.style.left = (rect.left - dimensions.left)*0.1 +'px';
+                    weight.style.top = (rect.top - dimensions.top + height/4) +'px';
+                }
+                else {
+                    weight.style.left = (rect.left - dimensions.left)*0.1 +'px';
+                    weight.style.top = (rect.top + height/4 - dimensions.top)*1.5 +'px';
+                }
+                console.log("final: ",i, weight.style.left, weight.style.top)
+
+            }
+        }
+        else if(length === 3) {
+            for(let i = 0; i < length; i++) {
+                let elem = selections.rows[i].cells[0];
+                let rect = elem.getBoundingClientRect();
+
+                let weight = weights.children[i];
+                let height = rect.bottom - rect.top
+                weight.style.position = "absolute";
+                if(i === 1) {
+                    weight.style.left = (rect.left - dimensions.left)*0.1 +'px';
+                    weight.style.top = (rect.top - dimensions.top + height/4) +'px';
+                }
+                if (i === 0) {
+                    weight.style.left = (rect.left - dimensions.left)*0.1 +'px';
+                    weight.style.top = (rect.top + height/4 - dimensions.top)*1.5 +'px';
+                }
+                else {
+                    weight.style.left = (rect.left - dimensions.left)*0.1 +'px';
+                    weight.style.top = (rect.top - dimensions.top + height/4) +'px';
+                }
+                console.log("final: ",i, weight.style.left, weight.style.top)
+
+            }
+        }
+
+
+
+    }
     updateWeightUI(parentElement) {
         //TODO: make code less messy
         let childCount = parentElement.children.length;
+        console.log(parentElement.id)
 
         if (childCount === 1) {
             let child = parentElement.children[0];
@@ -2024,6 +2061,7 @@ class Demo {
         dataOp.insertDataCol(inputs, c);
         this.insertWeightCol(c);
         display.handleHoverExit();
+        demo.adjustWeightPlacement();
         perceptron.updateWeightsFromUI();
         if (document.getElementById("BinaryToggle").checked)
             display.UpdateBinaryToggle(true);
@@ -2101,6 +2139,7 @@ class Demo {
         //console.log("isCorrect: " + isCorrect)
         display.outputLine.position()
         display.createOutputTableEditBorder();
+        demo.adjustWeightPlacement();
     }
 
     // convert to valid inputs for processing and keep track of invalid parts of input
