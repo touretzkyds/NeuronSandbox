@@ -202,12 +202,7 @@ class DataOperator {
                     }
                 }
             });
-            textbox.addEventListener("keydown", function(event){
-                if (event.keyCode === 13 || event.keyCode === 27) {
-                    textbox.blur(); // focus out of text box
-                    demo.update(this);
-                }
-            });
+
         }
         if (editable) {
             if (textbox.nodeName !== "TH" && !textbox.classList.contains("editable-border"))
@@ -221,6 +216,12 @@ class DataOperator {
             if (textbox.classList.contains("edit-handler"))
                 textbox.classList.remove("edit-handler");
         }
+        textbox.onkeydown = function(event){
+            if (event.keyCode === 13 || event.keyCode === 27) {
+                event.target.blur(); // focus out of text box
+                demo.update(this);
+            }
+        };
     }
 
 }
@@ -637,7 +638,7 @@ class Perceptron {
                         cell.innerHTML = parseInt(cell.innerHTML)
                     }
                 }
-               //display.highlightInvalidText(cell, isValid);
+                //display.highlightInvalidText(cell, isValid);
                 cell.innerText = parsedValue.toString();
                 this.weights[i] = parsedValue;
                 this.weightLabels.push(childNodes[i].childNodes[0].innerText);
@@ -1672,14 +1673,14 @@ class Display {
         if (!isValid){
             // cell.style.background = "pink";
             let n = parseInt(cell.innerText);
-            if(n > 0) {
-                //cell.innerText = 1;
-                cell.innerHTML = cell.innerHTML.replace(cell.innerText, "1")
-            }
-            else {
-                cell.innerHTML = cell.innerHTML.replace(cell.innerText, "0")
-            }
-
+            cell.innerHTML = cell.innerHTML.replace(cell.innerText, n.toString())
+            // if(n > 0) {
+            //     //cell.innerText = 1;
+            //     cell.innerHTML = cell.innerHTML.replace(cell.innerText, "1")
+            // }
+            // else {
+            //     cell.innerHTML = cell.innerHTML.replace(cell.innerText, "0")
+            // }
         }
         else {
             cell.style.removeProperty('background-color');
@@ -2138,6 +2139,7 @@ class Demo {
         //let isCorrect = display.checkCorrectness(outputs)
         //console.log("isCorrect: " + isCorrect)
         display.outputLine.position()
+        display.createInputTableEditBorder();
         display.createOutputTableEditBorder();
         demo.adjustWeightPlacement();
     }

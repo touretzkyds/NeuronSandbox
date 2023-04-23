@@ -275,6 +275,7 @@ article > section {
     width: 7vw;
     height: 5vw;
     line-height: 1.7em !important;
+    max-width: 7vw;
 }
 
 #output-table th {
