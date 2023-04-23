@@ -1918,12 +1918,12 @@ class Demo {
                 let height = rect.bottom - rect.top
                 weight.style.position = "absolute";
                 if(i === 1) {
-                    weight.style.left = (rect.left - dimensions.left)*0.1 +'px';
-                    weight.style.top = (rect.top - dimensions.top + height/4) +'px';
+                    weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
+                    weight.style.bottom = (rect.bottom - dimensions.top + 100) +'px';
                 }
                 else {
-                    weight.style.left = (rect.left - dimensions.left)*0.1 +'px';
-                    weight.style.top = (rect.top + height/4 - dimensions.top)*1.5 +'px';
+                    weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
+                    weight.style.top = (rect.top + height/4 - dimensions.top) +'px';
                 }
                 console.log("final: ",i, weight.style.left, weight.style.top)
 
@@ -2428,11 +2428,6 @@ function setupCloseButtons() {
 async function uploadZip(zipFile) {
     // Assume the zip file is stored in a variable called "zipFile" and is a binary string
     try {
-        let options = document.getElementById("problem-list").options
-        let len = options.length;
-        for (let i = 0; i < len; i++) {
-            options[i].selected = false;
-        }
         localStorage.clear();
         const zipObj = new JSZip();
         let jsonModelContent = ""
