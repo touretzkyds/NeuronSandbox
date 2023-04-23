@@ -344,7 +344,9 @@ article > section {
 }
 
 .input-content {
-    display: inline;
+    display: inline-block;
+    word-wrap: break-word;
+    max-width: 10vw;
 }
 
 .draggable{
