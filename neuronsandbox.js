@@ -1915,15 +1915,15 @@ class Demo {
                 let rect = elem.getBoundingClientRect();
 
                 let weight = weights.children[i];
-                let height = rect.bottom - rect.top
+                let height = elem.offsetHeight;
                 weight.style.position = "absolute";
                 if(i === 1) {
                     weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
-                    weight.style.bottom = (rect.bottom - dimensions.top + 100) +'px';
+                    weight.style.top = (rect.top- dimensions.top + height/2) +'px';
                 }
                 else {
                     weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
-                    weight.style.top = (rect.top + height/4 - dimensions.top) +'px';
+                    weight.style.top = (rect.top + height/3 - dimensions.top) +'px';
                 }
                 console.log("final: ",i, weight.style.left, weight.style.top)
 
@@ -1935,26 +1935,72 @@ class Demo {
                 let rect = elem.getBoundingClientRect();
 
                 let weight = weights.children[i];
-                let height = rect.bottom - rect.top
+                let height = rect.height;
                 weight.style.position = "absolute";
                 if(i === 1) {
-                    weight.style.left = (rect.left - dimensions.left)*0.1 +'px';
-                    weight.style.top = (rect.top - dimensions.top + height/4) +'px';
+                    weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
+                    weight.style.top = (rect.top - dimensions.top + height/5) +'px';
                 }
-                if (i === 0) {
-                    weight.style.left = (rect.left - dimensions.left)*0.1 +'px';
-                    weight.style.top = (rect.top + height/4 - dimensions.top)*1.5 +'px';
+                else if (i === 0) {
+                    weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
+                    weight.style.top = (rect.top - dimensions.top + height/3) +'px';
                 }
                 else {
-                    weight.style.left = (rect.left - dimensions.left)*0.1 +'px';
-                    weight.style.top = (rect.top - dimensions.top + height/4) +'px';
+                    weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
+                    weight.style.top = (rect.top - dimensions.top + height/3) +'px';
                 }
                 console.log("final: ",i, weight.style.left, weight.style.top)
 
             }
         }
+        else if (length === 4) {
+            for(let i = 0; i < length; i++) {
+                let elem = selections.rows[i].cells[0];
+                let rect = elem.getBoundingClientRect();
 
+                let weight = weights.children[i];
+                let height = rect.height;
+                weight.style.position = "absolute";
+                if(i === 1) {
+                    weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
+                    weight.style.top = (rect.top - dimensions.top+height/2) +'px';
+                }
+                else if (i === 0) {
+                    weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
+                    weight.style.top = (rect.top - dimensions.top + height/3) +'px';
+                }
+                else {
+                    weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
+                    weight.style.top = (rect.top - dimensions.top + height/3) +'px';
+                }
+                console.log("final: ",i, weight.style.left, weight.style.top)
 
+            }
+        }
+        else {
+            for(let i = 0; i < length; i++) {
+                let elem = selections.rows[i].cells[0];
+                let rect = elem.getBoundingClientRect();
+
+                let weight = weights.children[i];
+                let height = rect.height;
+                weight.style.position = "absolute";
+                if(i === 1) {
+                    weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
+                    weight.style.top = (rect.top - dimensions.top+height/2) +'px';
+                }
+                else if (i === 0) {
+                    weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
+                    weight.style.top = (rect.top - dimensions.top + height/3) +'px';
+                }
+                else {
+                    weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
+                    weight.style.top = (rect.top - dimensions.top + height/3) +'px';
+                }
+                console.log("final: ",i, weight.style.left, weight.style.top)
+
+            }
+        }
 
     }
     updateWeightUI(parentElement) {
@@ -1962,73 +2008,76 @@ class Demo {
         let childCount = parentElement.children.length;
         console.log(parentElement.id)
 
-        if (childCount === 1) {
-            let child = parentElement.children[0];
-            const top = 40;
-            child.style = "top:" + top + "%;";
-            addEditOption(0);
+        for(let i = 0; i < childCount; i++) {
+            addEditOption(i);
         }
-        else if (childCount === 3) {
-            let first = 20;
-            let last = 70;
-            let interval = (last - first) / (childCount - 1);
-            for (let i = 0; i < parentElement.children.length; i++) {
-                let child = parentElement.children[i];
-                let top = Math.floor(first + i * interval);
-                child.style = "left:" + -20 + "%;" + "top:" + top + "%;";
-                addEditOption(i);
-            }
-            let child = parentElement.children[1];
-            const top = 38;
-            child.style = "left: -20%;" +  "top:" + top + "%;";
-        }
-        else if (childCount === 4) {
-            let first = 10;
-            let last = 80;
-            let interval = (last - first) / (childCount - 1);
-            for (let i = 0; i < parentElement.children.length; i++) {
-                let child = parentElement.children[i];
-                let top = Math.floor(first + i * interval);
-                //child.style = "left:" + -10 + "%;";
-                child.style = "left:" + -50 + "%;" + "top:" + top + "%;";
-                addEditOption(i);
-            }
-
-        }
-        else if (childCount === 5) {
-            let first = 10;
-            let last = 80;
-            let interval = (last - first) / (childCount - 1);
-            for (let i = 0; i < parentElement.children.length; i++) {
-                let child = parentElement.children[i];
-                let top = Math.floor(first + i * interval);
-                child.style = "left:" + -20 + "%;" + "top:" + top + "%;";
-                addEditOption(i);
-            }
-            let child = parentElement.children[1];
-            const left = -40;
-            const top = 10 + 17.5
-            child.style = "left:" + left + "%;" + "top:" + top + "%;";
-            let child1 = parentElement.children[2];
-            const left1 = -80;
-            const top1 = 10 + 17.5*2 - 5
-            child1.style = "left:" + left1 + "%;" + "top:" + top1 + "%;";
-            let child2 = parentElement.children[3];
-            const left2 = -40;
-            const top2 = 10 + 17.5*2 + 8
-            child2.style = "left:" + left2 + "%;" + "top:" + top2 + "%;";
-        }
-        else {
-            let first = 20;
-            let last = 70;
-            let interval = (last - first) / (childCount - 1);
-            for (let i = 0; i < parentElement.children.length; i++) {
-                let child = parentElement.children[i];
-                let top = Math.floor(first + i * interval);
-                child.style = "top:" + top + "%;";
-                addEditOption(i);
-            }
-        }
+        // if (childCount === 1) {
+        //     let child = parentElement.children[0];
+        //     const top = 40;
+        //     child.style = "top:" + top + "%;";
+        //     addEditOption(0);
+        // }
+        // else if (childCount === 3) {
+        //     let first = 20;
+        //     let last = 70;
+        //     let interval = (last - first) / (childCount - 1);
+        //     for (let i = 0; i < parentElement.children.length; i++) {
+        //         let child = parentElement.children[i];
+        //         let top = Math.floor(first + i * interval);
+        //         child.style = "left:" + -20 + "%;" + "top:" + top + "%;";
+        //         addEditOption(i);
+        //     }
+        //     let child = parentElement.children[1];
+        //     const top = 38;
+        //     child.style = "left: -20%;" +  "top:" + top + "%;";
+        // }
+        // else if (childCount === 4) {
+        //     let first = 10;
+        //     let last = 80;
+        //     let interval = (last - first) / (childCount - 1);
+        //     for (let i = 0; i < parentElement.children.length; i++) {
+        //         let child = parentElement.children[i];
+        //         let top = Math.floor(first + i * interval);
+        //         //child.style = "left:" + -10 + "%;";
+        //         child.style = "left:" + -50 + "%;" + "top:" + top + "%;";
+        //         addEditOption(i);
+        //     }
+        //
+        // }
+        // else if (childCount === 5) {
+        //     let first = 10;
+        //     let last = 80;
+        //     let interval = (last - first) / (childCount - 1);
+        //     for (let i = 0; i < parentElement.children.length; i++) {
+        //         let child = parentElement.children[i];
+        //         let top = Math.floor(first + i * interval);
+        //         child.style = "left:" + -20 + "%;" + "top:" + top + "%;";
+        //         addEditOption(i);
+        //     }
+        //     let child = parentElement.children[1];
+        //     const left = -40;
+        //     const top = 10 + 17.5
+        //     child.style = "left:" + left + "%;" + "top:" + top + "%;";
+        //     let child1 = parentElement.children[2];
+        //     const left1 = -80;
+        //     const top1 = 10 + 17.5*2 - 5
+        //     child1.style = "left:" + left1 + "%;" + "top:" + top1 + "%;";
+        //     let child2 = parentElement.children[3];
+        //     const left2 = -40;
+        //     const top2 = 10 + 17.5*2 + 8
+        //     child2.style = "left:" + left2 + "%;" + "top:" + top2 + "%;";
+        // }
+        // else {
+        //     let first = 20;
+        //     let last = 70;
+        //     let interval = (last - first) / (childCount - 1);
+        //     for (let i = 0; i < parentElement.children.length; i++) {
+        //         let child = parentElement.children[i];
+        //         let top = Math.floor(first + i * interval);
+        //         child.style = "top:" + top + "%;";
+        //         addEditOption(i);
+        //     }
+        // }
         setupCloseButtons();
     }
 
