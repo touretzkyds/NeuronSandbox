@@ -121,6 +121,20 @@ class DataOperator {
                 if (table.id === 'output-table' && c === 2 && (parsedValue !== 1 && parsedValue !== 0) ) {
                     isValid = false;
                 }
+                const regex = '^-?0+$';
+                if (new RegExp(regex).test(rawValue)) {
+                    isValid = false;
+                }
+                const regex1 = '^00+1$';
+                if (new RegExp(regex1).test(rawValue)) {
+                    isValid = false;
+                }
+                if(!isValid) {
+                    if(parsedValue > 0)
+                        parsedValue = 1
+                    else
+                        parsedValue = 0
+                }
                 display.highlightInvalidText(cell, isValid);
                 dataObj.data[row-start][c-startCol] = parsedValue;
             }
@@ -636,7 +650,7 @@ class Perceptron {
             if (cell) {
                 //dataOp.makeEditable(cell);
 
-                const [parsedValue, isValid] = demo.stringToValidFloat(cell.innerHTML);
+                let [parsedValue, isValid] = demo.stringToValidFloat(cell.innerHTML);
                 if(isValid) {
                     //check for leading zeroes
                     const regex = '^-?0+[0-9]+$';
@@ -645,6 +659,13 @@ class Perceptron {
                     }
                 }
                 //display.highlightInvalidText(cell, isValid);
+                if(!isValid) {
+                    if(parsedValue > 0)
+                        parsedValue = 1
+                    else
+                        parsedValue = 0
+                }
+
                 cell.innerText = parsedValue.toString();
                 this.weights[i] = parsedValue;
                 this.weightLabels.push(childNodes[i].childNodes[0].innerText);
@@ -654,7 +675,7 @@ class Perceptron {
 
     updateThreshold(){
         const cell = document.getElementById(`th${1}`);
-        const [parsedValue, isValid] = demo.stringToValidFloat(cell.innerHTML);
+        let [parsedValue, isValid] = demo.stringToValidFloat(cell.innerHTML);
         if(isValid) {
             //check for leading zeroes
             const regex = '^-?0+[0-9]+$';
@@ -663,6 +684,12 @@ class Perceptron {
             }
         }
         //display.highlightInvalidText(cell, isValid);
+        if(!isValid) {
+            if(parsedValue > 0)
+                parsedValue = 1
+            else
+                parsedValue = 0
+        }
         cell.innerText = parsedValue.toString();
         this.threshold = parsedValue;
     }
@@ -1677,6 +1704,10 @@ class Display {
         if (!isValid){
             // cell.style.background = "pink";
             let n = parseInt(cell.innerText);
+            if(n > 0)
+                n = 1;
+            else
+                n = 0;
             cell.innerHTML = cell.innerHTML.replace(cell.innerText, n.toString())
             // if(n > 0) {
             //     //cell.innerText = 1;
@@ -2967,6 +2998,14 @@ function handleDesiredOutputColumn() {
             const rawValue = event.target.innerText;
             let [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
             if (parsedValue !== 1 && parsedValue !== 0 ) {
+                isValid = false;
+            } //00+
+            const regex = '^-?0+$';
+            if (new RegExp(regex).test(rawValue)) {
+                isValid = false;
+            }
+            const regex1 = '^00+1$';
+            if (new RegExp(regex1).test(rawValue)) {
                 isValid = false;
             }
             display.highlightInvalidText(event.target, isValid);
