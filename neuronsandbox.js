@@ -2311,7 +2311,7 @@ async function downloadFile() {
     await writableStream.close();
 }
 
-async function uploadFromZipUrl(url) {
+async function uploadFromZipUrl(url, isProblem = false) {
     try {
         const urlRegex = /[\w\.\/&]+\.sandbox$/i;
         if(!urlRegex.test(url)) {
@@ -2333,9 +2333,24 @@ async function uploadFromZipUrl(url) {
         }
 
         const blob = await response.blob();
-        await uploadZip(blob);
+        await uploadZip(blob, isProblem);
     } catch (err) {
         alert("An error occurred when loading model: Please enter valid URL.");
+    }
+    let options = document.getElementById("problem-list").options
+    if(!isProblem) {
+        if(options.length === 4) {
+            let option = document.createElement("option");
+            option.text = "---";
+            options.add(option);
+            let index = options.length-1;
+            options[index].selected = true;
+        }
+    }
+    else {
+        if(options.length === 5) {
+            options.remove(options.length-1);
+        }
     }
 }
 
@@ -2484,9 +2499,25 @@ function setupCloseButtons() {
     });
 }
 
-async function uploadZip(zipFile) {
+async function uploadZip(zipFile, isProblem = false) {
     // Assume the zip file is stored in a variable called "zipFile" and is a binary string
     try {
+        let options = document.getElementById("problem-list").options
+        if(!isProblem) {
+            if(options.length === 4) {
+                let option = document.createElement("option");
+                option.text = "---";
+                options.add(option);
+                let index = options.length-1;
+                options[index].selected = true;
+            }
+
+        }
+        else {
+            if(options.length === 5) {
+                options.remove(options.length-1);
+            }
+        }
         localStorage.clear();
         const zipObj = new JSZip();
         let jsonModelContent = ""
@@ -2794,7 +2825,7 @@ perceptron.displayPerceptron();
 const display = new Display();
 display.updateDisplay();
 //uploadFromUrl("SampleModel.json");
-uploadFromZipUrl("Problem 1.sandbox");
+uploadFromZipUrl("Problem 1.sandbox", true);
 display.createOutputTableColors();
 display.createInputTableEditBorder();
 display.createOutputTableEditBorder();
@@ -2970,7 +3001,7 @@ function loadQuestionsAndModels() {
                         //questiontext.innerText = item.question;
                         //load the model associated with the question
                         if (fileExists(item.model_name+".sandbox")) {
-                            uploadFromZipUrl(encodeURIComponent(item.model_name+".sandbox"));
+                            uploadFromZipUrl(encodeURIComponent(item.model_name+".sandbox"), true);
 
                         }
                     }
