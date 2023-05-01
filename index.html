@@ -67,6 +67,18 @@
                 <!--                            <button class="custom-btn myButton" id="generateTruthTable">Generate truth table</button>-->
                 <!--                        </th>-->
                 <th>
+                    <label>Guess</label>
+                    <label id="DemoSwitch" class="switch">
+                        <input type="checkbox" id="DemoToggle">
+                        <span id="demo-slider" class="slider round"></span>
+                    </label>
+                </th>
+                <th>
+                    <a style="margin-top: 19%" id= "CheckAnswerBtn" href="javascript:display.checkForSuccess();" class="custom-btn myButton">
+                        <i class="fa fa-check-square" aria-hidden="true"></i> Check Answer
+                    </a>
+                </th>
+                <th>
                     <label>Binary</label>
                     <label id="BinarySwitch" class="switch">
                         <input type="checkbox" id="BinaryToggle">
@@ -90,7 +102,7 @@
                     </label>
                 </th>
 
-                <th>
+                <th id="hello">
                     <div class="button-border">
                         <div class="user-input-wrp">
                             <br/>
@@ -179,6 +191,15 @@
                                 </div>
                             </div>
                         </div>
+                        <div id = "guess-output-container" class="left-guess">
+                            <table id="guess-output-table" class="table input-output-table">
+                                <tr>
+                                    <th id="guessoutput">
+                                        <div class="input-content">Output</div>
+                                    </th>
+                                </tr>
+                            </table>
+                        </div>
 
                         <div id="network-container" class="center">
                             <div class="center-input">
@@ -253,8 +274,8 @@
                             <div class = "rows">
                                 <table id="output-table" class="output-table table input-output-table" >
                                     <tr>
-                                        <th contenteditable = false id="activation">Activation<br>&Sigma;    </th>
-                                        <th contenteditable = false id="output">Output<br>(y)       </th>
+                                        <th contenteditable = false id="activation">Activation<br>&Sigma;</th>
+                                        <th contenteditable = false id="output">Output<br>y</th>
                                         <th contenteditable = false id="desired" > Desired Output
                                         </th>
                                     </tr>

@@ -55,6 +55,15 @@ article > section {
     align-items: flex-start;
 }
 
+.left-guess {
+    margin: 1px;
+    width: 10%;
+    height: 100%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
 .center {
     margin: 1px;
     width: 40%;
@@ -105,7 +114,7 @@ article > section {
 }
 
 #network-container {
-    display: inline-flex;  
+    display: inline-flex;
     width: 75vw;
     height: 50vh;
 }

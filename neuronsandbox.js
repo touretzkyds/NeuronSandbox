@@ -410,6 +410,8 @@ class Table {
         });
         display.createInputTableEditBorder()
         display.createOutputTableEditBorder();
+        display.createGuessTableEditBorder();
+
     }
 
     //finds available indices for variables
@@ -709,6 +711,38 @@ function ConvertToWeightSubscript(weightLabel) {
     return weightLabel;
 }
 
+function checkAnswerCorrect() {
+    let outputTable = document.getElementById("output-table")
+    let guessTable = document.getElementById("guess-output-table");
+    let guessToggle = document.getElementById("DemoToggle")
+    let tableRows = outputTable.rows.length
+    let isCorrect = true;
+    if(!guessToggle.checked) {
+        for (let i = 1; i < tableRows; i++) {
+            let cells = outputTable.rows.item(i).cells
+            let output = cells.item(1).innerText;
+            let desired = cells.item(2).innerText;
+            if (output !== desired) {
+                isCorrect = false
+                break
+            }
+        }
+    }
+    else {
+        for (let i = 1; i < tableRows; i++) {
+            let cells = outputTable.rows.item(i).cells
+            let childCheckbox = guessTable.rows.item(i).querySelector('input[type="checkbox"]');
+            let guess_output = childCheckbox.checked? "1" : "0";
+            let desired = cells.item(2).innerText;
+            if (guess_output !== desired) {
+                isCorrect = false
+                break
+            }
+        }
+    }
+    return isCorrect;
+}
+
 class Display {
     constructor(inpObj=null, percepObj=null, outObj=null){
         this.hovering = false;
@@ -971,24 +1005,49 @@ class Display {
             hideCameraImages();
         }
     }
-    checkForSuccess() {
+    createGuessTableEditBorder() {
         let outputTable = document.getElementById("output-table")
+        let guessTable = document.getElementById("guess-output-table");
+        guessTable.innerHTML = '<tr>\n' +
+            '                                    <th id="guessoutput">\n' +
+            '                                        <div class="input-content">Output</div>\n' +
+            '                                    </th>\n' +
+            '                                </tr>';
         let tableRows = outputTable.rows.length
-        let isCorrect = true;
-        for (let i = 1; i < tableRows; i++) {
-            let cells = outputTable.rows.item(i).cells
-            let output = cells.item(1).innerText;
-            let desired = cells.item(2).innerText;
-            if (output !== desired) {
-                isCorrect = false
-                break
-            }
-
+        for (let i = 0; i < tableRows - 1; i++) {
+            let newRow = guessTable.insertRow(i+1);
+            var cell = guessTable.rows[i+1].insertCell(-1);
+            cell.innerHTML = '<label class="switch">' +
+                '<span>0</span>' +
+                '<input type="checkbox" data-on="1" data-off="0">' +
+                '<span class="slider round"></span>' +
+                '<span>1</span>' +
+                '</label>';
         }
+    }
+
+    checkForSuccess() {
+        let isCorrect = checkAnswerCorrect();
         let fanfareToggleChecked = document.getElementById("FanfareToggle").checked
         let fanfareHidden =  document.getElementById("congrats-msg").hidden
         let outputToggleChecked = document.getElementById("OutputToggle").checked
-        if (fanfareToggleChecked && outputToggleChecked) {
+        let guessToggleChecked = document.getElementById("DemoToggle").checked;
+        if(guessToggleChecked) {
+            if (isCorrect) {
+                PlaySound();
+                if (!document.getElementById("popup").classList.contains("active"))
+                    document.getElementById("popup").classList.toggle('active');
+                const questionDropDown = document.getElementById("problem-list");
+                const selectedIndex = questionDropDown.selectedIndex;
+                const nextIndex = selectedIndex + 1;
+                let button = document.getElementById("next-question-btn");
+                button.style.display = nextIndex < questionDropDown.options.length - 1 ? "inline-block" : "none";
+            }
+            else {
+                alert("You guessed incorrectly, please try again");
+            }
+        }
+        else if (fanfareToggleChecked && outputToggleChecked) {
             if (fanfareHidden) {
                 if (isCorrect) {
                     PlaySound();
@@ -1293,6 +1352,7 @@ class Display {
         //let outputRowIndex = (rowIdx <= 0) ? 1 : rowIdx;
         let outputRowIndex = rowIdx - 1;
         const outputRow = document.querySelector(`#output-table > tbody > tr:nth-child(${outputRowIndex + 1})`)
+        const guessOutputRow = document.querySelector(`#guess-output-table > tbody > tr:nth-child(${outputRowIndex + 1})`)
 
         if (rowIdx < 2) //headers, or leave
         {
@@ -1313,20 +1373,21 @@ class Display {
             for (let i = 0; i < outputRow.children.length; i++) {
                 outputRow.children[i].style.background = "lightblue";
             }
+            guessOutputRow.style.background = "lightblue";
             display.adjustSelectedInputFontSize();
 
             //console.log("enter: set outputRow =" + outputRow);
         }
         else {
             if (rowIdx % 2 === 0) {
-                this.handleHoverExit(inputRow, outputRow );
+                this.handleHoverExit(inputRow, outputRow, guessOutputRow );
                 if (isOutputToggleChecked)
                     this.checkDesiredOutput(outputRow.children[1], outputRow.children[2])
 
             }
 
             else {
-                this.handleHoverExit(inputRow, outputRow, true ); //if it is odd, reset to gray
+                this.handleHoverExit(inputRow, outputRow, guessOutputRow,true ); //if it is odd, reset to gray
                 if (isOutputToggleChecked)
                     this.checkDesiredOutput(outputRow.children[1], outputRow.children[2])
             }
@@ -1337,6 +1398,10 @@ class Display {
         this.updateSelectedInput();
         this.displaySelectedOutput();
 
+        const isDemoMode = document.getElementById("DemoToggle").checked;
+        if(isDemoMode) {
+            return;
+        }
         //removes lines when not hovered
         demo.lines.forEach(line => line.remove());
         //empties lines array
@@ -1365,7 +1430,7 @@ class Display {
         display.createOutputTableEditBorder();
     }
 
-    handleHoverExit(inputRow, outputRow, isOdd = false) {
+    handleHoverExit(inputRow, outputRow, guessOutputRow, isOdd = false) {
         // reset display panel inputs to user-defined inputs (#11)
         let headerRowVals = [];
         this.getHeaderRowVals(headerRowVals);
@@ -1383,7 +1448,9 @@ class Display {
                 outputRow.children[1].style.background = "#f8ffcf"
                 outputRow.children[2].style.background =  "#f2f2f2"
             }
-
+            if(guessOutputRow) {
+                guessOutputRow.style.background =  "#f2f2f2"
+            }
         }
         else {
             if (inputRow)
@@ -1393,6 +1460,9 @@ class Display {
                     outputRow.children[0].style.background = "none";
                     this.checkDesiredOutput(outputRow.children[1], outputRow.children[2])
                 }
+            }
+            if(guessOutputRow) {
+                guessOutputRow.style.background = "none";
             }
 
         }
@@ -1613,6 +1683,30 @@ class Display {
         }
         display.createInputTableEditBorder();
         display.createOutputTableEditBorder();
+        this.UpdateInputToggle();
+    }
+
+    UpdateDemoToggle() {
+        let checkbox = document.getElementById("DemoToggle");
+        const otherHeaders = document.querySelectorAll('.top-table th:not(:first-child):not(:nth-child(2)):not(:nth-child(8))');
+        if (checkbox.checked) {
+            document.getElementById("guess-output-container").style.display = "inline-block";
+            document.getElementById("CheckAnswerBtn").style.display = "inline-block";
+            document.getElementById("network-container").style.display = "none";
+            document.getElementById("output-container").style.display = "none";
+            otherHeaders.forEach(header => {
+                header.hidden = true;
+            });
+        }
+        else {
+            document.getElementById("guess-output-container").style.display = "none";
+            document.getElementById("CheckAnswerBtn").style.display = "none";
+            document.getElementById("network-container").style.display = "inline-flex";
+            document.getElementById("output-container").style.display = "inline-flex";
+            otherHeaders.forEach(header => {
+                header.hidden = false;
+            });
+        }
         this.UpdateInputToggle();
     }
 
@@ -1980,7 +2074,7 @@ class Demo {
                         weight.style.top = (rect.top - dimensions.top + height/5) +'px';
                 }
                 else if (i === 0) {
-                    weight.style.left = (rect.left - dimensions.left + 1000)*0.05 +'px';
+                    weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
                     weight.style.top = (rect.top - dimensions.top + height/3) +'px';
                 }
                 else {
@@ -2289,6 +2383,7 @@ async function downloadFile() {
     let binaryToggleChecked = document.getElementById("BinaryToggle").checked;
     //let thresholdToggleChecked = document.getElementById("checkbox_threshold_editable").checked;
     let thresholdToggleChecked = document.getElementById("threshold_toggleBtn").classList.contains("edit-toggle-on");
+    let guessToggleChecked = document.getElementById("DemoToggle").checked;
 
     const editToggle = document.getElementById("InputToggle").checked;
     let question = "";
@@ -2312,6 +2407,7 @@ async function downloadFile() {
         "fanfare-toggle-checked": fanfareToggleChecked,
         "input-header-vars" : headerRowVariables,
         "binaryToggleChecked" : binaryToggleChecked,
+        "guessToggleChecked" : guessToggleChecked,
         "question" : question
         //"input-header": headerRows,
     };
@@ -2671,6 +2767,9 @@ function uploadJson(text) {
     document.getElementById('OutputToggle').checked = dict["output-toggle-checked"];
     document.getElementById("FanfareToggle").checked = dict["fanfare-toggle-checked"];
 
+    document.getElementById("DemoToggle").checked = dict["guessToggleChecked"];
+    display.UpdateDemoToggle();
+
     display.handleHoverExit();
     demo.update();
     // let headerRows = dict["input-header"];
@@ -2863,6 +2962,7 @@ display.createOutputTableEditBorder();
 addThresholdEditOption();
 handleDesiredOutputColumn();
 loadQuestionsAndModels();
+display.UpdateDemoToggle();
 
 
 function addTooltips()
@@ -2879,6 +2979,10 @@ function addTooltips()
 
     tippy('#FanfareSwitch', {
         content: 'celebrate when correct answer reached',
+        className: 'my-tooltip-class'
+    });
+    tippy('#DemoSwitch', {
+        content: 'Guess the output',
         className: 'my-tooltip-class'
     });
 }
@@ -2912,6 +3016,10 @@ $('#OutputToggle').change(function() { //toggle output
 $('#BinaryToggle').change(function() { //toggle output
     display.UpdateBinaryToggle(false);
     display.outputLine.position();
+});
+
+$('#DemoToggle').change(function() { //toggle output
+    display.UpdateDemoToggle();
 });
 
 function PlaySound() {
