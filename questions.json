@@ -1,0 +1,24 @@
+{
+  "items": [
+    {
+      "id": 1,
+      "label": "problem-1",
+      "model_name": "Problem 1"
+    },
+    {
+      "id": 2,
+      "label": "problem-2",
+      "model_name": "Problem 2"
+    },
+    {
+      "id": 3,
+      "label": "problem-3",
+      "model_name": "Problem 3"
+    },
+    {
+      "id": 0,
+      "label": "Blank Model",
+      "model_name": "SampleModel"
+    }
+  ]
+}

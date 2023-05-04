@@ -1,98 +1,326 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Neuron Sandbox</title>
-        
+
+        <link rel="stylesheet" href="slider.css" />
         <link rel="stylesheet" href="style.css" />
+        <!-- <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
         <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
         <script src="https://pixijs.download/release/pixi.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+        <script src="https://unpkg.com/@popperjs/core@2"></script>
+        <script src="https://unpkg.com/tippy.js@6"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 
-        <div id="header">
-            <h1>Neuron Sandbox</h1>
-        </div>
-        
-        <div id="all-containers">
-            <div id = "input-container">
-                <table id="input-table" cellspacing="1" cellpadding="8" class="table">
-                    <tr>
-                        <th>x<sub>1</sub></th>
-                        <th >x<sub>2</sub></th>
-                    </tr>
-                </table>
-            </div>
-            <div id="network-container" class="center">
-                <div class="center">
-                    <table id="selected-inputs" class="selected">
-                        <tr>
-                            <td>x<sub>1</sub></td>
-                        </tr>
-                        <tr>
-                            <td>x<sub>2</sub></td>
-                        </tr>
-                    </table>
+        <script src="leader_line.min.js"></script>
+        <script src = "truth_table.js"></script>
+
+        <article>
+            <section>
+                <div id="header">
+                    <h1 style="font-size: 30px">Neuron Sandbox</h1>
                 </div>
-                <div id = "input-links" class="center">
-                    <svg id="svg">
-                        <marker id="triangle" viewBox="0 0 10 10"
-                            refX="1" refY="5"
-                            markerUnits="strokeWidth"
-                            markerWidth="10" markerHeight="10"
-                            orient="auto">
-                            <path d="M 0 0 L 10 5 L 0 10 z" fill="black"/>
-                        </marker>
-                        <line id="line" stroke="black" stroke-width="3" x1="0%" y1="30%" x2="90%" y2="40%" marker-end="url(#triangle)"/>
-                        <line id="line" stroke="black" stroke-width="3" x1="0%" y1="70%" x2="90%" y2="60%" marker-end="url(#triangle)"/>
-                    </svg>
-                    <div id="input-link-text" class="center">
-                        <div id="weight-1">
-                            <text fill="black" class="weights">w<sub>1</sub> =</text>
-                            <text contenteditable="true" id="w1" fill="black" class="weights"></text>
+            </section>
+            <section>
+                <b class="model-name">Model Name: </b>
+            </section>
+            <section>
+                <b id ="fname" class="model-name">model</b></section>
+            <select name="problem-list" id="problem-list">
+                <option value="p1">Problem 1</option>
+                <option value="p1">Problem 2</option>
+                <option value="p1">Problem 3</option>
+            </select>
+        </article>
+
+        <article>
+<!--            <div style="width: 400px; height: 100px" class="editable-border">-->
+<!--                <p style="font-size: 20px">this is the word problem</p>-->
+<!--            </div>-->
+            <div id="qdiv">
+<!--                <input hidden style="width: 400px; height: 50px;" type="text" id="questionprompt">-->
+                <textarea hidden style="width: 400px; height: 50px;" id="questionprompt" cols="40" rows="5"></textarea>
+                <p id="questiontext" style="font-size: 23px">Enter question here!</p>
+            </div>
+
+
+        </article>
+
+        <table class = "heading-table">
+            <tr>
+                <th>
+                    <b hidden id="congrats-msg" class="congrats">Congratulations!</b>
+                </th>
+            </tr>
+
+        </table>
+
+        <table class = "top-table">
+            <tr>
+                <!--                        <th style="width: 50%;alignment: left">-->
+                <!--                            <button class="custom-btn myButton" id="generateTruthTable">Generate truth table</button>-->
+                <!--                        </th>-->
+                <th>
+                    <label>Guess</label>
+                    <label id="DemoSwitch" class="switch">
+                        <input type="checkbox" id="DemoToggle">
+                        <span id="demo-slider" class="slider round"></span>
+                    </label>
+                </th>
+                <th>
+                    <a style="margin-top: 19%" id= "CheckAnswerBtn" href="javascript:display.checkForSuccess();" class="custom-btn myButton">
+                        <i class="fa fa-check-square" aria-hidden="true"></i> Check Answer
+                    </a>
+                </th>
+                <th>
+                    <label>Binary</label>
+                    <label id="BinarySwitch" class="switch">
+                        <input type="checkbox" id="BinaryToggle">
+                        <span id="binary-slider" class="slider round"></span>
+                    </label>
+                </th>
+                <!--<th> <button class="custom-btn myButton" id="editButton">Edit</button></th>-->
+                <th>
+                    <label>Edit</label>
+                    <label id="InputSwitch" class="switch">
+                        <input type="checkbox" id="InputToggle">
+                        <span id="edit-slider" class="slider round"></span>
+                    </label>
+                </th>
+
+                <th hidden id="FanfareToggleBody">
+                    <label>Fanfare</label>
+                    <label id="FanfareSwitch" class="switch">
+                        <input type="checkbox" id="FanfareToggle">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+
+                <th id="hello">
+                    <div class="button-border">
+                        <div class="user-input-wrp">
+                            <br/>
+                            <input type="text" class="inputText" name="url" id="url" size="160" onkeypress="let keyCode = event.keyCode || event.which; if (keyCode == 13) {uploadFileCombined(); return false;}" required/>
+                            <span  class="floating-label">Model URL</span>
                         </div>
-                        <div id="weight-2">
-                            <text fill="black" class="weights">w<sub>2</sub> =</text>
-                            <text contenteditable="true" id="w2" fill="black" class="weights"></text>
+
+                        <!--                            <button for="upload-file" class="custom-btn myButton">-->
+                        <!--                                <i class="fa fa-upload" aria-hidden="true"></i>-->
+                        <!--                                upload file ...-->
+                        <!--                            </button>-->
+                        <a href="javascript:uploadFileCombined();" class="custom-btn myButton">
+                            <i class="fa fa-upload" aria-hidden="true"></i> Load from URL
+                        </a>
+                    </div>
+
+
+                    <!--                            <input type="button"  class="custom-btn myButton" id="loadFileJson" value="Upload Model" onclick="document.getElementById('upload-file').click();"> </input>-->
+
+                    <input id="upload-file" style="display:none;" type="file" accept=".sandbox" onchange="console.log('event = ', event); uploadFile(event)"/>
+                    <input id="upload-image_file" style="display:none;" type="file" accept="image/*" onchange="console.log('event = ', event); uploadImageFile(event)"/>
+                </th>
+                <th>
+                    <a style = "margin-top: 19%" href="javascript:uploadFileComputer();" class="custom-btn myButton">
+                        <i class="fa fa-upload" aria-hidden="true"></i> Load from this Computer
+                    </a>
+
+                </th>
+                <th>
+                    <a style = "margin-top: 19%" href="#" id="downloadFile" role="button" onclick="downloadFile();" class="custom-btn myButton"><i class="fa fa-download" aria-hidden="true"></i> Save to this Computer</a>
+
+                    <!--                            <button id="downloadFile" onclick="downloadFile();" class="custom-btn myButton" >-->
+                    <!--                                <i class="fa fa-download" aria-hidden="true"></i>-->
+                    <!--                                download file ...-->
+                    <!--                            </button>-->
+                </th>
+                <th>
+                    <label>Show Desired</label>
+                    <label class="switch" >
+                        <input type="checkbox" id="OutputToggle">
+                        <span class="slider round"></span>
+                    </label>
+                </th>
+            </tr>
+        </table>
+        <table class="bottom-table"  style="table-layout: fixed;">
+            <tr>
+                <th colspan="100%">
+                    <div id="all-containers">
+                        <div id = "input-container" class="left">
+
+                            <!--                <div class="rows">-->
+                            <!--                    <button class="custom-btn myButton" id="generateTruthTable">Generate truth table</button>-->
+                            <!--                    <button class="custom-btn myButton" id="editButton">Edit</button>-->
+                            <!--                </div>-->
+                            <div class="rows">
+
+                                <table id="input-table" class="table input-output-table">
+                                    <tr>
+                                        <td> <!-- edit button container -->
+                                            <div class="row-buttons-container">
+                                                <button class="button" id="first-row-button" onclick="demo.insertRow(this)">+</button>
+                                            </div>
+                                        </td>
+                                        <th id="tblinput1">
+                                            <div class="input-content">x<sub>1</sub></div>
+                                        </th>
+                                        <th id="tblinput2">
+                                            <div class="input-content">x<sub>2</sub></div>
+                                        </th>
+                                    </tr>
+                                </table>
+                                <div id="popup-menu" class="context-menu" style="display: none;">
+                                    <div class="new_image_menu">
+                                        <ul style="list-style-type: none; padding: 0;">
+                                            <li onclick="menuItemClicked(1)"><i class="fas fa-plus text-success"></i> Add icon ...</li>
+                                        </ul>
+                                    </div>
+                                    <div class="existing_image_menu">
+                                        <ul style="list-style-type: none; padding: 0;">
+                                            <li onclick="menuItemClicked(1)"><i class="fas fa-plus text-success"></i> Replace Icon ...</li>
+                                            <li onclick="menuItemClicked(2)"><i class="fas fa-minus text-danger"></i> Remove Icon</li>
+                                        </ul>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div id = "guess-output-container" class="left-guess">
+                            <table id="guess-output-table" class="table input-output-table">
+                                <tr>
+                                    <th id="guessoutput">
+                                        <div class="input-content">Output</div>
+                                    </th>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div id="network-container" class="center">
+                            <div class="center-input">
+                                <table id="selected-inputs" class="selected">
+                                    <tr>
+                                        <td id="selinput1">
+                                            <div class="input-content">x<sub>1</sub></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td id="selinput2">
+                                            <div class="input-content">x<sub>2</sub></div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div id = "input-links" class="center">
+                                <svg id="svg">
+                                    <marker id="triangle" viewBox="0 0 10 10"
+                                            refX="1" refY="5"
+                                            markerUnits="strokeWidth"
+                                            markerWidth="10" markerHeight="10"
+                                            orient="auto">
+                                        <path d="M 0 0 L 10 5 L 0 10 z" fill="black"/>
+                                    </marker>
+                                    <!--<line id="line" stroke="black" stroke-width="3" x1="0%" y1="30%" x2="80%" y2="40%" marker-end="url(#triangle)"/>-->
+                                    <!--<line id="line" stroke="black" stroke-width="3" x1="0%" y1="70%" x2="80%" y2="60%" marker-end="url(#triangle)"/>-->
+                                </svg>
+                                <div id="input-link-text" class="center">
+                                    <div id="weight-1" class="weight_label" >
+                                        <text fill="black">w<sub>1</sub> =</text>
+                                        <text contenteditable="true" id="w1" fill="black" class="weights" onkeypress="if (keyCode == 13) return false;"></text>
+                                    </div>
+                                    <div id="weight-2" class="weight_label">
+                                        <text fill="black">w<sub>2</sub> =</text>
+                                        <text contenteditable="true" id="w2" fill="black" class="weights" onkeypress="if (keyCode == 13) return false;"></text>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id = "perceptron1" class="center-perceptron">
+                                <div class="circle center">
+                                    <div id="threshold-text" class="center">
+                                        <text>∑> </text>
+                                        <text id="th1"></text>
+                                        <span id = "threshold_toggleBtn" class="edit-toggle edit-toggle-off">
+                                          <i class="fas fa-pencil-alt"></i>
+                                          <i class="fas fa-lock"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id = "output-links" class="center">
+                            </div>
+                            <div class="center-output">
+                                <table class="selected" id="selected-output">
+                                    <tr>
+                                        <td id="seloutput" class = "output-th"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id = "output-container" class="right">
+                            <div class = "rows">
+                                <table>
+                                    <tr>
+
+                                    </tr>
+                                </table>
+                            </div>
+                            <b id="unlearnable-msg" class="blink" hidden style="font-size: 20px; color: darkred">This pattern of desired outputs is not learnable.</b>
+                            <div class = "rows">
+                                <table id="output-table" class="output-table table input-output-table" >
+                                    <tr>
+                                        <th contenteditable = false id="activation">Activation<br>&Sigma;</th>
+                                        <th contenteditable = false id="output">Output<br>y</th>
+                                        <th contenteditable = false id="desired" > Desired Output
+                                        </th>
+                                    </tr>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div id = "perceptrons" class="center">
-                    <svg id="svg">
-                        <circle cx="50%" cy="50%" r="26%" stroke="black" stroke-width="3" fill="none" />
-                    </svg>
-                    <div id="threshold-text" class="center">
-                        <text font-size="30">∑> </text>
-                        <text font-size="30" contenteditable="true" id="th1"></text>
-                    </div>
-                </div>
-                <div id = "output-links" class="center">
-                    <svg id="svg">
-                        <line id="line" stroke="black" stroke-width="3" x1="0%" y1="50%" x2="90%" y2="50%" marker-end="url(#triangle)"/>
-                    </svg>
-                </div>
-                <div class="center">
-                    <table class="selected" id="selected-output">
-                        <tr>
-                            <td>selected output</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            
-            <div id = "output-container">
-                <table id="output-table" class="table">
-                    <tr>
-                        <th>activation</sub></th>
-                        <th>output</sub></th>
-                    </tr>
-                </table>
-            </div>
-        </div>
-            
+
+
+                </th>
+            </tr>
+        </table>
+
+
         <script src="neuronsandbox.js"></script>
 
     </head>
-    
-    <body>
 
+    <body>
+        <div id="popup" class="popup">
+            <b>Winner!</b>
+            <div class="play-button-container">
+                <button class="playing-btn" id="keep-playing-btn" onclick="toggle()">Keep Playing</button>
+                <button class="playing-btn" id="next-question-btn" onclick="nextQuestion()">Next Question</button>
+            </div>
+            <audio id="hooray_sound">
+                <source src="hooray.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+
+        <script type="text/javascript">
+        function toggle() {
+            document.getElementById("popup").classList.toggle('active');
+        }
+        function nextQuestion() {
+            document.getElementById("popup").classList.toggle('active');
+            const questionDropDown = document.getElementById("problem-list");
+            const selectedIndex = questionDropDown.selectedIndex;
+            const nextIndex = selectedIndex + 1;
+            if(nextIndex < questionDropDown.options.length) {
+                questionDropDown.selectedIndex = nextIndex;
+                const event = new Event("change");
+                questionDropDown.dispatchEvent(event);
+            }
+        }
+    </script>
     </body>
