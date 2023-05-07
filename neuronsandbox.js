@@ -731,8 +731,16 @@ function checkAnswerCorrect() {
     else {
         for (let i = 1; i < tableRows; i++) {
             let cells = outputTable.rows.item(i).cells
-            let childCheckbox = guessTable.rows.item(i).querySelector('input[type="checkbox"]');
-            let guess_output = childCheckbox.checked? "1" : "0";
+            var radioButtonGroup = document.getElementsByName(`guess-radio-${i-1}`);
+            let guess_output;
+
+            for (let j = 0; j < radioButtonGroup.length; j++) {
+                if (radioButtonGroup[j].checked) {
+                    guess_output = radioButtonGroup[j].value;
+                    break;
+                }
+            }
+
             let desired = cells.item(2).innerText;
             if (guess_output !== desired) {
                 isCorrect = false
@@ -1017,12 +1025,18 @@ class Display {
         for (let i = 0; i < tableRows - 1; i++) {
             let newRow = guessTable.insertRow(i+1);
             var cell = guessTable.rows[i+1].insertCell(-1);
-            cell.innerHTML = '<label class="switch">' +
-                '<span>0</span>' +
-                '<input type="checkbox" data-on="1" data-off="0">' +
-                '<span class="slider round"></span>' +
-                '<span>1</span>' +
-                '</label>';
+
+            cell.innerHTML = '<div className="radio-buttons"> ' +
+                '<label class="radio-button">\n' +
+                `    <input type="radio" name="guess-radio-${i}" checked="checked" value="0">\n` +
+                '    0\n' +
+                '  </label>\n' +
+                '  <label class="radio-button">\n' +
+                `    <input type="radio" name="guess-radio-${i}" value="1">\n` +
+                '    1\n' +
+                '  </label>\n' +
+                '</div>'
+               ;
         }
     }
 

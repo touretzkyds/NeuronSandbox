@@ -238,6 +238,17 @@ article > section {
     background: linear-gradient(0deg, rgba(0,3,255,1) 0%, rgba(2,126,251,1) 100%);
 }
 
+#CheckAnswerBtn {
+    background: rgb(131, 14, 6);
+    background: linear-gradient(0deg, rgba(131, 14, 6, 1) 0%, rgba(180, 25, 12, 1) 100%);
+    border: none;
+}
+#CheckAnswerBtn:hover {
+    background: rgb(255, 0, 0);
+    background: linear-gradient(0deg, rgba(255, 0, 0, 1) 0%, rgba(251, 126, 2, 1) 100%);
+}
+
+
 .custom-btn[disabled=disabled], .custom-btn:disabled{
     border: 1px solid #999999;
     background-color: #cccccc;
