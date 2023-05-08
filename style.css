@@ -298,6 +298,13 @@ article > section {
     max-width: 7vw;
 }
 
+#guess-output-table th {
+    width: 7vw;
+    height: 5vw;
+    line-height: 1.7em !important;
+    max-width: 7vw;
+}
+
 #output-table th {
     width: 2vw !important;
     height: 5vw;
@@ -830,4 +837,70 @@ select option:checked {
 
 #questionprompt {
     resize: none;
+}
+
+.accordion {
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    padding: 12px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 18px;
+    transition: 0.4s;
+}
+
+.accordion:hover {
+    background-color: #0056b3;
+}
+
+.accordion.active {
+    background-color: #0056b3;
+}
+
+.accordion::after {
+    content: '\25BC'; /* Down arrow */
+    font-size: 16px;
+    color: #fff;
+    float: right;
+    margin-left: 5px;
+}
+
+.accordion.active::after {
+    content: '\25B2'; /* Up arrow */
+}
+
+.panel {
+    padding: 16px;
+    background-color: #fff;
+    display: none;
+    overflow: hidden;
+    margin-top: 10px;
+}
+.panel .button-group {
+    display: flex;
+}
+
+.panel button {
+    flex: 1;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-right: 10px;
+}
+
+.panel button:last-child {
+    margin-right: 0; /* Remove right margin from last button */
+}
+
+.panel button:hover {
+    background-color: #0056b3;
 }

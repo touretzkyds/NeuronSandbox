@@ -825,6 +825,40 @@ class Display {
         }
     }
 
+    createGuessOutputTableColors() {
+        const guessOutputTable = document.getElementById("guess-output-table");
+        let n = guessOutputTable.rows.length;
+        for (let i = 1; i < n; i++) {
+            const outputRow = document.querySelector(`#output-table > tbody > tr:nth-child(${i+1})`)
+            const guessOutputRow = document.querySelector(`#guess-output-table > tbody > tr:nth-child(${i+1})`)
+            let desired = outputRow.children[2].innerText;
+            var radioButtonGroup = document.getElementsByName(`guess-radio-${i-1}`);
+            let guessed;
+            for (let j = 0; j < radioButtonGroup.length; j++) {
+                if (radioButtonGroup[j].checked) {
+                    guessed = radioButtonGroup[j].value;
+                    break;
+                }
+            }
+
+            if(desired !== guessed) {
+                guessOutputRow.style.background = '#ffbfcb';
+            }
+            else {
+                guessOutputRow.style.background = 'none';
+            }
+        }
+    }
+
+    removeGuessTableColors() {
+        const guessOutputTable = document.getElementById("guess-output-table");
+        let n = guessOutputTable.rows.length;
+        for (let i = 1; i < n; i++) {
+            const guessOutputRow = document.querySelector(`#guess-output-table > tbody > tr:nth-child(${i+1})`)
+            guessOutputRow.style.background = 'none';
+        }
+    }
+
     createOutputTableEditBorder() {
         //return;
 
@@ -1016,10 +1050,8 @@ class Display {
     createGuessTableEditBorder() {
         let outputTable = document.getElementById("output-table")
         let guessTable = document.getElementById("guess-output-table");
-        guessTable.innerHTML = '<tr>\n' +
-            '                                    <th id="guessoutput">\n' +
-            '                                        <div class="input-content">Output</div>\n' +
-            '                                    </th>\n' +
+        guessTable.innerHTML = ' <tr>\n' +
+            '                                    <th id="guessoutput" class="edit-handler input-table-th">Output</th>\n' +
             '                                </tr>';
         let tableRows = outputTable.rows.length
         for (let i = 0; i < tableRows - 1; i++) {
@@ -1028,7 +1060,7 @@ class Display {
 
             cell.innerHTML = '<div className="radio-buttons"> ' +
                 '<label class="radio-button">\n' +
-                `    <input type="radio" name="guess-radio-${i}" checked="checked" value="0">\n` +
+                `    <input type="radio" name="guess-radio-${i}" value="0">\n` +
                 '    0\n' +
                 '  </label>\n' +
                 '  <label class="radio-button">\n' +
@@ -1040,6 +1072,21 @@ class Display {
         }
     }
 
+    checkGuessResult() {
+        let isCorrect = checkAnswerCorrect();
+        if(isCorrect)
+            PlayDingSound();
+        else {
+            PlayBuzzSound();
+            display.createGuessOutputTableColors();
+        }
+    }
+
+    removeGuessHighlight() {
+        display.removeGuessTableColors();
+    }
+
+
     checkForSuccess() {
         let isCorrect = checkAnswerCorrect();
         let fanfareToggleChecked = document.getElementById("FanfareToggle").checked
@@ -1048,7 +1095,7 @@ class Display {
         let guessToggleChecked = document.getElementById("DemoToggle").checked;
         if(guessToggleChecked) {
             if (isCorrect) {
-                PlaySound();
+                PlayHooraySound();
                 if (!document.getElementById("popup").classList.contains("active"))
                     document.getElementById("popup").classList.toggle('active');
                 const questionDropDown = document.getElementById("problem-list");
@@ -1064,7 +1111,7 @@ class Display {
         else if (fanfareToggleChecked && outputToggleChecked) {
             if (fanfareHidden) {
                 if (isCorrect) {
-                    PlaySound();
+                    PlayHooraySound();
                     if (!document.getElementById("popup").classList.contains("active"))
                         document.getElementById("popup").classList.toggle('active');
 
@@ -1711,12 +1758,14 @@ class Display {
             otherHeaders.forEach(header => {
                 header.hidden = true;
             });
+            document.getElementById("edit-menu-section").style.display = "none";
         }
         else {
             document.getElementById("guess-output-container").style.display = "none";
             document.getElementById("CheckAnswerBtn").style.display = "none";
             document.getElementById("network-container").style.display = "inline-flex";
             document.getElementById("output-container").style.display = "inline-flex";
+            document.getElementById("edit-menu-section").style.display = "inline-block";
             otherHeaders.forEach(header => {
                 header.hidden = false;
             });
@@ -2978,6 +3027,23 @@ handleDesiredOutputColumn();
 loadQuestionsAndModels();
 display.UpdateDemoToggle();
 
+var accordion = document.querySelector(".accordion");
+accordion.addEventListener("click", function() {
+    this.classList.toggle("active");
+    var panel = this.nextElementSibling;
+    if (panel.style.display === "block") {
+        panel.style.display = "none";
+    } else {
+        panel.style.display = "block";
+    }
+    display.outputLine.position()
+    for (let i = 0; i < demo.weightLines.length; i++)
+    {
+        demo.weightLines[i].position();
+    }
+});
+
+
 
 function addTooltips()
 {
@@ -3036,9 +3102,25 @@ $('#DemoToggle').change(function() { //toggle output
     display.UpdateDemoToggle();
 });
 
-function PlaySound() {
+function PlayHooraySound() {
     //document.getElementById("popup").classList.toggle('active');
     const audio = document.getElementById("hooray_sound");
+    if (audio) {
+        audio.play();
+    }
+}
+
+function PlayBuzzSound() {
+    //document.getElementById("popup").classList.toggle('active');
+    const audio = document.getElementById("buzz_sound");
+    if (audio) {
+        audio.play();
+    }
+}
+
+function PlayDingSound() {
+    //document.getElementById("popup").classList.toggle('active');
+    const audio = document.getElementById("ding_sound");
     if (audio) {
         audio.play();
     }

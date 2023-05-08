@@ -37,6 +37,29 @@
                 <option value="p1">Problem 2</option>
                 <option value="p1">Problem 3</option>
             </select>
+
+            <section id="edit-menu-section">
+                <button class="accordion">Menu</button>
+                <div class="panel">
+                    <div class="button-group">
+                        <div>
+                            <label>Binary</label>
+                            <label id="BinarySwitch" class="switch">
+                                <input type="checkbox" id="BinaryToggle">
+                                <span id="binary-slider" class="slider round"></span>
+                            </label>
+                        </div>
+                        <div>
+                            <label>Edit</label>
+                            <label id="InputSwitch" class="switch">
+                                <input type="checkbox" id="InputToggle">
+                                <span id="edit-slider" class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
         </article>
 
         <article>
@@ -48,6 +71,7 @@
                 <textarea hidden style="width: 400px; height: 50px;" id="questionprompt" cols="40" rows="5"></textarea>
                 <p id="questiontext" style="font-size: 23px">Enter question here!</p>
             </div>
+
 
 
         </article>
@@ -74,25 +98,11 @@
                     </label>
                 </th>
                 <th>
-                    <a style="margin-top: 19%" id= "CheckAnswerBtn" href="javascript:display.checkForSuccess();" class="custom-btn myButton">
+                    <a style="margin-top: 19%" id= "CheckAnswerBtn" onmousedown="event.preventDefault();display.checkGuessResult(); " onmouseup="event.preventDefault(); display.removeGuessHighlight();" class="custom-btn myButton">
                         <i class="fa fa-check-square" aria-hidden="true"></i> Check Answer
                     </a>
                 </th>
-                <th>
-                    <label>Binary</label>
-                    <label id="BinarySwitch" class="switch">
-                        <input type="checkbox" id="BinaryToggle">
-                        <span id="binary-slider" class="slider round"></span>
-                    </label>
-                </th>
-                <!--<th> <button class="custom-btn myButton" id="editButton">Edit</button></th>-->
-                <th>
-                    <label>Edit</label>
-                    <label id="InputSwitch" class="switch">
-                        <input type="checkbox" id="InputToggle">
-                        <span id="edit-slider" class="slider round"></span>
-                    </label>
-                </th>
+
 
                 <th hidden id="FanfareToggleBody">
                     <label>Fanfare</label>
@@ -194,9 +204,7 @@
                         <div id = "guess-output-container" class="left-guess">
                             <table id="guess-output-table" class="table input-output-table">
                                 <tr>
-                                    <th id="guessoutput">
-                                        <div class="input-content">Output</div>
-                                    </th>
+                                    <th id="guessoutput" class="edit-handler input-table-th">Output</th>
                                 </tr>
                             </table>
                         </div>
@@ -303,6 +311,14 @@
             </div>
             <audio id="hooray_sound">
                 <source src="hooray.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+            <audio id="buzz_sound">
+                <source src="buzz.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+            <audio id="ding_sound">
+                <source src="ding.mp3" type="audio/mpeg">
                 Your browser does not support the audio element.
             </audio>
         </div>
