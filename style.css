@@ -869,7 +869,7 @@ select option:checked {
 }
 
 .dropdown-content label {
-    display: block;
+    display: inline-block;
     margin-bottom: 10px;
 }
 
@@ -901,4 +901,12 @@ select option:checked {
 
 .panel button:hover {
     background-color: #0056b3;
+}
+
+.myimage {
+    vertical-align: middle;
+}
+
+#guess-output-table {
+    width: 200px;
 }

@@ -1047,6 +1047,53 @@ class Display {
             hideCameraImages();
         }
     }
+
+    getOutputImageHtml(value) {
+        const img = document.createElement("img");
+        if(value == 1) {
+            img.alt = "1_Image";
+            const imageKey = JSON.stringify({table_name: 'output-table', column: 2, value: img.alt});
+            if (imageKey in dictImageMapping) {
+                let image_src = localStorage.getItem(dictImageMapping[imageKey]);
+                if (image_src === null) {
+                    img.src = "1_image.svg";
+                }
+                else {
+                    img.src = image_src;
+                }
+            }
+            else {
+                img.src = "1_image.svg";
+            }
+
+            img.width = 48;
+            img.height = 48;
+            img.classList.add("myimage");
+            return img.outerHTML;
+        }
+        else if( value == 0) {
+            img.alt = "0_Image";
+            const imageKey = JSON.stringify({table_name: 'output-table', column: 2, value: img.alt});
+            if (imageKey in dictImageMapping) {
+                let image_src = localStorage.getItem(dictImageMapping[imageKey]);
+                if (image_src === null) {
+                    img.src = "0_image.svg";
+                }
+                else {
+                    img.src = image_src;
+                }
+            }
+            else {
+                img.src = "0_image.svg";
+            }
+
+            img.width = 48;
+            img.height = 48;
+            img.classList.add("myimage");
+            return img.outerHTML;
+        }
+        return "";
+    }
     createGuessTableEditBorder() {
         let outputTable = document.getElementById("output-table")
         let guessTable = document.getElementById("guess-output-table");
@@ -1058,7 +1105,7 @@ class Display {
             let newRow = guessTable.insertRow(i+1);
             var cell = guessTable.rows[i+1].insertCell(-1);
 
-            cell.innerHTML = '<div className="radio-buttons"> ' +
+            cell.innerHTML = '<div className="radio-buttons"> ' + this.getOutputImageHtml(0) +
                 '<label class="radio-button">\n' +
                 `    <input type="radio" name="guess-radio-${i}" value="0">\n` +
                 '    0\n' +
@@ -1066,7 +1113,7 @@ class Display {
                 '  <label class="radio-button">\n' +
                 `    <input type="radio" name="guess-radio-${i}" value="1">\n` +
                 '    1\n' +
-                '  </label>\n' +
+                '  </label>\n' + this.getOutputImageHtml(1) +
                 '</div>'
                ;
         }
@@ -1402,6 +1449,7 @@ class Display {
         return tblId === "input-table";
     }
     // respond to user hovering over table
+
     hoverInput(row, tblId, mode) {
         const isOutputToggleChecked = document.getElementById("OutputToggle").checked
         let rowIdx = row.rowIndex || 0;
@@ -1434,7 +1482,8 @@ class Display {
             for (let i = 0; i < outputRow.children.length; i++) {
                 outputRow.children[i].style.background = "lightblue";
             }
-            guessOutputRow.style.background = "lightblue";
+            if(guessOutputRow)
+                guessOutputRow.style.background = "lightblue";
             display.adjustSelectedInputFontSize();
 
             //console.log("enter: set outputRow =" + outputRow);
@@ -1752,20 +1801,21 @@ class Display {
         const otherHeaders = document.querySelectorAll('.top-table th:not(:first-child):not(:nth-child(2))');
         if (checkbox.checked) {
             document.getElementById("guess-output-container").style.display = "inline-block";
+
             document.getElementById("CheckAnswerBtn").style.display = "inline-block";
             document.getElementById("network-container").style.display = "none";
             document.getElementById("output-container").style.display = "none";
             otherHeaders.forEach(header => {
                 header.hidden = true;
             });
-            document.getElementById("edit-menu-section").style.display = "none";
+            //document.getElementById("edit-menu-section").style.display = "none";
         }
         else {
             document.getElementById("guess-output-container").style.display = "none";
             document.getElementById("CheckAnswerBtn").style.display = "none";
             document.getElementById("network-container").style.display = "inline-flex";
             document.getElementById("output-container").style.display = "inline-flex";
-            document.getElementById("edit-menu-section").style.display = "inline-block";
+            //document.getElementById("edit-menu-section").style.display = "inline-block";
             otherHeaders.forEach(header => {
                 header.hidden = false;
             });
@@ -2738,6 +2788,7 @@ async function uploadZip(zipFile, isProblem = false) {
                         localStorage.setItem(relativePath, dataURL);
                         display.createInputTableEditBorder();
                         display.createOutputTableEditBorder();
+                        display.createGuessTableEditBorder();
                     });
                 }
             });
@@ -2947,6 +2998,7 @@ async function uploadImageFile(event) {
             localStorage.setItem(file.name, dataURL);
             display.createInputTableEditBorder();
             display.createOutputTableEditBorder();
+            display.createGuessTableEditBorder();
         }
         catch (e)
         {
@@ -2994,11 +3046,28 @@ window.onload = function(){
     console.log("window loaded")
     $("#input-table tr:first").hide();
     $("#input-table tr td:nth-child(1)").hide();
+    if(!checkAnswerButtonLocationInitialized) {
+        this.checkAnswerButtonLocationInitialized = true;
+        let button = document.getElementById("CheckAnswerBtn");
+        const rect = button.getBoundingClientRect();
+        const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+        let currentLocationPx = button.scrollX;
+        let currentLocationPy = button.scrollY;
+        const currentLocationXRem = currentLocationPx / rootFontSize;
+        const currentLocationYRem = currentLocationPy / rootFontSize;
+
+        button.style.position = 'fixed';
+        // button.style.top = (rect.top - 200 ) + "px" ;
+        // button.style.left = (rect.left + 1000) + "px";
+        button.style.top = currentLocationYRem + "rem";
+        button.style.left = currentLocationXRem + "rem";
+    }
     //$("#OutputButton").hide();
 }
 
 // initialize all classes
 const demo = new Demo();
+var checkAnswerButtonLocationInitialized = false;
 var currentImageType = "";
 var currentImage;
 var currentColumn = -1;
