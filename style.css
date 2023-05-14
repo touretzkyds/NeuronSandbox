@@ -839,46 +839,44 @@ select option:checked {
     resize: none;
 }
 
-.accordion {
-    background-color: #007bff;
-    color: #fff;
-    cursor: pointer;
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropbtn {
+    background-color: #2196F3;
+    color: white;
     padding: 12px;
-    width: 100%;
     border: none;
-    text-align: left;
-    outline: none;
-    font-size: 18px;
-    transition: 0.4s;
+    cursor: pointer;
 }
 
-.accordion:hover {
-    background-color: #0056b3;
-}
-
-.accordion.active {
-    background-color: #0056b3;
-}
-
-.accordion::after {
-    content: '\25BC'; /* Down arrow */
-    font-size: 16px;
-    color: #fff;
-    float: right;
-    margin-left: 5px;
-}
-
-.accordion.active::after {
-    content: '\25B2'; /* Up arrow */
-}
-
-.panel {
-    padding: 16px;
-    background-color: #fff;
+.dropdown-content {
     display: none;
-    overflow: hidden;
-    margin-top: 10px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 300px;
+    background-color: #f9f9f9;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    padding: 16px;
+    z-index: 1;
 }
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown-content label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.dropdown-content input[type="checkbox"] {
+    margin-right: 5px;
+}
+
 .panel .button-group {
     display: flex;
 }

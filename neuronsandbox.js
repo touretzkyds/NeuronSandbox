@@ -1749,7 +1749,7 @@ class Display {
 
     UpdateDemoToggle() {
         let checkbox = document.getElementById("DemoToggle");
-        const otherHeaders = document.querySelectorAll('.top-table th:not(:first-child):not(:nth-child(2)):not(:nth-child(8))');
+        const otherHeaders = document.querySelectorAll('.top-table th:not(:first-child):not(:nth-child(2))');
         if (checkbox.checked) {
             document.getElementById("guess-output-container").style.display = "inline-block";
             document.getElementById("CheckAnswerBtn").style.display = "inline-block";
@@ -3027,24 +3027,6 @@ handleDesiredOutputColumn();
 loadQuestionsAndModels();
 display.UpdateDemoToggle();
 
-var accordion = document.querySelector(".accordion");
-accordion.addEventListener("click", function() {
-    this.classList.toggle("active");
-    var panel = this.nextElementSibling;
-    if (panel.style.display === "block") {
-        panel.style.display = "none";
-    } else {
-        panel.style.display = "block";
-    }
-    display.outputLine.position()
-    for (let i = 0; i < demo.weightLines.length; i++)
-    {
-        demo.weightLines[i].position();
-    }
-});
-
-
-
 function addTooltips()
 {
     tippy('#BinarySwitch', {
@@ -3063,6 +3045,10 @@ function addTooltips()
     });
     tippy('#DemoSwitch', {
         content: 'Guess the output',
+        className: 'my-tooltip-class'
+    });
+    tippy('#OutputSwitch', {
+        content: 'Show desired output column',
         className: 'my-tooltip-class'
     });
 }

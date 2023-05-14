@@ -38,23 +38,75 @@
                 <option value="p1">Problem 3</option>
             </select>
 
+
             <section id="edit-menu-section">
-                <button class="accordion">Menu</button>
-                <div class="panel">
-                    <div class="button-group">
-                        <div>
-                            <label>Binary</label>
-                            <label id="BinarySwitch" class="switch">
-                                <input type="checkbox" id="BinaryToggle">
-                                <span id="binary-slider" class="slider round"></span>
-                            </label>
-                        </div>
-                        <div>
-                            <label>Edit</label>
-                            <label id="InputSwitch" class="switch">
-                                <input type="checkbox" id="InputToggle">
-                                <span id="edit-slider" class="slider round"></span>
-                            </label>
+                <div class="dropdown">
+                    <button class="dropbtn"><i class="fas fa-bars"></i> Menu</button>
+                    <div class="dropdown-content">
+                        <div class="button-group">
+                            <div>
+                                <label>Binary</label>
+                                <label id="BinarySwitch" class="switch">
+                                    <input type="checkbox" id="BinaryToggle">
+                                    <span id="binary-slider" class="slider round"></span>
+                                </label>
+                            </div>
+                            <div>
+                                <label>Edit</label>
+                                <label id="InputSwitch" class="switch">
+                                    <input type="checkbox" id="InputToggle">
+                                    <span id="edit-slider" class="slider round"></span>
+                                </label>
+                            </div>
+                            <div>
+                                <div class="button-border">
+                                    <div class="user-input-wrp">
+                                        <br/>
+                                        <input type="text" class="inputText" name="url" id="url" size="160" onkeypress="let keyCode = event.keyCode || event.which; if (keyCode == 13) {uploadFileCombined(); return false;}" required/>
+                                        <span  class="floating-label">Model URL</span>
+                                    </div>
+
+                                    <!--                            <button for="upload-file" class="custom-btn myButton">-->
+                                    <!--                                <i class="fa fa-upload" aria-hidden="true"></i>-->
+                                    <!--                                upload file ...-->
+                                    <!--                            </button>-->
+                                    <a href="javascript:uploadFileCombined();" class="custom-btn myButton">
+                                        <i class="fa fa-upload" aria-hidden="true"></i> Load from URL
+                                    </a>
+                                </div>
+
+
+                                <!--                            <input type="button"  class="custom-btn myButton" id="loadFileJson" value="Upload Model" onclick="document.getElementById('upload-file').click();"> </input>-->
+
+
+
+                            </div>
+                            <div>
+                                <input id="upload-file" style="display:none;" type="file" accept=".sandbox" onchange="console.log('event = ', event); uploadFile(event)"/>
+                            </div>
+                            <div>
+                                <input id="upload-image_file" style="display:none;" type="file" accept="image/*" onchange="console.log('event = ', event); uploadImageFile(event)"/>
+                            </div>
+                            <div>
+                                <a style = "margin-top: 19%" href="javascript:uploadFileComputer();" class="custom-btn myButton">
+                                    <i class="fa fa-upload" aria-hidden="true"></i> Load from this Computer
+                                </a>
+                            </div>
+                            <div>
+                                <a style = "margin-top: 19%" href="#" id="downloadFile" role="button" onclick="downloadFile();" class="custom-btn myButton"><i class="fa fa-download" aria-hidden="true"></i> Save to this Computer</a>
+
+                                <!--                            <button id="downloadFile" onclick="downloadFile();" class="custom-btn myButton" >-->
+                                <!--                                <i class="fa fa-download" aria-hidden="true"></i>-->
+                                <!--                                download file ...-->
+                                <!--                            </button>-->
+                            </div>
+                            <div id = "FanfareToggleBody">
+                                <label>Fanfare</label>
+                                <label id="FanfareSwitch" class="switch">
+                                    <input type="checkbox" id="FanfareToggle">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -103,55 +155,9 @@
                     </a>
                 </th>
 
-
-                <th hidden id="FanfareToggleBody">
-                    <label>Fanfare</label>
-                    <label id="FanfareSwitch" class="switch">
-                        <input type="checkbox" id="FanfareToggle">
-                        <span class="slider round"></span>
-                    </label>
-                </th>
-
-                <th id="hello">
-                    <div class="button-border">
-                        <div class="user-input-wrp">
-                            <br/>
-                            <input type="text" class="inputText" name="url" id="url" size="160" onkeypress="let keyCode = event.keyCode || event.which; if (keyCode == 13) {uploadFileCombined(); return false;}" required/>
-                            <span  class="floating-label">Model URL</span>
-                        </div>
-
-                        <!--                            <button for="upload-file" class="custom-btn myButton">-->
-                        <!--                                <i class="fa fa-upload" aria-hidden="true"></i>-->
-                        <!--                                upload file ...-->
-                        <!--                            </button>-->
-                        <a href="javascript:uploadFileCombined();" class="custom-btn myButton">
-                            <i class="fa fa-upload" aria-hidden="true"></i> Load from URL
-                        </a>
-                    </div>
-
-
-                    <!--                            <input type="button"  class="custom-btn myButton" id="loadFileJson" value="Upload Model" onclick="document.getElementById('upload-file').click();"> </input>-->
-
-                    <input id="upload-file" style="display:none;" type="file" accept=".sandbox" onchange="console.log('event = ', event); uploadFile(event)"/>
-                    <input id="upload-image_file" style="display:none;" type="file" accept="image/*" onchange="console.log('event = ', event); uploadImageFile(event)"/>
-                </th>
-                <th>
-                    <a style = "margin-top: 19%" href="javascript:uploadFileComputer();" class="custom-btn myButton">
-                        <i class="fa fa-upload" aria-hidden="true"></i> Load from this Computer
-                    </a>
-
-                </th>
-                <th>
-                    <a style = "margin-top: 19%" href="#" id="downloadFile" role="button" onclick="downloadFile();" class="custom-btn myButton"><i class="fa fa-download" aria-hidden="true"></i> Save to this Computer</a>
-
-                    <!--                            <button id="downloadFile" onclick="downloadFile();" class="custom-btn myButton" >-->
-                    <!--                                <i class="fa fa-download" aria-hidden="true"></i>-->
-                    <!--                                download file ...-->
-                    <!--                            </button>-->
-                </th>
                 <th>
                     <label>Show Desired</label>
-                    <label class="switch" >
+                    <label class="switch" id="OutputSwitch">
                         <input type="checkbox" id="OutputToggle">
                         <span class="slider round"></span>
                     </label>
