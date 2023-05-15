@@ -2692,6 +2692,17 @@ function addThresholdEditOption() {
     toggleBtn.onclick = thresholdButtonHandler;
 }
 
+function findAncestorTable(element) {
+    let ancestor = element.parentNode;
+    while (ancestor && ancestor.tagName !== 'TABLE') {
+        ancestor = ancestor.parentNode;
+    }
+    if (ancestor && ancestor.tagName === 'TABLE') {
+        return ancestor;
+    }
+    return null; // If no ancestor table is found
+}
+
 function hideCameraImages() {
     let images = document.querySelectorAll(`.myimage`);
     images.forEach((image) => {
@@ -2704,6 +2715,9 @@ function setImageEditOptions() {
     let images = document.querySelectorAll(`.myimage`);
     images.forEach((image) => {
         //console.log(image);
+        if(findAncestorTable(image)?.id === "guess-output-table") {
+            return;
+        }
         image.style.display = "inline-block";
         let tdElement = image;
         while (tdElement && tdElement.tagName !== 'TD') {
