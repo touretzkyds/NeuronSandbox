@@ -785,6 +785,8 @@ class Display {
         }
         const outputHeaderCells = document.getElementById("output-table").rows[0].cells;
         outputHeaderCells[0].style.height = maxHeight + 'px';
+        const guessOutputHeaderCells = document.getElementById("guess-output-table").rows[0].cells;
+        guessOutputHeaderCells[0].style.height = maxHeight + 'px';
     }
 
     toggleProblemDisplay() {
@@ -1056,14 +1058,14 @@ class Display {
             if (imageKey in dictImageMapping) {
                 let image_src = localStorage.getItem(dictImageMapping[imageKey]);
                 if (image_src === null) {
-                    img.src = "1_image.svg";
+                    return '';
                 }
                 else {
                     img.src = image_src;
                 }
             }
             else {
-                img.src = "1_image.svg";
+                return '';
             }
 
             img.width = 48;
@@ -1077,14 +1079,14 @@ class Display {
             if (imageKey in dictImageMapping) {
                 let image_src = localStorage.getItem(dictImageMapping[imageKey]);
                 if (image_src === null) {
-                    img.src = "0_image.svg";
+                    return '';
                 }
                 else {
                     img.src = image_src;
                 }
             }
             else {
-                img.src = "0_image.svg";
+                return '';
             }
 
             img.width = 48;
@@ -1115,7 +1117,7 @@ class Display {
                 '    1\n' +
                 '  </label>\n' + this.getOutputImageHtml(1) +
                 '</div>'
-               ;
+            ;
         }
     }
 
@@ -1708,6 +1710,7 @@ class Display {
             });
             //document.getElementById("generateTruthTable").disabled = true;
             document.getElementById("output-table").style.marginTop = "0px";
+            document.getElementById("guess-output-table").style.marginTop = "0px";
             document.getElementById("FanfareToggleBody").hidden = true;
         } else {
             $("#input-table tr:first").show();
@@ -1722,6 +1725,7 @@ class Display {
             });
             //document.getElementById("generateTruthTable").disabled = false;
             document.getElementById("output-table").style.marginTop = "40px";
+            document.getElementById("guess-output-table").style.marginTop = "40px";
             document.getElementById("FanfareToggleBody").hidden = false;
         }
 
