@@ -139,15 +139,16 @@
 
         <table class = "top-table">
             <tr>
-                <!--                        <th style="width: 50%;alignment: left">-->
-                <!--                            <button class="custom-btn myButton" id="generateTruthTable">Generate truth table</button>-->
-                <!--                        </th>-->
                 <th>
-                    <label>Guess</label>
-                    <label id="DemoSwitch" class="switch">
-                        <input type="checkbox" id="DemoToggle">
-                        <span id="demo-slider" class="slider round"></span>
-                    </label>
+                    <div style="width: 500px; display:flex; flex-direction: row; justify-content: center; align-items: center; column-gap: 10px;">
+                        <label style="width: 50px">Solve for Weights</label>
+                        <label id="DemoSwitch" class="switch">
+                            <input type="checkbox" id="DemoToggle">
+                            <span id="demo-slider" class="slider round"></span>
+                        </label>
+                        <label style="width: 50px">Solve for Outputs</label>
+                    </div>
+
                 </th>
                 <th>
                     <a style="margin-top: 19%" id= "CheckAnswerBtn" onmousedown="event.preventDefault();display.checkGuessResult(); " onmouseup="event.preventDefault(); display.removeGuessHighlight();" class="custom-btn myButton">
@@ -156,7 +157,7 @@
                 </th>
 
                 <th>
-                    <div  style="margin-left: 510%" >
+                    <div style="margin-left: 900%" >
                         <label >Show Desired</label>
                         <label class="switch" id="OutputSwitch">
                             <input type="checkbox" id="OutputToggle">
