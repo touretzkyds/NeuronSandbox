@@ -879,6 +879,7 @@ select option:checked {
 
 .panel .button-group {
     display: flex;
+    justify-content: flex-start;
 }
 
 .panel button {
@@ -908,5 +909,5 @@ select option:checked {
 }
 
 #guess-output-table {
-    width: 200px;
+    width: 600px;
 }

@@ -410,8 +410,6 @@ class Table {
         });
         display.createInputTableEditBorder()
         display.createOutputTableEditBorder();
-        display.createGuessTableEditBorder();
-
     }
 
     //finds available indices for variables
@@ -713,7 +711,6 @@ function ConvertToWeightSubscript(weightLabel) {
 
 function checkAnswerCorrect() {
     let outputTable = document.getElementById("output-table")
-    let guessTable = document.getElementById("guess-output-table");
     let guessToggle = document.getElementById("DemoToggle")
     let tableRows = outputTable.rows.length
     let isCorrect = true;
@@ -843,6 +840,7 @@ class Display {
                 }
             }
 
+            this.updateGuessTableCommentRow(i);
             if(desired !== guessed) {
                 guessOutputRow.style.background = '#ffbfcb';
             }
@@ -859,6 +857,10 @@ class Display {
             const guessOutputRow = document.querySelector(`#guess-output-table > tbody > tr:nth-child(${i+1})`)
             guessOutputRow.style.background = 'none';
         }
+        const comments = document.querySelectorAll('.guess-comment');
+        comments.forEach((comment) => {
+            comment.style.display = "none";
+        });
     }
 
     createOutputTableEditBorder() {
@@ -1050,23 +1052,39 @@ class Display {
         }
     }
 
+
+    getCommentControl(row) {
+        let label = document.createElement("span");
+        label.classList.add("guess-comment");
+        label.style.display = "none";
+        const imageKey = JSON.stringify({table_name: 'guess-output-table', row: row});
+        if (imageKey in dictCommentMapping) {
+            let labelText = document.createTextNode(dictCommentMapping[imageKey]);
+            labelText.onchange = function() {
+                let inputValue = labelText.value;
+                dictCommentMapping[JSON.stringify({table_name: "guess-output-table", row: row})] = inputValue;
+            };
+            label.appendChild(labelText);
+        }
+        else
+        {
+            let labelText = document.createTextNode("");
+            labelText.onchange = function() {
+                let inputValue = labelText.value;
+                dictCommentMapping[JSON.stringify({table_name: "guess-output-table", row: row})] = inputValue;
+            };
+            label.appendChild(labelText);
+        }
+
+        return label;
+    }
+
     getOutputImageHtml(value) {
         const img = document.createElement("img");
         if(value == 1) {
             img.alt = "1_Image";
-            const imageKey = JSON.stringify({table_name: 'output-table', column: 2, value: img.alt});
-            if (imageKey in dictImageMapping) {
-                let image_src = localStorage.getItem(dictImageMapping[imageKey]);
-                if (image_src === null) {
-                    return '';
-                }
-                else {
-                    img.src = image_src;
-                }
-            }
-            else {
-                return '';
-            }
+            img.src = "";
+            img.style.display = "none";
 
             img.width = 48;
             img.height = 48;
@@ -1076,48 +1094,153 @@ class Display {
         else if( value == 0) {
             img.alt = "0_Image";
             const imageKey = JSON.stringify({table_name: 'output-table', column: 2, value: img.alt});
-            if (imageKey in dictImageMapping) {
-                let image_src = localStorage.getItem(dictImageMapping[imageKey]);
-                if (image_src === null) {
-                    return '';
-                }
-                else {
-                    img.src = image_src;
-                }
-            }
-            else {
-                return '';
-            }
-
+            img.src = "";
+            img.style.display = "none";
             img.width = 48;
             img.height = 48;
             img.classList.add("myimage");
-            return img.outerHTML;
         }
-        return "";
+        return img.outerHTML;
     }
-    createGuessTableEditBorder() {
+
+    updateGuessTableImageRow(row) {
+        let guessTable = document.getElementById("guess-output-table");
+        var cell = guessTable.rows[row].cells[0];
+        let radioButtonGroup = document.getElementsByName(`guess-radio-${row-1}`);
+        //get the selected value and show the corresponding image if available
+        let guessed;
+        for (let j = 0; j < radioButtonGroup.length; j++) {
+            if (radioButtonGroup[j].checked) {
+                guessed = radioButtonGroup[j].value;
+                break;
+            }
+        }
+        if(guessed !== undefined) {
+            guessed = Number(guessed);
+
+            let images = cell.querySelectorAll(".myimage");
+            for( let i = 0; i < images.length; i++) {
+                if( i === guessed) {
+                    const imageKey = JSON.stringify({table_name: 'output-table', column: 2, value: ""+i + "_Image"});
+                    if (imageKey in dictImageMapping) {
+                        images[i].src = localStorage.getItem(dictImageMapping[imageKey]);
+                        images[i].style.display = "inline-block";
+                    }
+                    else
+                    {
+                        images[i].src = "";
+                        images[i].style.display = "none";
+                    }
+                }
+                else {
+                    images[i].src = "";
+                    images[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    updateGuessTableCommentRow(row) {
+        let guessTable = document.getElementById("guess-output-table");
+        const outputRow = document.querySelector(`#output-table > tbody > tr:nth-child(${row+1})`)
+        const guessOutputRow = document.querySelector(`#guess-output-table > tbody > tr:nth-child(${row+1})`)
+        let editCheckbox = document.getElementById("InputToggle");
+        if(editCheckbox.checked) {
+            let comments = guessOutputRow.querySelectorAll(".guess-comment");
+            for( let i = 0; i < comments.length; i++) {
+                comments[i].style.display = "inline-block";
+                comments[i].contentEditable = true;
+                if (!comments[i].classList.contains("edit-handler"))
+                    comments[i].classList.add("edit-handler");
+                if (!comments[i].classList.contains("editable-border"))
+                    comments[i].classList.add("editable-border");
+            }
+            return;
+        }
+        //non-edit mode, we will display the comment for the wrong answer, in read only mode
+
+        let desired = outputRow.children[2].innerText;
+
+        var cell = guessTable.rows[row].cells[0];
+        let radioButtonGroup = document.getElementsByName(`guess-radio-${row-1}`);
+        //get the selected value and show the corresponding image if available
+        let guessed;
+        for (let j = 0; j < radioButtonGroup.length; j++) {
+            if (radioButtonGroup[j].checked) {
+                guessed = radioButtonGroup[j].value;
+                break;
+            }
+        }
+        if(guessed !== desired ) {
+            let comments = guessOutputRow.querySelectorAll(".guess-comment");
+            for( let i = 0; i < comments.length; i++) {
+                comments[i].style.display = "inline-block";
+                comments[i].contentEditable = false;
+                if (comments[i].classList.contains("edit-handler"))
+                    comments[i].classList.remove("edit-handler");
+                if (comments[i].classList.contains("editable-border"))
+                    comments[i].classList.remove("editable-border");
+            }
+        }
+        if(!checkAnswerButtonPressed) {
+            let comments = guessOutputRow.querySelectorAll(".guess-comment");
+            for( let i = 0; i < comments.length; i++) {
+                comments[i].style.display = "none";
+            }
+        }
+    }
+
+    updateGuessTable() {
+        let guessTable = document.getElementById("guess-output-table");
+        let tableRows = guessTable.rows.length;
+        for (let row = 1; row < tableRows; row++) {
+            this.updateGuessTableCommentRow(row);
+        }
+    }
+
+    saveGuessComment() {
+        dictCommentMapping = {};
+        let guessTable = document.getElementById("guess-output-table");
+        let tableRows = guessTable.rows.length;
+        for (let row = 1; row < tableRows; row++) {
+
+            const guessOutputRow = document.querySelector(`#guess-output-table > tbody > tr:nth-child(${row+1})`)
+            let comments = guessOutputRow.querySelectorAll(".guess-comment");
+            for( let i = 0; i < comments.length; i++) {
+                dictCommentMapping[JSON.stringify({table_name: "guess-output-table", row: row})] = comments[i].innerText;
+            }
+        }
+    }
+    createGuessTable() {
         let outputTable = document.getElementById("output-table")
         let guessTable = document.getElementById("guess-output-table");
         guessTable.innerHTML = ' <tr>\n' +
             '                                    <th id="guessoutput" class="edit-handler input-table-th">Output</th>\n' +
+            '                                    <th id="guesscomment" class="edit-handler input-table-th">Comment</th>\n' +
             '                                </tr>';
         let tableRows = outputTable.rows.length
         for (let i = 0; i < tableRows - 1; i++) {
             let newRow = guessTable.insertRow(i+1);
-            var cell = guessTable.rows[i+1].insertCell(-1);
-
+            let cell = guessTable.rows[i+1].insertCell(-1);
             cell.innerHTML = '<div className="radio-buttons"> ' + this.getOutputImageHtml(0) +
                 '<label class="radio-button">\n' +
-                `    <input type="radio" name="guess-radio-${i}" value="0">\n` +
+                `    <input type="radio" name="guess-radio-${i}" value="0" onclick="display.updateGuessTableImageRow(${i + 1})">\n` +
                 '    0\n' +
                 '  </label>\n' +
                 '  <label class="radio-button">\n' +
-                `    <input type="radio" name="guess-radio-${i}" value="1">\n` +
+                `    <input type="radio" name="guess-radio-${i}" value="1" onclick="display.updateGuessTableImageRow(${i + 1})">\n` +
                 '    1\n' +
-                '  </label>\n' + this.getOutputImageHtml(1) +
+                '  </label>\n' +
+                 this.getOutputImageHtml(1) +
                 '</div>'
-            ;
+               ;
+
+            let commentCell = guessTable.rows[i+1].insertCell(-1);
+            commentCell.append(this.getCommentControl(i + 1));
+        }
+
+        for (let row = 1; row < tableRows; row++) {
+            this.updateGuessTableCommentRow(row);
         }
     }
 
@@ -1127,11 +1250,13 @@ class Display {
             PlayDingSound();
         else {
             PlayBuzzSound();
+            checkAnswerButtonPressed = true;
             display.createGuessOutputTableColors();
         }
     }
 
     removeGuessHighlight() {
+        checkAnswerButtonPressed = false;
         display.removeGuessTableColors();
     }
 
@@ -1143,19 +1268,19 @@ class Display {
         let outputToggleChecked = document.getElementById("OutputToggle").checked
         let guessToggleChecked = document.getElementById("DemoToggle").checked;
         if(guessToggleChecked) {
-            if (isCorrect) {
-                PlayHooraySound();
-                if (!document.getElementById("popup").classList.contains("active"))
-                    document.getElementById("popup").classList.toggle('active');
-                const questionDropDown = document.getElementById("problem-list");
-                const selectedIndex = questionDropDown.selectedIndex;
-                const nextIndex = selectedIndex + 1;
-                let button = document.getElementById("next-question-btn");
-                button.style.display = nextIndex < questionDropDown.options.length - 1 ? "inline-block" : "none";
-            }
-            else {
-                alert("You guessed incorrectly, please try again");
-            }
+            // if (isCorrect) {
+            //     PlayHooraySound();
+            //     if (!document.getElementById("popup").classList.contains("active"))
+            //         document.getElementById("popup").classList.toggle('active');
+            //     const questionDropDown = document.getElementById("problem-list");
+            //     const selectedIndex = questionDropDown.selectedIndex;
+            //     const nextIndex = selectedIndex + 1;
+            //     let button = document.getElementById("next-question-btn");
+            //     button.style.display = nextIndex < questionDropDown.options.length - 1 ? "inline-block" : "none";
+            // }
+            // else {
+            //     alert("You guessed incorrectly, please try again");
+            // }
         }
         else if (fanfareToggleChecked && outputToggleChecked) {
             if (fanfareHidden) {
@@ -1825,6 +1950,7 @@ class Display {
             });
         }
         this.UpdateInputToggle();
+        display.updateGuessTable();
     }
 
     UpdateFanfareToggle() {
@@ -2256,80 +2382,11 @@ class Demo {
 
     }
     updateWeightUI(parentElement) {
-        //TODO: make code less messy
         let childCount = parentElement.children.length;
-        console.log(parentElement.id)
 
         for(let i = 0; i < childCount; i++) {
             addEditOption(i);
         }
-        // if (childCount === 1) {
-        //     let child = parentElement.children[0];
-        //     const top = 40;
-        //     child.style = "top:" + top + "%;";
-        //     addEditOption(0);
-        // }
-        // else if (childCount === 3) {
-        //     let first = 20;
-        //     let last = 70;
-        //     let interval = (last - first) / (childCount - 1);
-        //     for (let i = 0; i < parentElement.children.length; i++) {
-        //         let child = parentElement.children[i];
-        //         let top = Math.floor(first + i * interval);
-        //         child.style = "left:" + -20 + "%;" + "top:" + top + "%;";
-        //         addEditOption(i);
-        //     }
-        //     let child = parentElement.children[1];
-        //     const top = 38;
-        //     child.style = "left: -20%;" +  "top:" + top + "%;";
-        // }
-        // else if (childCount === 4) {
-        //     let first = 10;
-        //     let last = 80;
-        //     let interval = (last - first) / (childCount - 1);
-        //     for (let i = 0; i < parentElement.children.length; i++) {
-        //         let child = parentElement.children[i];
-        //         let top = Math.floor(first + i * interval);
-        //         //child.style = "left:" + -10 + "%;";
-        //         child.style = "left:" + -50 + "%;" + "top:" + top + "%;";
-        //         addEditOption(i);
-        //     }
-        //
-        // }
-        // else if (childCount === 5) {
-        //     let first = 10;
-        //     let last = 80;
-        //     let interval = (last - first) / (childCount - 1);
-        //     for (let i = 0; i < parentElement.children.length; i++) {
-        //         let child = parentElement.children[i];
-        //         let top = Math.floor(first + i * interval);
-        //         child.style = "left:" + -20 + "%;" + "top:" + top + "%;";
-        //         addEditOption(i);
-        //     }
-        //     let child = parentElement.children[1];
-        //     const left = -40;
-        //     const top = 10 + 17.5
-        //     child.style = "left:" + left + "%;" + "top:" + top + "%;";
-        //     let child1 = parentElement.children[2];
-        //     const left1 = -80;
-        //     const top1 = 10 + 17.5*2 - 5
-        //     child1.style = "left:" + left1 + "%;" + "top:" + top1 + "%;";
-        //     let child2 = parentElement.children[3];
-        //     const left2 = -40;
-        //     const top2 = 10 + 17.5*2 + 8
-        //     child2.style = "left:" + left2 + "%;" + "top:" + top2 + "%;";
-        // }
-        // else {
-        //     let first = 20;
-        //     let last = 70;
-        //     let interval = (last - first) / (childCount - 1);
-        //     for (let i = 0; i < parentElement.children.length; i++) {
-        //         let child = parentElement.children[i];
-        //         let top = Math.floor(first + i * interval);
-        //         child.style = "top:" + top + "%;";
-        //         addEditOption(i);
-        //     }
-        // }
         setupCloseButtons();
     }
 
@@ -2535,7 +2592,8 @@ async function downloadFile() {
     // Add the file to the zip archive
     zip.file("model.json", blob);
     zip.file("ImageMapping.json", new Blob([JSON.stringify(dictImageMapping)]))
-
+    display.saveGuessComment();
+    zip.file("CommentMapping.json", new Blob([JSON.stringify(dictCommentMapping)]))
     for (const key in dictImageMapping) {
         let keyStorage = dictImageMapping[key];
         console.log("localstorage key:" + key);
@@ -2732,7 +2790,7 @@ function setImageEditOptions() {
             if (document.getElementById("InputToggle").checked) {
                 let table = tdElement.closest('table');
                 event.preventDefault();
-                showMenu(event, this, tdElement.cellIndex, table)
+                showMenu(event, this, tdElement.cellIndex, tdElement.rowIndex, table)
             }
             //handleImageClick(this, tdElement.cellIndex);
         };
@@ -2789,6 +2847,12 @@ async function uploadZip(zipFile, isProblem = false) {
                         dictImageMapping = JSON.parse(content);
                     });
                 }
+                else if (relativePath === "CommentMapping.json") {
+                    zipEntry.async('text').then(function (content) {
+                        console.log(content);
+                        dictCommentMapping = JSON.parse(content);
+                    });
+                }
                 else if (relativePath.endsWith(".json")) {
                     zipEntry.async('text').then(function (content) {
                         console.log(content);
@@ -2806,7 +2870,7 @@ async function uploadZip(zipFile, isProblem = false) {
                         localStorage.setItem(relativePath, dataURL);
                         display.createInputTableEditBorder();
                         display.createOutputTableEditBorder();
-                        display.createGuessTableEditBorder();
+                        display.createGuessTable();
                     });
                 }
             });
@@ -3016,7 +3080,7 @@ async function uploadImageFile(event) {
             localStorage.setItem(file.name, dataURL);
             display.createInputTableEditBorder();
             display.createOutputTableEditBorder();
-            display.createGuessTableEditBorder();
+            display.updateGuessTable();
         }
         catch (e)
         {
@@ -3064,22 +3128,22 @@ window.onload = function(){
     console.log("window loaded")
     $("#input-table tr:first").hide();
     $("#input-table tr td:nth-child(1)").hide();
-    if(!checkAnswerButtonLocationInitialized) {
-        this.checkAnswerButtonLocationInitialized = true;
-        let button = document.getElementById("CheckAnswerBtn");
-        const rect = button.getBoundingClientRect();
-        const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
-        let currentLocationPx = button.scrollX;
-        let currentLocationPy = button.scrollY;
-        const currentLocationXRem = currentLocationPx / rootFontSize;
-        const currentLocationYRem = currentLocationPy / rootFontSize;
-
-        button.style.position = 'fixed';
-        // button.style.top = (rect.top - 200 ) + "px" ;
-        // button.style.left = (rect.left + 1000) + "px";
-        button.style.top = currentLocationYRem + "rem";
-        button.style.left = currentLocationXRem + "rem";
-    }
+    // if(!checkAnswerButtonLocationInitialized) {
+    //     this.checkAnswerButtonLocationInitialized = true;
+    //     let button = document.getElementById("CheckAnswerBtn");
+    //     const rect = button.getBoundingClientRect();
+    //     const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    //     let currentLocationPx = button.scrollX;
+    //     let currentLocationPy = button.scrollY;
+    //     const currentLocationXRem = currentLocationPx / rootFontSize;
+    //     const currentLocationYRem = currentLocationPy / rootFontSize;
+    //
+    //     button.style.position = 'fixed';
+    //     // button.style.top = (rect.top - 200 ) + "px" ;
+    //     // button.style.left = (rect.left + 1000) + "px";
+    //     button.style.top = currentLocationYRem + "rem";
+    //     button.style.left = currentLocationXRem + "rem";
+    // }
     //$("#OutputButton").hide();
 }
 
@@ -3088,10 +3152,13 @@ const demo = new Demo();
 var checkAnswerButtonLocationInitialized = false;
 var currentImageType = "";
 var currentImage;
+var currentRow = -1;
 var currentColumn = -1;
 var currentTable = "input-table";
 var dictImageMapping = {}
+var dictCommentMapping = {}
 var isLoading = false;
+var checkAnswerButtonPressed = false;
 let inputs = new Data(demo.inputData);
 let desiredOutputs = new Data(demo.desiredOutput);
 const dataOp = new DataOperator();
@@ -3152,6 +3219,7 @@ $('#InputToggle').change(function() { //toggle edit
     demo.showWeightToggle(show);
     display.createInputTableEditBorder();
     display.createOutputTableEditBorder();
+    display.updateGuessTable();
     display.toggleProblemDisplay();
     for (let i = 0; i < demo.weightLines.length; i++) {
         demo.weightLines[i].position();
@@ -3208,11 +3276,12 @@ $('#FanfareToggle').change(function() { //toggle output
     }
 });
 
-function showMenu(event, img, col, table) {
+function showMenu(event, img, col, row, table) {
     if (document.getElementById("InputToggle").checked) {
         currentImage = img;
         currentImageType = img.alt;
         currentColumn = col;
+        currentRow = row;
         currentTable = table.id;
         const menu = document.getElementById("popup-menu");
         menu.style.display = "block";
@@ -3325,6 +3394,12 @@ function loadQuestionsAndModels() {
             });
         });
 }
+
+function goToAboutPage() {
+    location.href = 'about.html';
+}
+
+
 
 
 
