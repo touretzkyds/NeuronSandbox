@@ -1366,8 +1366,7 @@ class Display {
                 selections.rows[c-1].cells[0].style.fontSize = newFontSize + "px"
         }
 
-        for (let i = 0; i < demo.weightLines.length; i++)
-        {
+        for (let i = 0; i < demo.weightLines.length; i++) {
             demo.weightLines[i].position();
         }
 

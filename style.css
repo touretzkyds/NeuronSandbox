@@ -911,3 +911,7 @@ select option:checked {
 #guess-output-table {
     width: 600px;
 }
+
+span.guess-comment {
+    line-height: 1em;
+}
