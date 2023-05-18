@@ -1362,7 +1362,8 @@ class Display {
                 }
             }
             const selections = document.getElementById("selected-inputs");
-            selections.rows[c-1].cells[0].style.fontSize = newFontSize + "px"
+            if (selections.rows[c-1] && selections.rows[c-1].cells[0] )
+                selections.rows[c-1].cells[0].style.fontSize = newFontSize + "px"
         }
 
         for (let i = 0; i < demo.weightLines.length; i++)
@@ -1799,10 +1800,11 @@ class Display {
 
     UpdateInputToggle() {
         let checkbox = document.getElementById("InputToggle");
-        let checkboxBinary = document.getElementById(("BinaryToggle"));
+        let checkboxBinary = document.getElementById("BinaryToggle");
+        let checkboxGuess = document.getElementById("DemoToggle");
         //display.createOutputTableColors();
         this.updateSelectedInput();
-        if (!checkbox.checked) {
+        if (!checkbox.checked || checkboxGuess.checked) {
             $("#input-table tr:first").hide();
             $("#input-table tr td:nth-child(1)").hide();
             const buttonRows = document.getElementsByClassName("row-buttons-container");
@@ -2383,6 +2385,8 @@ class Demo {
         if (document.getElementById("BinaryToggle").checked)
             display.UpdateBinaryToggle(true);
         demo.update(); //TODO: check if efficient
+        display.saveGuessComment();
+        display.createGuessTable();
     }
 
 
@@ -3086,6 +3090,10 @@ window.onload = function(){
     console.log("window loaded")
     $("#input-table tr:first").hide();
     $("#input-table tr td:nth-child(1)").hide();
+    let button = document.getElementById("CheckAnswerBtn");
+    button.style.position = 'fixed';
+    button.style.top = 0 + "px";
+    button.style.right = 200 + "px";
     // if(!checkAnswerButtonLocationInitialized) {
     //     this.checkAnswerButtonLocationInitialized = true;
     //     let button = document.getElementById("CheckAnswerBtn");
@@ -3355,11 +3363,6 @@ function loadQuestionsAndModels() {
 
 function goToAboutPage() {
     location.href = 'about.html';
-}
-
-function goToNeuronSandbox() {
-    window.history.back();
-    //location.href = 'index.html';
 }
 
 
