@@ -1914,6 +1914,7 @@ class Display {
             otherHeaders.forEach(header => {
                 header.hidden = false;
             });
+            demo.adjustWeightPlacement()
         }
         this.UpdateInputToggle();
         display.updateGuessTable();
