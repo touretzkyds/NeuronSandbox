@@ -683,7 +683,6 @@ class Perceptron {
                 cell.innerHTML = parseInt(cell.innerHTML)
             }
         }
-        //display.highlightInvalidText(cell, isValid);
         if(!isValid) {
             if(parsedValue > 0)
                 parsedValue = 1
@@ -818,9 +817,6 @@ class Display {
             td2.style.fontWeight = 'bold';
             if (td2.style.background !== '#ffbfcb') //error
                 td2.style.background = '#f8ffcf'
-            //td2.classList.add("bold-td");
-
-
         }
     }
 
@@ -864,8 +860,6 @@ class Display {
     }
 
     createOutputTableEditBorder() {
-        //return;
-
         const outputTable = document.getElementById("output-table")
         let binaryCheckbox = document.getElementById("BinaryToggle");
         let editCheckbox = document.getElementById("InputToggle");
@@ -1059,20 +1053,11 @@ class Display {
         label.style.display = "none";
         const imageKey = JSON.stringify({table_name: 'guess-output-table', row: row});
         if (imageKey in dictCommentMapping) {
-            let labelText = document.createTextNode(dictCommentMapping[imageKey]);
-            labelText.onchange = function() {
-                let inputValue = labelText.value;
-                dictCommentMapping[JSON.stringify({table_name: "guess-output-table", row: row})] = inputValue;
-            };
-            label.appendChild(labelText);
+            let htmlText = dictCommentMapping[imageKey].replace(/\n/g, '<br>');
+            label.innerHTML = htmlText;
         }
-        else
-        {
+        else {
             let labelText = document.createTextNode("");
-            labelText.onchange = function() {
-                let inputValue = labelText.value;
-                dictCommentMapping[JSON.stringify({table_name: "guess-output-table", row: row})] = inputValue;
-            };
             label.appendChild(labelText);
         }
 
@@ -1115,7 +1100,7 @@ class Display {
                 break;
             }
         }
-        if(guessed !== undefined) {
+        if(guessed != undefined) {
             guessed = Number(guessed);
 
             let images = cell.querySelectorAll(".myimage");
@@ -1126,8 +1111,7 @@ class Display {
                         images[i].src = localStorage.getItem(dictImageMapping[imageKey]);
                         images[i].style.display = "inline-block";
                     }
-                    else
-                    {
+                    else {
                         images[i].src = "";
                         images[i].style.display = "none";
                     }
@@ -1171,7 +1155,7 @@ class Display {
                 break;
             }
         }
-        if(guessed !== desired ) {
+        if(guessed != desired ) {
             let comments = guessOutputRow.querySelectorAll(".guess-comment");
             for( let i = 0; i < comments.length; i++) {
                 comments[i].style.display = "inline-block";
@@ -1231,9 +1215,9 @@ class Display {
                 `    <input type="radio" name="guess-radio-${i}" value="1" onclick="display.updateGuessTableImageRow(${i + 1})">\n` +
                 '    1\n' +
                 '  </label>\n' +
-                 this.getOutputImageHtml(1) +
+                this.getOutputImageHtml(1) +
                 '</div>'
-               ;
+            ;
 
             let commentCell = guessTable.rows[i+1].insertCell(-1);
             commentCell.append(this.getCommentControl(i + 1));
@@ -1804,10 +1788,6 @@ class Display {
             let headerInput = headerCells[c];
             //var headerInput = document.querySelector(`#input-table> tbody > tr:nth-child(${2}) > td:nth-child(${c} > div:nth-child(${1}))`);
             if (headerInput.id.startsWith("tblinput")) {
-                /*if(headerInput.children[0]) {
-                    headerRowVals.push(headerInput.children[0].innerHTML);
-                }
-                else*/
 
                 headerInput.innerHTML = headerRowVals[c-1];
             }
@@ -1871,14 +1851,6 @@ class Display {
 
         let isCorrect = true;
 
-        // if(checkbox.checked) {
-        //     document.getElementById("output-table").style.marginTop = "-20px";
-        // }
-        // else {
-        //     document.getElementById("output-table").style.marginTop = "7px";
-        //     document.getElementById("congrats-msg").hidden = true;
-        // }
-
         for (let i = 1; i < n; i++) {
             //var tr = outputCol.rows[i];
             let output = outputCol.rows[i].cells[1];
@@ -1888,13 +1860,6 @@ class Display {
             if (!currCorrect)
                 isCorrect = false;
         }
-
-        // if(checkbox.checked) {
-        //     let fanfareToggleChecked = document.getElementById("FanfareToggle")
-        //     if(!isCorrect && fanfareToggleChecked) {
-        //         alert("Congrats! Desired outputs reached!")
-        //     }
-        // }
 
         for (let i = 0; i < demo.weightLines.length; i++) {
             demo.weightLines[i].position();
@@ -2158,13 +2123,6 @@ class Demo {
 
         }
         document.getElementById("unlearnable-msg").hidden = false;
-
-
-        //alert("this desired output cannot be achieved!")
-
-
-
-
     }
 
     // calculate row to insert at, from html button address
@@ -3397,6 +3355,11 @@ function loadQuestionsAndModels() {
 
 function goToAboutPage() {
     location.href = 'about.html';
+}
+
+function goToNeuronSandbox() {
+    window.history.back();
+    //location.href = 'index.html';
 }
 
 
