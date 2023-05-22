@@ -1029,13 +1029,16 @@ class Display {
                     img.width = 48;
                     img.height = 48;
                     img.classList.add("myimage");
-                    if (document.getElementById("InputToggle").checked)
+                    if (document.getElementById("InputToggle").checked && !document.getElementById("DemoToggle").checked) {
                         img.classList.add("editable-border")
+                    }
                     else {
                         if (img.classList.contains("editable-border"))
                             img.classList.remove("editable-border")
                     }
-                    textbox.appendChild(img);
+                    if(!(document.getElementById("DemoToggle").checked && (img.src.endsWith("0_image.svg") ||img.src.endsWith("1_image.svg")))) {
+                        textbox.appendChild(img);
+                    }
                 }
             }
         }
@@ -1110,8 +1113,8 @@ class Display {
             for( let i = 0; i < images.length; i++) {
                 if( i === guessed) {
                     const imageKey = JSON.stringify({table_name: 'output-table', column: 2, value: ""+i + "_Image"});
-                    images[i].src = localStorage.getItem(dictImageMapping[imageKey]);
                     if (imageKey in dictImageMapping) {
+                        images[i].src = localStorage.getItem(dictImageMapping[imageKey]);
                         images[i].style.visibility = "visible";
                     }
                     else {
@@ -1806,9 +1809,10 @@ class Display {
     UpdateInputToggle() {
         let checkbox = document.getElementById("InputToggle");
         let checkboxBinary = document.getElementById(("BinaryToggle"));
+        let checkboxGuess = document.getElementById("DemoToggle");
         //display.createOutputTableColors();
         this.updateSelectedInput();
-        if (!checkbox.checked) {
+        if (!checkbox.checked || checkboxGuess.checked) {
             $("#input-table tr:first").hide();
             $("#input-table tr td:nth-child(1)").hide();
             const buttonRows = document.getElementsByClassName("row-buttons-container");
@@ -1908,6 +1912,7 @@ class Display {
             otherHeaders.forEach(header => {
                 header.hidden = true;
             });
+            document.getElementById("guess-toggle").style.marginLeft = "35%";
             //document.getElementById("edit-menu-section").style.display = "none";
         }
         else {
@@ -1924,6 +1929,7 @@ class Display {
         display.updateGuessTable();
         demo.adjustWeightPlacement();
         FixCheckAnswerButtonPosition();
+        display.createInputTableEditBorder();
     }
 
     UpdateFanfareToggle() {
@@ -2410,6 +2416,8 @@ class Demo {
         if (document.getElementById("BinaryToggle").checked)
             display.UpdateBinaryToggle(true);
         demo.update(); //TODO: check if efficient
+        display.saveGuessComment();
+        display.createGuessTable();
     }
 
     // switch between binary and regular mode
@@ -2759,6 +2767,16 @@ function setImageEditOptions() {
         while (tdElement && tdElement.tagName !== 'TD') {
             tdElement = tdElement.parentNode;
         }
+        if(document.getElementById("InputToggle").checked && !document.getElementById("DemoToggle").checked) {
+            if(!image.classList.contains("editable-border")) {
+                image.classList.add("editable-border")
+            }
+        }
+        else {
+            if(image.classList.contains("editable-border")) {
+                image.classList.remove("editable-border")
+            }
+        }
         let imageMenuHandler = function (event) {
             //make the dialog box visible
             if (document.getElementById("InputToggle").checked && !document.getElementById("DemoToggle").checked) {
@@ -3102,10 +3120,12 @@ window.onload = function(){
     console.log("window loaded")
     $("#input-table tr:first").hide();
     $("#input-table tr td:nth-child(1)").hide();
-    let button = document.getElementById("CheckAnswerBtn");
-    button.style.position = 'fixed';
-    button.style.top = 0 + "px";
-    button.style.right = 200 + "px";
+    // let button = document.getElementById("CheckAnswerBtn");
+    // button.style.position = 'fixed';
+    // button.style.top = 0 + "px";
+    // button.style.right = 200 + "px";
+
+
     // if(!checkAnswerButtonLocationInitialized) {
     //     this.checkAnswerButtonLocationInitialized = true;
     //     let button = document.getElementById("CheckAnswerBtn");
@@ -3176,7 +3196,7 @@ function addTooltips()
         className: 'my-tooltip-class'
     });
     tippy('#DemoSwitch', {
-        content: 'Guess the output',
+        content: 'Solve for output or solve for weight',
         className: 'my-tooltip-class'
     });
     tippy('#OutputSwitch', {
@@ -3378,20 +3398,21 @@ function goToAboutPage() {
 }
 
 function FixCheckAnswerButtonPosition() {
-    var button = document.getElementById('DemoToggle');
+    var button = document.getElementById('CheckAnswerBtn');
+    var referenceSwitch = document.getElementById('DemoSwitch');
 
     // Get the initial position of the button relative to the document
     var buttonRect = button.getBoundingClientRect();
     var initialLeft = buttonRect.left;
     var initialTop = buttonRect.top;
 
-    // Set the initial position of the button
-    button.style.position = 'relative';
-    button.style.left = initialLeft + 'px';
-    button.style.top = initialTop + 'px';
+    // // Set the initial position of the button
+    // button.style.position = 'relative';
+    // button.style.left = initialLeft + 'px';
+    // button.style.top = initialTop + 'px';
 
     // Get the updated position of the button relative to the viewport
-    var updatedButtonRect = button.getBoundingClientRect();
+    var updatedButtonRect = referenceSwitch.getBoundingClientRect();
     var updatedLeft = updatedButtonRect.left;
     var updatedTop = updatedButtonRect.top;
 
@@ -3401,8 +3422,10 @@ function FixCheckAnswerButtonPosition() {
 
     // Set the button's position to fixed
     button.style.position = 'fixed';
-    button.style.left = screenLeft + 'px';
-    button.style.top = screenTop + 'px';
+    button.style.left = screenLeft + 200 + 'px';
+    button.style.top = screenTop - 10 + 'px';
+    button.style.marginTop = "10px";
+
 
 }
 
