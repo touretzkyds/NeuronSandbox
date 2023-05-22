@@ -113,8 +113,7 @@
                 </div>
             </section>
             <section>
-                <!--                <i onclick="goToAboutPage()" style="margin-left: 50px" class="fa fa-question-circle" aria-hidden="true"></i>-->
-                <button onclick="goToAboutPage()" class="dropbtn"><i class="fas fa-question-circle"></i> About</button>
+                <i onclick="goToAboutPage()" style="margin-left: 50px" class="fa fa-question-circle" aria-hidden="true"></i>
             </section>
 
         </article>
@@ -340,16 +339,6 @@
             </audio>
         </div>
 
-        <div id="guess-popup" class="popup">
-            <b>Congratulations!</b>
-            <p>Would you like to solve for weight now?</p>
-
-            <div class="play-button-container">
-                <button class="playing-btn" id="guess-weight-button" onclick="solveForWeight()">Ok</button>
-                <button class="playing-btn" id="keep-guessing-btn" onclick="toggle2()">Stay here</button>
-            </div>
-        </div>
-
         <script type="text/javascript">
         function toggle() {
             document.getElementById("popup").classList.toggle('active');
@@ -364,15 +353,6 @@
                 const event = new Event("change");
                 questionDropDown.dispatchEvent(event);
             }
-        }
-        function toggle2() {
-            document.getElementById("guess-popup").classList.toggle('active');
-        }
-
-        function solveForWeight() {
-            document.getElementById("guess-popup").classList.toggle('active');
-            document.getElementById("DemoToggle").checked = false;
-            display.UpdateDemoToggle();
         }
     </script>
     </body>
