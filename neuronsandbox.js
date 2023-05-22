@@ -853,6 +853,9 @@ class Display {
             const guessOutputRow = document.querySelector(`#guess-output-table > tbody > tr:nth-child(${i+1})`)
             guessOutputRow.style.background = 'none';
         }
+        if(document.getElementById("InputToggle").checked) {
+            return;
+        }
         const comments = document.querySelectorAll('.guess-comment');
         comments.forEach((comment) => {
             comment.style.display = "none";
@@ -1068,8 +1071,8 @@ class Display {
         const img = document.createElement("img");
         if(value == 1) {
             img.alt = "1_Image";
-            img.src = "";
-            img.style.display = "none";
+            img.src = "1_image.svg";
+            img.style.visibility = "hidden";
 
             img.width = 48;
             img.height = 48;
@@ -1079,8 +1082,8 @@ class Display {
         else if( value == 0) {
             img.alt = "0_Image";
             const imageKey = JSON.stringify({table_name: 'output-table', column: 2, value: img.alt});
-            img.src = "";
-            img.style.display = "none";
+            img.src = "0_image.svg";
+            img.style.visibility = "hidden";
             img.width = 48;
             img.height = 48;
             img.classList.add("myimage");
@@ -1107,18 +1110,16 @@ class Display {
             for( let i = 0; i < images.length; i++) {
                 if( i === guessed) {
                     const imageKey = JSON.stringify({table_name: 'output-table', column: 2, value: ""+i + "_Image"});
+                    images[i].src = localStorage.getItem(dictImageMapping[imageKey]);
                     if (imageKey in dictImageMapping) {
-                        images[i].src = localStorage.getItem(dictImageMapping[imageKey]);
-                        images[i].style.display = "inline-block";
+                        images[i].style.visibility = "visible";
                     }
                     else {
-                        images[i].src = "";
-                        images[i].style.display = "none";
+                        images[i].style.visibility = "hidden";
                     }
                 }
                 else {
-                    images[i].src = "";
-                    images[i].style.display = "none";
+                    images[i].style.visibility = "hidden";
                 }
             }
         }
@@ -1199,7 +1200,7 @@ class Display {
         let outputTable = document.getElementById("output-table")
         let guessTable = document.getElementById("guess-output-table");
         guessTable.innerHTML = ' <tr>\n' +
-            '                                    <th id="guessoutput" class="edit-handler input-table-th">Output</th>\n' +
+            '                                    <th id="guessoutput" class="edit-handler input-table-th">Predicted Output</th>\n' +
             '                                    <th id="guesscomment" class="edit-handler input-table-th">Comment</th>\n' +
             '                                </tr>';
         let tableRows = outputTable.rows.length
@@ -1230,8 +1231,12 @@ class Display {
 
     checkGuessResult() {
         let isCorrect = checkAnswerCorrect();
-        if(isCorrect)
+        if(isCorrect) {
             PlayDingSound();
+            if(!document.getElementById("guess-popup").classList.contains("active")) {
+                document.getElementById("guess-popup").classList.toggle('active');
+            }
+        }
         else {
             PlayBuzzSound();
             checkAnswerButtonPressed = true;
@@ -1362,11 +1367,12 @@ class Display {
                 }
             }
             const selections = document.getElementById("selected-inputs");
-            if (selections.rows[c-1] && selections.rows[c-1].cells[0] )
+            if(selections.rows[c-1] && selections.rows[c-1].cells[0] )
                 selections.rows[c-1].cells[0].style.fontSize = newFontSize + "px"
         }
 
-        for (let i = 0; i < demo.weightLines.length; i++) {
+        for (let i = 0; i < demo.weightLines.length; i++)
+        {
             demo.weightLines[i].position();
         }
 
@@ -1799,11 +1805,10 @@ class Display {
 
     UpdateInputToggle() {
         let checkbox = document.getElementById("InputToggle");
-        let checkboxBinary = document.getElementById("BinaryToggle");
-        let checkboxGuess = document.getElementById("DemoToggle");
+        let checkboxBinary = document.getElementById(("BinaryToggle"));
         //display.createOutputTableColors();
         this.updateSelectedInput();
-        if (!checkbox.checked || checkboxGuess.checked) {
+        if (!checkbox.checked) {
             $("#input-table tr:first").hide();
             $("#input-table tr td:nth-child(1)").hide();
             const buttonRows = document.getElementsByClassName("row-buttons-container");
@@ -1914,10 +1919,11 @@ class Display {
             otherHeaders.forEach(header => {
                 header.hidden = false;
             });
-            demo.adjustWeightPlacement()
         }
         this.UpdateInputToggle();
         display.updateGuessTable();
+        demo.adjustWeightPlacement();
+        FixCheckAnswerButtonPosition();
     }
 
     UpdateFanfareToggle() {
@@ -2730,8 +2736,14 @@ function findAncestorTable(element) {
 function hideCameraImages() {
     let images = document.querySelectorAll(`.myimage`);
     images.forEach((image) => {
-        if(image.src.endsWith("1_image.svg") || image.src.endsWith("0_image.svg"))
-            image.style.display = "none";
+        if(image.src.endsWith("1_image.svg") || image.src.endsWith("0_image.svg")) {
+            if(findAncestorTable(image)?.id === "guess-output-table") {
+                image.visibility = "hidden";
+            }
+            else {
+                image.style.display = "none";
+            }
+        }
     });
 }
 
@@ -2749,7 +2761,7 @@ function setImageEditOptions() {
         }
         let imageMenuHandler = function (event) {
             //make the dialog box visible
-            if (document.getElementById("InputToggle").checked) {
+            if (document.getElementById("InputToggle").checked && !document.getElementById("DemoToggle").checked) {
                 let table = tdElement.closest('table');
                 event.preventDefault();
                 showMenu(event, this, tdElement.cellIndex, tdElement.rowIndex, table)
@@ -3365,7 +3377,34 @@ function goToAboutPage() {
     location.href = 'about.html';
 }
 
+function FixCheckAnswerButtonPosition() {
+    var button = document.getElementById('DemoToggle');
 
+    // Get the initial position of the button relative to the document
+    var buttonRect = button.getBoundingClientRect();
+    var initialLeft = buttonRect.left;
+    var initialTop = buttonRect.top;
+
+    // Set the initial position of the button
+    button.style.position = 'relative';
+    button.style.left = initialLeft + 'px';
+    button.style.top = initialTop + 'px';
+
+    // Get the updated position of the button relative to the viewport
+    var updatedButtonRect = button.getBoundingClientRect();
+    var updatedLeft = updatedButtonRect.left;
+    var updatedTop = updatedButtonRect.top;
+
+    // Calculate the screen coordinates by adding the scroll offsets
+    var screenLeft = updatedLeft + window.pageXOffset;
+    var screenTop = updatedTop + window.pageYOffset;
+
+    // Set the button's position to fixed
+    button.style.position = 'fixed';
+    button.style.left = screenLeft + 'px';
+    button.style.top = screenTop + 'px';
+
+}
 
 
 

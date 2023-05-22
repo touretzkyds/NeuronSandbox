@@ -558,6 +558,30 @@ span {
     transition: 0.5s;
 }
 
+#guess-popup {
+    text-align: center;
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 400px;
+    padding: 50px;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, .3);
+    background: #fff;
+    z-index : 10;
+    visibility: hidden;
+    opacity: 0;
+    transition: 0.5s;
+    font-size: 50px;
+}
+
+#guess-popup.active {
+    visibility: visible;
+    opacity: 1;
+    transition: 0.5s;
+}
+
 .weight_popup {
     text-align: center;
     position: absolute;
@@ -911,7 +935,6 @@ select option:checked {
 #guess-output-table {
     width: 600px;
 }
-
 span.guess-comment {
     line-height: 1em;
 }
