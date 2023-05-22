@@ -853,6 +853,9 @@ class Display {
             const guessOutputRow = document.querySelector(`#guess-output-table > tbody > tr:nth-child(${i+1})`)
             guessOutputRow.style.background = 'none';
         }
+        if(document.getElementById("InputToggle").checked) {
+            return;
+        }
         const comments = document.querySelectorAll('.guess-comment');
         comments.forEach((comment) => {
             comment.style.display = "none";
@@ -1026,13 +1029,16 @@ class Display {
                     img.width = 48;
                     img.height = 48;
                     img.classList.add("myimage");
-                    if (document.getElementById("InputToggle").checked)
+                    if (document.getElementById("InputToggle").checked && !document.getElementById("DemoToggle").checked) {
                         img.classList.add("editable-border")
+                    }
                     else {
                         if (img.classList.contains("editable-border"))
                             img.classList.remove("editable-border")
                     }
-                    textbox.appendChild(img);
+                    if(!(document.getElementById("DemoToggle").checked && (img.src.endsWith("0_image.svg") ||img.src.endsWith("1_image.svg")))) {
+                        textbox.appendChild(img);
+                    }
                 }
             }
         }
@@ -1068,8 +1074,8 @@ class Display {
         const img = document.createElement("img");
         if(value == 1) {
             img.alt = "1_Image";
-            img.src = "";
-            img.style.display = "none";
+            img.src = "1_image.svg";
+            img.style.visibility = "hidden";
 
             img.width = 48;
             img.height = 48;
@@ -1079,8 +1085,8 @@ class Display {
         else if( value == 0) {
             img.alt = "0_Image";
             const imageKey = JSON.stringify({table_name: 'output-table', column: 2, value: img.alt});
-            img.src = "";
-            img.style.display = "none";
+            img.src = "0_image.svg";
+            img.style.visibility = "hidden";
             img.width = 48;
             img.height = 48;
             img.classList.add("myimage");
@@ -1109,16 +1115,14 @@ class Display {
                     const imageKey = JSON.stringify({table_name: 'output-table', column: 2, value: ""+i + "_Image"});
                     if (imageKey in dictImageMapping) {
                         images[i].src = localStorage.getItem(dictImageMapping[imageKey]);
-                        images[i].style.display = "inline-block";
+                        images[i].style.visibility = "visible";
                     }
                     else {
-                        images[i].src = "";
-                        images[i].style.display = "none";
+                        images[i].style.visibility = "hidden";
                     }
                 }
                 else {
-                    images[i].src = "";
-                    images[i].style.display = "none";
+                    images[i].style.visibility = "hidden";
                 }
             }
         }
@@ -1199,7 +1203,7 @@ class Display {
         let outputTable = document.getElementById("output-table")
         let guessTable = document.getElementById("guess-output-table");
         guessTable.innerHTML = ' <tr>\n' +
-            '                                    <th id="guessoutput" class="edit-handler input-table-th">Output</th>\n' +
+            '                                    <th id="guessoutput" class="edit-handler input-table-th">Predicted Output</th>\n' +
             '                                    <th id="guesscomment" class="edit-handler input-table-th">Comment</th>\n' +
             '                                </tr>';
         let tableRows = outputTable.rows.length
@@ -1230,8 +1234,12 @@ class Display {
 
     checkGuessResult() {
         let isCorrect = checkAnswerCorrect();
-        if(isCorrect)
+        if(isCorrect) {
             PlayDingSound();
+            if(!document.getElementById("guess-popup").classList.contains("active")) {
+                document.getElementById("guess-popup").classList.toggle('active');
+            }
+        }
         else {
             PlayBuzzSound();
             checkAnswerButtonPressed = true;
@@ -1362,11 +1370,12 @@ class Display {
                 }
             }
             const selections = document.getElementById("selected-inputs");
-            if (selections.rows[c-1] && selections.rows[c-1].cells[0] )
+            if(selections.rows[c-1] && selections.rows[c-1].cells[0] )
                 selections.rows[c-1].cells[0].style.fontSize = newFontSize + "px"
         }
 
-        for (let i = 0; i < demo.weightLines.length; i++) {
+        for (let i = 0; i < demo.weightLines.length; i++)
+        {
             demo.weightLines[i].position();
         }
 
@@ -1799,11 +1808,10 @@ class Display {
 
     UpdateInputToggle() {
         let checkbox = document.getElementById("InputToggle");
-        let checkboxBinary = document.getElementById("BinaryToggle");
-        let checkboxGuess = document.getElementById("DemoToggle");
+        let checkboxBinary = document.getElementById(("BinaryToggle"));
         //display.createOutputTableColors();
         this.updateSelectedInput();
-        if (!checkbox.checked || checkboxGuess.checked) {
+        if (!checkbox.checked) {
             $("#input-table tr:first").hide();
             $("#input-table tr td:nth-child(1)").hide();
             const buttonRows = document.getElementsByClassName("row-buttons-container");
@@ -1914,10 +1922,12 @@ class Display {
             otherHeaders.forEach(header => {
                 header.hidden = false;
             });
-            demo.adjustWeightPlacement()
         }
         this.UpdateInputToggle();
         display.updateGuessTable();
+        demo.adjustWeightPlacement();
+        FixCheckAnswerButtonPosition();
+        display.createInputTableEditBorder();
     }
 
     UpdateFanfareToggle() {
@@ -2404,6 +2414,8 @@ class Demo {
         if (document.getElementById("BinaryToggle").checked)
             display.UpdateBinaryToggle(true);
         demo.update(); //TODO: check if efficient
+        display.saveGuessComment();
+        display.createGuessTable();
     }
 
     // switch between binary and regular mode
@@ -2730,8 +2742,14 @@ function findAncestorTable(element) {
 function hideCameraImages() {
     let images = document.querySelectorAll(`.myimage`);
     images.forEach((image) => {
-        if(image.src.endsWith("1_image.svg") || image.src.endsWith("0_image.svg"))
-            image.style.display = "none";
+        if(image.src.endsWith("1_image.svg") || image.src.endsWith("0_image.svg")) {
+            if(findAncestorTable(image)?.id === "guess-output-table") {
+                image.visibility = "hidden";
+            }
+            else {
+                image.style.display = "none";
+            }
+        }
     });
 }
 
@@ -2747,9 +2765,19 @@ function setImageEditOptions() {
         while (tdElement && tdElement.tagName !== 'TD') {
             tdElement = tdElement.parentNode;
         }
+        if(document.getElementById("InputToggle").checked && !document.getElementById("DemoToggle").checked) {
+            if(!image.classList.contains("editable-border")) {
+                image.classList.add("editable-border")
+            }
+        }
+        else {
+            if(image.classList.contains("editable-border")) {
+                image.classList.remove("editable-border")
+            }
+        }
         let imageMenuHandler = function (event) {
             //make the dialog box visible
-            if (document.getElementById("InputToggle").checked) {
+            if (document.getElementById("InputToggle").checked && !document.getElementById("DemoToggle").checked) {
                 let table = tdElement.closest('table');
                 event.preventDefault();
                 showMenu(event, this, tdElement.cellIndex, tdElement.rowIndex, table)
@@ -3090,10 +3118,12 @@ window.onload = function(){
     console.log("window loaded")
     $("#input-table tr:first").hide();
     $("#input-table tr td:nth-child(1)").hide();
-    let button = document.getElementById("CheckAnswerBtn");
-    button.style.position = 'fixed';
-    button.style.top = 0 + "px";
-    button.style.right = 200 + "px";
+    // let button = document.getElementById("CheckAnswerBtn");
+    // button.style.position = 'fixed';
+    // button.style.top = 0 + "px";
+    // button.style.right = 200 + "px";
+
+
     // if(!checkAnswerButtonLocationInitialized) {
     //     this.checkAnswerButtonLocationInitialized = true;
     //     let button = document.getElementById("CheckAnswerBtn");
@@ -3164,7 +3194,7 @@ function addTooltips()
         className: 'my-tooltip-class'
     });
     tippy('#DemoSwitch', {
-        content: 'Guess the output',
+        content: 'Solve for output or solve for weight',
         className: 'my-tooltip-class'
     });
     tippy('#OutputSwitch', {
@@ -3365,7 +3395,37 @@ function goToAboutPage() {
     location.href = 'about.html';
 }
 
+function FixCheckAnswerButtonPosition() {
+    var button = document.getElementById('CheckAnswerBtn');
+    var referenceSwitch = document.getElementById('DemoSwitch');
 
+    // Get the initial position of the button relative to the document
+    var buttonRect = button.getBoundingClientRect();
+    var initialLeft = buttonRect.left;
+    var initialTop = buttonRect.top;
+
+    // // Set the initial position of the button
+    // button.style.position = 'relative';
+    // button.style.left = initialLeft + 'px';
+    // button.style.top = initialTop + 'px';
+
+    // Get the updated position of the button relative to the viewport
+    var updatedButtonRect = referenceSwitch.getBoundingClientRect();
+    var updatedLeft = updatedButtonRect.left;
+    var updatedTop = updatedButtonRect.top;
+
+    // Calculate the screen coordinates by adding the scroll offsets
+    var screenLeft = updatedLeft + window.pageXOffset;
+    var screenTop = updatedTop + window.pageYOffset;
+
+    // Set the button's position to fixed
+    button.style.position = 'fixed';
+    button.style.left = screenLeft + 200 + 'px';
+    button.style.top = screenTop - 10 + 'px';
+    button.style.marginTop = "10px";
+
+
+}
 
 
 
