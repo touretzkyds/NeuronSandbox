@@ -30,7 +30,7 @@ article > section {
 }
 
 .top-table {
-    width: 20%;
+    width: 100%;
     padding: 0;
     margin-left: auto;
     margin-right: auto;
@@ -156,7 +156,7 @@ article > section {
     left: 0;
     width: 100%;
     height: 100%;
-}   
+}
 
 #output-links{
     position: relative;
@@ -377,7 +377,7 @@ article > section {
 }
 
 .draggable{
-    
+
 }
 .button {
     width: 80%;
@@ -396,7 +396,7 @@ article > section {
     width: 0%;
     visibility: hidden;
 }
-    /* edit buttons container to hold and position + and - buttons */
+/* edit buttons container to hold and position + and - buttons */
 .row-buttons-container{
     height: 8vh;
     width: 2vw;
