@@ -30,7 +30,7 @@ article > section {
 }
 
 .top-table {
-    width: 100%;
+    width: 20%;
     padding: 0;
     margin-left: auto;
     margin-right: auto;
@@ -886,6 +886,7 @@ select option:checked {
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
     padding: 16px;
     z-index: 1;
+    text-align: left;
 }
 
 .dropdown:hover .dropdown-content {
@@ -937,4 +938,17 @@ select option:checked {
 }
 span.guess-comment {
     line-height: 1em;
+}
+
+.comment-editable-border {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 1px solid gray;
+    box-sizing: border-box;
+    line-height: 1em;
+}
+.menu-row-container {
+    display: flex;
+    justify-content: space-between;
 }

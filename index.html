@@ -44,21 +44,21 @@
                 <button class="dropbtn"><i class="fas fa-bars"></i> Menu</button>
                 <div class="dropdown-content">
                     <div class="button-group">
-                        <div>
+                        <div class="menu-row-container">
                             <label>Binary</label>
                             <label id="BinarySwitch" class="switch">
                                 <input type="checkbox" id="BinaryToggle">
                                 <span id="binary-slider" class="slider round"></span>
                             </label>
                         </div>
-                        <div>
+                        <div class="menu-row-container">
                             <label>Edit</label>
                             <label id="InputSwitch" class="switch">
                                 <input type="checkbox" id="InputToggle">
                                 <span id="edit-slider" class="slider round"></span>
                             </label>
                         </div>
-                        <div id = "FanfareToggleBody">
+                        <div id = "FanfareToggleBody" class="menu-row-container">
                             <label>Fanfare</label>
                             <label id="FanfareSwitch" class="switch">
                                 <input type="checkbox" id="FanfareToggle">
@@ -142,10 +142,10 @@
 
     </table>
 
-    <table class = "top-table">
-        <tr>
+    <table class = "top-table" style="width: 100%">
+        <tr style="width: 100%">
             <th>
-                <div id = "guess-toggle" style="margin-left: 50%; width: 500px; display:flex; flex-direction: row; justify-content: center; align-items: center; column-gap: 10px;">
+                <div id = "demo-toggle" style="margin-left: 60%; width: 500px; display:flex; flex-direction: row; justify-content: center; align-items: center; column-gap: 10px;">
                     <label style="width: 50px">Solve for Weights</label>
                     <label id="DemoSwitch" class="switch">
                         <input type="checkbox" id="DemoToggle">
@@ -161,8 +161,8 @@
                 </a>
             </th>
 
-            <th>
-                <div style="float: right; margin-left: 200%" >
+            <th style="width: 50%;">
+                <div style="float: right;  margin-left: 600%" >
                     <label >Show Desired</label>
                     <label class="switch" id="OutputSwitch">
                         <input type="checkbox" id="OutputToggle">
@@ -300,7 +300,7 @@
                             <table id="output-table" class="output-table table input-output-table" >
                                 <tr>
                                     <th contenteditable = false id="activation">Activation<br>&Sigma;</th>
-                                    <th contenteditable = false id="output">Output<br>y</th>
+                                    <th contenteditable = false id="output">Current<br>Output<br>y</th>
                                     <th contenteditable = false id="desired" > Desired Output
                                     </th>
                                 </tr>

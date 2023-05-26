@@ -454,7 +454,8 @@ class Table {
 
         let tuple = this.findAvailableIndex();
         let newCol  = tuple[0];
-        let newNameIndex = tuple[1];
+        let newNameIndex = tuple[0];
+        //make the variable label to match with weight label
         if (newCol < 0 || newNameIndex < 0)
             return;
         let th = document.createElement('th'); //column
@@ -1140,8 +1141,8 @@ class Display {
                 comments[i].contentEditable = true;
                 if (!comments[i].classList.contains("edit-handler"))
                     comments[i].classList.add("edit-handler");
-                if (!comments[i].classList.contains("editable-border"))
-                    comments[i].classList.add("editable-border");
+                if (!comments[i].classList.contains("comment-editable-border"))
+                    comments[i].classList.add("comment-editable-border");
             }
             return;
         }
@@ -1166,8 +1167,8 @@ class Display {
                 comments[i].contentEditable = false;
                 if (comments[i].classList.contains("edit-handler"))
                     comments[i].classList.remove("edit-handler");
-                if (comments[i].classList.contains("editable-border"))
-                    comments[i].classList.remove("editable-border");
+                if (comments[i].classList.contains("comment-editable-border"))
+                    comments[i].classList.remove("comment-editable-border");
             }
         }
         if(!checkAnswerButtonPressed) {
@@ -1203,8 +1204,8 @@ class Display {
         let outputTable = document.getElementById("output-table")
         let guessTable = document.getElementById("guess-output-table");
         guessTable.innerHTML = ' <tr>\n' +
-            '                                    <th id="guessoutput" class="edit-handler input-table-th">Predicted Output</th>\n' +
-            '                                    <th id="guesscomment" class="edit-handler input-table-th">Comment</th>\n' +
+            '                                    <th id="guessoutput" class="edit-handler input-table-th">Predicted Output (0=No, 1=Yes)</th>\n' +
+            '                                    <th id="guesscomment" class="edit-handler input-table-th">Hint</th>\n' +
             '                                </tr>';
         let tableRows = outputTable.rows.length
         for (let i = 0; i < tableRows - 1; i++) {
@@ -1255,7 +1256,7 @@ class Display {
 
     checkForSuccess() {
         let isCorrect = checkAnswerCorrect();
-        let fanfareToggleChecked = document.getElementById("FanfareToggle").checked
+        //let fanfareToggleChecked = document.getElementById("FanfareToggle").checked
         let fanfareHidden =  document.getElementById("congrats-msg").hidden
         let outputToggleChecked = document.getElementById("OutputToggle").checked
         let guessToggleChecked = document.getElementById("DemoToggle").checked;
@@ -1274,7 +1275,7 @@ class Display {
             //     alert("You guessed incorrectly, please try again");
             // }
         }
-        else if (fanfareToggleChecked && outputToggleChecked) {
+        else if (outputToggleChecked) {
             if (fanfareHidden) {
                 if (isCorrect) {
                     PlayHooraySound();
@@ -1911,6 +1912,7 @@ class Display {
             otherHeaders.forEach(header => {
                 header.hidden = true;
             });
+            document.getElementById("demo-toggle").style.marginLeft = '30%';
             //document.getElementById("edit-menu-section").style.display = "none";
         }
         else {
@@ -1922,6 +1924,7 @@ class Display {
             otherHeaders.forEach(header => {
                 header.hidden = false;
             });
+            document.getElementById("demo-toggle").style.marginLeft = '60%';
         }
         this.UpdateInputToggle();
         display.updateGuessTable();
@@ -3241,6 +3244,9 @@ $('#DemoToggle').change(function() { //toggle output
 
 function PlayHooraySound() {
     //document.getElementById("popup").classList.toggle('active');
+    let fanfareToggleChecked = document.getElementById("FanfareToggle").checked;
+    if(!fanfareToggleChecked)
+        return;
     const audio = document.getElementById("hooray_sound");
     if (audio) {
         audio.play();
@@ -3249,6 +3255,9 @@ function PlayHooraySound() {
 
 function PlayBuzzSound() {
     //document.getElementById("popup").classList.toggle('active');
+    let fanfareToggleChecked = document.getElementById("FanfareToggle").checked;
+    if(!fanfareToggleChecked)
+        return;
     const audio = document.getElementById("buzz_sound");
     if (audio) {
         audio.play();
@@ -3257,6 +3266,9 @@ function PlayBuzzSound() {
 
 function PlayDingSound() {
     //document.getElementById("popup").classList.toggle('active');
+    let fanfareToggleChecked = document.getElementById("FanfareToggle").checked;
+    if(!fanfareToggleChecked)
+        return;
     const audio = document.getElementById("ding_sound");
     if (audio) {
         audio.play();
