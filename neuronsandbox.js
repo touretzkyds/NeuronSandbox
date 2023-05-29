@@ -1602,7 +1602,11 @@ class Display {
             // highlight input and output rows corresponding to the hovered input row
             inputRow.style.background = "lightblue";
             for (let i = 0; i < outputRow.children.length; i++) {
-                outputRow.children[i].style.background = "lightblue";
+                if (outputRow.children[i].style.background === "rgb(255, 191, 203)")
+                    outputRow.children[i].style.background = "#c2abc9";
+                else {
+                    outputRow.children[i].style.background = "lightblue";
+                }
             }
             if(guessOutputRow)
                 guessOutputRow.style.background = "lightblue";
