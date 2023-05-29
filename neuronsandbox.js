@@ -1827,7 +1827,7 @@ class Display {
             //document.getElementById("generateTruthTable").disabled = true;
             document.getElementById("output-table").style.marginTop = "0px";
             document.getElementById("guess-output-table").style.marginTop = "0px";
-            document.getElementById("FanfareToggleBody").hidden = true;
+            document.getElementById("AutoProgressToggleBody").style.display = "none";
         } else {
             $("#input-table tr:first").show();
             $("#input-table tr td:nth-child(1)").show();
@@ -1842,7 +1842,7 @@ class Display {
             //document.getElementById("generateTruthTable").disabled = false;
             document.getElementById("output-table").style.marginTop = "40px";
             document.getElementById("guess-output-table").style.marginTop = "40px";
-            document.getElementById("FanfareToggleBody").hidden = false;
+            document.getElementById("AutoProgressToggleBody").style.display = "flex";
         }
 
         for (let i = 0; i < demo.weightLines.length; i++) {
@@ -3180,6 +3180,7 @@ addThresholdEditOption();
 handleDesiredOutputColumn();
 loadQuestionsAndModels();
 display.UpdateDemoToggle();
+document.getElementById("AutoProgressToggle").checked = true;
 
 function addTooltips()
 {
