@@ -1204,7 +1204,7 @@ class Display {
         let outputTable = document.getElementById("output-table")
         let guessTable = document.getElementById("guess-output-table");
         guessTable.innerHTML = ' <tr>\n' +
-            '                                    <th id="guessoutput" class="edit-handler input-table-th">Predicted Output (0=No, 1=Yes)</th>\n' +
+            '                                    <th id="guessoutput" class="edit-handler input-table-th">Predicted Output<br>(0=No, 1=Yes)</th>\n' +
             '                                    <th id="guesscomment" class="edit-handler input-table-th">Hint</th>\n' +
             '                                </tr>';
         let tableRows = outputTable.rows.length
@@ -1257,6 +1257,7 @@ class Display {
     checkForSuccess() {
         let isCorrect = checkAnswerCorrect();
         //let fanfareToggleChecked = document.getElementById("FanfareToggle").checked
+        let autoProgressChecked = document.getElementById("AutoProgressToggle").checked;
         let fanfareHidden =  document.getElementById("congrats-msg").hidden
         let outputToggleChecked = document.getElementById("OutputToggle").checked
         let guessToggleChecked = document.getElementById("DemoToggle").checked;
@@ -1275,7 +1276,7 @@ class Display {
             //     alert("You guessed incorrectly, please try again");
             // }
         }
-        else if (outputToggleChecked) {
+        else if (autoProgressChecked &&  outputToggleChecked) {
             if (fanfareHidden) {
                 if (isCorrect) {
                     PlayHooraySound();
@@ -2763,7 +2764,7 @@ function setImageEditOptions() {
         if(findAncestorTable(image)?.id === "guess-output-table") {
             return;
         }
-        image.style.display = "inline-block";
+        image.style.display = "inline";
         let tdElement = image;
         while (tdElement && tdElement.tagName !== 'TD') {
             tdElement = tdElement.parentNode;
