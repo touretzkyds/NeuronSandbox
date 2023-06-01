@@ -887,7 +887,7 @@ class Display {
                     textbox.removeChild(textbox.children[1]);
                 }
                 //textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
-                if (!nonBinaryMode) {
+                if (true) {
                     if (textbox.children.length === 0) {
                         textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
                     }
@@ -946,7 +946,7 @@ class Display {
                 }
             }
         }
-        if (!nonBinaryMode && editCheckbox.checked)
+        if (editCheckbox.checked)
         {
             setImageEditOptions();
         }
@@ -1276,7 +1276,7 @@ class Display {
             //     alert("You guessed incorrectly, please try again");
             // }
         }
-        else if (autoProgressChecked &&  outputToggleChecked) {
+        else if (outputToggleChecked) {
             if (fanfareHidden) {
                 if (isCorrect) {
                     PlayHooraySound();
@@ -1287,7 +1287,7 @@ class Display {
                     const selectedIndex = questionDropDown.selectedIndex;
                     const nextIndex = selectedIndex + 1;
                     let button = document.getElementById("next-question-btn");
-                    button.style.display = nextIndex < questionDropDown.options.length - 1 ? "inline-block" : "none";
+                    button.style.display = (nextIndex < questionDropDown.options.length - 1) && autoProgressChecked ? "inline-block" : "none";
                     //document.getElementById("congrats-msg").hidden = false;
                     display.outputLine.position()
                     for (let i = 0; i < demo.weightLines.length; i++)
@@ -1917,7 +1917,7 @@ class Display {
             otherHeaders.forEach(header => {
                 header.hidden = true;
             });
-            document.getElementById("demo-toggle").style.marginLeft = '30%';
+            //document.getElementById("demo-toggle").style.marginLeft = '30%';
             //document.getElementById("edit-menu-section").style.display = "none";
         }
         else {
@@ -1929,7 +1929,7 @@ class Display {
             otherHeaders.forEach(header => {
                 header.hidden = false;
             });
-            document.getElementById("demo-toggle").style.marginLeft = '60%';
+            //document.getElementById("demo-toggle").style.marginLeft = '60%';
         }
         this.UpdateInputToggle();
         display.updateGuessTable();
@@ -2749,12 +2749,13 @@ function findAncestorTable(element) {
 
 function hideCameraImages() {
     let images = document.querySelectorAll(`.myimage`);
+    let editToggleChecked = document.getElementById("InputToggle").checked;
     images.forEach((image) => {
         if(image.src.endsWith("1_image.svg") || image.src.endsWith("0_image.svg")) {
             if(findAncestorTable(image)?.id === "guess-output-table") {
                 image.visibility = "hidden";
             }
-            else {
+            else if(findAncestorTable(image)?.id !== "output-table" || !editToggleChecked ) {
                 image.style.display = "none";
             }
         }

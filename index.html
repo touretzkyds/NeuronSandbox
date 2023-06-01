@@ -45,30 +45,37 @@
                 <div class="dropdown-content">
                     <div class="button-group">
                         <div class="menu-row-container">
-                            <label>Binary</label>
+                            <label style="margin-right: 10px">Binary</label>
                             <label id="BinarySwitch" class="switch">
                                 <input type="checkbox" id="BinaryToggle">
                                 <span id="binary-slider" class="slider round"></span>
                             </label>
                         </div>
                         <div class="menu-row-container">
-                            <label>Edit</label>
+                            <label style="margin-right: 10px">Edit</label>
                             <label id="InputSwitch" class="switch">
                                 <input type="checkbox" id="InputToggle">
                                 <span id="edit-slider" class="slider round"></span>
                             </label>
                         </div>
                         <div id = "FanfareToggleBody" class="menu-row-container">
-                            <label>Fanfare</label>
+                            <label style="margin-right: 10px">Fanfare</label>
                             <label id="FanfareSwitch" class="switch">
                                 <input type="checkbox" id="FanfareToggle">
                                 <span class="slider round"></span>
                             </label>
                         </div>
                         <div id = "AutoProgressToggleBody" class="menu-row-container">
-                            <label>Auto Progress</label>
+                            <label style="margin-right: 10px">Auto Progress</label>
                             <label id="AutoProgressSwitch" class="switch">
                                 <input type="checkbox" id="AutoProgressToggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div  class="menu-row-container">
+                            <label style="margin-right: 10px">Show Desired</label>
+                            <label class="switch" >
+                                <input type="checkbox" id="OutputToggle">
                                 <span class="slider round"></span>
                             </label>
                         </div>
@@ -149,10 +156,10 @@
 
     </table>
 
-    <table class = "top-table" style="width: 100%">
-        <tr style="width: 100%">
+    <table class = "top-table">
+        <tr>
             <th>
-                <div id = "demo-toggle" style="margin-left: 60%; width: 500px; display:flex; flex-direction: row; justify-content: center; align-items: center; column-gap: 10px;">
+                <div id = "demo-toggle" style="width: 100%; display:flex; flex-direction: row; justify-content: center; align-items: center; column-gap: 10px;">
                     <label style="width: 50px">Solve for Weights</label>
                     <label id="DemoSwitch" class="switch">
                         <input type="checkbox" id="DemoToggle">
@@ -160,23 +167,11 @@
                     </label>
                     <label style="width: 50px">Solve for Outputs</label>
                 </div>
-
             </th>
             <th>
                 <a style="margin-top: 19%" id= "CheckAnswerBtn" onmousedown="event.preventDefault();display.checkGuessResult(); " onmouseup="event.preventDefault(); display.removeGuessHighlight();" class="custom-btn myButton">
                     <i class="fa" aria-hidden="true"></i> Check Answer
                 </a>
-            </th>
-
-            <th style="width: 50%;">
-                <div style="float: right;  margin-left: 600%" >
-                    <label >Show Desired</label>
-                    <label class="switch" id="OutputSwitch">
-                        <input type="checkbox" id="OutputToggle">
-                        <span class="slider round"></span>
-                    </label>
-                </div>
-
             </th>
         </tr>
     </table>
