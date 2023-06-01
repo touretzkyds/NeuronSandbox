@@ -2623,7 +2623,7 @@ async function uploadFromZipUrl(url, isProblem = false) {
     }
     let options = document.getElementById("problem-list").options
     if(!isProblem) {
-        if(options.length === 4) {
+        if(options.length === 6) {
             let option = document.createElement("option");
             option.text = "---";
             options.add(option);
@@ -2632,7 +2632,7 @@ async function uploadFromZipUrl(url, isProblem = false) {
         }
     }
     else {
-        if(options.length === 5) {
+        if(options.length === 7) {
             options.remove(options.length-1);
         }
     }
@@ -2819,7 +2819,7 @@ async function uploadZip(zipFile, isProblem = false) {
     try {
         let options = document.getElementById("problem-list").options
         if(!isProblem) {
-            if(options.length === 4) {
+            if(options.length === 6) {
                 let option = document.createElement("option");
                 option.text = "---";
                 options.add(option);
@@ -2829,7 +2829,7 @@ async function uploadZip(zipFile, isProblem = false) {
 
         }
         else {
-            if(options.length === 5) {
+            if(options.length === 7) {
                 options.remove(options.length-1);
             }
         }

@@ -16,6 +16,16 @@
       "model_name": "Problem 3"
     },
     {
+      "id": 4,
+      "label": "problem-4",
+      "model_name": "Problem 4"
+    },
+    {
+      "id": 5,
+      "label": "problem-5",
+      "model_name": "Problem 5"
+    },
+    {
       "id": 0,
       "label": "Blank Model",
       "model_name": "SampleModel"
