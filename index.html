@@ -6,6 +6,7 @@
     <title>Neuron Sandbox</title>
 
     <link rel="stylesheet" href="slider.css" />
+    <link rel="stylesheet" href="slider2.css" />
     <link rel="stylesheet" href="style.css" />
     <!-- <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
@@ -160,12 +161,12 @@
         <tr>
             <th>
                 <div id = "demo-toggle" style="width: 100%; display:flex; flex-direction: row; justify-content: center; align-items: center; column-gap: 10px;">
-                    <label style="width: 50px">Solve for Weights</label>
-                    <label id="DemoSwitch" class="switch">
-                        <input type="checkbox" id="DemoToggle">
-                        <span id="demo-slider" class="slider round"></span>
-                    </label>
                     <label style="width: 50px">Solve for Outputs</label>
+                    <label id="DemoSwitch" class="switch2">
+                        <input type="checkbox" id="DemoToggle">
+                        <span id="demo-slider" class="slider2 round"></span>
+                    </label>
+                    <label style="width: 50px">Solve for Weights</label>
                 </div>
             </th>
             <th>
@@ -269,7 +270,7 @@
                         <div id = "perceptron1" class="center-perceptron">
                             <div class="circle center">
                                 <div id="threshold-text" class="center">
-                                    <text>∑> </text>
+                                    <text id="sigma">∑> </text>
                                     <text id="th1"></text>
                                     <span id = "threshold_toggleBtn" class="edit-toggle edit-toggle-off">
                                           <i class="fas fa-pencil-alt"></i>

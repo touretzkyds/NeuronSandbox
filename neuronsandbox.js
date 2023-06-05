@@ -1612,6 +1612,10 @@ class Display {
                 guessOutputRow.style.background = "lightblue";
             display.adjustSelectedInputFontSize();
 
+            //show the activation number
+            perceptron.computeAffineOutput();
+            document.getElementById("sigma").innerText = perceptron.affineOutput[rowIdx-2].toString() + "> ";
+
             //console.log("enter: set outputRow =" + outputRow);
         }
         else {
@@ -1627,6 +1631,7 @@ class Display {
                 if (isOutputToggleChecked)
                     this.checkDesiredOutput(outputRow.children[1], outputRow.children[2])
             }
+            document.getElementById("sigma").innerText = "∑> ";
 
 
         }
@@ -3022,6 +3027,7 @@ function uploadJson(text) {
     }
     thresholdToggle.dispatchEvent(new Event("click"));
     handleDesiredOutputColumn();
+    document.getElementById("DemoToggle").dispatchEvent(new Event("click"));
     isLoading = false;
 }
 
@@ -3127,29 +3133,6 @@ window.onload = function(){
     console.log("window loaded")
     $("#input-table tr:first").hide();
     $("#input-table tr td:nth-child(1)").hide();
-    // let button = document.getElementById("CheckAnswerBtn");
-    // button.style.position = 'fixed';
-    // button.style.top = 0 + "px";
-    // button.style.right = 200 + "px";
-
-
-    // if(!checkAnswerButtonLocationInitialized) {
-    //     this.checkAnswerButtonLocationInitialized = true;
-    //     let button = document.getElementById("CheckAnswerBtn");
-    //     const rect = button.getBoundingClientRect();
-    //     const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
-    //     let currentLocationPx = button.scrollX;
-    //     let currentLocationPy = button.scrollY;
-    //     const currentLocationXRem = currentLocationPx / rootFontSize;
-    //     const currentLocationYRem = currentLocationPy / rootFontSize;
-    //
-    //     button.style.position = 'fixed';
-    //     // button.style.top = (rect.top - 200 ) + "px" ;
-    //     // button.style.left = (rect.left + 1000) + "px";
-    //     button.style.top = currentLocationYRem + "rem";
-    //     button.style.left = currentLocationXRem + "rem";
-    // }
-    //$("#OutputButton").hide();
 }
 
 // initialize all classes
@@ -3184,6 +3167,7 @@ display.createOutputTableEditBorder();
 addThresholdEditOption();
 handleDesiredOutputColumn();
 loadQuestionsAndModels();
+document.getElementById("DemoToggle").checked = true;
 display.UpdateDemoToggle();
 document.getElementById("AutoProgressToggle").checked = true;
 
