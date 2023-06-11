@@ -1147,7 +1147,8 @@ class Display {
             return;
         }
         //non-edit mode, we will display the comment for the wrong answer, in read only mode
-
+        if(!outputRow)
+            return;
         let desired = outputRow.children[2].innerText;
 
         var cell = guessTable.rows[row].cells[0];
@@ -1414,6 +1415,8 @@ class Display {
 
     updateSelectedInput() {
         if (!demo.selectedInput)
+            return;
+        if(document.getElementById("DemoToggle").checked)
             return;
         let selections = document.getElementById("selected-inputs");
         selections.innerHTML = "";
@@ -1820,9 +1823,10 @@ class Display {
     UpdateInputToggle() {
         let checkbox = document.getElementById("InputToggle");
         let checkboxBinary = document.getElementById(("BinaryToggle"));
+        let checkboxDemo = document.getElementById("DemoToggle")
         //display.createOutputTableColors();
         this.updateSelectedInput();
-        if (!checkbox.checked) {
+        if (!checkbox.checked || checkboxDemo.checked) {
             $("#input-table tr:first").hide();
             $("#input-table tr td:nth-child(1)").hide();
             const buttonRows = document.getElementsByClassName("row-buttons-container");
@@ -1922,8 +1926,10 @@ class Display {
             otherHeaders.forEach(header => {
                 header.hidden = true;
             });
-            //document.getElementById("demo-toggle").style.marginLeft = '30%';
-            //document.getElementById("edit-menu-section").style.display = "none";
+            const buttonRows = document.getElementsByClassName("row-buttons-container");
+            buttonRows.forEach(element => {
+                element.style.display = "none"
+            });
         }
         else {
             document.getElementById("guess-output-container").style.display = "none";
@@ -1934,6 +1940,12 @@ class Display {
             otherHeaders.forEach(header => {
                 header.hidden = false;
             });
+            let binaryCheck = document.getElementById("BinaryToggle");
+            const buttonRows = document.getElementsByClassName("row-buttons-container");
+            buttonRows.forEach(element => {
+                element.style.display = binaryCheck.checked? "none" : "flex";
+            });
+
             //document.getElementById("demo-toggle").style.marginLeft = '60%';
         }
         this.UpdateInputToggle();
@@ -1941,6 +1953,7 @@ class Display {
         demo.adjustWeightPlacement();
         FixCheckAnswerButtonPosition();
         display.createInputTableEditBorder();
+
     }
 
     UpdateFanfareToggle() {
@@ -2258,6 +2271,8 @@ class Demo {
     }
 
     adjustWeightPlacement() {
+        if(document.getElementById("DemoToggle").checked)
+            return;
         let selections = document.getElementById("selected-inputs");
         let weights = document.getElementById("input-link-text");
         let dimensions = weights.getBoundingClientRect()
@@ -2628,7 +2643,7 @@ async function uploadFromZipUrl(url, isProblem = false) {
     }
     let options = document.getElementById("problem-list").options
     if(!isProblem) {
-        if(options.length === 8) {
+        if(options.length === problemNum) {
             let option = document.createElement("option");
             option.text = "---";
             options.add(option);
@@ -2637,7 +2652,7 @@ async function uploadFromZipUrl(url, isProblem = false) {
         }
     }
     else {
-        if(options.length === 9) {
+        if(options.length === problemNum+1) {
             options.remove(options.length-1);
         }
     }
@@ -2824,7 +2839,7 @@ async function uploadZip(zipFile, isProblem = false) {
     try {
         let options = document.getElementById("problem-list").options
         if(!isProblem) {
-            if(options.length === 8) {
+            if(options.length === problemNum) {
                 let option = document.createElement("option");
                 option.text = "---";
                 options.add(option);
@@ -2834,7 +2849,7 @@ async function uploadZip(zipFile, isProblem = false) {
 
         }
         else {
-            if(options.length === 9) {
+            if(options.length === problemNum + 1) {
                 options.remove(options.length-1);
             }
         }
@@ -3170,6 +3185,8 @@ loadQuestionsAndModels();
 document.getElementById("DemoToggle").checked = true;
 display.UpdateDemoToggle();
 document.getElementById("AutoProgressToggle").checked = true;
+
+const problemNum = 15;
 
 function addTooltips()
 {

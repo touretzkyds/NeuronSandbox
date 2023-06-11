@@ -36,6 +36,41 @@
       "model_name": "Problem 7"
     },
     {
+      "id": 8,
+      "label": "problem-8",
+      "model_name": "Problem 8"
+    },
+    {
+      "id": 9,
+      "label": "problem-9",
+      "model_name": "Problem 9"
+    },
+    {
+      "id": 10,
+      "label": "problem-10",
+      "model_name": "Problem 10"
+    },
+    {
+      "id": 11,
+      "label": "problem-11",
+      "model_name": "Problem 11"
+    },
+    {
+      "id": 12,
+      "label": "problem-12",
+      "model_name": "Problem 12"
+    },
+    {
+      "id": 13,
+      "label": "problem-13",
+      "model_name": "Problem 13"
+    },
+    {
+      "id": 14,
+      "label": "problem-14",
+      "model_name": "Problem 14"
+    },
+    {
       "id": 0,
       "label": "Blank Model",
       "model_name": "SampleModel"
