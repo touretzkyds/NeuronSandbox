@@ -88,7 +88,7 @@ class DataOperator {
         let start = (table.id === 'output-table')? 1 : 2;
         let startCol = (table.id === 'output-table')? 0 : 1;
         let row = start;
-        if(dataObj.data.length === 0)
+        if(dataObj.data.length !== table.rows.length)
         {
             for (let i = 0; i < table.rows.length; i++) {
                 dataObj.data[i] = Array(table.rows[0].cells.length).fill(0);
@@ -842,7 +842,7 @@ class Display {
                 guessOutputRow.style.background = '#ffbfcb';
             }
             else {
-                guessOutputRow.style.background = 'none';
+                guessOutputRow.style.background = '';
             }
         }
     }
@@ -852,7 +852,7 @@ class Display {
         let n = guessOutputTable.rows.length;
         for (let i = 1; i < n; i++) {
             const guessOutputRow = document.querySelector(`#guess-output-table > tbody > tr:nth-child(${i+1})`)
-            guessOutputRow.style.background = 'none';
+            guessOutputRow.style.background = '';
         }
         if(document.getElementById("InputToggle").checked) {
             return;
@@ -2502,6 +2502,9 @@ class Demo {
         display.createInputTableEditBorder();
         display.createOutputTableEditBorder();
         demo.adjustWeightPlacement();
+        display.saveGuessComment();
+        display.createGuessTable();
+
     }
 
     // convert to valid inputs for processing and keep track of invalid parts of input
