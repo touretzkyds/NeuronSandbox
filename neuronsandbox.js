@@ -3189,7 +3189,7 @@ document.getElementById("DemoToggle").checked = true;
 display.UpdateDemoToggle();
 document.getElementById("AutoProgressToggle").checked = true;
 
-const problemNum = 15;
+const problemNum = 16;
 
 function addTooltips()
 {
