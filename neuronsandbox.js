@@ -1,5 +1,87 @@
 "use strict";
 
+class Hints {
+    constructor(editableFields) {
+        this.update(editableFields);
+    }
+
+    update(editableFields) {
+        this.editableFields = editableFields;
+    }
+
+    //https://stackoverflow.com/questions/42773836/how-to-find-all-subsets-of-a-set-in-javascript-powerset-of-array
+    getAllSubsets() {
+        const subsets = [[]];
+
+        for (const field of this.editableFields) {
+            const last = subsets.length-1;
+            for (let i = 0; i <= last; i++) {
+                subsets.push( [...subsets[i], field] );
+            }
+        }
+        return subsets;
+    }
+
+    hasNoSolutionHint() {
+        if (!document.getElementById("OutputToggle").checked)
+            return
+        if(isLoading)
+            return;
+        dataOp.updateDataFromTableNoDisplay(outputs, outputTable);
+        let outputData = outputs.data;
+        //second column is output
+        let adjustedWeights = []; //these weights will be adjusted throughout
+        for (let i = 0; i < demo.weights.length; i++) {
+            adjustedWeights.push(demo.weights[i])
+        }
+        adjustedWeights.push(demo.threshold * -1);
+        //iterate through inputs 100 times, if still not correct then we assume no solution
+        for (let i = 0; i < 100; i++) {
+            let hasSolution = true
+            for (let j = 0; j < demo.inputData.length; j++) {
+                let input = demo.inputData[j];
+                let actualOutput = 0
+                for (let w = 0; w < adjustedWeights.length-1; w++) {
+                    actualOutput += input[w]*adjustedWeights[w]
+                }
+                actualOutput += adjustedWeights[adjustedWeights.length-1];
+                actualOutput = actualOutput > demo.threshold ? 1 : 0
+                let desiredOutput = outputData[j][2]
+                if (actualOutput < desiredOutput) {
+                    hasSolution = false
+                    for (let k = 0; k < adjustedWeights.length-1; k++) {
+                        if (this.editableFields.contains(k)) {
+                            adjustedWeights[k] += demo.inputData[j][k]
+                        }
+                    }
+                    if(this.editableFields.contains(adjustedWeights.length-1))
+                        adjustedWeights[adjustedWeights.length-1]++;
+                }
+                if (actualOutput > desiredOutput) {
+                    hasSolution = false
+                    for (let k = 0; k < adjustedWeights.length-1; k++) {
+                        if (this.editableFields.contains(k)) {
+                            adjustedWeights[k] -= demo.inputData[j][k]
+                        }
+
+                    }
+                    if(this.editableFields.contains(adjustedWeights.length-1))
+                        adjustedWeights[adjustedWeights.length-1]--;
+                }
+
+            }
+            if (hasSolution) {
+                //document.getElementById("unlearnable-msg").hidden = true;
+                //TODO gives hint: change *insert change here*
+                return
+            }
+
+        }
+        //document.getElementById("unlearnable-msg").hidden = false;
+        //TODO signal that not possible
+    }
+
+}
 class Data {
     constructor(inputData) {
         this.update(inputData); //default shape: (2, 4)
