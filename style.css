@@ -953,3 +953,12 @@ span.guess-comment {
     justify-content: right;
     margin-right: 25%;
 }
+
+#guesscomment {
+    width: 11vw !important;
+    max-width: 11vw !important;
+}
+
+.red-border {
+    border: 4px solid red !important;
+}

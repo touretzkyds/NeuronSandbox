@@ -710,18 +710,35 @@ function ConvertToWeightSubscript(weightLabel) {
 }
 
 function checkAnswerCorrect() {
+    let inputTable = document.getElementById("input-table")
     let outputTable = document.getElementById("output-table")
     let guessToggle = document.getElementById("DemoToggle")
     let tableRows = outputTable.rows.length
     let isCorrect = true;
     if(!guessToggle.checked) {
         for (let i = 1; i < tableRows; i++) {
+            let row = outputTable.rows.item(i);
+            let inputRow = inputTable.rows.item(i+1);
             let cells = outputTable.rows.item(i).cells
             let output = cells.item(1).innerText;
             let desired = cells.item(2).innerText;
             if (output !== desired) {
+                //highlight the entire row
+                if(!row.classList.contains("red-border")) {
+                    row.classList.add("red-border");
+                }
+                if(!inputRow.classList.contains("red-border")) {
+                    inputRow.classList.add("red-border");
+                }
                 isCorrect = false
-                break
+            }
+            else {
+                if(row.classList.contains("red-border")) {
+                    row.classList.remove("red-border");
+                }
+                if(inputRow.classList.contains("red-border")) {
+                    inputRow.classList.remove("red-border");
+                }
             }
         }
     }
@@ -740,9 +757,11 @@ function checkAnswerCorrect() {
 
             let desired = cells.item(2).innerText;
             if (guess_output !== desired) {
+
                 isCorrect = false
                 break
             }
+
         }
     }
     return isCorrect;
@@ -1254,6 +1273,19 @@ class Display {
         display.removeGuessTableColors();
     }
 
+    getCellInfo(cell, tableName) {
+        let table = document.getElementById(tableName);
+        for (let r = 0; r < table.rows.length; r++) {
+            for (let c = 0; c < table.rows[r].cells.length; c++) {
+                if (table.rows[r].cells[c] === cell) {
+                    console.log('Row: ' + (r + 1));
+                    console.log('Column: ' + (c + 1));
+                    return {row:r, col: c};
+                }
+            }
+        }
+        return null;
+    }
 
     checkForSuccess() {
         let isCorrect = checkAnswerCorrect();
@@ -2893,6 +2925,7 @@ async function uploadZip(zipFile, isProblem = false) {
                         display.createInputTableEditBorder();
                         display.createOutputTableEditBorder();
                         display.createGuessTable();
+                        display.checkForSuccess();
                     });
                 }
             });
