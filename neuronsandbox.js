@@ -3448,7 +3448,7 @@ function loadQuestionsAndModels() {
 }
 
 function goToAboutPage() {
-    location.href = 'about.html';
+    window.open('about.html', '_blank');
 }
 
 function FixCheckAnswerButtonPosition() {
