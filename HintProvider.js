@@ -69,28 +69,65 @@ class HintProvider {
 
             }
             if (hasSolution) {
-                return "yay solution!"
+                adjustedWeights[adjustedWeights.length - 1] *= -1;// we want to transform threshold back into positive
+                return adjustedWeights;
             }
 
         }
-        return "no solution :("
+        return [Number.MIN_VALUE];
 
     }
 
     provideHint() {
-        // Logic to calculate hint based on weights, thresholds, and editableList
-        let hint = "Hint: ";
-        for (let i = 0; i < this.parameters.length; i++) {
-            if (this.editableList[i]) {
-                if (this.parameters[i] >= this.inputData[i]) {
-                    hint += `Increase weight ${i + 1}. `;
-                } else {
-                    hint += `Decrease weight ${i + 1}. `;
+        let hint = "";
+        let indexHint = "";
+        //create subsets
+        let subsets = hintProvider.getAllSubsets();
+        if (subsets.length === 2) { // only one parameter can change
+            //compare solution with current value
+            const selectedParams = subsets[1];
+            let solution = this.checkForSolution(selectedParams);
+            const paramIndex = subsets[1][0];
+            if (solution.includes(Number.MIN_VALUE)) {
+                hint = `this seems impossible.`
+            }
+            else if (this.parameters[paramIndex] > solution[paramIndex]) {
+                hint = `try decreasing parameter ${paramIndex}`;
+            }
+            else {
+                hint = `try increasing parameter ${paramIndex}`;
+            }
+
+                
+        }
+        else {
+            //can change multiple parameters ==> we go through all possibilities
+            //we start by trying changing only one parameter, so we sort list by lengths of sublists
+            subsets.sort(function (a, b) {
+                return a.length - b.length;
+            });
+            for(let i = 0; i < subsets.length; i++) {
+                let subset = subsets[i];
+                let len = subset.length; //depending on this, we show diff hints
+                let solution = this.checkForSolution(subset)
+                if (!solution.includes(Number.MIN_VALUE)) { //solution present!
+                    if (len === 1) {
+                        indexHint = subset[0]
+                        hint = `try changing parameter ${indexHint}`;
+
+                    }
+                    else {
+                        //pick a random parameter
+                        indexHint = Math.floor(Math.random() * subset.length);
+                        hint =`try changing parameter ${indexHint}`;
+                    }
                 }
+
             }
         }
+        //TODO: return hint, and also return what "type" of hint
+        return [hint, indexHint];
 
-        return hint;
     }
 }
 
@@ -103,8 +140,7 @@ const desiredOutput = [0, 0, 0, 1]
 
 const hintProvider = new HintProvider(parameters, inputData, desiredOutput, editableList);
 //const hintMessage = hintProvider.provideHint();
-let subsets = hintProvider.getAllSubsets()
-const sol = hintProvider.checkForSolution(subsets[5])
-
-console.log(subsets)
-console.log(sol)
+//let subsets = hintProvider.getAllSubsets()
+//const sol = hintProvider.checkForSolution(subsets[4])
+const test = hintProvider.provideHint();
+console.log(test)
