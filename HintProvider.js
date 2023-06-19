@@ -52,19 +52,19 @@ class HintProvider {
                     hasSolution = false
                     for (let k = 0; k < adjustedWeights.length-1; k++) {
                         if (selectedParams.includes(k))
-                            adjustedWeights[k] += this.inputData[j][k]
+                            adjustedWeights[k] += (this.inputData[j][k] * 0.1)
                     }
                     if (selectedParams.includes(adjustedWeights.length-1))
-                        adjustedWeights[adjustedWeights.length-1]++;
+                        adjustedWeights[adjustedWeights.length-1] += 0.1;
                 }
                 if (actualOutput > desiredOutput) {
                     hasSolution = false
                     for (let k = 0; k < adjustedWeights.length-1; k++) {
                         if (selectedParams.includes(k))
-                            adjustedWeights[k] -= this.inputData[j][k]
+                            adjustedWeights[k] -= (this.inputData[j][k] * 0.1)
                     }
                     if (selectedParams.includes(adjustedWeights.length-1))
-                        adjustedWeights[adjustedWeights.length-1]--;
+                        adjustedWeights[adjustedWeights.length-1] -= 0.1;
                 }
 
             }
@@ -120,7 +120,7 @@ class HintProvider {
                     if (len === 1) {
                         indexHint = subset[0]
                         if (indexHint !== solution.length - 1)
-                            hint = `try changing weight ${indexHint}`;
+                            hint = `try changing weight ${indexHint + 1}`;
                         else
                             hint = `try changing the threshold`;
 
@@ -129,8 +129,8 @@ class HintProvider {
                         //pick a random parameter
                         //in this case, need to keep track of which param we told them to change
                         indexHint = Math.floor(Math.random() * subset.length);
-                        if (indexHint !== solution.length - 1)
-                            hint =`try changing weight ${indexHint}`;
+                        if (subset[indexHint] !== solution.length - 1)
+                            hint =`try changing weight ${subset[indexHint] + 1}`;
                         else
                             hint = `try changing the threshold`;
                     }
