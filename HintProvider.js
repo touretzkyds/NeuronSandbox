@@ -127,6 +127,7 @@ class HintProvider {
                     }
                     else {
                         //pick a random parameter
+                        //in this case, need to keep track of which param we told them to change
                         indexHint = Math.floor(Math.random() * subset.length);
                         if (indexHint !== solution.length - 1)
                             hint =`try changing weight ${indexHint}`;

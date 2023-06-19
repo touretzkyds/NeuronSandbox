@@ -1411,9 +1411,9 @@ class Display {
                 }
 
 
-                if(newFontSize === 40 && headerInput.offsetHeight > 70) {
-                    newFontSize -= (headerInput.offsetHeight - 70) * 1.2
-                }
+                // if(newFontSize === 40 && headerInput.offsetHeight > 70) {
+                //     newFontSize -= (headerInput.offsetHeight - 70) * 1.2
+                // }
 
             }
             const selections = document.getElementById("selected-inputs");
