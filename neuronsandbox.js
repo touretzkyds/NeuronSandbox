@@ -1,87 +1,5 @@
 "use strict";
 
-class Hints {
-    constructor(editableFields) {
-        this.update(editableFields);
-    }
-
-    update(editableFields) {
-        this.editableFields = editableFields;
-    }
-
-    //https://stackoverflow.com/questions/42773836/how-to-find-all-subsets-of-a-set-in-javascript-powerset-of-array
-    getAllSubsets() {
-        const subsets = [[]];
-
-        for (const field of this.editableFields) {
-            const last = subsets.length-1;
-            for (let i = 0; i <= last; i++) {
-                subsets.push( [...subsets[i], field] );
-            }
-        }
-        return subsets;
-    }
-
-    hasNoSolutionHint() {
-        if (!document.getElementById("OutputToggle").checked)
-            return
-        if(isLoading)
-            return;
-        dataOp.updateDataFromTableNoDisplay(outputs, outputTable);
-        let outputData = outputs.data;
-        //second column is output
-        let adjustedWeights = []; //these weights will be adjusted throughout
-        for (let i = 0; i < demo.weights.length; i++) {
-            adjustedWeights.push(demo.weights[i])
-        }
-        adjustedWeights.push(demo.threshold * -1);
-        //iterate through inputs 100 times, if still not correct then we assume no solution
-        for (let i = 0; i < 100; i++) {
-            let hasSolution = true
-            for (let j = 0; j < demo.inputData.length; j++) {
-                let input = demo.inputData[j];
-                let actualOutput = 0
-                for (let w = 0; w < adjustedWeights.length-1; w++) {
-                    actualOutput += input[w]*adjustedWeights[w]
-                }
-                actualOutput += adjustedWeights[adjustedWeights.length-1];
-                actualOutput = actualOutput > demo.threshold ? 1 : 0
-                let desiredOutput = outputData[j][2]
-                if (actualOutput < desiredOutput) {
-                    hasSolution = false
-                    for (let k = 0; k < adjustedWeights.length-1; k++) {
-                        if (this.editableFields.contains(k)) {
-                            adjustedWeights[k] += demo.inputData[j][k]
-                        }
-                    }
-                    if(this.editableFields.contains(adjustedWeights.length-1))
-                        adjustedWeights[adjustedWeights.length-1]++;
-                }
-                if (actualOutput > desiredOutput) {
-                    hasSolution = false
-                    for (let k = 0; k < adjustedWeights.length-1; k++) {
-                        if (this.editableFields.contains(k)) {
-                            adjustedWeights[k] -= demo.inputData[j][k]
-                        }
-
-                    }
-                    if(this.editableFields.contains(adjustedWeights.length-1))
-                        adjustedWeights[adjustedWeights.length-1]--;
-                }
-
-            }
-            if (hasSolution) {
-                //document.getElementById("unlearnable-msg").hidden = true;
-                //TODO gives hint: change *insert change here*
-                return
-            }
-
-        }
-        //document.getElementById("unlearnable-msg").hidden = false;
-        //TODO signal that not possible
-    }
-
-}
 class Data {
     constructor(inputData) {
         this.update(inputData); //default shape: (2, 4)
@@ -1057,6 +975,12 @@ class Display {
         }
     }
 
+    updateHintButton()
+    {
+        const hintButton = document.getElementById("hintButton");
+        hintButton.style.display = !document.getElementById("DemoToggle").checked? "inline-block" : "none";
+    }
+
     createInputTableEditBorder() {
         const inputTable = document.getElementById("input-table")
 
@@ -1483,8 +1407,14 @@ class Display {
                     newFontSize = 30;
                 }
                 else {
-                    newFontSize = 40 - (length-10)
+                    newFontSize = 40 - (length-10)*1.2
                 }
+
+
+                if(newFontSize === 40 && headerInput.offsetHeight > 70) {
+                    newFontSize -= (headerInput.offsetHeight - 70) * 1.2
+                }
+
             }
             const selections = document.getElementById("selected-inputs");
             if(selections.rows[c-1] && selections.rows[c-1].cells[0] )
@@ -2067,6 +1997,7 @@ class Display {
         demo.adjustWeightPlacement();
         FixCheckAnswerButtonPosition();
         display.createInputTableEditBorder();
+        display.updateHintButton();
 
     }
 
@@ -2123,7 +2054,6 @@ class Display {
             }
             dataOp.makeEditable(desired.firstChild, editable);
         }
-        //console.log("parsed: " + parsedValue);
         if (parsedValue !== 1 && parsedValue !== 0 ) {
             isValid = false;
         }
@@ -2390,7 +2320,6 @@ class Demo {
         let selections = document.getElementById("selected-inputs");
         let weights = document.getElementById("input-link-text");
         let dimensions = weights.getBoundingClientRect()
-        console.log("children:" + weights.children.length);
 
         let length = weights.children.length
         if(length === 2) {
@@ -2409,7 +2338,6 @@ class Demo {
                     weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
                     weight.style.top = (rect.top + height/3 - dimensions.top) +'px';
                 }
-                console.log("final: ",i, weight.style.left, weight.style.top)
 
             }
         }
@@ -2436,7 +2364,6 @@ class Demo {
                     weight.style.left = (rect.left - dimensions.left)*0.025 +'px';
                     weight.style.top = (rect.top - dimensions.top + height/3) +'px';
                 }
-                console.log("final: ",i, weight.style.left, weight.style.top)
 
             }
         }
@@ -2463,7 +2390,6 @@ class Demo {
                     weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
                     weight.style.top = (rect.top - dimensions.top + height/3) +'px';
                 }
-                console.log("final: ",i, weight.style.left, weight.style.top)
 
             }
         }
@@ -2487,7 +2413,6 @@ class Demo {
                     weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
                     weight.style.top = (rect.top - dimensions.top + height/3) +'px';
                 }
-                console.log("final: ",i, weight.style.left, weight.style.top)
 
             }
         }
@@ -2568,7 +2493,6 @@ class Demo {
         else {
             this.mode = "binary";
         }
-        //console.log('mode set as', this.mode)
     }
 
     // update entire demo
@@ -2618,6 +2542,7 @@ class Demo {
         demo.adjustWeightPlacement();
         display.saveGuessComment();
         display.createGuessTable();
+        display.updateHintButton();
 
     }
 
@@ -2639,15 +2564,11 @@ async function downloadFile() {
     let inputToggleChecked=document.getElementById("InputToggle").checked;
     let outputToggleChecked=document.getElementById("OutputToggle").checked;
     let fanfareToggleChecked = document.getElementById("FanfareToggle").checked;
-    //console.log("in download: "+  demo.inputData);
-    // let headerRows = [];
-    // display.getHeaderRowVals(headerRows);
 
     let headerRowVariables = [];
     display.getHeaderRowVariables(headerRowVariables);
 
     let modelname = document.getElementById("fname").innerText
-    //if(modelname.length == 0)  modelname = "model"
 
     const handle = await showSaveFilePicker({
         suggestedName: modelname + '.sandbox',
@@ -2658,12 +2579,10 @@ async function downloadFile() {
     });
 
     let table = document.getElementById("output-table");
-    //console.log(table);
     for (let i = 1; i < table.rows.length; i++ ) {
         let tr = table.rows[i];
         let td = tr.cells[2];
         desiredOutputs.data[i-1] = td.innerText;
-        //console.log("desired output: " + desiredOutputs.data[i-1]);
     }
     desiredOutputs.rows = table.rows.length-1;
 
@@ -2812,6 +2731,43 @@ async function uploadFileComputer(event) {
     fileInput.click();
 }
 
+async function provideHint() {
+    //get all the input
+
+    //dataOp.updateDataFromTableNoDisplay(outputs, outputTable);
+    //let desiredOutputs = perceptron.outputData.map(row => row[row.length - 1]);
+    let desiredOutputs = []
+    let outputTable = document.getElementById("output-table")
+    for (let i = 1; i < outputTable.rows.length; i++) {
+        desiredOutputs.push(parseInt(outputTable.rows[i].cells[2].innerText));
+    }
+    const thresholdToggleBtn = document.getElementById(`threshold_toggleBtn`);
+
+    let editableList  = [];
+
+    let weight_parent = document.getElementById(`input-link-text`);
+    let weight_lebels = weight_parent.querySelectorAll('span.edit-toggle');
+    for( let i = 0; i < weight_lebels.length; i++) {
+        let weight_label = weight_lebels[i];
+        if (weight_label.classList.contains("edit-toggle-on")) {
+            editableList.push(true);
+        }
+        else {
+            editableList.push(false);
+        }
+    }
+
+    //threshold
+    if (thresholdToggleBtn.classList.contains("edit-toggle-on")) {
+        editableList.push(true);
+    }
+    else {
+        editableList.push(false);
+    }
+    console.log(editableList)
+    let hintProvider = new HintProvider([...perceptron.weights].concat(perceptron.threshold), perceptron.inputData, desiredOutputs, editableList);
+    alert(hintProvider.provideHint());
+}
 function addEditOption(c) {
     //cannot use getElementById since it is not accurate
     let weight_parent = document.getElementById(`input-link-text`);
@@ -3304,7 +3260,7 @@ document.getElementById("DemoToggle").checked = true;
 display.UpdateDemoToggle();
 document.getElementById("AutoProgressToggle").checked = true;
 
-const problemNum = 16;
+const problemNum = 8;
 
 function addTooltips()
 {
@@ -3512,10 +3468,10 @@ function loadQuestionsAndModels() {
             });
             dropdown.addEventListener('change', event => {
                 const selectedItemId = event.target.value;
-                console.log(`User selected item with ID ${selectedItemId}`);
+                //console.log(`User selected item with ID ${selectedItemId}`);
                 data.items.forEach(item => {
                     if (item.id.toString() === selectedItemId) {
-                        console.log(`Selected item: ${JSON.stringify(item)}`);
+                        //console.log(`Selected item: ${JSON.stringify(item)}`);
                         //const questiontext = document.getElementById("questiontext");
                         //questiontext.innerText = item.question;
                         //load the model associated with the question
@@ -3530,7 +3486,7 @@ function loadQuestionsAndModels() {
 }
 
 function goToAboutPage() {
-    window.open('about.html', '_blank');
+    location.href = 'about.html';
 }
 
 function FixCheckAnswerButtonPosition() {

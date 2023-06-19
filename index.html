@@ -170,6 +170,15 @@
                 </div>
             </th>
             <th>
+                <div>
+                    <div>
+                        <a id = 'hintButton' style = "margin-top: 10%" href="javascript:provideHint();" class="custom-btn myButton">
+                            <i class="fa fa-lightbulb" aria-hidden="true"></i> Hint
+                        </a>
+                    </div>
+                </div>
+            </th>
+            <th>
                 <a style="margin-top: 19%" id= "CheckAnswerBtn" onmousedown="event.preventDefault();display.checkGuessResult(); " onmouseup="event.preventDefault(); display.removeGuessHighlight();" class="custom-btn myButton">
                     <i class="fa" aria-hidden="true"></i> Check Answer
                 </a>
@@ -319,7 +328,7 @@
 
 
     <script src="neuronsandbox.js"></script>
-
+    <script src="HintProvider.js"></script>
 </head>
 
 <body>

@@ -11,8 +11,8 @@ class HintProvider {
         const subsets = [[]];
 
         let editableFields = []
-        for (let i = 0; i < parameters.length; i++) {
-            if (editableList[i]) {
+        for (let i = 0; i < this.parameters.length; i++) {
+            if (this.editableList[i]) {
                 editableFields.push(i)
             }
         }
@@ -82,7 +82,7 @@ class HintProvider {
         let hint = "";
         let indexHint = "";
         //create subsets
-        let subsets = hintProvider.getAllSubsets();
+        let subsets = this.getAllSubsets();
         if (subsets.length === 2) { // only one parameter can change
             //compare solution with current value
             const selectedParams = subsets[1];
@@ -92,10 +92,16 @@ class HintProvider {
                 hint = `this seems impossible.`
             }
             else if (this.parameters[paramIndex] > solution[paramIndex]) {
-                hint = `try decreasing parameter ${paramIndex}`;
+                if (paramIndex !== solution.length-1)
+                    hint = `try decreasing weight ${paramIndex + 1}`;
+                else
+                    hint = `try decreasing the threshold`;
             }
             else {
-                hint = `try increasing parameter ${paramIndex}`;
+                if (paramIndex !== solution.length-1)
+                    hint = `try increasing weight ${paramIndex + 1}`;
+                else
+                    hint = `try increasing the threshold`;
             }
 
                 
@@ -113,34 +119,40 @@ class HintProvider {
                 if (!solution.includes(Number.MIN_VALUE)) { //solution present!
                     if (len === 1) {
                         indexHint = subset[0]
-                        hint = `try changing parameter ${indexHint}`;
+                        if (indexHint !== solution.length - 1)
+                            hint = `try changing weight ${indexHint}`;
+                        else
+                            hint = `try changing the threshold`;
 
                     }
                     else {
                         //pick a random parameter
                         indexHint = Math.floor(Math.random() * subset.length);
-                        hint =`try changing parameter ${indexHint}`;
+                        if (indexHint !== solution.length - 1)
+                            hint =`try changing weight ${indexHint}`;
+                        else
+                            hint = `try changing the threshold`;
                     }
                 }
 
             }
         }
         //TODO: return hint, and also return what "type" of hint
-        return [hint, indexHint];
+        return hint;
 
     }
 }
 
-// Usage example:
-const parameters = [1, 1, 0]
-const inputData = [[0, 0], [0, 1], [1, 0], [1, 1]]
-const editableList = [true, true, true]
-const desiredOutput = [0, 0, 0, 1]
-
-
-const hintProvider = new HintProvider(parameters, inputData, desiredOutput, editableList);
-//const hintMessage = hintProvider.provideHint();
-//let subsets = hintProvider.getAllSubsets()
-//const sol = hintProvider.checkForSolution(subsets[4])
-const test = hintProvider.provideHint();
-console.log(test)
+// // Usage example:
+// const parameters = [1, 1, 0]
+// const inputData = [[0, 0], [0, 1], [1, 0], [1, 1]]
+// const editableList = [true, true, true]
+// const desiredOutput = [0, 0, 0, 1]
+//
+//
+// const hintProvider = new HintProvider(parameters, inputData, desiredOutput, editableList);
+// //const hintMessage = hintProvider.provideHint();
+// //let subsets = hintProvider.getAllSubsets()
+// //const sol = hintProvider.checkForSolution(subsets[4])
+// const test = hintProvider.provideHint();
+// console.log(test)
