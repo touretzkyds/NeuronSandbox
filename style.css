@@ -138,6 +138,12 @@ article > section {
     height: 100%;
 }
 
+#bias-link-text{
+    position: absolute;
+    width: 80%;
+    height: 100%;
+}
+
 /*#weight-1{*/
 /*    position: absolute;*/
 /*    top: 22%;*/

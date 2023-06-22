@@ -171,6 +171,16 @@
             </th>
             <th>
                 <div>
+                    <div id="bias-toggle">
+                        <label style="margin-right: 10px">Bias</label>
+                        <label id="BiasSwitch" class="switch">
+                            <input type="checkbox" id="biasToggle">
+                            <span id="bias-slider" class="slider round"></span>
+                        </label>
+                    </div>
+            </th>
+            <th>
+                <div>
                     <div>
                         <a id = 'hintButton' style = "margin-top: 10%" href="javascript:provideHint();" class="custom-btn myButton">
                             <i class="fa fa-lightbulb" aria-hidden="true"></i> Hint
@@ -242,6 +252,11 @@
                         <div class="center-input">
                             <table id="selected-inputs" class="selected">
                                 <tr>
+                                    <td id="biasInput">
+                                        <div class="bias-content">Bias</div>
+                                    </td>
+                                </tr>
+                                <tr>
                                     <td id="selinput1">
                                         <div class="input-content">x<sub>1</sub></div>
                                     </td>
@@ -265,6 +280,12 @@
                                 <!--<line id="line" stroke="black" stroke-width="3" x1="0%" y1="30%" x2="80%" y2="40%" marker-end="url(#triangle)"/>-->
                                 <!--<line id="line" stroke="black" stroke-width="3" x1="0%" y1="70%" x2="80%" y2="60%" marker-end="url(#triangle)"/>-->
                             </svg>
+                            <div id="bias-link-text" class="center">
+                                <div id="bias-1" class="weight_label" >
+                                    <text fill="black">w =</text>
+                                    <text id='bias_weight' contenteditable="false" fill="black" class="weights">1</text>
+                                </div>
+                            </div>
                             <div id="input-link-text" class="center">
                                 <div id="weight-1" class="weight_label" >
                                     <text fill="black">w<sub>1</sub> =</text>

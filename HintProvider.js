@@ -7,12 +7,12 @@ class HintProvider {
         this.desiredOutput = desiredOutput //keeps track of desired outputs
     }
 
-    getAllSubsets() {
+    getAllSubsets(editable=this.editableList) {
         const subsets = [[]];
 
         let editableFields = []
         for (let i = 0; i < this.parameters.length; i++) {
-            if (this.editableList[i]) {
+            if (editable[i]) {
                 editableFields.push(i)
             }
         }
@@ -78,11 +78,9 @@ class HintProvider {
 
     }
 
-    provideHint() {
+    provideHintHelper(subsets) {
         let hint = "";
         let indexHint = "";
-        //create subsets
-        let subsets = this.getAllSubsets();
         if (subsets.length === 2) { // only one parameter can change
             //compare solution with current value
             const selectedParams = subsets[1];
@@ -103,8 +101,7 @@ class HintProvider {
                 else
                     hint = `try increasing the threshold`;
             }
-
-                
+            return [hint, -1, selectedParams];
         }
         else {
             //can change multiple parameters ==> we go through all possibilities
@@ -124,6 +121,8 @@ class HintProvider {
                         else
                             hint = `try changing the threshold`;
 
+                        return [hint, -1, subset];
+
                     }
                     else {
                         //pick a random parameter
@@ -133,15 +132,74 @@ class HintProvider {
                             hint =`try changing weight ${subset[indexHint] + 1}`;
                         else
                             hint = `try changing the threshold`;
+
+                        return [hint, subset[indexHint], subset];
                     }
                 }
 
             }
         }
-        //TODO: return hint, and also return what "type" of hint
-        return hint;
+    }
+    provideHint(prevHintIndex, prevSubset) {
+        let hint = "";
+        let indexHint = "";
+        //create subsets
+        let subsets = this.getAllSubsets();
+        if(prevHintIndex === -1) { //previous hint not relevant
+            return this.provideHintHelper(subsets);
+        }
+        else {
+            //previous hint was at a particular weight/threshold
+            /*
+            step 1. check if a solution is present without changing this particular weight/threshold
+            this suggests that the user has correctly followed the previous hint, and we can continue
+            giving new hints
+            */
+            let tempEditableList = [...this.editableList];
+            tempEditableList[prevHintIndex] = false; //make it uneditable
+            let subsets = this.getAllSubsets(tempEditableList);
+            subsets.sort(function (a, b) {
+                return a.length - b.length;
+            });
+            for (let i = 0; i < subsets.length; i++) {
+                let subset = subsets[i];
+                let len = subset.length; //depending on this, we show diff hints
+                let solution = this.checkForSolution(subset)
+                if (!solution.includes(Number.MIN_VALUE)) { //solution present!
+                    //this means they followed the hint properly and got a correct
+                    //answer for one of the params.
+                    //If that is the case, we give new hint.
+                    return this.provideHintHelper(subsets)
+                }
+
+            }
+            //they followed the hint improperly
+            // compare to solution, what needs to be changed?
+            let hint = ""
+            let sol = this.checkForSolution(prevSubset)
+            let correctValue = sol[prevHintIndex];
+            if (this.parameters[prevHintIndex] > correctValue) {
+                if (prevHintIndex !== sol.length-1)
+                    hint = `try decreasing weight ${prevHintIndex + 1}`;
+                else
+                    hint = `try decreasing the threshold`;
+            }
+            else {
+                if (prevHintIndex !== sol.length-1)
+                    hint = `try increasing weight ${prevHintIndex + 1}`;
+                else
+                    hint = `try increasing the threshold`;
+            }
+            return [hint, prevHintIndex, prevSubset]
+
+
+
+        }
+
+        return "";
 
     }
+
 }
 
 // // Usage example:

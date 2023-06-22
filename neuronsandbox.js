@@ -642,6 +642,33 @@ class Perceptron {
             }
         }
     }
+    setBiasUI() {
+        if(document.getElementById("biasToggle").checked) {
+            document.getElementById("bias-link-text").style.display = "inline-block";
+            const cell = document.getElementById("bias_weight");
+            if (cell) {
+                cell.innerHTML = (-1)*perceptron.threshold + "";
+            }
+            //we should set the threshold value to 0, and also make it not editable
+            const threshold = document.getElementById("th1");
+            threshold.innerText = 0;
+            threshold.contentEditable = false;
+            if (threshold.classList.contains("edit-handler"))
+                threshold.classList.remove("edit-handler");
+            if (threshold.classList.contains("comment-editable-border"))
+                threshold.classList.remove("comment-editable-border");
+        }
+        else {
+            document.getElementById("bias-link-text").style.display = "none";
+            const threshold = document.getElementById("th1");
+            threshold.innerText = perceptron.threshold;
+            if (demo.biasLine) {
+                demo.biasLine.remove();
+                demo.biasLine = null;
+            }
+        }
+    }
+
     updateWeightsFromUI(){
         let childNodes = document.getElementById("input-link-text").childNodes;
         this.weightLabels = [];
@@ -675,23 +702,41 @@ class Perceptron {
     }
 
     updateThreshold(){
+        let biasMode = document.getElementById("biasToggle").checked;
         const cell = document.getElementById(`th${1}`);
-        let [parsedValue, isValid] = demo.stringToValidFloat(cell.innerHTML);
-        if(isValid) {
-            //check for leading zeroes
-            const regex = '^-?0+[0-9]+$';
-            if (new RegExp(regex).test(cell.innerHTML)) {
-                cell.innerHTML = parseInt(cell.innerHTML)
+        if(biasMode)
+        {
+            const biasCell = document.getElementById("bias_weight");
+            let [parsedValue, isValid] = demo.stringToValidFloat(biasCell.innerHTML);
+            if(isValid) {
+                //check for leading zeroes
+                const regex = '^-?0+[0-9]+$';
+                if (new RegExp(regex).test(biasCell.innerHTML)) {
+                    biasCell.innerHTML = parseInt(biasCell.innerHTML)
+                }
             }
+            biasCell.innerText = parsedValue.toString();
+            this.threshold = (-1) * parsedValue;
         }
-        if(!isValid) {
-            if(parsedValue > 0)
-                parsedValue = 1
-            else
-                parsedValue = 0
+        else
+        {
+            let [parsedValue, isValid] = demo.stringToValidFloat(cell.innerHTML);
+            if(isValid) {
+                //check for leading zeroes
+                const regex = '^-?0+[0-9]+$';
+                if (new RegExp(regex).test(cell.innerHTML)) {
+                    cell.innerHTML = parseInt(cell.innerHTML)
+                }
+            }
+            if(!isValid) {
+                if(parsedValue > 0)
+                    parsedValue = 1
+                else
+                    parsedValue = 0
+            }
+            cell.innerText = parsedValue.toString();
+            this.threshold = parsedValue;
         }
-        cell.innerText = parsedValue.toString();
-        this.threshold = parsedValue;
     }
 }
 
@@ -1333,6 +1378,9 @@ class Display {
                     {
                         demo.weightLines[i].position();
                     }
+                    if (demo.biasLine) {
+                        demo.biasLine.position();
+                    }
                 }
                 else {
                     document.getElementById("congrats-msg").hidden = true;
@@ -1340,6 +1388,9 @@ class Display {
                     for (let i = 0; i < demo.weightLines.length; i++)
                     {
                         demo.weightLines[i].position();
+                    }
+                    if (demo.biasLine) {
+                        demo.biasLine.position();
                     }
                 }
 
@@ -1351,6 +1402,9 @@ class Display {
                     for (let i = 0; i < demo.weightLines.length; i++)
                     {
                         demo.weightLines[i].position();
+                    }
+                    if (demo.biasLine) {
+                        demo.biasLine.position();
                     }
 
                 }
@@ -1410,15 +1464,17 @@ class Display {
                     newFontSize = 40 - (length-10)*1.2
                 }
 
-
-                // if(newFontSize === 40 && headerInput.offsetHeight > 70) {
-                //     newFontSize -= (headerInput.offsetHeight - 70) * 1.2
-                // }
-
             }
             const selections = document.getElementById("selected-inputs");
-            if(selections.rows[c-1] && selections.rows[c-1].cells[0] )
-                selections.rows[c-1].cells[0].style.fontSize = newFontSize + "px"
+            if (!document.getElementById("biasToggle").checked) {
+                if(selections.rows[c-1] && selections.rows[c-1].cells[0] )
+                    selections.rows[c-1].cells[0].style.fontSize = newFontSize + "px"
+            }
+            else {
+                if(selections.rows[c] && selections.rows[c].cells[0] )
+                    selections.rows[c].cells[0].style.fontSize = newFontSize + "px"
+            }
+
         }
 
         for (let i = 0; i < demo.weightLines.length; i++)
@@ -1470,6 +1526,18 @@ class Display {
             let newCell = newRow.insertCell(0);
             //newCell.innerHTML = `<div class=\"input-content\">${demo.selectedInput[i]}</div>`;
             newCell.innerHTML = `<div class=\"input-content\">${demo.selectedInput[i]}</div>`;
+        }
+        if(document.getElementById("biasToggle").checked)
+        {
+            let newRow = selections.insertRow(0);
+            let newCell = newRow.insertCell(0);
+
+            let bias_value = 1;
+            if(typeof demo.selectedInput[0] === "string")
+            {
+                bias_value = "Bias";
+            }
+            newCell.innerHTML = `<div class=\"bias-content\">${bias_value}</div>`;
         }
         //removes lines when not hovered
         demo.weightLines.forEach(line => line.remove());
@@ -1536,12 +1604,41 @@ class Display {
         let weight_labels = document.getElementById("input-link-text").children;
 
         //TODO: x values should also be variable
+        if(document.getElementById('biasToggle').checked)
+        {
+            if(demo.biasLine) {
+                demo.biasLine.remove()
+                demo.biasLine = null;
+            }
+            demo.biasLine = new LeaderLine(
+                LeaderLine.pointAnchor(selections.rows[0].cells[0], {x: '110%', y: '50%'}),
+                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {
+                    x: 6 + percentsX[0] + '%',
+                    y: 30 + '%'
+                })
+            );
+            demo.biasLine.path = "straight";
+            demo.biasLine.color = 'black';
+        }
+        else {
+            if (demo.biasLine) {
+                demo.biasLine.remove()
+                demo.biasLine = null;
+            }
+        }
+
         for (let i = 0; i < demo.selectedInput.length; i++) {
-            let xposition = 6+ percentsX[i]
+
             // if(i !== 0 && i !== demo.selectedInput.length-1)
             //     xposition = 3;
+            let real_i = i;
+            if(document.getElementById('biasToggle').checked)
+            {
+                real_i += 1;
+            }
+            let xposition = 6+ percentsX[i];
             demo.weightLines[i] = new LeaderLine(
-                LeaderLine.pointAnchor(selections.rows[i].cells[0], {x: '110%', y: '50%'}),
+                LeaderLine.pointAnchor(selections.rows[real_i].cells[0], {x: '110%', y: '50%'}),
                 LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: xposition+'%', y: percentsY[i]+'%'})
             );
 
@@ -1695,23 +1792,27 @@ class Display {
         //empties lines array
         demo.lines = []
 
+
         const selections = document.getElementById("selected-inputs");
         //demo.selectedInput = demo.inputData[rowIdx];
         //demo.selectedOutput = perceptron.outputData[rowIdx];
-        for (let r=0; r<selections.rows.length; r++) {
+        for (let r=0; r<demo.selectedInput.length; r++) {
+            let real_r = r;
+            if(document.getElementById("biasToggle").checked)
+            {
+                real_r += 1;
+            }
             if (this.hovering) {
-                selections.rows[r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</div>`;
-                //console.log(demo.selectedInput[r])
-                //draws line
+                selections.rows[real_r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</div>`;
                 demo.lines[r] = new LeaderLine(
                     LeaderLine.pointAnchor(inputRow.children[r+1], {x: '70%', y: '50%'}),
-                    LeaderLine.pointAnchor(selections.rows[r].cells[0], {x: '10%', y: '50%'}),
+                    LeaderLine.pointAnchor(selections.rows[real_r].cells[0], {x: '10%', y: '50%'}),
                     {dash: {animation: true}}
                 );
                 demo.lines[r].setOptions({startSocket: 'right', endSocket: 'left'});
             }
             else {
-                selections.rows[r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</div>`;
+                selections.rows[real_r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</div>`;
             }
         }
         display.alignTables()
@@ -1905,8 +2006,10 @@ class Display {
         for (let i = 0; i < demo.weightLines.length; i++) {
             demo.weightLines[i].position();
         }
+        // if (demo.biasLine ) {
+        //     demo.biasLine.position();
+        // }
         this.UpdateOutputToggle()
-
     }
 
     UpdateOutputToggle() {
@@ -1932,6 +2035,9 @@ class Display {
         for (let i = 0; i < demo.weightLines.length; i++) {
             demo.weightLines[i].position();
         }
+        // if (demo.biasLine) {
+        //     demo.biasLine.position();
+        // }
 
         display.outputLine.position();
         display.createOutputTableEditBorder();
@@ -1967,6 +2073,7 @@ class Display {
             document.getElementById("CheckAnswerBtn").style.display = "inline-block";
             document.getElementById("network-container").style.display = "none";
             document.getElementById("output-container").style.display = "none";
+            document.getElementById("bias-toggle").style.display = "none";
             otherHeaders.forEach(header => {
                 header.hidden = true;
             });
@@ -1980,6 +2087,7 @@ class Display {
             document.getElementById("CheckAnswerBtn").style.display = "none";
             document.getElementById("network-container").style.display = "inline-flex";
             document.getElementById("output-container").style.display = "inline-flex";
+            document.getElementById("bias-toggle").style.display = "inline-flex";
             //document.getElementById("edit-menu-section").style.display = "inline-block";
             otherHeaders.forEach(header => {
                 header.hidden = false;
@@ -1999,6 +2107,12 @@ class Display {
         display.createInputTableEditBorder();
         display.updateHintButton();
 
+    }
+
+    updateBiasToggle()
+    {
+        perceptron.setBiasUI();
+        display.updateSelectedInput();
     }
 
     UpdateFanfareToggle() {
@@ -2151,6 +2265,7 @@ class Demo {
         this.selectedOutput = this.defaultSelectedOutput;
         this.lines = [];
         this.weightLines = [];
+        this.biasLine = null;
         this.desiredOutput = [0, 0, 0, 0];
     }
 
@@ -2321,13 +2436,25 @@ class Demo {
         let weights = document.getElementById("input-link-text");
         let dimensions = weights.getBoundingClientRect()
 
-        let length = weights.children.length
+        let weightsList = []
+        for (let i = 0; i < weights.children.length; i++) {
+            weightsList.push(weights.children[i])
+        }
+
+        let biasToggleChecked = document.getElementById("biasToggle").checked
+        if (biasToggleChecked) {
+            let biasCell = document.getElementById(`bias-1`);
+            weightsList.unshift(biasCell)
+        }
+
+        let length = weightsList.length
+
         if(length === 2) {
             for(let i = 0; i < length; i++) {
                 let elem = selections.rows[i].cells[0];
                 let rect = elem.getBoundingClientRect();
 
-                let weight = weights.children[i];
+                let weight = weightsList[i];
                 let height = elem.offsetHeight;
                 weight.style.position = "absolute";
                 if(i === 1) {
@@ -2346,7 +2473,7 @@ class Demo {
                 let elem = selections.rows[i].cells[0];
                 let rect = elem.getBoundingClientRect();
 
-                let weight = weights.children[i];
+                let weight = weightsList[i];
                 let height = rect.height;
                 weight.style.position = "absolute";
                 if(i === 1) {
@@ -2372,7 +2499,7 @@ class Demo {
                 let elem = selections.rows[i].cells[0];
                 let rect = elem.getBoundingClientRect();
 
-                let weight = weights.children[i];
+                let weight = weightsList[i];
                 let height = rect.height;
                 weight.style.position = "absolute";
                 if(i === 1) {
@@ -2398,7 +2525,7 @@ class Demo {
                 let elem = selections.rows[i].cells[0];
                 let rect = elem.getBoundingClientRect();
 
-                let weight = weights.children[i];
+                let weight = weightsList[i];
                 let height = rect.height;
                 weight.style.position = "absolute";
                 if(i === 1) {
@@ -2766,7 +2893,10 @@ async function provideHint() {
     }
     console.log(editableList)
     let hintProvider = new HintProvider([...perceptron.weights].concat(perceptron.threshold), perceptron.inputData, desiredOutputs, editableList);
-    alert(hintProvider.provideHint());
+    let hintArr = hintProvider.provideHint(prevHintIndex, prevSubset);
+    prevHintIndex = hintArr[1];
+    prevSubset = hintArr[2];
+    alert(hintArr[0]);
 }
 function addEditOption(c) {
     //cannot use getElementById since it is not accurate
@@ -3041,6 +3171,7 @@ function uploadJson(text) {
     dataOp.updateTableFromData(inputs, inputTable);
     perceptron = new Perceptron(inputs, demo.weights, demo.threshold, dict["weight_labels"]);
     perceptron.setWeightsUI();
+    perceptron.setBiasUI();
     perceptron.computeOutputs();
     display.createOutputTableColors();
 
@@ -3084,11 +3215,12 @@ function uploadJson(text) {
         display.checkDesiredOutput(output, desired);
     }
     display.handleHoverExit();
-
+    display.updateBiasToggle();
     display.outputLine.position();
     display.createInputTableEditBorder();
     display.createOutputTableEditBorder();
     display.alignTables();
+
 
     if (document.getElementById('OutputToggle').checked)
         demo.hasNoSolution()
@@ -3262,6 +3394,8 @@ document.getElementById("AutoProgressToggle").checked = true;
 
 const problemNum = 8;
 
+let prevHintIndex = -1;
+let prevSubset = [];
 function addTooltips()
 {
     tippy('#BinarySwitch', {
@@ -3305,6 +3439,9 @@ $('#InputToggle').change(function() { //toggle edit
     for (let i = 0; i < demo.weightLines.length; i++) {
         demo.weightLines[i].position();
     }
+    if (demo.biasLine && !document.getElementById("DemoToggle").checked) {
+        demo.biasLine.position();
+    }
     display.outputLine.position()
 });
 
@@ -3322,6 +3459,10 @@ $('#BinaryToggle').change(function() { //toggle output
 
 $('#DemoToggle').change(function() { //toggle output
     display.UpdateDemoToggle();
+});
+
+$('#biasToggle').change(function() { //toggle bias
+    display.updateBiasToggle();
 });
 
 function PlayHooraySound() {
@@ -3363,6 +3504,9 @@ $('#FanfareToggle').change(function() { //toggle output
     for (let i = 0; i < demo.weightLines.length; i++)
     {
         demo.weightLines[i].position();
+    }
+    if (demo.biasLine && !$('#DemoToggle').checked) {
+        demo.biasLine.position();
     }
 });
 
