@@ -6,6 +6,7 @@
     <title>Neuron Sandbox</title>
 
     <link rel="stylesheet" href="slider.css" />
+    <link rel="stylesheet" href="slider2.css" />
     <link rel="stylesheet" href="style.css" />
     <!-- <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
@@ -20,6 +21,18 @@
 
     <script src="leader_line.min.js"></script>
     <script src = "truth_table.js"></script>
+
+    <script type="text/javascript">
+(function(window, document, dataLayerName, id) {
+window[dataLayerName]=window[dataLayerName]||[],window[dataLayerName].push({start:(new Date).getTime(),event:"stg.start"});var scripts=document.getElementsByTagName('script')[0],tags=document.createElement('script');
+function stgCreateCookie(a,b,c){var d="";if(c){var e=new Date;e.setTime(e.getTime()+24*c*60*60*1e3),d="; expires="+e.toUTCString();f="; SameSite=Strict"}document.cookie=a+"="+b+d+f+"; path=/"}
+var isStgDebug=(window.location.href.match("stg_debug")||document.cookie.match("stg_debug"))&&!window.location.href.match("stg_disable_debug");stgCreateCookie("stg_debug",isStgDebug?1:"",isStgDebug?14:-1);
+var qP=[];dataLayerName!=="dataLayer"&&qP.push("data_layer_name="+dataLayerName),isStgDebug&&qP.push("stg_debug");var qPString=qP.length>0?("?"+qP.join("&")):"";
+tags.async=!0,tags.src="https://touretzky.containers.piwik.pro/"+id+".js"+qPString,scripts.parentNode.insertBefore(tags,scripts);
+!function(a,n,i){a[n]=a[n]||{};for(var c=0;c<i.length;c++)!function(i){a[n][i]=a[n][i]||{},a[n][i].api=a[n][i].api||function(){var a=[].slice.call(arguments,0);"string"==typeof a[0]&&window[dataLayerName].push({event:n+"."+i+":"+a[0],parameters:[].slice.call(arguments,1)})}}(i[c])}(window,"ppms",["tm","cm"]);
+})(window, document, 'dataLayer', '2d77e53b-cd17-4d04-8bac-ee43f178bdb8');
+    </script>
+
 
     <article>
         <section>
@@ -44,24 +57,38 @@
                 <button class="dropbtn"><i class="fas fa-bars"></i> Menu</button>
                 <div class="dropdown-content">
                     <div class="button-group">
-                        <div>
-                            <label>Binary</label>
+                        <div class="menu-row-container">
+                            <label style="margin-right: 10px">Binary</label>
                             <label id="BinarySwitch" class="switch">
                                 <input type="checkbox" id="BinaryToggle">
                                 <span id="binary-slider" class="slider round"></span>
                             </label>
                         </div>
-                        <div>
-                            <label>Edit</label>
+                        <div class="menu-row-container">
+                            <label style="margin-right: 10px">Edit</label>
                             <label id="InputSwitch" class="switch">
                                 <input type="checkbox" id="InputToggle">
                                 <span id="edit-slider" class="slider round"></span>
                             </label>
                         </div>
-                        <div id = "FanfareToggleBody">
-                            <label>Fanfare</label>
+                        <div id = "FanfareToggleBody" class="menu-row-container">
+                            <label style="margin-right: 10px">Fanfare</label>
                             <label id="FanfareSwitch" class="switch">
                                 <input type="checkbox" id="FanfareToggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div id = "AutoProgressToggleBody" class="menu-row-container">
+                            <label style="margin-right: 10px">Auto Progress</label>
+                            <label id="AutoProgressSwitch" class="switch">
+                                <input type="checkbox" id="AutoProgressToggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div  class="menu-row-container">
+                            <label style="margin-right: 10px">Show Desired</label>
+                            <label class="switch" >
+                                <input type="checkbox" id="OutputToggle">
                                 <span class="slider round"></span>
                             </label>
                         </div>
@@ -145,31 +172,19 @@
     <table class = "top-table">
         <tr>
             <th>
-                <div id = "guess-toggle" style="margin-left: 50%; width: 500px; display:flex; flex-direction: row; justify-content: center; align-items: center; column-gap: 10px;">
-                    <label style="width: 50px">Solve for Weights</label>
-                    <label id="DemoSwitch" class="switch">
-                        <input type="checkbox" id="DemoToggle">
-                        <span id="demo-slider" class="slider round"></span>
-                    </label>
+                <div id = "demo-toggle" style="width: 100%; display:flex; flex-direction: row; justify-content: center; align-items: center; column-gap: 10px;">
                     <label style="width: 50px">Solve for Outputs</label>
+                    <label id="DemoSwitch" class="switch2">
+                        <input type="checkbox" id="DemoToggle">
+                        <span id="demo-slider" class="slider2 round"></span>
+                    </label>
+                    <label style="width: 50px">Solve for Weights</label>
                 </div>
-
             </th>
             <th>
                 <a style="margin-top: 19%" id= "CheckAnswerBtn" onmousedown="event.preventDefault();display.checkGuessResult(); " onmouseup="event.preventDefault(); display.removeGuessHighlight();" class="custom-btn myButton">
                     <i class="fa" aria-hidden="true"></i> Check Answer
                 </a>
-            </th>
-
-            <th>
-                <div style="float: right; margin-left: 200%" >
-                    <label >Show Desired</label>
-                    <label class="switch" id="OutputSwitch">
-                        <input type="checkbox" id="OutputToggle">
-                        <span class="slider round"></span>
-                    </label>
-                </div>
-
             </th>
         </tr>
     </table>
@@ -267,7 +282,7 @@
                         <div id = "perceptron1" class="center-perceptron">
                             <div class="circle center">
                                 <div id="threshold-text" class="center">
-                                    <text>∑> </text>
+                                    <text id="sigma">∑> </text>
                                     <text id="th1"></text>
                                     <span id = "threshold_toggleBtn" class="edit-toggle edit-toggle-off">
                                           <i class="fas fa-pencil-alt"></i>
@@ -300,7 +315,7 @@
                             <table id="output-table" class="output-table table input-output-table" >
                                 <tr>
                                     <th contenteditable = false id="activation">Activation<br>&Sigma;</th>
-                                    <th contenteditable = false id="output">Output<br>y</th>
+                                    <th contenteditable = false id="output">Current<br>Output<br>y</th>
                                     <th contenteditable = false id="desired" > Desired Output
                                     </th>
                                 </tr>
@@ -342,7 +357,7 @@
 
 <div id="guess-popup" class="popup">
     <b>Congratulations!</b>
-    <p>Would you like to solve for weight now?</p>
+    <p>Would you like to solve for weights now?</p>
 
     <div class="play-button-container">
         <button class="playing-btn" id="guess-weight-button" onclick="solveForWeight()">Ok</button>

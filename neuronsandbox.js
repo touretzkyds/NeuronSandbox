@@ -454,7 +454,8 @@ class Table {
 
         let tuple = this.findAvailableIndex();
         let newCol  = tuple[0];
-        let newNameIndex = tuple[1];
+        let newNameIndex = tuple[0];
+        //make the variable label to match with weight label
         if (newCol < 0 || newNameIndex < 0)
             return;
         let th = document.createElement('th'); //column
@@ -886,7 +887,7 @@ class Display {
                     textbox.removeChild(textbox.children[1]);
                 }
                 //textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
-                if (!nonBinaryMode) {
+                if (true) {
                     if (textbox.children.length === 0) {
                         textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
                     }
@@ -945,7 +946,7 @@ class Display {
                 }
             }
         }
-        if (!nonBinaryMode && editCheckbox.checked)
+        if (editCheckbox.checked)
         {
             setImageEditOptions();
         }
@@ -1140,8 +1141,8 @@ class Display {
                 comments[i].contentEditable = true;
                 if (!comments[i].classList.contains("edit-handler"))
                     comments[i].classList.add("edit-handler");
-                if (!comments[i].classList.contains("editable-border"))
-                    comments[i].classList.add("editable-border");
+                if (!comments[i].classList.contains("comment-editable-border"))
+                    comments[i].classList.add("comment-editable-border");
             }
             return;
         }
@@ -1166,8 +1167,8 @@ class Display {
                 comments[i].contentEditable = false;
                 if (comments[i].classList.contains("edit-handler"))
                     comments[i].classList.remove("edit-handler");
-                if (comments[i].classList.contains("editable-border"))
-                    comments[i].classList.remove("editable-border");
+                if (comments[i].classList.contains("comment-editable-border"))
+                    comments[i].classList.remove("comment-editable-border");
             }
         }
         if(!checkAnswerButtonPressed) {
@@ -1203,8 +1204,8 @@ class Display {
         let outputTable = document.getElementById("output-table")
         let guessTable = document.getElementById("guess-output-table");
         guessTable.innerHTML = ' <tr>\n' +
-            '                                    <th id="guessoutput" class="edit-handler input-table-th">Predicted Output</th>\n' +
-            '                                    <th id="guesscomment" class="edit-handler input-table-th">Comment</th>\n' +
+            '                                    <th id="guessoutput" class="edit-handler input-table-th">Predicted Output<br>(0=No, 1=Yes)</th>\n' +
+            '                                    <th id="guesscomment" class="edit-handler input-table-th">Hint</th>\n' +
             '                                </tr>';
         let tableRows = outputTable.rows.length
         for (let i = 0; i < tableRows - 1; i++) {
@@ -1255,7 +1256,8 @@ class Display {
 
     checkForSuccess() {
         let isCorrect = checkAnswerCorrect();
-        let fanfareToggleChecked = document.getElementById("FanfareToggle").checked
+        //let fanfareToggleChecked = document.getElementById("FanfareToggle").checked
+        let autoProgressChecked = document.getElementById("AutoProgressToggle").checked;
         let fanfareHidden =  document.getElementById("congrats-msg").hidden
         let outputToggleChecked = document.getElementById("OutputToggle").checked
         let guessToggleChecked = document.getElementById("DemoToggle").checked;
@@ -1274,7 +1276,7 @@ class Display {
             //     alert("You guessed incorrectly, please try again");
             // }
         }
-        else if (fanfareToggleChecked && outputToggleChecked) {
+        else if (outputToggleChecked) {
             if (fanfareHidden) {
                 if (isCorrect) {
                     PlayHooraySound();
@@ -1285,7 +1287,7 @@ class Display {
                     const selectedIndex = questionDropDown.selectedIndex;
                     const nextIndex = selectedIndex + 1;
                     let button = document.getElementById("next-question-btn");
-                    button.style.display = nextIndex < questionDropDown.options.length - 1 ? "inline-block" : "none";
+                    button.style.display = (nextIndex < questionDropDown.options.length - 1) && autoProgressChecked ? "inline-block" : "none";
                     //document.getElementById("congrats-msg").hidden = false;
                     display.outputLine.position()
                     for (let i = 0; i < demo.weightLines.length; i++)
@@ -1600,11 +1602,19 @@ class Display {
             // highlight input and output rows corresponding to the hovered input row
             inputRow.style.background = "lightblue";
             for (let i = 0; i < outputRow.children.length; i++) {
-                outputRow.children[i].style.background = "lightblue";
+                if (outputRow.children[i].style.background === "rgb(255, 191, 203)")
+                    outputRow.children[i].style.background = "#c2abc9";
+                else {
+                    outputRow.children[i].style.background = "lightblue";
+                }
             }
             if(guessOutputRow)
                 guessOutputRow.style.background = "lightblue";
             display.adjustSelectedInputFontSize();
+
+            //show the activation number
+            perceptron.computeAffineOutput();
+            document.getElementById("sigma").innerText = perceptron.affineOutput[rowIdx-2].toString() + "> ";
 
             //console.log("enter: set outputRow =" + outputRow);
         }
@@ -1621,6 +1631,7 @@ class Display {
                 if (isOutputToggleChecked)
                     this.checkDesiredOutput(outputRow.children[1], outputRow.children[2])
             }
+            document.getElementById("sigma").innerText = "∑> ";
 
 
         }
@@ -1825,7 +1836,7 @@ class Display {
             //document.getElementById("generateTruthTable").disabled = true;
             document.getElementById("output-table").style.marginTop = "0px";
             document.getElementById("guess-output-table").style.marginTop = "0px";
-            document.getElementById("FanfareToggleBody").hidden = true;
+            document.getElementById("AutoProgressToggleBody").style.display = "none";
         } else {
             $("#input-table tr:first").show();
             $("#input-table tr td:nth-child(1)").show();
@@ -1840,7 +1851,7 @@ class Display {
             //document.getElementById("generateTruthTable").disabled = false;
             document.getElementById("output-table").style.marginTop = "40px";
             document.getElementById("guess-output-table").style.marginTop = "40px";
-            document.getElementById("FanfareToggleBody").hidden = false;
+            document.getElementById("AutoProgressToggleBody").style.display = "flex";
         }
 
         for (let i = 0; i < demo.weightLines.length; i++) {
@@ -1911,6 +1922,7 @@ class Display {
             otherHeaders.forEach(header => {
                 header.hidden = true;
             });
+            //document.getElementById("demo-toggle").style.marginLeft = '30%';
             //document.getElementById("edit-menu-section").style.display = "none";
         }
         else {
@@ -1922,6 +1934,7 @@ class Display {
             otherHeaders.forEach(header => {
                 header.hidden = false;
             });
+            //document.getElementById("demo-toggle").style.marginLeft = '60%';
         }
         this.UpdateInputToggle();
         display.updateGuessTable();
@@ -2615,7 +2628,7 @@ async function uploadFromZipUrl(url, isProblem = false) {
     }
     let options = document.getElementById("problem-list").options
     if(!isProblem) {
-        if(options.length === 4) {
+        if(options.length === 8) {
             let option = document.createElement("option");
             option.text = "---";
             options.add(option);
@@ -2624,7 +2637,7 @@ async function uploadFromZipUrl(url, isProblem = false) {
         }
     }
     else {
-        if(options.length === 5) {
+        if(options.length === 9) {
             options.remove(options.length-1);
         }
     }
@@ -2741,12 +2754,13 @@ function findAncestorTable(element) {
 
 function hideCameraImages() {
     let images = document.querySelectorAll(`.myimage`);
+    let editToggleChecked = document.getElementById("InputToggle").checked;
     images.forEach((image) => {
         if(image.src.endsWith("1_image.svg") || image.src.endsWith("0_image.svg")) {
             if(findAncestorTable(image)?.id === "guess-output-table") {
                 image.visibility = "hidden";
             }
-            else {
+            else if(findAncestorTable(image)?.id !== "output-table" || !editToggleChecked ) {
                 image.style.display = "none";
             }
         }
@@ -2760,7 +2774,7 @@ function setImageEditOptions() {
         if(findAncestorTable(image)?.id === "guess-output-table") {
             return;
         }
-        image.style.display = "inline-block";
+        image.style.display = "inline";
         let tdElement = image;
         while (tdElement && tdElement.tagName !== 'TD') {
             tdElement = tdElement.parentNode;
@@ -2810,7 +2824,7 @@ async function uploadZip(zipFile, isProblem = false) {
     try {
         let options = document.getElementById("problem-list").options
         if(!isProblem) {
-            if(options.length === 4) {
+            if(options.length === 8) {
                 let option = document.createElement("option");
                 option.text = "---";
                 options.add(option);
@@ -2820,7 +2834,7 @@ async function uploadZip(zipFile, isProblem = false) {
 
         }
         else {
-            if(options.length === 5) {
+            if(options.length === 9) {
                 options.remove(options.length-1);
             }
         }
@@ -3013,6 +3027,7 @@ function uploadJson(text) {
     }
     thresholdToggle.dispatchEvent(new Event("click"));
     handleDesiredOutputColumn();
+    document.getElementById("DemoToggle").dispatchEvent(new Event("click"));
     isLoading = false;
 }
 
@@ -3118,29 +3133,6 @@ window.onload = function(){
     console.log("window loaded")
     $("#input-table tr:first").hide();
     $("#input-table tr td:nth-child(1)").hide();
-    // let button = document.getElementById("CheckAnswerBtn");
-    // button.style.position = 'fixed';
-    // button.style.top = 0 + "px";
-    // button.style.right = 200 + "px";
-
-
-    // if(!checkAnswerButtonLocationInitialized) {
-    //     this.checkAnswerButtonLocationInitialized = true;
-    //     let button = document.getElementById("CheckAnswerBtn");
-    //     const rect = button.getBoundingClientRect();
-    //     const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
-    //     let currentLocationPx = button.scrollX;
-    //     let currentLocationPy = button.scrollY;
-    //     const currentLocationXRem = currentLocationPx / rootFontSize;
-    //     const currentLocationYRem = currentLocationPy / rootFontSize;
-    //
-    //     button.style.position = 'fixed';
-    //     // button.style.top = (rect.top - 200 ) + "px" ;
-    //     // button.style.left = (rect.left + 1000) + "px";
-    //     button.style.top = currentLocationYRem + "rem";
-    //     button.style.left = currentLocationXRem + "rem";
-    // }
-    //$("#OutputButton").hide();
 }
 
 // initialize all classes
@@ -3175,7 +3167,9 @@ display.createOutputTableEditBorder();
 addThresholdEditOption();
 handleDesiredOutputColumn();
 loadQuestionsAndModels();
+document.getElementById("DemoToggle").checked = true;
 display.UpdateDemoToggle();
+document.getElementById("AutoProgressToggle").checked = true;
 
 function addTooltips()
 {
@@ -3241,6 +3235,9 @@ $('#DemoToggle').change(function() { //toggle output
 
 function PlayHooraySound() {
     //document.getElementById("popup").classList.toggle('active');
+    let fanfareToggleChecked = document.getElementById("FanfareToggle").checked;
+    if(!fanfareToggleChecked)
+        return;
     const audio = document.getElementById("hooray_sound");
     if (audio) {
         audio.play();
@@ -3249,6 +3246,9 @@ function PlayHooraySound() {
 
 function PlayBuzzSound() {
     //document.getElementById("popup").classList.toggle('active');
+    let fanfareToggleChecked = document.getElementById("FanfareToggle").checked;
+    if(!fanfareToggleChecked)
+        return;
     const audio = document.getElementById("buzz_sound");
     if (audio) {
         audio.play();
@@ -3257,6 +3257,9 @@ function PlayBuzzSound() {
 
 function PlayDingSound() {
     //document.getElementById("popup").classList.toggle('active');
+    let fanfareToggleChecked = document.getElementById("FanfareToggle").checked;
+    if(!fanfareToggleChecked)
+        return;
     const audio = document.getElementById("ding_sound");
     if (audio) {
         audio.play();
