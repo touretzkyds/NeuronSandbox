@@ -643,11 +643,57 @@ class Perceptron {
         }
     }
     setBiasUI() {
+        const cell = document.getElementById("bias_weight");
         if(document.getElementById("biasToggle").checked) {
             document.getElementById("bias-link-text").style.display = "inline-block";
-            const cell = document.getElementById("bias_weight");
             if (cell) {
                 cell.innerHTML = (-1)*perceptron.threshold + "";
+                cell.innerHTML += `<span id="bias-edit-toggle" class="edit-toggle edit-toggle-on">
+                              <i class="fas fa-pencil-alt"></i>
+                              <i class="fas fa-lock"></i> `
+                cell.style.background = "none";
+                let image = document.getElementById("bias-edit-toggle");
+                let thresholdToggle = document.getElementById("threshold_toggleBtn");
+                if (thresholdToggle.classList.contains("edit-toggle-on")) {
+                    cell.contentEditable = "true";
+                    dataOp.makeEditable(cell);
+                    // if (!cell.classList.contains("editable-border"))
+                    //     cell.classList.add("editable-border");
+                    // if (!cell.classList.contains("edit-handler"))
+                    //     cell.classList.add("edit-handler");
+
+                    if(!image.classList.contains("edit-toggle-on")) {
+                        image.classList.add("edit-toggle-on")
+                    }
+                    if(image.classList.contains("edit-toggle-off")) {
+                        image.classList.remove("edit-toggle-off")
+                    }
+
+                }
+                else {
+                    dataOp.makeEditable(cell, false);
+
+                    if(!image.classList.contains("edit-toggle-off")) {
+                        image.classList.add("edit-toggle-off")
+                    }
+                    if(image.classList.contains("edit-toggle-on")) {
+                        image.classList.remove("edit-toggle-on")
+                    }
+                }
+
+                let editToggle = document.getElementById("InputToggle");
+                let span = document.getElementById("bias-edit-toggle");
+                if (span) {
+                    if (!editToggle.checked) {
+                        span.style.display = "none";
+                    } else {
+                        span.style.display = "inline-block";
+                    }
+                }
+
+                thresholdToggle.style.display = "none";
+
+
             }
             //we should set the threshold value to 0, and also make it not editable
             const threshold = document.getElementById("th1");
@@ -655,8 +701,11 @@ class Perceptron {
             threshold.contentEditable = false;
             if (threshold.classList.contains("edit-handler"))
                 threshold.classList.remove("edit-handler");
+            if (threshold.classList.contains("editable-border"))
+                threshold.classList.remove("editable-border");
             if (threshold.classList.contains("comment-editable-border"))
                 threshold.classList.remove("comment-editable-border");
+            threshold.style.background = 'none';
         }
         else {
             document.getElementById("bias-link-text").style.display = "none";
@@ -666,6 +715,17 @@ class Perceptron {
                 demo.biasLine.remove();
                 demo.biasLine = null;
             }
+            let thresholdToggle = document.getElementById("threshold_toggleBtn");
+            if (thresholdToggle.classList.contains("edit-toggle-on")) {
+                if (!threshold.classList.contains("editable-border"))
+                    threshold.classList.add("editable-border");
+                threshold.contentEditable = true;
+            }
+
+            let editToggle = document.getElementById("InputToggle");
+            if (editToggle.checked)
+                thresholdToggle.style.display = "inline-block";
+
         }
     }
 
@@ -1544,7 +1604,7 @@ class Display {
         //empties lines array
         demo.weightLines = []
 
-        const length = demo.selectedInput.length
+        const length = document.getElementById("biasToggle").checked ? demo.selectedInput.length + 1 : demo.selectedInput.length
 
         //percentage values for weight lines for x-axis
         let percentsX = []
@@ -1614,7 +1674,7 @@ class Display {
                 LeaderLine.pointAnchor(selections.rows[0].cells[0], {x: '110%', y: '50%'}),
                 LeaderLine.pointAnchor(document.getElementById("perceptron1"), {
                     x: 6 + percentsX[0] + '%',
-                    y: 30 + '%'
+                    y: percentsY[0] + '%'
                 })
             );
             demo.biasLine.path = "straight";
@@ -1636,10 +1696,10 @@ class Display {
             {
                 real_i += 1;
             }
-            let xposition = 6+ percentsX[i];
+            let xposition = 6+ percentsX[real_i];
             demo.weightLines[i] = new LeaderLine(
                 LeaderLine.pointAnchor(selections.rows[real_i].cells[0], {x: '110%', y: '50%'}),
-                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: xposition+'%', y: percentsY[i]+'%'})
+                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: xposition+'%', y: percentsY[real_i]+'%'})
             );
 
             let splitup = weight_labels[i].children[1].textContent.split(" ")
@@ -2107,12 +2167,22 @@ class Display {
         display.createInputTableEditBorder();
         display.updateHintButton();
 
+        //reposition lines
+        for (let i = 0; i < demo.weightLines.length; i++) {
+            demo.weightLines[i].position();
+        }
+        if (demo.biasLine && !document.getElementById("DemoToggle").checked) {
+            demo.biasLine.position();
+        }
+        display.outputLine.position()
+
     }
 
     updateBiasToggle()
     {
         perceptron.setBiasUI();
         display.updateSelectedInput();
+        demo.adjustWeightPlacement();
     }
 
     UpdateFanfareToggle() {
@@ -2478,7 +2548,7 @@ class Demo {
                 weight.style.position = "absolute";
                 if(i === 1) {
                     weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
-                    if(height < 200)
+                    if(height < 150)
                         weight.style.top = (rect.top - dimensions.top - height/10) +'px';
                     else
                         weight.style.top = (rect.top - dimensions.top + height/5) +'px';
@@ -2896,7 +2966,17 @@ async function provideHint() {
     let hintArr = hintProvider.provideHint(prevHintIndex, prevSubset);
     prevHintIndex = hintArr[1];
     prevSubset = hintArr[2];
-    alert(hintArr[0]);
+    let hintText = document.getElementById("hintText");
+    hintText.innerText = hintArr[0];
+
+    display.outputLine.position()
+    for (let i = 0; i < demo.weightLines.length; i++)
+    {
+        demo.weightLines[i].position();
+    }
+    if (demo.biasLine) {
+        demo.biasLine.position();
+    }
 }
 function addEditOption(c) {
     //cannot use getElementById since it is not accurate
@@ -3443,6 +3523,7 @@ $('#InputToggle').change(function() { //toggle edit
         demo.biasLine.position();
     }
     display.outputLine.position()
+    display.updateBiasToggle()
 });
 
 $('#OutputToggle').change(function() { //toggle output

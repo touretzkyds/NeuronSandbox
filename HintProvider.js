@@ -91,15 +91,15 @@ class HintProvider {
             }
             else if (this.parameters[paramIndex] > solution[paramIndex]) {
                 if (paramIndex !== solution.length-1)
-                    hint = `try decreasing weight ${paramIndex + 1}`;
+                    hint = `Try decreasing weight ${paramIndex + 1}.`;
                 else
-                    hint = `try decreasing the threshold`;
+                    hint = `Try decreasing the threshold.`;
             }
             else {
                 if (paramIndex !== solution.length-1)
-                    hint = `try increasing weight ${paramIndex + 1}`;
+                    hint = `Try increasing weight ${paramIndex + 1}.`;
                 else
-                    hint = `try increasing the threshold`;
+                    hint = `Try increasing the threshold.`;
             }
             return [hint, -1, selectedParams];
         }
@@ -117,9 +117,9 @@ class HintProvider {
                     if (len === 1) {
                         indexHint = subset[0]
                         if (indexHint !== solution.length - 1)
-                            hint = `try changing weight ${indexHint + 1}`;
+                            hint = `Try changing weight ${indexHint + 1}.`;
                         else
-                            hint = `try changing the threshold`;
+                            hint = `Try changing the threshold.`;
 
                         return [hint, -1, subset];
 
@@ -129,9 +129,9 @@ class HintProvider {
                         //in this case, need to keep track of which param we told them to change
                         indexHint = Math.floor(Math.random() * subset.length);
                         if (subset[indexHint] !== solution.length - 1)
-                            hint =`try changing weight ${subset[indexHint] + 1}`;
+                            hint =`Try changing weight ${subset[indexHint] + 1}.`;
                         else
-                            hint = `try changing the threshold`;
+                            hint = `Try changing the threshold`;
 
                         return [hint, subset[indexHint], subset];
                     }
@@ -169,6 +169,10 @@ class HintProvider {
                     //this means they followed the hint properly and got a correct
                     //answer for one of the params.
                     //If that is the case, we give new hint.
+                    let subsets = this.getAllSubsets(this.editableList);
+                    subsets.sort(function (a, b) {
+                        return a.length - b.length;
+                    });
                     return this.provideHintHelper(subsets)
                 }
 
@@ -180,15 +184,15 @@ class HintProvider {
             let correctValue = sol[prevHintIndex];
             if (this.parameters[prevHintIndex] > correctValue) {
                 if (prevHintIndex !== sol.length-1)
-                    hint = `try decreasing weight ${prevHintIndex + 1}`;
+                    hint = `Try decreasing weight ${prevHintIndex + 1}.`;
                 else
-                    hint = `try decreasing the threshold`;
+                    hint = `Try decreasing the threshold.`;
             }
             else {
                 if (prevHintIndex !== sol.length-1)
-                    hint = `try increasing weight ${prevHintIndex + 1}`;
+                    hint = `Try increasing weight ${prevHintIndex + 1}.`;
                 else
-                    hint = `try increasing the threshold`;
+                    hint = `Try increasing the threshold.`;
             }
             return [hint, prevHintIndex, prevSubset]
 
