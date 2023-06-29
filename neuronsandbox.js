@@ -3455,7 +3455,7 @@ perceptron.displayPerceptron();
 const display = new Display();
 display.updateDisplay();
 //uploadFromUrl("SampleModel.json");
-uploadFromZipUrl("Problem 1.sandbox", true);
+uploadFromZipUrl("problems/Problem 1.sandbox", true);
 display.createOutputTableColors();
 display.createInputTableEditBorder();
 display.createOutputTableEditBorder();
@@ -3694,8 +3694,10 @@ function loadQuestionsAndModels() {
                         //const questiontext = document.getElementById("questiontext");
                         //questiontext.innerText = item.question;
                         //load the model associated with the question
-                        if (fileExists(item.model_name+".sandbox")) {
-                            uploadFromZipUrl(encodeURIComponent(item.model_name+".sandbox"), true);
+                        let filePath = "problems/" + item.model_name+".sandbox"
+                        if (fileExists(filePath)) {
+                            console.log("filePath = ", encodeURIComponent(filePath));
+                            uploadFromZipUrl(encodeURIComponent(filePath), true);
 
                         }
                     }
