@@ -646,39 +646,29 @@ class Perceptron {
         const cell = document.getElementById("bias_weight");
         if(document.getElementById("biasToggle").checked) {
             document.getElementById("bias-link-text").style.display = "inline-block";
+
             if (cell) {
-                cell.innerHTML = (-1)*perceptron.threshold + "";
+                cell.innerHTML = `<div padding="10px" id="bias-text">`+(-1)*perceptron.threshold + "" + `</div>`;
                 cell.innerHTML += `<span id="bias-edit-toggle" class="edit-toggle edit-toggle-on">
                               <i class="fas fa-pencil-alt"></i>
-                              <i class="fas fa-lock"></i> `
+                              <i class="fas fa-lock"></i> </span>`
                 cell.style.background = "none";
                 let image = document.getElementById("bias-edit-toggle");
                 let thresholdToggle = document.getElementById("threshold_toggleBtn");
-                if (thresholdToggle.classList.contains("edit-toggle-on")) {
-                    cell.contentEditable = "true";
-                    dataOp.makeEditable(cell);
-                    // if (!cell.classList.contains("editable-border"))
-                    //     cell.classList.add("editable-border");
-                    // if (!cell.classList.contains("edit-handler"))
-                    //     cell.classList.add("edit-handler");
+                let text = document.getElementById("bias-text");
 
-                    if(!image.classList.contains("edit-toggle-on")) {
-                        image.classList.add("edit-toggle-on")
-                    }
-                    if(image.classList.contains("edit-toggle-off")) {
-                        image.classList.remove("edit-toggle-off")
-                    }
-
+                dataOp.makeEditable(text);
+                if(!image.classList.contains("edit-toggle-on")) {
+                    image.classList.add("edit-toggle-on")
                 }
-                else {
-                    dataOp.makeEditable(cell, false);
-
-                    if(!image.classList.contains("edit-toggle-off")) {
-                        image.classList.add("edit-toggle-off")
-                    }
-                    if(image.classList.contains("edit-toggle-on")) {
-                        image.classList.remove("edit-toggle-on")
-                    }
+                if(image.classList.contains("edit-toggle-off")) {
+                    image.classList.remove("edit-toggle-off")
+                }
+                if(!text.classList.contains('weight-edit-text')) {
+                    text.classList.add('weight-edit-text');
+                }
+                if(!text.classList.contains('weights')) {
+                    text.classList.add('weights');
                 }
 
                 let editToggle = document.getElementById("InputToggle");
@@ -690,10 +680,7 @@ class Perceptron {
                         span.style.display = "inline-block";
                     }
                 }
-
                 thresholdToggle.style.display = "none";
-
-
             }
             //we should set the threshold value to 0, and also make it not editable
             const threshold = document.getElementById("th1");
@@ -767,25 +754,25 @@ class Perceptron {
         if(biasMode)
         {
             const biasCell = document.getElementById("bias_weight");
-            let [parsedValue, isValid] = demo.stringToValidFloat(biasCell.innerHTML);
+            let [parsedValue, isValid] = demo.stringToValidFloat(biasCell.innerText);
             if(isValid) {
                 //check for leading zeroes
                 const regex = '^-?0+[0-9]+$';
-                if (new RegExp(regex).test(biasCell.innerHTML)) {
-                    biasCell.innerHTML = parseInt(biasCell.innerHTML)
+                if (new RegExp(regex).test(biasCell.innerText)) {
+                    biasCell.innerText = parseInt(biasCell.innerText)
                 }
             }
-            biasCell.innerText = parsedValue.toString();
+            biasCell.children[0].textContent = parsedValue.toString();
             this.threshold = (-1) * parsedValue;
         }
         else
         {
-            let [parsedValue, isValid] = demo.stringToValidFloat(cell.innerHTML);
+            let [parsedValue, isValid] = demo.stringToValidFloat(cell.innerText);
             if(isValid) {
                 //check for leading zeroes
                 const regex = '^-?0+[0-9]+$';
-                if (new RegExp(regex).test(cell.innerHTML)) {
-                    cell.innerHTML = parseInt(cell.innerHTML)
+                if (new RegExp(regex).test(cell.innerText)) {
+                    cell.innerText = parseInt(cell.innerText)
                 }
             }
             if(!isValid) {
@@ -818,6 +805,7 @@ function checkAnswerCorrect() {
     let inputTable = document.getElementById("input-table")
     let outputTable = document.getElementById("output-table")
     let guessToggle = document.getElementById("DemoToggle")
+    let outputToggleChecked = document.getElementById("OutputToggle").checked
     let tableRows = outputTable.rows.length
     let isCorrect = true;
     if(!guessToggle.checked) {
@@ -827,7 +815,7 @@ function checkAnswerCorrect() {
             let cells = outputTable.rows.item(i).cells
             let output = cells.item(1).innerText;
             let desired = cells.item(2).innerText;
-            if (output !== desired) {
+            if (output !== desired && outputToggleChecked) {
                 //highlight the entire row
                 if(!row.classList.contains("red-border")) {
                     row.classList.add("red-border");
@@ -2029,6 +2017,9 @@ class Display {
         let checkbox = document.getElementById("InputToggle");
         let checkboxBinary = document.getElementById(("BinaryToggle"));
         let checkboxDemo = document.getElementById("DemoToggle")
+        // checkboxBinary.style.display = checkbox.checked? "inline-block" : "none";
+        // document.getElementById("OutputToggle").style.display =  checkbox.checked? "inline-block" : "none";
+
         //display.createOutputTableColors();
         this.updateSelectedInput();
         if (!checkbox.checked || checkboxDemo.checked) {
@@ -3219,6 +3210,9 @@ function uploadJson(text) {
     document.getElementById("questionprompt").hidden = true;
     document.getElementById("questiontext").hidden = false;
 
+    document.getElementById("biasToggle").checked = false;
+    document.getElementById("hintText").innerText = "";
+
 
 
     inputs = new Data(demo.inputData);
@@ -3251,7 +3245,6 @@ function uploadJson(text) {
     dataOp.updateTableFromData(inputs, inputTable);
     perceptron = new Perceptron(inputs, demo.weights, demo.threshold, dict["weight_labels"]);
     perceptron.setWeightsUI();
-    perceptron.setBiasUI();
     perceptron.computeOutputs();
     display.createOutputTableColors();
 
@@ -3330,6 +3323,7 @@ function uploadJson(text) {
     handleDesiredOutputColumn();
     document.getElementById("DemoToggle").dispatchEvent(new Event("click"));
     isLoading = false;
+    perceptron.setBiasUI();
 }
 
 async function uploadFile(event) {

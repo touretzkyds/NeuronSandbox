@@ -121,7 +121,7 @@ class HintProvider {
                         else
                             hint = `Try changing the threshold.`;
 
-                        return [hint, -1, subset];
+                        return [hint, indexHint, subset];
 
                     }
                     else {
@@ -139,6 +139,8 @@ class HintProvider {
 
             }
         }
+        hint = "This seems impossible, please double check the correctness of this problem."
+        return [hint, -1, []];
     }
     provideHint(prevHintIndex, prevSubset) {
         let hint = "";
@@ -169,7 +171,7 @@ class HintProvider {
                     //this means they followed the hint properly and got a correct
                     //answer for one of the params.
                     //If that is the case, we give new hint.
-                    let subsets = this.getAllSubsets(this.editableList);
+                    let subsets = this.getAllSubsets(tempEditableList);
                     subsets.sort(function (a, b) {
                         return a.length - b.length;
                     });
