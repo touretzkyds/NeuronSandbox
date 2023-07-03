@@ -2037,6 +2037,9 @@ class Display {
             document.getElementById("output-table").style.marginTop = "0px";
             document.getElementById("guess-output-table").style.marginTop = "0px";
             document.getElementById("AutoProgressToggleBody").style.display = "none";
+            document.getElementById("BinaryToggleBody").style.display= "none";
+            document.getElementById("ShowDesiredToggleBody").style.display= "none";
+            document.getElementById("ShowBiasToggleBody").style.display= "none";
         } else {
             $("#input-table tr:first").show();
             $("#input-table tr td:nth-child(1)").show();
@@ -2052,6 +2055,9 @@ class Display {
             document.getElementById("output-table").style.marginTop = "40px";
             document.getElementById("guess-output-table").style.marginTop = "40px";
             document.getElementById("AutoProgressToggleBody").style.display = "flex";
+            document.getElementById("BinaryToggleBody").style.display= "flex";
+            document.getElementById("ShowDesiredToggleBody").style.display= "flex";
+            document.getElementById("ShowBiasToggleBody").style.display= "flex";
         }
 
         for (let i = 0; i < demo.weightLines.length; i++) {
@@ -2061,6 +2067,16 @@ class Display {
         //     demo.biasLine.position();
         // }
         this.UpdateOutputToggle()
+        this.UpdateShowBiasToggle();
+    }
+
+    UpdateShowBiasToggle () {
+        if(document.getElementById("ShowBiasToggle").checked) {
+            document.getElementById("bias-toggle").style.display = "flex";
+        }
+        else {
+            document.getElementById("bias-toggle").style.display = "none";
+        }
     }
 
     UpdateOutputToggle() {
@@ -2116,9 +2132,11 @@ class Display {
     }
 
     UpdateDemoToggle() {
+        let hintText = document.getElementById("hintText");
         let checkbox = document.getElementById("DemoToggle");
-        const otherHeaders = document.querySelectorAll('.top-table th:not(:first-child):not(:nth-child(2))');
+        const otherHeaders = document.querySelectorAll('.top-table th:not(:first-child):not(:nth-child(2)):not(:last-child)');
         if (checkbox.checked) {
+            hintText.hidden = true;
             document.getElementById("guess-output-container").style.display = "inline-block";
 
             document.getElementById("CheckAnswerBtn").style.display = "inline-block";
@@ -2134,6 +2152,7 @@ class Display {
             });
         }
         else {
+            hintText.hidden = false;
             document.getElementById("guess-output-container").style.display = "none";
             document.getElementById("CheckAnswerBtn").style.display = "none";
             document.getElementById("network-container").style.display = "inline-flex";
@@ -2954,9 +2973,10 @@ async function provideHint() {
     }
     console.log(editableList)
     let hintProvider = new HintProvider([...perceptron.weights].concat(perceptron.threshold), perceptron.inputData, desiredOutputs, editableList);
-    let hintArr = hintProvider.provideHint(prevHintIndex, prevSubset);
+    let hintArr = hintProvider.provideHint(prevHintIndex, prevSubset, prevHintLevel);
     prevHintIndex = hintArr[1];
     prevSubset = hintArr[2];
+    prevHintLevel = hintArr[3];
     let hintText = document.getElementById("hintText");
     hintText.innerText = hintArr[0];
 
@@ -3324,6 +3344,10 @@ function uploadJson(text) {
     document.getElementById("DemoToggle").dispatchEvent(new Event("click"));
     isLoading = false;
     perceptron.setBiasUI();
+
+    prevHintLevel = 0;
+    prevHintIndex = -1;
+    prevSubset = [];
 }
 
 async function uploadFile(event) {
@@ -3470,6 +3494,8 @@ const problemNum = 8;
 
 let prevHintIndex = -1;
 let prevSubset = [];
+let prevHintLevel = 0;
+
 function addTooltips()
 {
     tippy('#BinarySwitch', {
@@ -3526,6 +3552,11 @@ $('#OutputToggle').change(function() { //toggle output
     display.checkForSuccess();
     demo.hasNoSolution();
 });
+
+$('#ShowBiasToggle').change(function() { //toggle output
+    display.UpdateShowBiasToggle();
+});
+
 
 $('#BinaryToggle').change(function() { //toggle output
     display.UpdateBinaryToggle(false);

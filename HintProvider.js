@@ -7,6 +7,32 @@ class HintProvider {
         this.desiredOutput = desiredOutput //keeps track of desired outputs
     }
 
+    // 0 means change, -1 or < 0, means decreasing, >0 means increasing
+    getThresholdHoldText (mode) {
+        let biasMode = document.getElementById("biasToggle").checked;
+        if(biasMode) {
+            if(mode < 0) {
+                return `Try increasing the bias.`;
+            }
+            if(mode > 0) {
+                return `Try decreasing the bias.`;
+            }
+            else {
+                return `Try changing the bias.`;
+            }
+        }
+        else {
+            if(mode < 0) {
+                return `Try decreasing the threshold.`;
+            }
+            if(mode > 0) {
+                return `Try increasing the threshold.`;
+            }
+            else {
+                return `Try changing the threshold.`;
+            }
+        }
+    }
     getAllSubsets(editable=this.editableList) {
         const subsets = [[]];
 
@@ -75,10 +101,9 @@ class HintProvider {
 
         }
         return [Number.MIN_VALUE];
-
     }
 
-    provideHintHelper(subsets) {
+    provideHintHelper(subsets, prevHint=0) {
         let hint = "";
         let indexHint = "";
         if (subsets.length === 2) { // only one parameter can change
@@ -93,15 +118,15 @@ class HintProvider {
                 if (paramIndex !== solution.length-1)
                     hint = `Try decreasing weight ${paramIndex + 1}.`;
                 else
-                    hint = `Try decreasing the threshold.`;
+                    hint = this.getThresholdHoldText( -1);
             }
             else {
                 if (paramIndex !== solution.length-1)
                     hint = `Try increasing weight ${paramIndex + 1}.`;
                 else
-                    hint = `Try increasing the threshold.`;
+                    hint = this.getThresholdHoldText( 1);
             }
-            return [hint, -1, selectedParams];
+            return [hint, -1, selectedParams, 1];
         }
         else {
             //can change multiple parameters ==> we go through all possibilities
@@ -116,24 +141,42 @@ class HintProvider {
                 if (!solution.includes(Number.MIN_VALUE)) { //solution present!
                     if (len === 1) {
                         indexHint = subset[0]
-                        if (indexHint !== solution.length - 1)
-                            hint = `Try changing weight ${indexHint + 1}.`;
-                        else
-                            hint = `Try changing the threshold.`;
+                        if(prevHint === 0) {
+                            if (indexHint !== solution.length - 1) {
+                                hint = `Try changing weight ${indexHint + 1}.`;
+                            }
+                            else
+                                hint = this.getThresholdHoldText( 0);
+                        }
+                        else {
+                            if (this.parameters[indexHint] > solution[indexHint]) {
+                                if (indexHint !== solution.length-1)
+                                    hint = `Try decreasing weight ${indexHint + 1}.`;
+                                else
+                                    hint = this.getThresholdHoldText( -1);
+                            }
+                            else {
+                                if (indexHint !== solution.length-1)
+                                    hint = `Try increasing weight ${indexHint + 1}.`;
+                                else
+                                    hint = this.getThresholdHoldText( 1);
+                            }
+                        }
 
-                        return [hint, indexHint, subset];
+                        return [hint, indexHint, subset, 0];
 
                     }
                     else {
                         //pick a random parameter
                         //in this case, need to keep track of which param we told them to change
-                        indexHint = Math.floor(Math.random() * subset.length);
+                        //indexHint = Math.floor(Math.random() * subset.length);
+                        indexHint = 1;
                         if (subset[indexHint] !== solution.length - 1)
                             hint =`Try changing weight ${subset[indexHint] + 1}.`;
                         else
-                            hint = `Try changing the threshold`;
+                            hint = this.getThresholdHoldText( 0);
 
-                        return [hint, subset[indexHint], subset];
+                        return [hint, subset[indexHint], subset, 0];
                     }
                 }
 
@@ -142,13 +185,17 @@ class HintProvider {
         hint = "This seems impossible, please double check the correctness of this problem."
         return [hint, -1, []];
     }
-    provideHint(prevHintIndex, prevSubset) {
+    provideHint(prevHintIndex, prevSubset, prevHintLevel) {
         let hint = "";
         let indexHint = "";
+        //first check if no change works
+        let sol = this.checkForSolution([]);
+        if (!sol.includes(Number.MIN_VALUE)) //solution present!
+            return ["This problem is solved, try choosing another problem.", -1, [], 0]
         //create subsets
         let subsets = this.getAllSubsets();
         if(prevHintIndex === -1) { //previous hint not relevant
-            return this.provideHintHelper(subsets);
+            return this.provideHintHelper(subsets, prevHintLevel);
         }
         else {
             //previous hint was at a particular weight/threshold
@@ -175,7 +222,7 @@ class HintProvider {
                     subsets.sort(function (a, b) {
                         return a.length - b.length;
                     });
-                    return this.provideHintHelper(subsets)
+                    return this.provideHintHelper(subsets, 1)
                 }
 
             }
@@ -188,15 +235,15 @@ class HintProvider {
                 if (prevHintIndex !== sol.length-1)
                     hint = `Try decreasing weight ${prevHintIndex + 1}.`;
                 else
-                    hint = `Try decreasing the threshold.`;
+                    hint = this.getThresholdHoldText( -1);
             }
             else {
                 if (prevHintIndex !== sol.length-1)
                     hint = `Try increasing weight ${prevHintIndex + 1}.`;
                 else
-                    hint = `Try increasing the threshold.`;
+                    hint = this.getThresholdHoldText( 1);
             }
-            return [hint, prevHintIndex, prevSubset]
+            return [hint, prevHintIndex, prevSubset, 1]
 
 
 

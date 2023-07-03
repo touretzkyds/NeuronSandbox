@@ -23,14 +23,14 @@
     <script src = "truth_table.js"></script>
 
     <script type="text/javascript">
-(function(window, document, dataLayerName, id) {
-window[dataLayerName]=window[dataLayerName]||[],window[dataLayerName].push({start:(new Date).getTime(),event:"stg.start"});var scripts=document.getElementsByTagName('script')[0],tags=document.createElement('script');
-function stgCreateCookie(a,b,c){var d="";if(c){var e=new Date;e.setTime(e.getTime()+24*c*60*60*1e3),d="; expires="+e.toUTCString();f="; SameSite=Strict"}document.cookie=a+"="+b+d+f+"; path=/"}
-var isStgDebug=(window.location.href.match("stg_debug")||document.cookie.match("stg_debug"))&&!window.location.href.match("stg_disable_debug");stgCreateCookie("stg_debug",isStgDebug?1:"",isStgDebug?14:-1);
-var qP=[];dataLayerName!=="dataLayer"&&qP.push("data_layer_name="+dataLayerName),isStgDebug&&qP.push("stg_debug");var qPString=qP.length>0?("?"+qP.join("&")):"";
-tags.async=!0,tags.src="https://touretzky.containers.piwik.pro/"+id+".js"+qPString,scripts.parentNode.insertBefore(tags,scripts);
-!function(a,n,i){a[n]=a[n]||{};for(var c=0;c<i.length;c++)!function(i){a[n][i]=a[n][i]||{},a[n][i].api=a[n][i].api||function(){var a=[].slice.call(arguments,0);"string"==typeof a[0]&&window[dataLayerName].push({event:n+"."+i+":"+a[0],parameters:[].slice.call(arguments,1)})}}(i[c])}(window,"ppms",["tm","cm"]);
-})(window, document, 'dataLayer', '2d77e53b-cd17-4d04-8bac-ee43f178bdb8');
+        (function(window, document, dataLayerName, id) {
+            window[dataLayerName]=window[dataLayerName]||[],window[dataLayerName].push({start:(new Date).getTime(),event:"stg.start"});var scripts=document.getElementsByTagName('script')[0],tags=document.createElement('script');
+            function stgCreateCookie(a,b,c){var d="";if(c){var e=new Date;e.setTime(e.getTime()+24*c*60*60*1e3),d="; expires="+e.toUTCString();f="; SameSite=Strict"}document.cookie=a+"="+b+d+f+"; path=/"}
+            var isStgDebug=(window.location.href.match("stg_debug")||document.cookie.match("stg_debug"))&&!window.location.href.match("stg_disable_debug");stgCreateCookie("stg_debug",isStgDebug?1:"",isStgDebug?14:-1);
+            var qP=[];dataLayerName!=="dataLayer"&&qP.push("data_layer_name="+dataLayerName),isStgDebug&&qP.push("stg_debug");var qPString=qP.length>0?("?"+qP.join("&")):"";
+            tags.async=!0,tags.src="https://touretzky.containers.piwik.pro/"+id+".js"+qPString,scripts.parentNode.insertBefore(tags,scripts);
+            !function(a,n,i){a[n]=a[n]||{};for(var c=0;c<i.length;c++)!function(i){a[n][i]=a[n][i]||{},a[n][i].api=a[n][i].api||function(){var a=[].slice.call(arguments,0);"string"==typeof a[0]&&window[dataLayerName].push({event:n+"."+i+":"+a[0],parameters:[].slice.call(arguments,1)})}}(i[c])}(window,"ppms",["tm","cm"]);
+        })(window, document, 'dataLayer', '2d77e53b-cd17-4d04-8bac-ee43f178bdb8');
     </script>
 
 
@@ -57,7 +57,7 @@ tags.async=!0,tags.src="https://touretzky.containers.piwik.pro/"+id+".js"+qPStri
                 <button class="dropbtn"><i class="fas fa-bars"></i> Menu</button>
                 <div class="dropdown-content">
                     <div class="button-group">
-                        <div class="menu-row-container">
+                        <div id="BinaryToggleBody" class="menu-row-container">
                             <label style="margin-right: 10px">Binary</label>
                             <label id="BinarySwitch" class="switch">
                                 <input type="checkbox" id="BinaryToggle">
@@ -85,10 +85,17 @@ tags.async=!0,tags.src="https://touretzky.containers.piwik.pro/"+id+".js"+qPStri
                                 <span class="slider round"></span>
                             </label>
                         </div>
-                        <div  class="menu-row-container">
+                        <div id="ShowDesiredToggleBody" class="menu-row-container">
                             <label style="margin-right: 10px">Show Desired</label>
                             <label class="switch" >
                                 <input type="checkbox" id="OutputToggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div id="ShowBiasToggleBody" class="menu-row-container">
+                            <label style="margin-right: 10px">Show Bias</label>
+                            <label class="switch" >
+                                <input type="checkbox" id="ShowBiasToggle">
                                 <span class="slider round"></span>
                             </label>
                         </div>
@@ -184,11 +191,12 @@ tags.async=!0,tags.src="https://touretzky.containers.piwik.pro/"+id+".js"+qPStri
             <th>
                 <div>
                     <div id="bias-toggle">
-                        <label style="margin-right: 10px">Bias</label>
+                        <label style="width: 70px">Threshold mode</label>
                         <label id="BiasSwitch" class="switch">
                             <input type="checkbox" id="biasToggle">
                             <span id="bias-slider" class="slider round"></span>
                         </label>
+                        <label style="width: 70px">Bias mode</label>
                     </div>
                 </div>
             </th>
@@ -296,7 +304,7 @@ tags.async=!0,tags.src="https://touretzky.containers.piwik.pro/"+id+".js"+qPStri
                             </svg>
                             <div id="bias-link-text" >
                                 <div id="bias-1" class="weight_label" style="z-index: 10" >
-                                    <text fill="black">w =</text>
+                                    <text fill="black">w<sub>0</sub> =</text>
                                     <text id='bias_weight' contenteditable="false" fill="black" class="weights">1</text>
                                 </div>
                             </div>
