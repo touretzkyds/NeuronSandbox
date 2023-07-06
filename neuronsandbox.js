@@ -3007,7 +3007,7 @@ async function provideHint() {
     prevSubset = hintArr[2];
     prevHintLevel = hintArr[3];
     let hintText = document.getElementById("hintText");
-    hintText.innerText = hintArr[0];
+    hintText.innerHTML = hintArr[0];
 
     display.outputLine.position()
     for (let i = 0; i < demo.weightLines.length; i++)

@@ -116,13 +116,13 @@ class hintprovider {
             }
             else if (this.parameters[paramIndex] > solution[paramIndex]) {
                 if (paramIndex !== solution.length-1)
-                    hint = `Try decreasing weight ${paramIndex + 1}.`;
+                    hint = `Try decreasing weight w<sub>${paramIndex + 1}</sub>.`;
                 else
                     hint = this.getThresholdHoldText( -1);
             }
             else {
                 if (paramIndex !== solution.length-1)
-                    hint = `Try increasing weight ${paramIndex + 1}.`;
+                    hint = `Try increasing weightw<sub>${paramIndex + 1}</sub>.`;
                 else
                     hint = this.getThresholdHoldText( 1);
             }
@@ -143,7 +143,7 @@ class hintprovider {
                         indexHint = subset[0]
                         if(prevHint === 0) {
                             if (indexHint !== solution.length - 1) {
-                                hint = `Try changing weight ${indexHint + 1}.`;
+                                hint = `Try changing weight w<sub>${indexHint + 1}</sub>.`;
                             }
                             else
                                 hint = this.getThresholdHoldText( 0);
@@ -151,13 +151,13 @@ class hintprovider {
                         else {
                             if (this.parameters[indexHint] > solution[indexHint]) {
                                 if (indexHint !== solution.length-1)
-                                    hint = `Try decreasing weight ${indexHint + 1}.`;
+                                    hint = `Try decreasing weight w<sub>${indexHint + 1}</sub>.`;
                                 else
                                     hint = this.getThresholdHoldText( -1);
                             }
                             else {
                                 if (indexHint !== solution.length-1)
-                                    hint = `Try increasing weight ${indexHint + 1}.`;
+                                    hint = `Try increasing weight w<sub>${indexHint + 1}</sub>.`;
                                 else
                                     hint = this.getThresholdHoldText( 1);
                             }
@@ -172,7 +172,7 @@ class hintprovider {
                         //indexHint = Math.floor(Math.random() * subset.length);
                         indexHint = 1;
                         if (subset[indexHint] !== solution.length - 1)
-                            hint =`Try changing weight ${subset[indexHint] + 1}.`;
+                            hint =`Try changing weight w<sub>${subset[indexHint] + 1}</sub>.`;
                         else
                             hint = this.getThresholdHoldText( 0);
 
@@ -233,13 +233,13 @@ class hintprovider {
             let correctValue = sol[prevHintIndex];
             if (this.parameters[prevHintIndex] > correctValue) {
                 if (prevHintIndex !== sol.length-1)
-                    hint = `Try decreasing weight ${prevHintIndex + 1}.`;
+                    hint = `Try decreasing weight w<sub>${prevHintIndex + 1}</sub>.`;
                 else
                     hint = this.getThresholdHoldText( -1);
             }
             else {
                 if (prevHintIndex !== sol.length-1)
-                    hint = `Try increasing weight ${prevHintIndex + 1}.`;
+                    hint = `Try increasing weight w<sub>${prevHintIndex + 1}</sub>.`;
                 else
                     hint = this.getThresholdHoldText( 1);
             }
