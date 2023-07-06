@@ -1019,14 +1019,14 @@ class Display {
                         if (imageKey in dictImageMapping) {
                             let image_src = localStorage.getItem(dictImageMapping[imageKey]);
                             if (image_src === null) {
-                                img.src = "1_image.svg";
+                                img.src = "media/1_image.svg";
                             }
                             else {
                                 img.src = image_src;
                             }
                         }
                         else {
-                            img.src = "1_image.svg";
+                            img.src = "media/1_image.svg";
                         }
                     }
                     else {
@@ -1035,14 +1035,14 @@ class Display {
                         if (imageKey in dictImageMapping) {
                             let image_src = localStorage.getItem(dictImageMapping[imageKey]);
                             if (image_src === null) {
-                                img.src = "0_image.svg";
+                                img.src = "media/0_image.svg";
                             }
                             else {
                                 img.src = image_src;
                             }
                         }
                         else {
-                            img.src = "0_image.svg";
+                            img.src = "media/0_image.svg";
                         }
                     }
                     img.width = 48;
@@ -1117,14 +1117,14 @@ class Display {
                         if (imageKey in dictImageMapping) {
                             let image_src = localStorage.getItem(dictImageMapping[imageKey]);
                             if (image_src === null) {
-                                img.src = "1_image.svg";
+                                img.src = "media/1_image.svg";
                             }
                             else {
                                 img.src = image_src;
                             }
                         }
                         else {
-                            img.src = "1_image.svg";
+                            img.src = "media/1_image.svg";
                         }
 
 
@@ -1135,14 +1135,14 @@ class Display {
                         if (imageKey in dictImageMapping) {
                             let image_src = localStorage.getItem(dictImageMapping[imageKey]);
                             if (image_src === null) {
-                                img.src = "0_image.svg";
+                                img.src = "media/0_image.svg";
                             }
                             else {
                                 img.src = image_src;
                             }
                         }
                         else {
-                            img.src = "0_image.svg";
+                            img.src = "media/0_image.svg";
                         }
                     }
                     img.width = 48;
@@ -1155,7 +1155,7 @@ class Display {
                         if (img.classList.contains("editable-border"))
                             img.classList.remove("editable-border")
                     }
-                    if(!(document.getElementById("DemoToggle").checked && (img.src.endsWith("0_image.svg") ||img.src.endsWith("1_image.svg")))) {
+                    if(!(document.getElementById("DemoToggle").checked && (img.src.endsWith("media/0_image.svg") ||img.src.endsWith("media/1_image.svg")))) {
                         textbox.appendChild(img);
                     }
                 }
@@ -1193,7 +1193,7 @@ class Display {
         const img = document.createElement("img");
         if(value == 1) {
             img.alt = "1_Image";
-            img.src = "1_image.svg";
+            img.src = "media/1_image.svg";
             img.style.visibility = "hidden";
 
             img.width = 48;
@@ -1204,7 +1204,7 @@ class Display {
         else if( value == 0) {
             img.alt = "0_Image";
             const imageKey = JSON.stringify({table_name: 'output-table', column: 2, value: img.alt});
-            img.src = "0_image.svg";
+            img.src = "media/0_image.svg";
             img.style.visibility = "hidden";
             img.width = 48;
             img.height = 48;
@@ -1585,7 +1585,7 @@ class Display {
             {
                 bias_value = "Bias";
             }
-            newCell.innerHTML = `<div class=\"bias-content\">${bias_value}</div>`;
+            newCell.innerHTML = `<div class=\"bias-content\"><span style="display: inline-flex">${bias_value}<img src="media/ground.png" height="33px" style="transform: translateX(30px);"></span></div>`;
         }
         //removes lines when not hovered
         demo.weightLines.forEach(line => line.remove());
@@ -2972,7 +2972,7 @@ async function provideHint() {
         editableList.push(false);
     }
     console.log(editableList)
-    let hintProvider = new HintProvider([...perceptron.weights].concat(perceptron.threshold), perceptron.inputData, desiredOutputs, editableList);
+    let hintProvider = new hintprovider([...perceptron.weights].concat(perceptron.threshold), perceptron.inputData, desiredOutputs, editableList);
     let hintArr = hintProvider.provideHint(prevHintIndex, prevSubset, prevHintLevel);
     prevHintIndex = hintArr[1];
     prevSubset = hintArr[2];
@@ -3065,7 +3065,7 @@ function hideCameraImages() {
     let images = document.querySelectorAll(`.myimage`);
     let editToggleChecked = document.getElementById("InputToggle").checked;
     images.forEach((image) => {
-        if(image.src.endsWith("1_image.svg") || image.src.endsWith("0_image.svg")) {
+        if(image.src.endsWith("media/1_image.svg") || image.src.endsWith("media/0_image.svg")) {
             if(findAncestorTable(image)?.id === "guess-output-table") {
                 image.visibility = "hidden";
             }

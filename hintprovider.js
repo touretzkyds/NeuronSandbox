@@ -1,4 +1,4 @@
-class HintProvider {
+class hintprovider {
     constructor(parameters, inputData, desiredOutput, editableList) {
         this.parameters = parameters; // includes weights + threshold at the end
         this.inputData = inputData; //input data
@@ -262,7 +262,7 @@ class HintProvider {
 // const desiredOutput = [0, 0, 0, 1]
 //
 //
-// const hintProvider = new HintProvider(parameters, inputData, desiredOutput, editableList);
+// const hintProvider = new Hintprovider(parameters, inputData, desiredOutput, editableList);
 // //const hintMessage = hintProvider.provideHint();
 // //let subsets = hintProvider.getAllSubsets()
 // //const sol = hintProvider.checkForSolution(subsets[4])
