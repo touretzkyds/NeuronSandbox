@@ -658,6 +658,7 @@ class Perceptron {
                 let text = document.getElementById("bias-text");
 
                 dataOp.makeEditable(text);
+
                 if(!image.classList.contains("edit-toggle-on")) {
                     image.classList.add("edit-toggle-on")
                 }
@@ -670,6 +671,34 @@ class Perceptron {
                 if(!text.classList.contains('weights')) {
                     text.classList.add('weights');
                 }
+
+                let weightButtonHandler = function () {
+                    if (image.classList.contains("edit-toggle-on")) {
+                        image.classList.add("edit-toggle-off");
+                        image.classList.remove("edit-toggle-on")
+                    }
+                    else {
+                        image.classList.remove("edit-toggle-off");
+                        image.classList.add("edit-toggle-on")
+                    }
+
+                    let editable = image.classList.contains("edit-toggle-on");
+                    text.contentEditable = editable;
+                    if (editable) {
+                        if (!text.classList.contains("weights")) {
+                            text.classList.add("weights");
+                        }
+                    }
+                    else {
+                        if (text.classList.contains("weights")) {
+                            text.classList.remove("weights");
+                        }
+                    }
+                    dataOp.makeEditable(text, editable);
+                };
+
+
+                image.onclick = weightButtonHandler;
 
                 let editToggle = document.getElementById("InputToggle");
                 let span = document.getElementById("bias-edit-toggle");
