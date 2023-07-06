@@ -642,6 +642,80 @@ class Perceptron {
             }
         }
     }
+    setBiasUI() {
+        const cell = document.getElementById("bias_weight");
+        if(document.getElementById("biasToggle").checked) {
+            document.getElementById("bias-link-text").style.display = "inline-block";
+
+            if (cell) {
+                cell.innerHTML = `<div padding="10px" id="bias-text">`+(-1)*perceptron.threshold + "" + `</div>`;
+                cell.innerHTML += `<span id="bias-edit-toggle" class="edit-toggle edit-toggle-on">
+                              <i class="fas fa-pencil-alt"></i>
+                              <i class="fas fa-lock"></i> </span>`
+                cell.style.background = "none";
+                let image = document.getElementById("bias-edit-toggle");
+                let thresholdToggle = document.getElementById("threshold_toggleBtn");
+                let text = document.getElementById("bias-text");
+
+                dataOp.makeEditable(text);
+                if(!image.classList.contains("edit-toggle-on")) {
+                    image.classList.add("edit-toggle-on")
+                }
+                if(image.classList.contains("edit-toggle-off")) {
+                    image.classList.remove("edit-toggle-off")
+                }
+                if(!text.classList.contains('weight-edit-text')) {
+                    text.classList.add('weight-edit-text');
+                }
+                if(!text.classList.contains('weights')) {
+                    text.classList.add('weights');
+                }
+
+                let editToggle = document.getElementById("InputToggle");
+                let span = document.getElementById("bias-edit-toggle");
+                if (span) {
+                    if (!editToggle.checked) {
+                        span.style.display = "none";
+                    } else {
+                        span.style.display = "inline-block";
+                    }
+                }
+                thresholdToggle.style.display = "none";
+            }
+            //we should set the threshold value to 0, and also make it not editable
+            const threshold = document.getElementById("th1");
+            threshold.innerText = 0;
+            threshold.contentEditable = false;
+            if (threshold.classList.contains("edit-handler"))
+                threshold.classList.remove("edit-handler");
+            if (threshold.classList.contains("editable-border"))
+                threshold.classList.remove("editable-border");
+            if (threshold.classList.contains("comment-editable-border"))
+                threshold.classList.remove("comment-editable-border");
+            threshold.style.background = 'none';
+        }
+        else {
+            document.getElementById("bias-link-text").style.display = "none";
+            const threshold = document.getElementById("th1");
+            threshold.innerText = perceptron.threshold;
+            if (demo.biasLine) {
+                demo.biasLine.remove();
+                demo.biasLine = null;
+            }
+            let thresholdToggle = document.getElementById("threshold_toggleBtn");
+            if (thresholdToggle.classList.contains("edit-toggle-on")) {
+                if (!threshold.classList.contains("editable-border"))
+                    threshold.classList.add("editable-border");
+                threshold.contentEditable = true;
+            }
+
+            let editToggle = document.getElementById("InputToggle");
+            if (editToggle.checked)
+                thresholdToggle.style.display = "inline-block";
+
+        }
+    }
+
     updateWeightsFromUI(){
         let childNodes = document.getElementById("input-link-text").childNodes;
         this.weightLabels = [];
@@ -675,23 +749,41 @@ class Perceptron {
     }
 
     updateThreshold(){
+        let biasMode = document.getElementById("biasToggle").checked;
         const cell = document.getElementById(`th${1}`);
-        let [parsedValue, isValid] = demo.stringToValidFloat(cell.innerHTML);
-        if(isValid) {
-            //check for leading zeroes
-            const regex = '^-?0+[0-9]+$';
-            if (new RegExp(regex).test(cell.innerHTML)) {
-                cell.innerHTML = parseInt(cell.innerHTML)
+        if(biasMode)
+        {
+            const biasCell = document.getElementById("bias_weight");
+            let [parsedValue, isValid] = demo.stringToValidFloat(biasCell.innerText);
+            if(isValid) {
+                //check for leading zeroes
+                const regex = '^-?0+[0-9]+$';
+                if (new RegExp(regex).test(biasCell.innerText)) {
+                    biasCell.innerText = parseInt(biasCell.innerText)
+                }
             }
+            biasCell.children[0].textContent = parsedValue.toString();
+            this.threshold = (-1) * parsedValue;
         }
-        if(!isValid) {
-            if(parsedValue > 0)
-                parsedValue = 1
-            else
-                parsedValue = 0
+        else
+        {
+            let [parsedValue, isValid] = demo.stringToValidFloat(cell.innerText);
+            if(isValid) {
+                //check for leading zeroes
+                const regex = '^-?0+[0-9]+$';
+                if (new RegExp(regex).test(cell.innerText)) {
+                    cell.innerText = parseInt(cell.innerText)
+                }
+            }
+            if(!isValid) {
+                if(parsedValue > 0)
+                    parsedValue = 1
+                else
+                    parsedValue = 0
+            }
+            cell.innerText = parsedValue.toString();
+            this.threshold = parsedValue;
         }
-        cell.innerText = parsedValue.toString();
-        this.threshold = parsedValue;
     }
 }
 
@@ -713,6 +805,7 @@ function checkAnswerCorrect() {
     let inputTable = document.getElementById("input-table")
     let outputTable = document.getElementById("output-table")
     let guessToggle = document.getElementById("DemoToggle")
+    let outputToggleChecked = document.getElementById("OutputToggle").checked
     let tableRows = outputTable.rows.length
     let isCorrect = true;
     if(!guessToggle.checked) {
@@ -722,7 +815,7 @@ function checkAnswerCorrect() {
             let cells = outputTable.rows.item(i).cells
             let output = cells.item(1).innerText;
             let desired = cells.item(2).innerText;
-            if (output !== desired) {
+            if (output !== desired && outputToggleChecked) {
                 //highlight the entire row
                 if(!row.classList.contains("red-border")) {
                     row.classList.add("red-border");
@@ -926,14 +1019,14 @@ class Display {
                         if (imageKey in dictImageMapping) {
                             let image_src = localStorage.getItem(dictImageMapping[imageKey]);
                             if (image_src === null) {
-                                img.src = "1_image.svg";
+                                img.src = "media/1_image.svg";
                             }
                             else {
                                 img.src = image_src;
                             }
                         }
                         else {
-                            img.src = "1_image.svg";
+                            img.src = "media/1_image.svg";
                         }
                     }
                     else {
@@ -942,14 +1035,14 @@ class Display {
                         if (imageKey in dictImageMapping) {
                             let image_src = localStorage.getItem(dictImageMapping[imageKey]);
                             if (image_src === null) {
-                                img.src = "0_image.svg";
+                                img.src = "media/0_image.svg";
                             }
                             else {
                                 img.src = image_src;
                             }
                         }
                         else {
-                            img.src = "0_image.svg";
+                            img.src = "media/0_image.svg";
                         }
                     }
                     img.width = 48;
@@ -973,6 +1066,12 @@ class Display {
         {
             hideCameraImages();
         }
+    }
+
+    updateHintButton()
+    {
+        const hintButton = document.getElementById("hintButton");
+        hintButton.style.display = !document.getElementById("DemoToggle").checked? "inline-block" : "none";
     }
 
     createInputTableEditBorder() {
@@ -1018,14 +1117,14 @@ class Display {
                         if (imageKey in dictImageMapping) {
                             let image_src = localStorage.getItem(dictImageMapping[imageKey]);
                             if (image_src === null) {
-                                img.src = "1_image.svg";
+                                img.src = "media/1_image.svg";
                             }
                             else {
                                 img.src = image_src;
                             }
                         }
                         else {
-                            img.src = "1_image.svg";
+                            img.src = "media/1_image.svg";
                         }
 
 
@@ -1036,14 +1135,14 @@ class Display {
                         if (imageKey in dictImageMapping) {
                             let image_src = localStorage.getItem(dictImageMapping[imageKey]);
                             if (image_src === null) {
-                                img.src = "0_image.svg";
+                                img.src = "media/0_image.svg";
                             }
                             else {
                                 img.src = image_src;
                             }
                         }
                         else {
-                            img.src = "0_image.svg";
+                            img.src = "media/0_image.svg";
                         }
                     }
                     img.width = 48;
@@ -1056,7 +1155,7 @@ class Display {
                         if (img.classList.contains("editable-border"))
                             img.classList.remove("editable-border")
                     }
-                    if(!(document.getElementById("DemoToggle").checked && (img.src.endsWith("0_image.svg") ||img.src.endsWith("1_image.svg")))) {
+                    if(!(document.getElementById("DemoToggle").checked && (img.src.endsWith("media/0_image.svg") ||img.src.endsWith("media/1_image.svg")))) {
                         textbox.appendChild(img);
                     }
                 }
@@ -1094,7 +1193,7 @@ class Display {
         const img = document.createElement("img");
         if(value == 1) {
             img.alt = "1_Image";
-            img.src = "1_image.svg";
+            img.src = "media/1_image.svg";
             img.style.visibility = "hidden";
 
             img.width = 48;
@@ -1105,7 +1204,7 @@ class Display {
         else if( value == 0) {
             img.alt = "0_Image";
             const imageKey = JSON.stringify({table_name: 'output-table', column: 2, value: img.alt});
-            img.src = "0_image.svg";
+            img.src = "media/0_image.svg";
             img.style.visibility = "hidden";
             img.width = 48;
             img.height = 48;
@@ -1327,6 +1426,9 @@ class Display {
                     {
                         demo.weightLines[i].position();
                     }
+                    if (demo.biasLine) {
+                        demo.biasLine.position();
+                    }
                 }
                 else {
                     document.getElementById("congrats-msg").hidden = true;
@@ -1334,6 +1436,9 @@ class Display {
                     for (let i = 0; i < demo.weightLines.length; i++)
                     {
                         demo.weightLines[i].position();
+                    }
+                    if (demo.biasLine) {
+                        demo.biasLine.position();
                     }
                 }
 
@@ -1345,6 +1450,9 @@ class Display {
                     for (let i = 0; i < demo.weightLines.length; i++)
                     {
                         demo.weightLines[i].position();
+                    }
+                    if (demo.biasLine) {
+                        demo.biasLine.position();
                     }
 
                 }
@@ -1401,12 +1509,20 @@ class Display {
                     newFontSize = 30;
                 }
                 else {
-                    newFontSize = 40 - (length-10)
+                    newFontSize = 40 - (length-10)*1.2
                 }
+
             }
             const selections = document.getElementById("selected-inputs");
-            if(selections.rows[c-1] && selections.rows[c-1].cells[0] )
-                selections.rows[c-1].cells[0].style.fontSize = newFontSize + "px"
+            if (!document.getElementById("biasToggle").checked) {
+                if(selections.rows[c-1] && selections.rows[c-1].cells[0] )
+                    selections.rows[c-1].cells[0].style.fontSize = newFontSize + "px"
+            }
+            else {
+                if(selections.rows[c] && selections.rows[c].cells[0] )
+                    selections.rows[c].cells[0].style.fontSize = newFontSize + "px"
+            }
+
         }
 
         for (let i = 0; i < demo.weightLines.length; i++)
@@ -1459,12 +1575,24 @@ class Display {
             //newCell.innerHTML = `<div class=\"input-content\">${demo.selectedInput[i]}</div>`;
             newCell.innerHTML = `<div class=\"input-content\">${demo.selectedInput[i]}</div>`;
         }
+        if(document.getElementById("biasToggle").checked)
+        {
+            let newRow = selections.insertRow(0);
+            let newCell = newRow.insertCell(0);
+
+            let bias_value = 1;
+            if(typeof demo.selectedInput[0] === "string")
+            {
+                bias_value = "Bias";
+            }
+            newCell.innerHTML = `<div class=\"bias-content\"><span style="display: inline-flex">${bias_value}<img src="media/ground.png" height="33px" style="transform: translateX(30px);"></span></div>`;
+        }
         //removes lines when not hovered
         demo.weightLines.forEach(line => line.remove());
         //empties lines array
         demo.weightLines = []
 
-        const length = demo.selectedInput.length
+        const length = document.getElementById("biasToggle").checked ? demo.selectedInput.length + 1 : demo.selectedInput.length
 
         //percentage values for weight lines for x-axis
         let percentsX = []
@@ -1524,13 +1652,42 @@ class Display {
         let weight_labels = document.getElementById("input-link-text").children;
 
         //TODO: x values should also be variable
+        if(document.getElementById('biasToggle').checked)
+        {
+            if(demo.biasLine) {
+                demo.biasLine.remove()
+                demo.biasLine = null;
+            }
+            demo.biasLine = new LeaderLine(
+                LeaderLine.pointAnchor(selections.rows[0].cells[0], {x: '110%', y: '50%'}),
+                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {
+                    x: 6 + percentsX[0] + '%',
+                    y: percentsY[0] + '%'
+                })
+            );
+            demo.biasLine.path = "straight";
+            demo.biasLine.color = 'black';
+        }
+        else {
+            if (demo.biasLine) {
+                demo.biasLine.remove()
+                demo.biasLine = null;
+            }
+        }
+
         for (let i = 0; i < demo.selectedInput.length; i++) {
-            let xposition = 6+ percentsX[i]
+
             // if(i !== 0 && i !== demo.selectedInput.length-1)
             //     xposition = 3;
+            let real_i = i;
+            if(document.getElementById('biasToggle').checked)
+            {
+                real_i += 1;
+            }
+            let xposition = 6+ percentsX[real_i];
             demo.weightLines[i] = new LeaderLine(
-                LeaderLine.pointAnchor(selections.rows[i].cells[0], {x: '110%', y: '50%'}),
-                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: xposition+'%', y: percentsY[i]+'%'})
+                LeaderLine.pointAnchor(selections.rows[real_i].cells[0], {x: '110%', y: '50%'}),
+                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: xposition+'%', y: percentsY[real_i]+'%'})
             );
 
             let splitup = weight_labels[i].children[1].textContent.split(" ")
@@ -1683,23 +1840,27 @@ class Display {
         //empties lines array
         demo.lines = []
 
+
         const selections = document.getElementById("selected-inputs");
         //demo.selectedInput = demo.inputData[rowIdx];
         //demo.selectedOutput = perceptron.outputData[rowIdx];
-        for (let r=0; r<selections.rows.length; r++) {
+        for (let r=0; r<demo.selectedInput.length; r++) {
+            let real_r = r;
+            if(document.getElementById("biasToggle").checked)
+            {
+                real_r += 1;
+            }
             if (this.hovering) {
-                selections.rows[r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</div>`;
-                //console.log(demo.selectedInput[r])
-                //draws line
+                selections.rows[real_r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</div>`;
                 demo.lines[r] = new LeaderLine(
                     LeaderLine.pointAnchor(inputRow.children[r+1], {x: '70%', y: '50%'}),
-                    LeaderLine.pointAnchor(selections.rows[r].cells[0], {x: '10%', y: '50%'}),
+                    LeaderLine.pointAnchor(selections.rows[real_r].cells[0], {x: '10%', y: '50%'}),
                     {dash: {animation: true}}
                 );
                 demo.lines[r].setOptions({startSocket: 'right', endSocket: 'left'});
             }
             else {
-                selections.rows[r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</div>`;
+                selections.rows[real_r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</div>`;
             }
         }
         display.alignTables()
@@ -1856,6 +2017,9 @@ class Display {
         let checkbox = document.getElementById("InputToggle");
         let checkboxBinary = document.getElementById(("BinaryToggle"));
         let checkboxDemo = document.getElementById("DemoToggle")
+        // checkboxBinary.style.display = checkbox.checked? "inline-block" : "none";
+        // document.getElementById("OutputToggle").style.display =  checkbox.checked? "inline-block" : "none";
+
         //display.createOutputTableColors();
         this.updateSelectedInput();
         if (!checkbox.checked || checkboxDemo.checked) {
@@ -1873,6 +2037,10 @@ class Display {
             document.getElementById("output-table").style.marginTop = "0px";
             document.getElementById("guess-output-table").style.marginTop = "0px";
             document.getElementById("AutoProgressToggleBody").style.display = "none";
+            document.getElementById("BinaryToggleBody").style.display= "none";
+            document.getElementById("ShowDesiredToggleBody").style.display= "none";
+            document.getElementById("ShowBiasToggleBody").style.display= "none";
+            //document.getElementById("difficultySlide").style.display = "none";
         } else {
             $("#input-table tr:first").show();
             $("#input-table tr td:nth-child(1)").show();
@@ -1888,13 +2056,29 @@ class Display {
             document.getElementById("output-table").style.marginTop = "40px";
             document.getElementById("guess-output-table").style.marginTop = "40px";
             document.getElementById("AutoProgressToggleBody").style.display = "flex";
+            document.getElementById("BinaryToggleBody").style.display= "flex";
+            document.getElementById("ShowDesiredToggleBody").style.display= "flex";
+            document.getElementById("ShowBiasToggleBody").style.display= "flex";
+            //document.getElementById("difficultySlide").style.display = "flex";
         }
 
         for (let i = 0; i < demo.weightLines.length; i++) {
             demo.weightLines[i].position();
         }
+        // if (demo.biasLine ) {
+        //     demo.biasLine.position();
+        // }
         this.UpdateOutputToggle()
+        this.UpdateShowBiasToggle();
+    }
 
+    UpdateShowBiasToggle () {
+        if(document.getElementById("ShowBiasToggle").checked) {
+            document.getElementById("bias-toggle").style.display = "flex";
+        }
+        else {
+            document.getElementById("bias-toggle").style.display = "none";
+        }
     }
 
     UpdateOutputToggle() {
@@ -1920,6 +2104,9 @@ class Display {
         for (let i = 0; i < demo.weightLines.length; i++) {
             demo.weightLines[i].position();
         }
+        // if (demo.biasLine) {
+        //     demo.biasLine.position();
+        // }
 
         display.outputLine.position();
         display.createOutputTableEditBorder();
@@ -1947,14 +2134,17 @@ class Display {
     }
 
     UpdateDemoToggle() {
+        let hintText = document.getElementById("hintText");
         let checkbox = document.getElementById("DemoToggle");
-        const otherHeaders = document.querySelectorAll('.top-table th:not(:first-child):not(:nth-child(2))');
+        const otherHeaders = document.querySelectorAll('.top-table th:not(:first-child):not(:nth-child(2)):not(:last-child)');
         if (checkbox.checked) {
+            hintText.hidden = true;
             document.getElementById("guess-output-container").style.display = "inline-block";
 
             document.getElementById("CheckAnswerBtn").style.display = "inline-block";
             document.getElementById("network-container").style.display = "none";
             document.getElementById("output-container").style.display = "none";
+            document.getElementById("bias-toggle").style.display = "none";
             otherHeaders.forEach(header => {
                 header.hidden = true;
             });
@@ -1964,10 +2154,12 @@ class Display {
             });
         }
         else {
+            hintText.hidden = false;
             document.getElementById("guess-output-container").style.display = "none";
             document.getElementById("CheckAnswerBtn").style.display = "none";
             document.getElementById("network-container").style.display = "inline-flex";
             document.getElementById("output-container").style.display = "inline-flex";
+            document.getElementById("bias-toggle").style.display = "inline-flex";
             //document.getElementById("edit-menu-section").style.display = "inline-block";
             otherHeaders.forEach(header => {
                 header.hidden = false;
@@ -1985,7 +2177,24 @@ class Display {
         demo.adjustWeightPlacement();
         FixCheckAnswerButtonPosition();
         display.createInputTableEditBorder();
+        display.updateHintButton();
 
+        //reposition lines
+        for (let i = 0; i < demo.weightLines.length; i++) {
+            demo.weightLines[i].position();
+        }
+        if (demo.biasLine && !document.getElementById("DemoToggle").checked) {
+            demo.biasLine.position();
+        }
+        display.outputLine.position()
+
+    }
+
+    updateBiasToggle()
+    {
+        perceptron.setBiasUI();
+        display.updateSelectedInput();
+        demo.adjustWeightPlacement();
     }
 
     UpdateFanfareToggle() {
@@ -2041,7 +2250,6 @@ class Display {
             }
             dataOp.makeEditable(desired.firstChild, editable);
         }
-        //console.log("parsed: " + parsedValue);
         if (parsedValue !== 1 && parsedValue !== 0 ) {
             isValid = false;
         }
@@ -2139,6 +2347,7 @@ class Demo {
         this.selectedOutput = this.defaultSelectedOutput;
         this.lines = [];
         this.weightLines = [];
+        this.biasLine = null;
         this.desiredOutput = [0, 0, 0, 0];
     }
 
@@ -2308,15 +2517,26 @@ class Demo {
         let selections = document.getElementById("selected-inputs");
         let weights = document.getElementById("input-link-text");
         let dimensions = weights.getBoundingClientRect()
-        console.log("children:" + weights.children.length);
 
-        let length = weights.children.length
+        let weightsList = []
+        for (let i = 0; i < weights.children.length; i++) {
+            weightsList.push(weights.children[i])
+        }
+
+        let biasToggleChecked = document.getElementById("biasToggle").checked
+        if (biasToggleChecked) {
+            let biasCell = document.getElementById(`bias-1`);
+            weightsList.unshift(biasCell)
+        }
+
+        let length = weightsList.length
+
         if(length === 2) {
             for(let i = 0; i < length; i++) {
                 let elem = selections.rows[i].cells[0];
                 let rect = elem.getBoundingClientRect();
 
-                let weight = weights.children[i];
+                let weight = weightsList[i];
                 let height = elem.offsetHeight;
                 weight.style.position = "absolute";
                 if(i === 1) {
@@ -2327,7 +2547,6 @@ class Demo {
                     weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
                     weight.style.top = (rect.top + height/3 - dimensions.top) +'px';
                 }
-                console.log("final: ",i, weight.style.left, weight.style.top)
 
             }
         }
@@ -2336,12 +2555,12 @@ class Demo {
                 let elem = selections.rows[i].cells[0];
                 let rect = elem.getBoundingClientRect();
 
-                let weight = weights.children[i];
+                let weight = weightsList[i];
                 let height = rect.height;
                 weight.style.position = "absolute";
                 if(i === 1) {
                     weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
-                    if(height < 200)
+                    if(height < 150)
                         weight.style.top = (rect.top - dimensions.top - height/10) +'px';
                     else
                         weight.style.top = (rect.top - dimensions.top + height/5) +'px';
@@ -2354,7 +2573,6 @@ class Demo {
                     weight.style.left = (rect.left - dimensions.left)*0.025 +'px';
                     weight.style.top = (rect.top - dimensions.top + height/3) +'px';
                 }
-                console.log("final: ",i, weight.style.left, weight.style.top)
 
             }
         }
@@ -2363,7 +2581,7 @@ class Demo {
                 let elem = selections.rows[i].cells[0];
                 let rect = elem.getBoundingClientRect();
 
-                let weight = weights.children[i];
+                let weight = weightsList[i];
                 let height = rect.height;
                 weight.style.position = "absolute";
                 if(i === 1) {
@@ -2381,7 +2599,6 @@ class Demo {
                     weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
                     weight.style.top = (rect.top - dimensions.top + height/3) +'px';
                 }
-                console.log("final: ",i, weight.style.left, weight.style.top)
 
             }
         }
@@ -2390,7 +2607,7 @@ class Demo {
                 let elem = selections.rows[i].cells[0];
                 let rect = elem.getBoundingClientRect();
 
-                let weight = weights.children[i];
+                let weight = weightsList[i];
                 let height = rect.height;
                 weight.style.position = "absolute";
                 if(i === 1) {
@@ -2405,7 +2622,6 @@ class Demo {
                     weight.style.left = (rect.left - dimensions.left)*0.05 +'px';
                     weight.style.top = (rect.top - dimensions.top + height/3) +'px';
                 }
-                console.log("final: ",i, weight.style.left, weight.style.top)
 
             }
         }
@@ -2486,7 +2702,6 @@ class Demo {
         else {
             this.mode = "binary";
         }
-        //console.log('mode set as', this.mode)
     }
 
     // update entire demo
@@ -2536,6 +2751,7 @@ class Demo {
         demo.adjustWeightPlacement();
         display.saveGuessComment();
         display.createGuessTable();
+        display.updateHintButton();
 
     }
 
@@ -2557,15 +2773,11 @@ async function downloadFile() {
     let inputToggleChecked=document.getElementById("InputToggle").checked;
     let outputToggleChecked=document.getElementById("OutputToggle").checked;
     let fanfareToggleChecked = document.getElementById("FanfareToggle").checked;
-    //console.log("in download: "+  demo.inputData);
-    // let headerRows = [];
-    // display.getHeaderRowVals(headerRows);
 
     let headerRowVariables = [];
     display.getHeaderRowVariables(headerRowVariables);
 
     let modelname = document.getElementById("fname").innerText
-    //if(modelname.length == 0)  modelname = "model"
 
     const handle = await showSaveFilePicker({
         suggestedName: modelname + '.sandbox',
@@ -2576,12 +2788,10 @@ async function downloadFile() {
     });
 
     let table = document.getElementById("output-table");
-    //console.log(table);
     for (let i = 1; i < table.rows.length; i++ ) {
         let tr = table.rows[i];
         let td = tr.cells[2];
         desiredOutputs.data[i-1] = td.innerText;
-        //console.log("desired output: " + desiredOutputs.data[i-1]);
     }
     desiredOutputs.rows = table.rows.length-1;
 
@@ -2595,7 +2805,7 @@ async function downloadFile() {
     //let thresholdToggleChecked = document.getElementById("checkbox_threshold_editable").checked;
     let thresholdToggleChecked = document.getElementById("threshold_toggleBtn").classList.contains("edit-toggle-on");
     let guessToggleChecked = document.getElementById("DemoToggle").checked;
-
+    //let difficultyLevel = document.getElementById("difficulty_slide").value;
     const editToggle = document.getElementById("InputToggle").checked;
     let question = "";
     if (editToggle) {
@@ -2619,6 +2829,7 @@ async function downloadFile() {
         "input-header-vars" : headerRowVariables,
         "binaryToggleChecked" : binaryToggleChecked,
         "guessToggleChecked" : guessToggleChecked,
+        //"difficultyLevel": difficultyLevel,
         "question" : question
         //"input-header": headerRows,
     };
@@ -2730,6 +2941,57 @@ async function uploadFileComputer(event) {
     fileInput.click();
 }
 
+async function provideHint() {
+    //get all the input
+
+    //dataOp.updateDataFromTableNoDisplay(outputs, outputTable);
+    //let desiredOutputs = perceptron.outputData.map(row => row[row.length - 1]);
+    let desiredOutputs = []
+    let outputTable = document.getElementById("output-table")
+    for (let i = 1; i < outputTable.rows.length; i++) {
+        desiredOutputs.push(parseInt(outputTable.rows[i].cells[2].innerText));
+    }
+    const thresholdToggleBtn = document.getElementById(`threshold_toggleBtn`);
+
+    let editableList  = [];
+
+    let weight_parent = document.getElementById(`input-link-text`);
+    let weight_lebels = weight_parent.querySelectorAll('span.edit-toggle');
+    for( let i = 0; i < weight_lebels.length; i++) {
+        let weight_label = weight_lebels[i];
+        if (weight_label.classList.contains("edit-toggle-on")) {
+            editableList.push(true);
+        }
+        else {
+            editableList.push(false);
+        }
+    }
+
+    //threshold
+    if (thresholdToggleBtn.classList.contains("edit-toggle-on")) {
+        editableList.push(true);
+    }
+    else {
+        editableList.push(false);
+    }
+    console.log(editableList)
+    let hintProvider = new hintprovider([...perceptron.weights].concat(perceptron.threshold), perceptron.inputData, desiredOutputs, editableList);
+    let hintArr = hintProvider.provideHint(prevHintIndex, prevSubset, prevHintLevel);
+    prevHintIndex = hintArr[1];
+    prevSubset = hintArr[2];
+    prevHintLevel = hintArr[3];
+    let hintText = document.getElementById("hintText");
+    hintText.innerText = hintArr[0];
+
+    display.outputLine.position()
+    for (let i = 0; i < demo.weightLines.length; i++)
+    {
+        demo.weightLines[i].position();
+    }
+    if (demo.biasLine) {
+        demo.biasLine.position();
+    }
+}
 function addEditOption(c) {
     //cannot use getElementById since it is not accurate
     let weight_parent = document.getElementById(`input-link-text`);
@@ -2806,7 +3068,7 @@ function hideCameraImages() {
     let images = document.querySelectorAll(`.myimage`);
     let editToggleChecked = document.getElementById("InputToggle").checked;
     images.forEach((image) => {
-        if(image.src.endsWith("1_image.svg") || image.src.endsWith("0_image.svg")) {
+        if(image.src.endsWith("media/1_image.svg") || image.src.endsWith("media/0_image.svg")) {
             if(findAncestorTable(image)?.id === "guess-output-table") {
                 image.visibility = "hidden";
             }
@@ -2971,6 +3233,9 @@ function uploadJson(text) {
     document.getElementById("questionprompt").hidden = true;
     document.getElementById("questiontext").hidden = false;
 
+    document.getElementById("biasToggle").checked = false;
+    document.getElementById("hintText").innerText = "";
+
 
 
     inputs = new Data(demo.inputData);
@@ -3019,6 +3284,7 @@ function uploadJson(text) {
     document.getElementById("FanfareToggle").checked = dict["fanfare-toggle-checked"];
 
     document.getElementById("DemoToggle").checked = dict["guessToggleChecked"];
+    //document.getElementById("difficulty_slide").value = dict["difficultyLevel"];
     display.UpdateDemoToggle();
 
     display.handleHoverExit();
@@ -3046,11 +3312,12 @@ function uploadJson(text) {
         display.checkDesiredOutput(output, desired);
     }
     display.handleHoverExit();
-
+    display.updateBiasToggle();
     display.outputLine.position();
     display.createInputTableEditBorder();
     display.createOutputTableEditBorder();
     display.alignTables();
+
 
     if (document.getElementById('OutputToggle').checked)
         demo.hasNoSolution()
@@ -3080,6 +3347,11 @@ function uploadJson(text) {
     handleDesiredOutputColumn();
     document.getElementById("DemoToggle").dispatchEvent(new Event("click"));
     isLoading = false;
+    perceptron.setBiasUI();
+
+    prevHintLevel = 0;
+    prevHintIndex = -1;
+    prevSubset = [];
 }
 
 async function uploadFile(event) {
@@ -3211,7 +3483,7 @@ perceptron.displayPerceptron();
 const display = new Display();
 display.updateDisplay();
 //uploadFromUrl("SampleModel.json");
-uploadFromZipUrl("Problem 1.sandbox", true);
+uploadFromZipUrl("problems/Problem 1.sandbox", true);
 display.createOutputTableColors();
 display.createInputTableEditBorder();
 display.createOutputTableEditBorder();
@@ -3222,7 +3494,11 @@ document.getElementById("DemoToggle").checked = true;
 display.UpdateDemoToggle();
 document.getElementById("AutoProgressToggle").checked = true;
 
-const problemNum = 16;
+const problemNum = 8;
+
+let prevHintIndex = -1;
+let prevSubset = [];
+let prevHintLevel = 0;
 
 function addTooltips()
 {
@@ -3267,7 +3543,11 @@ $('#InputToggle').change(function() { //toggle edit
     for (let i = 0; i < demo.weightLines.length; i++) {
         demo.weightLines[i].position();
     }
+    if (demo.biasLine && !document.getElementById("DemoToggle").checked) {
+        demo.biasLine.position();
+    }
     display.outputLine.position()
+    display.updateBiasToggle()
 });
 
 $('#OutputToggle').change(function() { //toggle output
@@ -3277,6 +3557,11 @@ $('#OutputToggle').change(function() { //toggle output
     demo.hasNoSolution();
 });
 
+$('#ShowBiasToggle').change(function() { //toggle output
+    display.UpdateShowBiasToggle();
+});
+
+
 $('#BinaryToggle').change(function() { //toggle output
     display.UpdateBinaryToggle(false);
     display.outputLine.position();
@@ -3284,6 +3569,10 @@ $('#BinaryToggle').change(function() { //toggle output
 
 $('#DemoToggle').change(function() { //toggle output
     display.UpdateDemoToggle();
+});
+
+$('#biasToggle').change(function() { //toggle bias
+    display.updateBiasToggle();
 });
 
 function PlayHooraySound() {
@@ -3325,6 +3614,9 @@ $('#FanfareToggle').change(function() { //toggle output
     for (let i = 0; i < demo.weightLines.length; i++)
     {
         demo.weightLines[i].position();
+    }
+    if (demo.biasLine && !$('#DemoToggle').checked) {
+        demo.biasLine.position();
     }
 });
 
@@ -3430,15 +3722,17 @@ function loadQuestionsAndModels() {
             });
             dropdown.addEventListener('change', event => {
                 const selectedItemId = event.target.value;
-                console.log(`User selected item with ID ${selectedItemId}`);
+                //console.log(`User selected item with ID ${selectedItemId}`);
                 data.items.forEach(item => {
                     if (item.id.toString() === selectedItemId) {
-                        console.log(`Selected item: ${JSON.stringify(item)}`);
+                        //console.log(`Selected item: ${JSON.stringify(item)}`);
                         //const questiontext = document.getElementById("questiontext");
                         //questiontext.innerText = item.question;
                         //load the model associated with the question
-                        if (fileExists(item.model_name+".sandbox")) {
-                            uploadFromZipUrl(encodeURIComponent(item.model_name+".sandbox"), true);
+                        let filePath = "problems/" + item.model_name+".sandbox"
+                        if (fileExists(filePath)) {
+                            console.log("filePath = ", encodeURIComponent(filePath));
+                            uploadFromZipUrl(encodeURIComponent(filePath), true);
 
                         }
                     }
@@ -3448,7 +3742,7 @@ function loadQuestionsAndModels() {
 }
 
 function goToAboutPage() {
-    window.open('about.html', '_blank');
+    location.href = 'about.html';
 }
 
 function FixCheckAnswerButtonPosition() {
