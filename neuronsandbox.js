@@ -3508,7 +3508,7 @@ perceptron.displayPerceptron();
 const display = new Display();
 display.updateDisplay();
 //uploadFromUrl("SampleModel.json");
-uploadFromZipUrl("problems/Problem 1.sandbox", true);
+uploadFromZipUrl(encodeURI("problems/Problem 1.sandbox"), true);
 display.createOutputTableColors();
 display.createInputTableEditBorder();
 display.createOutputTableEditBorder();
@@ -3756,8 +3756,8 @@ function loadQuestionsAndModels() {
                         //load the model associated with the question
                         let filePath = "problems/" + item.model_name+".sandbox"
                         if (fileExists(filePath)) {
-                            console.log("filePath = ", encodeURIComponent(filePath));
-                            uploadFromZipUrl(encodeURIComponent(filePath), true);
+                            console.log("filePath = ", encodeURI(filePath));
+                            uploadFromZipUrl(encodeURI(filePath), true);
 
                         }
                     }
