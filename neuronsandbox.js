@@ -3700,7 +3700,7 @@ function handleDesiredOutputColumn() {
 }
 function fileExists(url) {
     let http = new XMLHttpRequest();
-    http.open('HEAD', encodeURIComponent(url), false);
+    http.open('HEAD', encodeURI(url), false);
     http.send();
     return http.status !== 404;
 }
@@ -3727,8 +3727,7 @@ function loadQuestionsAndModels() {
                         //load the model associated with the question
                         let filePath = "problems/" + item.model_name+".sandbox"
                         if (fileExists(filePath)) {
-                            console.log("filePath = ", encodeURIComponent(filePath));
-                            uploadFromZipUrl(encodeURIComponent(filePath), true);
+                            uploadFromZipUrl(encodeURI(filePath), true);
 
                         }
                     }
