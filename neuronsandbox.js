@@ -3675,6 +3675,10 @@ $('#FanfareToggle').change(function() { //toggle output
     }
 });
 
+$('#difficulty_slide').change(function() {
+    $('#difficulty_level').text("Level: " + $('#difficulty_slide').val());
+});
+
 function showMenu(event, img, col, row, table) {
     if (document.getElementById("InputToggle").checked) {
         currentImage = img;
