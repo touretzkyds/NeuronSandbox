@@ -691,10 +691,15 @@ class Perceptron {
                     if (image.classList.contains("edit-toggle-on")) {
                         image.classList.add("edit-toggle-off");
                         image.classList.remove("edit-toggle-on")
+                        thresholdToggle.classList.add("edit-toggle-off");
+                        thresholdToggle.classList.remove("edit-toggle-on")
+
                     }
                     else {
                         image.classList.remove("edit-toggle-off");
                         image.classList.add("edit-toggle-on")
+                        thresholdToggle.classList.remove("edit-toggle-off");
+                        thresholdToggle.classList.add("edit-toggle-on")
                     }
 
                     let editable = image.classList.contains("edit-toggle-on");
@@ -747,10 +752,24 @@ class Perceptron {
                 demo.biasLine = null;
             }
             let thresholdToggle = document.getElementById("threshold_toggleBtn");
+            let image = document.getElementById("bias-edit-toggle");
             if (thresholdToggle.classList.contains("edit-toggle-on")) {
                 if (!threshold.classList.contains("editable-border"))
                     threshold.classList.add("editable-border");
+                if (thresholdToggle.classList.contains("edit-toggle-off"))
+                    thresholdToggle.classList.remove("edit-toggle-off")
+                if (!thresholdToggle.classList.contains("edit-toggle-on"))
+                    thresholdToggle.classList.add("edit-toggle-on")
                 threshold.contentEditable = true;
+            }
+            else {
+                if (threshold.classList.contains("editable-border"))
+                    threshold.classList.remove("editable-border");
+                if (!thresholdToggle.classList.contains("edit-toggle-off"))
+                    thresholdToggle.classList.add("edit-toggle-off")
+                if (thresholdToggle.classList.contains("edit-toggle-on"))
+                    thresholdToggle.classList.remove("edit-toggle-on")
+                threshold.contentEditable = false;
             }
 
             let editToggle = document.getElementById("InputToggle");
