@@ -657,14 +657,29 @@ class Perceptron {
                 let thresholdToggle = document.getElementById("threshold_toggleBtn");
                 let text = document.getElementById("bias-text");
 
-                dataOp.makeEditable(text);
 
-                if(!image.classList.contains("edit-toggle-on")) {
-                    image.classList.add("edit-toggle-on")
+                if (thresholdToggle.classList.contains("edit-toggle-on")) {
+                    if(!image.classList.contains("edit-toggle-on")) {
+                        image.classList.add("edit-toggle-on");
+                    }
+                    if(image.classList.contains("edit-toggle-off")) {
+                        image.classList.remove("edit-toggle-off");
+                    }
+                    dataOp.makeEditable(text);
+
                 }
-                if(image.classList.contains("edit-toggle-off")) {
-                    image.classList.remove("edit-toggle-off")
+                else {
+                    if(image.classList.contains("edit-toggle-on")) {
+                        image.classList.remove("edit-toggle-on");
+                    }
+                    if(!image.classList.contains("edit-toggle-off")) {
+                        image.classList.add("edit-toggle-off");
+                    }
+                    dataOp.makeEditable(text, false);
+                    text.style.background = "none";
+
                 }
+
                 if(!text.classList.contains('weight-edit-text')) {
                     text.classList.add('weight-edit-text');
                 }
@@ -1534,11 +1549,10 @@ class Display {
                 if (length <= 10) {
                     newFontSize = 40;
                 }
-                else if (length >= 30){
-                    newFontSize = 30;
-                }
                 else {
-                    newFontSize = 40 - (length-10)*1.2
+                    newFontSize = 40 - (length-10);
+                    if (newFontSize < 20)
+                        newFontSize = 20;
                 }
 
             }
@@ -3006,8 +3020,20 @@ async function provideHint() {
     prevHintIndex = hintArr[1];
     prevSubset = hintArr[2];
     prevHintLevel = hintArr[3];
+    let hintIndex = hintArr[4];
     let hintText = document.getElementById("hintText");
-    hintText.innerHTML = hintArr[0];
+    let weightHolder = document.getElementById("input-link-text");
+    let weightName = "";
+    if (hintIndex < weightHolder.children.length) { //weight
+        weightName = weightHolder?.children[hintIndex]?.children[0].innerHTML;
+        weightName = weightName.replace("=", "");
+        hintText.innerHTML = hintArr[0] + " " + weightName + ".";
+    }
+    else {
+        hintText.innerHTML = hintArr[0];
+    }
+
+
 
     display.outputLine.position()
     for (let i = 0; i < demo.weightLines.length; i++)
@@ -3766,7 +3792,10 @@ function loadQuestionsAndModels() {
 }
 
 function goToAboutPage() {
-    location.href = 'about.html';
+    window.open(
+        'about.html',
+        '_blank'
+    );
 }
 
 function FixCheckAnswerButtonPosition() {
