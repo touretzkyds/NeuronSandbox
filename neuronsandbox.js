@@ -2083,6 +2083,7 @@ class Display {
             document.getElementById("BinaryToggleBody").style.display= "none";
             document.getElementById("ShowDesiredToggleBody").style.display= "none";
             document.getElementById("ShowBiasToggleBody").style.display= "none";
+            document.getElementById("difficultySlide").style.display = "none";
         } else {
             $("#input-table tr:first").show();
             $("#input-table tr td:nth-child(1)").show();
@@ -2101,6 +2102,7 @@ class Display {
             document.getElementById("BinaryToggleBody").style.display= "flex";
             document.getElementById("ShowDesiredToggleBody").style.display= "flex";
             document.getElementById("ShowBiasToggleBody").style.display= "flex";
+            document.getElementById("difficultySlide").style.display = "flex";
         }
 
         for (let i = 0; i < demo.weightLines.length; i++) {
@@ -2870,6 +2872,7 @@ async function downloadFile() {
         "input-header-vars" : headerRowVariables,
         "binaryToggleChecked" : binaryToggleChecked,
         "guessToggleChecked" : guessToggleChecked,
+        "difficultyLevel": difficultyLevel,
         "question" : question
         //"input-header": headerRows,
     };
@@ -3336,6 +3339,7 @@ function uploadJson(text) {
     document.getElementById("FanfareToggle").checked = dict["fanfare-toggle-checked"];
 
     document.getElementById("DemoToggle").checked = dict["guessToggleChecked"];
+    document.getElementById("difficulty_slide").value = dict["difficultyLevel"];
     display.UpdateDemoToggle();
 
     display.handleHoverExit();
