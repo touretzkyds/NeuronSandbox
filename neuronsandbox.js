@@ -2847,6 +2847,7 @@ async function downloadFile() {
     let binaryToggleChecked = document.getElementById("BinaryToggle").checked;
     //let thresholdToggleChecked = document.getElementById("checkbox_threshold_editable").checked;
     let thresholdToggleChecked = document.getElementById("threshold_toggleBtn").classList.contains("edit-toggle-on");
+    let difficultyLevel = document.getElementById("difficulty_slide").value;
     let guessToggleChecked = document.getElementById("DemoToggle").checked;
 
     const editToggle = document.getElementById("InputToggle").checked;
@@ -3340,6 +3341,7 @@ function uploadJson(text) {
 
     document.getElementById("DemoToggle").checked = dict["guessToggleChecked"];
     document.getElementById("difficulty_slide").value = dict["difficultyLevel"];
+    document.getElementById("difficulty_level").innerText = "Level: " + dict["difficultyLevel"];
     display.UpdateDemoToggle();
 
     display.handleHoverExit();
