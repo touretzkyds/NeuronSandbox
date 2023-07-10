@@ -657,19 +657,68 @@ class Perceptron {
                 let thresholdToggle = document.getElementById("threshold_toggleBtn");
                 let text = document.getElementById("bias-text");
 
-                dataOp.makeEditable(text);
-                if(!image.classList.contains("edit-toggle-on")) {
-                    image.classList.add("edit-toggle-on")
+
+                if (thresholdToggle.classList.contains("edit-toggle-on")) {
+                    if(!image.classList.contains("edit-toggle-on")) {
+                        image.classList.add("edit-toggle-on");
+                    }
+                    if(image.classList.contains("edit-toggle-off")) {
+                        image.classList.remove("edit-toggle-off");
+                    }
+                    dataOp.makeEditable(text);
+
                 }
-                if(image.classList.contains("edit-toggle-off")) {
-                    image.classList.remove("edit-toggle-off")
+                else {
+                    if(image.classList.contains("edit-toggle-on")) {
+                        image.classList.remove("edit-toggle-on");
+                    }
+                    if(!image.classList.contains("edit-toggle-off")) {
+                        image.classList.add("edit-toggle-off");
+                    }
+                    dataOp.makeEditable(text, false);
+                    text.style.background = "none";
+
                 }
+
                 if(!text.classList.contains('weight-edit-text')) {
                     text.classList.add('weight-edit-text');
                 }
                 if(!text.classList.contains('weights')) {
                     text.classList.add('weights');
                 }
+
+                let weightButtonHandler = function () {
+                    if (image.classList.contains("edit-toggle-on")) {
+                        image.classList.add("edit-toggle-off");
+                        image.classList.remove("edit-toggle-on")
+                        thresholdToggle.classList.add("edit-toggle-off");
+                        thresholdToggle.classList.remove("edit-toggle-on")
+
+                    }
+                    else {
+                        image.classList.remove("edit-toggle-off");
+                        image.classList.add("edit-toggle-on")
+                        thresholdToggle.classList.remove("edit-toggle-off");
+                        thresholdToggle.classList.add("edit-toggle-on")
+                    }
+
+                    let editable = image.classList.contains("edit-toggle-on");
+                    text.contentEditable = editable;
+                    if (editable) {
+                        if (!text.classList.contains("weights")) {
+                            text.classList.add("weights");
+                        }
+                    }
+                    else {
+                        if (text.classList.contains("weights")) {
+                            text.classList.remove("weights");
+                        }
+                    }
+                    dataOp.makeEditable(text, editable);
+                };
+
+
+                image.onclick = weightButtonHandler;
 
                 let editToggle = document.getElementById("InputToggle");
                 let span = document.getElementById("bias-edit-toggle");
@@ -703,10 +752,24 @@ class Perceptron {
                 demo.biasLine = null;
             }
             let thresholdToggle = document.getElementById("threshold_toggleBtn");
+            let image = document.getElementById("bias-edit-toggle");
             if (thresholdToggle.classList.contains("edit-toggle-on")) {
                 if (!threshold.classList.contains("editable-border"))
                     threshold.classList.add("editable-border");
+                if (thresholdToggle.classList.contains("edit-toggle-off"))
+                    thresholdToggle.classList.remove("edit-toggle-off")
+                if (!thresholdToggle.classList.contains("edit-toggle-on"))
+                    thresholdToggle.classList.add("edit-toggle-on")
                 threshold.contentEditable = true;
+            }
+            else {
+                if (threshold.classList.contains("editable-border"))
+                    threshold.classList.remove("editable-border");
+                if (!thresholdToggle.classList.contains("edit-toggle-off"))
+                    thresholdToggle.classList.add("edit-toggle-off")
+                if (thresholdToggle.classList.contains("edit-toggle-on"))
+                    thresholdToggle.classList.remove("edit-toggle-on")
+                threshold.contentEditable = false;
             }
 
             let editToggle = document.getElementById("InputToggle");
@@ -1019,14 +1082,14 @@ class Display {
                         if (imageKey in dictImageMapping) {
                             let image_src = localStorage.getItem(dictImageMapping[imageKey]);
                             if (image_src === null) {
-                                img.src = "1_image.svg";
+                                img.src = "media/1_image.svg";
                             }
                             else {
                                 img.src = image_src;
                             }
                         }
                         else {
-                            img.src = "1_image.svg";
+                            img.src = "media/1_image.svg";
                         }
                     }
                     else {
@@ -1035,14 +1098,14 @@ class Display {
                         if (imageKey in dictImageMapping) {
                             let image_src = localStorage.getItem(dictImageMapping[imageKey]);
                             if (image_src === null) {
-                                img.src = "0_image.svg";
+                                img.src = "media/0_image.svg";
                             }
                             else {
                                 img.src = image_src;
                             }
                         }
                         else {
-                            img.src = "0_image.svg";
+                            img.src = "media/0_image.svg";
                         }
                     }
                     img.width = 48;
@@ -1117,14 +1180,14 @@ class Display {
                         if (imageKey in dictImageMapping) {
                             let image_src = localStorage.getItem(dictImageMapping[imageKey]);
                             if (image_src === null) {
-                                img.src = "1_image.svg";
+                                img.src = "media/1_image.svg";
                             }
                             else {
                                 img.src = image_src;
                             }
                         }
                         else {
-                            img.src = "1_image.svg";
+                            img.src = "media/1_image.svg";
                         }
 
 
@@ -1135,14 +1198,14 @@ class Display {
                         if (imageKey in dictImageMapping) {
                             let image_src = localStorage.getItem(dictImageMapping[imageKey]);
                             if (image_src === null) {
-                                img.src = "0_image.svg";
+                                img.src = "media/0_image.svg";
                             }
                             else {
                                 img.src = image_src;
                             }
                         }
                         else {
-                            img.src = "0_image.svg";
+                            img.src = "media/0_image.svg";
                         }
                     }
                     img.width = 48;
@@ -1155,7 +1218,7 @@ class Display {
                         if (img.classList.contains("editable-border"))
                             img.classList.remove("editable-border")
                     }
-                    if(!(document.getElementById("DemoToggle").checked && (img.src.endsWith("0_image.svg") ||img.src.endsWith("1_image.svg")))) {
+                    if(!(document.getElementById("DemoToggle").checked && (img.src.endsWith("media/0_image.svg") ||img.src.endsWith("media/1_image.svg")))) {
                         textbox.appendChild(img);
                     }
                 }
@@ -1193,7 +1256,7 @@ class Display {
         const img = document.createElement("img");
         if(value == 1) {
             img.alt = "1_Image";
-            img.src = "1_image.svg";
+            img.src = "media/1_image.svg";
             img.style.visibility = "hidden";
 
             img.width = 48;
@@ -1204,7 +1267,7 @@ class Display {
         else if( value == 0) {
             img.alt = "0_Image";
             const imageKey = JSON.stringify({table_name: 'output-table', column: 2, value: img.alt});
-            img.src = "0_image.svg";
+            img.src = "media/0_image.svg";
             img.style.visibility = "hidden";
             img.width = 48;
             img.height = 48;
@@ -1505,11 +1568,10 @@ class Display {
                 if (length <= 10) {
                     newFontSize = 40;
                 }
-                else if (length >= 30){
-                    newFontSize = 30;
-                }
                 else {
-                    newFontSize = 40 - (length-10)*1.2
+                    newFontSize = 40 - (length-10);
+                    if (newFontSize < 20)
+                        newFontSize = 20;
                 }
 
             }
@@ -1585,7 +1647,7 @@ class Display {
             {
                 bias_value = "Bias";
             }
-            newCell.innerHTML = `<div class=\"bias-content\">${bias_value}</div>`;
+            newCell.innerHTML = `<div class=\"bias-content\"><span style="display: inline-flex">${bias_value}<img src="media/ground.png" height="33px" style="transform: translateX(30px);"></span></div>`;
         }
         //removes lines when not hovered
         demo.weightLines.forEach(line => line.remove());
@@ -2972,13 +3034,25 @@ async function provideHint() {
         editableList.push(false);
     }
     console.log(editableList)
-    let hintProvider = new HintProvider([...perceptron.weights].concat(perceptron.threshold), perceptron.inputData, desiredOutputs, editableList);
+    let hintProvider = new hintprovider([...perceptron.weights].concat(perceptron.threshold), perceptron.inputData, desiredOutputs, editableList);
     let hintArr = hintProvider.provideHint(prevHintIndex, prevSubset, prevHintLevel);
     prevHintIndex = hintArr[1];
     prevSubset = hintArr[2];
     prevHintLevel = hintArr[3];
+    let hintIndex = hintArr[4];
     let hintText = document.getElementById("hintText");
-    hintText.innerText = hintArr[0];
+    let weightHolder = document.getElementById("input-link-text");
+    let weightName = "";
+    if (hintIndex < weightHolder.children.length) { //weight
+        weightName = weightHolder?.children[hintIndex]?.children[0].innerHTML;
+        weightName = weightName.replace("=", "");
+        hintText.innerHTML = hintArr[0] + " " + weightName + ".";
+    }
+    else {
+        hintText.innerHTML = hintArr[0];
+    }
+
+
 
     display.outputLine.position()
     for (let i = 0; i < demo.weightLines.length; i++)
@@ -3065,7 +3139,7 @@ function hideCameraImages() {
     let images = document.querySelectorAll(`.myimage`);
     let editToggleChecked = document.getElementById("InputToggle").checked;
     images.forEach((image) => {
-        if(image.src.endsWith("1_image.svg") || image.src.endsWith("0_image.svg")) {
+        if(image.src.endsWith("media/1_image.svg") || image.src.endsWith("media/0_image.svg")) {
             if(findAncestorTable(image)?.id === "guess-output-table") {
                 image.visibility = "hidden";
             }
@@ -3479,7 +3553,7 @@ perceptron.displayPerceptron();
 const display = new Display();
 display.updateDisplay();
 //uploadFromUrl("SampleModel.json");
-uploadFromZipUrl("problems/Problem 1.sandbox", true);
+uploadFromZipUrl(encodeURI("problems/Problem 1.sandbox"), true);
 display.createOutputTableColors();
 display.createInputTableEditBorder();
 display.createOutputTableEditBorder();
@@ -3490,7 +3564,7 @@ document.getElementById("DemoToggle").checked = true;
 display.UpdateDemoToggle();
 document.getElementById("AutoProgressToggle").checked = true;
 
-const problemNum = 8;
+const problemNum = 16;
 
 let prevHintIndex = -1;
 let prevSubset = [];
@@ -3737,7 +3811,10 @@ function loadQuestionsAndModels() {
 }
 
 function goToAboutPage() {
-    location.href = 'about.html';
+    window.open(
+        'about.html',
+        '_blank'
+    );
 }
 
 function FixCheckAnswerButtonPosition() {

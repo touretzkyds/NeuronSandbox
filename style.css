@@ -975,6 +975,10 @@ span.guess-comment {
     max-width: 11vw !important;
 }
 
+.weight-edit-text {
+    display: inline-block;
+}
+
 .red-border {
     border: 4px solid red !important;
 }
