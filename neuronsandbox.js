@@ -3564,7 +3564,7 @@ document.getElementById("DemoToggle").checked = true;
 display.UpdateDemoToggle();
 document.getElementById("AutoProgressToggle").checked = true;
 
-const problemNum = 8;
+const problemNum = 16;
 
 let prevHintIndex = -1;
 let prevSubset = [];
