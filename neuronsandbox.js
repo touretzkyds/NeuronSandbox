@@ -993,6 +993,7 @@ class Display {
             td2.style.fontWeight = 'bold';
             if (td2.style.background !== '#ffbfcb') //error
                 td2.style.background = '#f8ffcf'
+                td2.style.background = 'none'
         }
     }
 
@@ -1876,14 +1877,14 @@ class Display {
             if (rowIdx % 2 === 0) {
                 this.handleHoverExit(inputRow, outputRow, guessOutputRow );
                 if (isOutputToggleChecked)
-                    this.checkDesiredOutput(outputRow.children[1], outputRow.children[2])
+                    this.checkDesiredOutput(outputRow.children[1], outputRow.children[2], outputRow.children[0])
 
             }
 
             else {
                 this.handleHoverExit(inputRow, outputRow, guessOutputRow,true ); //if it is odd, reset to gray
                 if (isOutputToggleChecked)
-                    this.checkDesiredOutput(outputRow.children[1], outputRow.children[2])
+                    this.checkDesiredOutput(outputRow.children[1], outputRow.children[2], outputRow.children[0])
             }
             document.getElementById("sigma").innerText = "∑> ";
 
@@ -1944,7 +1945,7 @@ class Display {
         if (outputRow) {
             for (let i = 0; i < outputRow.children.length; i++) {
                 outputRow.children[0].style.background = "none";
-                this.checkDesiredOutput(outputRow.children[1], outputRow.children[2])
+                this.checkDesiredOutput(outputRow.children[1], outputRow.children[2], outputRow.children[0])
             }
         }
         if(guessOutputRow) {
@@ -2141,8 +2142,9 @@ class Display {
             //var tr = outputCol.rows[i];
             let output = outputCol.rows[i].cells[1];
             let desired = outputCol.rows[i].cells[2];
+            let activation = outputCol.rows[i].cells[0];
 
-            let currCorrect = this.checkDesiredOutput(output, desired);
+            let currCorrect = this.checkDesiredOutput(output, desired, activation);
             if (!currCorrect)
                 isCorrect = false;
         }
@@ -2253,7 +2255,7 @@ class Display {
         }
     }
 
-    checkDesiredOutput(output, desired) {
+    checkDesiredOutput(output, desired, activation) {
         //TODO: do extra testing with the regex and make changes if necessary
         if (!output)
             return
@@ -2303,11 +2305,13 @@ class Display {
 
         if (outputParsedValue !== parsedValue && document.getElementById("OutputToggle").checked) {
             output.style.background = "#ffbfcb"; //pink (error)
+            activation.style.background = "#ffbfcb";
             return false
         }
         else {
             //output.style.removeProperty('background-color');
-            output.style.background = "#f8ffcf"
+            output.style.background = "#f8ffcf";
+            activation.style.background = "none";
             return true
         }
         display.createOutputTableEditBorder();
@@ -2764,7 +2768,7 @@ class Demo {
         if (sender && sender.closest('table')?.id === "output-table") { //must be the desired output cell, no need to calculate
             bEditOutput = true;
             //console.log(sender.previousSibling)
-            display.checkDesiredOutput(sender.previousSibling, sender);
+            display.checkDesiredOutput(sender.previousSibling, sender, sender.previousSibling.previousSibling);
             //dataOp.updateDesiredOutput(demo.desiredOutput, outputTable);
             return;
         }
@@ -3368,7 +3372,8 @@ function uploadJson(text) {
         //var tr = outputCol.rows[i];
         let output = outputCol.rows[i].cells[1];
         let desired = outputCol.rows[i].cells[2];
-        display.checkDesiredOutput(output, desired);
+        let activation = outputCol.rows[i].cells[0]
+        display.checkDesiredOutput(output, desired, activation);
     }
     display.handleHoverExit();
     display.updateBiasToggle();
