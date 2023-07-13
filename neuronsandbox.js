@@ -3039,6 +3039,7 @@ async function provideHint() {
     if (hintIndex < weightHolder.children.length) { //weight
         weightName = weightHolder?.children[hintIndex]?.children[0].innerHTML;
         weightName = weightName.replace("=", "");
+        weightName = weightName.replace(" ", "");
         hintText.innerHTML = hintArr[0] + " " + weightName + ".";
     }
     else {

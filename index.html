@@ -57,6 +57,13 @@
                 <button class="dropbtn"><i class="fas fa-bars"></i> Menu</button>
                 <div class="dropdown-content">
                     <div class="button-group">
+                        <div class="menu-row-container">
+                            <label style="margin-right: 10px">Edit</label>
+                            <label id="InputSwitch" class="switch">
+                                <input type="checkbox" id="InputToggle">
+                                <span id="edit-slider" class="slider round"></span>
+                            </label>
+                        </div>
                         <div id="BinaryToggleBody" class="menu-row-container">
                             <label style="margin-right: 10px">Binary</label>
                             <label id="BinarySwitch" class="switch">
@@ -64,11 +71,18 @@
                                 <span id="binary-slider" class="slider round"></span>
                             </label>
                         </div>
-                        <div class="menu-row-container">
-                            <label style="margin-right: 10px">Edit</label>
-                            <label id="InputSwitch" class="switch">
-                                <input type="checkbox" id="InputToggle">
-                                <span id="edit-slider" class="slider round"></span>
+                        <div id="ShowBiasToggleBody" class="menu-row-container">
+                            <label style="margin-right: 10px">Show Bias</label>
+                            <label class="switch" >
+                                <input type="checkbox" id="ShowBiasToggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div id="ShowDesiredToggleBody" class="menu-row-container">
+                            <label style="margin-right: 10px">Show Desired</label>
+                            <label class="switch" >
+                                <input type="checkbox" id="OutputToggle">
+                                <span class="slider round"></span>
                             </label>
                         </div>
                         <div id = "FanfareToggleBody" class="menu-row-container">
@@ -82,20 +96,6 @@
                             <label style="margin-right: 10px">Auto Progress</label>
                             <label id="AutoProgressSwitch" class="switch">
                                 <input type="checkbox" id="AutoProgressToggle">
-                                <span class="slider round"></span>
-                            </label>
-                        </div>
-                        <div id="ShowDesiredToggleBody" class="menu-row-container">
-                            <label style="margin-right: 10px">Show Desired</label>
-                            <label class="switch" >
-                                <input type="checkbox" id="OutputToggle">
-                                <span class="slider round"></span>
-                            </label>
-                        </div>
-                        <div id="ShowBiasToggleBody" class="menu-row-container">
-                            <label style="margin-right: 10px">Show Bias</label>
-                            <label class="switch" >
-                                <input type="checkbox" id="ShowBiasToggle">
                                 <span class="slider round"></span>
                             </label>
                         </div>
