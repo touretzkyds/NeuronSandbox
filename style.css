@@ -336,7 +336,7 @@ article > section {
 }
 
 .table tr:nth-child(even){
-    background-color: #f2f2f2;
+    /*background-color: #f2f2f2;*/
 }
 
 .table td:nth-child(odd){
@@ -349,7 +349,7 @@ article > section {
 }
 
 .output-table tr:nth-child(odd){
-    background-color: #f2f2f2;
+    /*background-color: #f2f2f2;*/
 }
 
 .output-table tr:nth-child(even){

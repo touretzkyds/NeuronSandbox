@@ -1939,32 +1939,18 @@ class Display {
         // reset displayed output to default
         demo.selectedOutput = demo.defaultSelectedOutput;
 
-        if (isOdd) { //if odd reset color to gray
-            if (inputRow)
-                inputRow.style.background = "#f2f2f2"; //color gray
-            if (outputRow) {
-                outputRow.children[0].style.background =  "#f2f2f2"
-                outputRow.children[1].style.background = "#f8ffcf"
-                outputRow.children[2].style.background =  "#f2f2f2"
-            }
-            if(guessOutputRow) {
-                guessOutputRow.style.background =  "#f2f2f2"
+        if (inputRow)
+            inputRow.style.background = "none";
+        if (outputRow) {
+            for (let i = 0; i < outputRow.children.length; i++) {
+                outputRow.children[0].style.background = "none";
+                this.checkDesiredOutput(outputRow.children[1], outputRow.children[2])
             }
         }
-        else {
-            if (inputRow)
-                inputRow.style.background = "none";
-            if (outputRow) {
-                for (let i = 0; i < outputRow.children.length; i++) {
-                    outputRow.children[0].style.background = "none";
-                    this.checkDesiredOutput(outputRow.children[1], outputRow.children[2])
-                }
-            }
-            if(guessOutputRow) {
-                guessOutputRow.style.background = "none";
-            }
+        if(guessOutputRow) {
+            guessOutputRow.style.background = "none";
+        }
 
-        }
         //this.createOutputTableColors();
         this.updateSelectedInput();
         display.adjustSelectedInputFontSize();
@@ -2812,6 +2798,9 @@ class Demo {
         display.saveGuessComment();
         display.createGuessTable();
         display.updateHintButton();
+
+        let hintText = document.getElementById("hintText");
+        hintText.innerText = "";
 
     }
 
