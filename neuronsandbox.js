@@ -237,7 +237,7 @@ class DataOperator {
                 textbox.classList.remove("edit-handler");
         }
         textbox.onkeydown = function(event){
-            if (event.keyCode === 13 || event.keyCode === 27) {
+            if (event.which === 13 || event.which === 27 || event.keyCode === 13 || event.keyCode === 27) {
                 event.target.blur(); // focus out of text box
                 demo.update(this);
             }
@@ -991,9 +991,11 @@ class Display {
             td1.style.fontWeight = 'normal';
 
             td2.style.fontWeight = 'bold';
-            if (td2.style.background !== '#ffbfcb') //error
+            if (td2.style.background !== '#ffbfcb') { //error
                 td2.style.background = '#f8ffcf'
-                td2.style.background = 'none'
+                td1.style.background = 'none'
+            }
+
         }
     }
 
@@ -1601,7 +1603,7 @@ class Display {
         if (!weight) {
             let wDiv = document.createElement('div');
             wDiv.id = `weight-${idx+1}`;
-            wDiv.innerHTML = `<text fill="black" class="weight-edit-text weights">w<sub>${idx+1}</sub> =</text> <text contenteditable="true" onkeypress="if (keyCode == 13) return false;" id="w${idx+1}" fill="black" class="weights"></text>`;
+            wDiv.innerHTML = `<text fill="black" class="weight-edit-text weights">w<sub>${idx+1}</sub> =</text> <text contenteditable="true" onkeypress="if (event.which === 13 || event.keyCode === 13) return false;" id="w${idx+1}" fill="black" class="weights"></text>`;
             document.getElementById("input-link-text").appendChild(wDiv);
             weight = document.getElementById(wID);
         }
@@ -2530,7 +2532,7 @@ class Demo {
         wDiv.id = `weight-${unique_id}`;
         wDiv.className = "weight_label";
         wDiv.innerHTML = `<text fill="black">w<sub>${unique_id}</sub> =</text> <text contenteditable="true" 
-                            onkeypress="if (keyCode == 13) return false;" id="w${unique_id}" fill="black" class="weight-edit-text weights">0</text>
+                            onkeypress="if (event.which === 13 || event.keyCode === 13) return false;" id="w${unique_id}" fill="black" class="weight-edit-text weights">0</text>
                            <span class="edit-toggle edit-toggle-on">
                               <i class="fas fa-pencil-alt"></i>
                               <i class="fas fa-lock"></i>
@@ -3749,7 +3751,7 @@ function handleDesiredOutputColumn() {
     });
 
     function handleKeyDown(event) {
-        if (event.keyCode === 13) {
+        if (event.which === 13 || event.keyCode === 13 ) {
             const rawValue = event.target.innerText;
             let [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
             if (parsedValue !== 1 && parsedValue !== 0 ) {

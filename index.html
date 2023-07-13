@@ -103,7 +103,7 @@
                             <div class="button-border">
                                 <div class="user-input-wrp">
                                     <br/>
-                                    <input type="text" class="inputText" name="url" id="url" size="160" onkeypress="let keyCode = event.keyCode || event.which; if (keyCode == 13) {uploadFileCombined(); return false;}" required/>
+                                    <input type="text" class="inputText" name="url" id="url" size="160" onkeypress="let keyCode = event.keyCode || event.which; if (keyCode === 13) {uploadFileCombined(); return false;}" required/>
                                     <span  class="floating-label">Model URL</span>
                                 </div>
 
@@ -311,11 +311,11 @@
                             <div id="input-link-text" class="center" style="z-index: 1">
                                 <div id="weight-1" class="weight_label">
                                     <text fill="black">w<sub>1</sub> =</text>
-                                    <text contenteditable="true" id="w1" fill="black" class="weights" onkeypress="if (keyCode == 13) return false;"></text>
+                                    <text contenteditable="true" id="w1" fill="black" class="weights" onkeypress="if (event.which === 13 || event.keyCode === 13) return false;"></text>
                                 </div>
                                 <div id="weight-2" class="weight_label">
                                     <text fill="black">w<sub>2</sub> =</text>
-                                    <text contenteditable="true" id="w2" fill="black" class="weights" onkeypress="if (keyCode == 13) return false;"></text>
+                                    <text contenteditable="true" id="w2" fill="black" class="weights" onkeypress="if (event.which === 13 || event.keyCode === 13) return false;"></text>
                                 </div>
                             </div>
                         </div>
