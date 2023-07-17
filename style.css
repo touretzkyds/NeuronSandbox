@@ -992,6 +992,7 @@ span.guess-comment {
 .hint-text {
     text-align: center;
     font-size: 23px;
+    height: 20px;
 }
 
 .spacer-cell {
