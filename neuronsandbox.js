@@ -2188,7 +2188,6 @@ class Display {
         let checkbox = document.getElementById("DemoToggle");
         const otherHeaders = document.querySelectorAll('.top-table th:not(:first-child):not(:nth-child(2)):not(:last-child)');
         if (checkbox.checked) {
-            hintText.hidden = true;
             document.getElementById("guess-output-container").style.display = "inline-block";
 
             document.getElementById("CheckAnswerBtn").style.display = "inline-block";
@@ -2204,7 +2203,6 @@ class Display {
             });
         }
         else {
-            hintText.hidden = false;
             document.getElementById("guess-output-container").style.display = "none";
             document.getElementById("CheckAnswerBtn").style.display = "none";
             document.getElementById("network-container").style.display = "inline-flex";
