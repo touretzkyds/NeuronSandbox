@@ -327,6 +327,12 @@ article > section {
     line-height: 1.7em !important;
 }
 
+#activation-table th {
+    width: 2vw !important;
+    height: 5vw;
+    line-height: 1.7em !important;
+}
+
 .table tr {
     border: 0.05vw solid #ddd;
 }
@@ -986,4 +992,10 @@ span.guess-comment {
 .hint-text {
     text-align: center;
     font-size: 23px;
+}
+
+.spacer-cell {
+    width: 20px;
+    border: none !important;
+    visibility: hidden;
 }

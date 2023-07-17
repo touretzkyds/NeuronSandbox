@@ -1,5 +1,8 @@
 "use strict";
 
+const ACTIVATION_COLUMN = 0;
+const OUTPUT_COLUMN = 0;
+const DESIRED_OUTPUT_COLUMN = 1;
 class Data {
     constructor(inputData) {
         this.update(inputData); //default shape: (2, 4)
@@ -99,7 +102,7 @@ class DataOperator {
                 const cell = table.rows[row].cells[c];
                 const rawValue = cell.innerText;
                 let [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
-                if (table.id === 'output-table' && c === 2 && (parsedValue !== 1 && parsedValue !== 0) ) {
+                if (table.id === 'output-table' && c === DESIRED_OUTPUT_COLUMN && (parsedValue !== 1 && parsedValue !== 0) ) {
                     isValid = false;
                 }
                 dataObj.data[row-start][c-startCol] = parsedValue;
@@ -118,7 +121,7 @@ class DataOperator {
                 const cell = table.rows[row].cells[c];
                 const rawValue = cell.innerText;
                 let [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
-                if (table.id === 'output-table' && c === 2 && (parsedValue !== 1 && parsedValue !== 0) ) {
+                if (table.id === 'output-table' && c === DESIRED_OUTPUT_COLUMN && (parsedValue !== 1 && parsedValue !== 0) ) {
                     isValid = false;
                 }
                 const regex = '^-?0+$';
@@ -165,7 +168,7 @@ class DataOperator {
         let start = 1;
         //let row = start;
         for (let row = start; row < table.rows.length; row++) {
-            const cell = table.rows[row].cells[2];
+            const cell = table.rows[row].cells[DESIRED_OUTPUT_COLUMN];
             cell.innerText = desiredOutput.data[row-1];
         }
     }
@@ -580,6 +583,7 @@ class Perceptron {
         this.weights = weights;
         this.weightLabels = weight_labels;
         this.threshold = threshold;
+        this.activationData = new Array(this.dataObj.rows).fill(0).map(() => new Array(1).fill(0));
     }
 
     // simple float operations give precision problems (#6)
@@ -598,25 +602,26 @@ class Perceptron {
                 // simple float operations give precision problems (#6)
                 const affineOutput = this.correctPrecision(this.affineOutput[r] + prod);
                 this.affineOutput[r] = affineOutput;
-                this.outputData[r][0] = affineOutput;
+                this.activationData[r][ACTIVATION_COLUMN] = affineOutput;
             }
         }
     }
 
     // compute activation column of output table
     computeActivnOutput(activation = "threshold"){
-        this.activnOutput = new Array(this.dataObj.rows).fill(0);
+        this.activationOutput = new Array(this.dataObj.rows).fill(0);
         if (activation === "threshold") {
             for (let r=0; r<this.dataObj.rows; ++r){
                 const res = (this.affineOutput[r] > this.threshold ? 1 : 0);
-                this.activnOutput[r] = res;
-                this.outputData[r][1] = res;
+                this.activationOutput[r] = res;
+                this.outputData[r][OUTPUT_COLUMN] = res;
             }
         }
     }
 
     computeOutputs(){
-        this.outputData = new Array(this.dataObj.rows).fill(0).map(() => new Array(3).fill(0));
+        this.activationData = new Array(this.dataObj.rows).fill(0).map(() => new Array(1).fill(0));
+        this.outputData = new Array(this.dataObj.rows).fill(0).map(() => new Array(2).fill(0));
         this.computeAffineOutput();
         this.computeActivnOutput();
     }
@@ -715,6 +720,7 @@ class Perceptron {
                         }
                     }
                     dataOp.makeEditable(text, editable);
+                    setupQuestionFields();
                 };
 
 
@@ -876,8 +882,8 @@ function checkAnswerCorrect() {
             let row = outputTable.rows.item(i);
             let inputRow = inputTable.rows.item(i+1);
             let cells = outputTable.rows.item(i).cells
-            let output = cells.item(1).innerText;
-            let desired = cells.item(2).innerText;
+            let output = cells.item(OUTPUT_COLUMN).innerText;
+            let desired = cells.item(DESIRED_OUTPUT_COLUMN).innerText;
             if (output !== desired && outputToggleChecked) {
                 //highlight the entire row
                 if(!row.classList.contains("red-border")) {
@@ -911,7 +917,7 @@ function checkAnswerCorrect() {
                 }
             }
 
-            let desired = cells.item(2).innerText;
+            let desired = cells.item(DESIRED_OUTPUT_COLUMN).innerText;
             if (guess_output !== desired) {
 
                 isCorrect = false
@@ -959,6 +965,23 @@ class Display {
         outputHeaderCells[0].style.height = maxHeight + 'px';
         const guessOutputHeaderCells = document.getElementById("guess-output-table").rows[0].cells;
         guessOutputHeaderCells[0].style.height = maxHeight + 'px';
+        const activationHeaderCells = document.getElementById("activation-table").rows[0].cells;
+        activationHeaderCells[0].style.height = maxHeight + 'px';
+    }
+
+    updateTableOutputColumn() {
+        let outputTable = document.getElementById("output-table");
+        let outputColumn = outputTable.rows[0].cells[OUTPUT_COLUMN];
+
+        let biasToggle = document.getElementById("biasToggle");
+        let sigma = 0;
+        if (!biasToggle.checked) {
+            sigma = parseFloat(document.getElementById("th1").innerText);
+        }
+        else {
+            sigma = parseFloat(document.getElementById("bias-text").innerText) * -1;
+        }
+        outputColumn.innerText = "Current Output Sigma > " + sigma.toString();
     }
 
     toggleProblemDisplay() {
@@ -983,19 +1006,19 @@ class Display {
 
     createOutputTableColors() {
         const outputTable = document.getElementById("output-table");
+        const activationTable = document.getElementById("activation-table");
         let n = outputTable.rows.length;
         for (let i = 1; i < n; i++) {
             let tr = outputTable.rows[i];
-            let td1 = tr.cells[0];
-            let td2 = tr.cells[1];
+            let tr_activation = activationTable.rows[i];
+            let td1 = tr_activation.cells[ACTIVATION_COLUMN];
+            let td2 = tr.cells[OUTPUT_COLUMN];
             td1.style.fontWeight = 'normal';
 
             td2.style.fontWeight = 'bold';
-            if (td2.style.background !== '#ffbfcb') { //error
+            if (td2.style.background !== '#ffbfcb') //error
                 td2.style.background = '#f8ffcf'
-                td1.style.background = 'none'
-            }
-
+            td2.style.background = 'none'
         }
     }
 
@@ -1005,7 +1028,7 @@ class Display {
         for (let i = 1; i < n; i++) {
             const outputRow = document.querySelector(`#output-table > tbody > tr:nth-child(${i+1})`)
             const guessOutputRow = document.querySelector(`#guess-output-table > tbody > tr:nth-child(${i+1})`)
-            let desired = outputRow.children[2].innerText;
+            let desired = outputRow.children[DESIRED_OUTPUT_COLUMN].innerText;
             var radioButtonGroup = document.getElementsByName(`guess-radio-${i-1}`);
             let guessed;
             for (let j = 0; j < radioButtonGroup.length; j++) {
@@ -1051,12 +1074,12 @@ class Display {
         let n = outputTable.rows.length;
         for (let i = 1; i < n; i++) {
             let tr = outputTable.rows[i];
-            for (let j = 1; j < tr.cells.length; j++) {
+            for (let j = OUTPUT_COLUMN; j < tr.cells.length; j++) {
                 let textbox = tr.cells[j]
                 if (textbox.children.length === 0) {
                     textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
                 }
-                if(j == 2) { //desired output
+                if(j === DESIRED_OUTPUT_COLUMN) { //desired output
                     textbox.children[0].classList.add("editable-border")
                     dataOp.makeEditable(textbox.firstChild, editCheckbox.checked)
                 }
@@ -1070,7 +1093,7 @@ class Display {
                         textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
                     }
                     textbox.children[0].classList.remove("editable-border")
-                    if(j === 2)
+                    if(j === DESIRED_OUTPUT_COLUMN)
                     {
                         dataOp.makeEditable(textbox.firstChild, editCheckbox.checked)
                     }
@@ -1297,7 +1320,7 @@ class Display {
             let images = cell.querySelectorAll(".myimage");
             for( let i = 0; i < images.length; i++) {
                 if( i === guessed) {
-                    const imageKey = JSON.stringify({table_name: 'output-table', column: 2, value: ""+i + "_Image"});
+                    const imageKey = JSON.stringify({table_name: 'output-table', column: DESIRED_OUTPUT_COLUMN, value: ""+i + "_Image"});
                     if (imageKey in dictImageMapping) {
                         images[i].src = localStorage.getItem(dictImageMapping[imageKey]);
                         images[i].style.visibility = "visible";
@@ -1333,7 +1356,7 @@ class Display {
         //non-edit mode, we will display the comment for the wrong answer, in read only mode
         if(!outputRow)
             return;
-        let desired = outputRow.children[2].innerText;
+        let desired = outputRow.children[DESIRED_OUTPUT_COLUMN].innerText;
 
         var cell = guessTable.rows[row].cells[0];
         let radioButtonGroup = document.getElementsByName(`guess-radio-${row-1}`);
@@ -1841,6 +1864,8 @@ class Display {
         let outputRowIndex = rowIdx - 1;
         const outputRow = document.querySelector(`#output-table > tbody > tr:nth-child(${outputRowIndex + 1})`)
         const guessOutputRow = document.querySelector(`#guess-output-table > tbody > tr:nth-child(${outputRowIndex + 1})`)
+        const activationRow = document.querySelector(`#activation-table > tbody > tr:nth-child(${outputRowIndex + 1})`)
+
 
         if (rowIdx < 2) //headers, or leave
         {
@@ -1877,16 +1902,16 @@ class Display {
         }
         else {
             if (rowIdx % 2 === 0) {
-                this.handleHoverExit(inputRow, outputRow, guessOutputRow );
+                this.handleHoverExit(inputRow, outputRow, guessOutputRow, activationRow );
                 if (isOutputToggleChecked)
-                    this.checkDesiredOutput(outputRow.children[1], outputRow.children[2], outputRow.children[0])
+                    this.checkDesiredOutput(outputRow.children[OUTPUT_COLUMN], outputRow.children[DESIRED_OUTPUT_COLUMN], activationRow.children[ACTIVATION_COLUMN])
 
             }
 
             else {
-                this.handleHoverExit(inputRow, outputRow, guessOutputRow,true ); //if it is odd, reset to gray
+                this.handleHoverExit(inputRow, outputRow, guessOutputRow, activationRow, true ); //if it is odd, reset to gray
                 if (isOutputToggleChecked)
-                    this.checkDesiredOutput(outputRow.children[1], outputRow.children[2], outputRow.children[0])
+                    this.checkDesiredOutput(outputRow.children[OUTPUT_COLUMN], outputRow.children[DESIRED_OUTPUT_COLUMN], activationRow.children[ACTIVATION_COLUMN])
             }
             document.getElementById("sigma").innerText = "∑> ";
 
@@ -1932,7 +1957,7 @@ class Display {
         display.createOutputTableEditBorder();
     }
 
-    handleHoverExit(inputRow, outputRow, guessOutputRow, isOdd = false) {
+    handleHoverExit(inputRow, outputRow, guessOutputRow, activationRow,  isOdd = false) {
         // reset display panel inputs to user-defined inputs (#11)
         let headerRowVals = [];
         this.getHeaderRowVals(headerRowVals);
@@ -1947,7 +1972,7 @@ class Display {
         if (outputRow) {
             for (let i = 0; i < outputRow.children.length; i++) {
                 outputRow.children[0].style.background = "none";
-                this.checkDesiredOutput(outputRow.children[1], outputRow.children[2], outputRow.children[0])
+                this.checkDesiredOutput(outputRow.children[OUTPUT_COLUMN], outputRow.children[DESIRED_OUTPUT_COLUMN], activationRow.children[ACTIVATION_COLUMN])
             }
         }
         if(guessOutputRow) {
@@ -2134,6 +2159,7 @@ class Display {
         let checkbox = document.getElementById("OutputToggle");
         let checkboxEditable = document.getElementById("InputToggle");
         display.showDesiredOutput(checkbox.checked, checkboxEditable.checked);
+        let activationTable = document.getElementById("activation-table");
         let outputCol = document.getElementById("output-table");
         let n = outputCol.rows.length;
         display.createOutputTableColors();
@@ -2142,9 +2168,9 @@ class Display {
 
         for (let i = 1; i < n; i++) {
             //var tr = outputCol.rows[i];
-            let output = outputCol.rows[i].cells[1];
-            let desired = outputCol.rows[i].cells[2];
-            let activation = outputCol.rows[i].cells[0];
+            let output = outputCol.rows[i].cells[OUTPUT_COLUMN];
+            let desired = outputCol.rows[i].cells[DESIRED_OUTPUT_COLUMN];
+            let activation = activationTable.rows[i].cells[ACTIVATION_COLUMN];
 
             let currCorrect = this.checkDesiredOutput(output, desired, activation);
             if (!currCorrect)
@@ -2194,6 +2220,7 @@ class Display {
             document.getElementById("CheckAnswerBtn").style.display = "inline-block";
             document.getElementById("network-container").style.display = "none";
             document.getElementById("output-container").style.display = "none";
+            document.getElementById("activation-container").style.display = "none";
             document.getElementById("bias-toggle").style.display = "none";
             otherHeaders.forEach(header => {
                 header.hidden = true;
@@ -2209,6 +2236,7 @@ class Display {
             document.getElementById("CheckAnswerBtn").style.display = "none";
             document.getElementById("network-container").style.display = "inline-flex";
             document.getElementById("output-container").style.display = "inline-flex";
+            document.getElementById("activation-container").style.display = "inline-flex";
             document.getElementById("bias-toggle").style.display = "inline-flex";
             //document.getElementById("edit-menu-section").style.display = "inline-block";
             otherHeaders.forEach(header => {
@@ -2245,6 +2273,7 @@ class Display {
         perceptron.setBiasUI();
         display.updateSelectedInput();
         demo.adjustWeightPlacement();
+        setupQuestionFields()
     }
 
     UpdateFanfareToggle() {
@@ -2369,7 +2398,7 @@ class Display {
         });
     }
     showDesiredOutput (show, editable) {
-        outputTable.showColumn(2, show, editable);
+        outputTable.showColumn(DESIRED_OUTPUT_COLUMN, show, editable);
         //display.createOutputTableEditBorder()
     }
 }
@@ -2789,7 +2818,15 @@ class Demo {
                 outputs.data[i][j] = perceptron.outputData[i][j]
             }
         }
+        for (let i = 0; i < perceptron.activationData.length; i++) {
+            for (let j = 0; j < perceptron.activationData[0].length; j++ ) {
+                activations.data[i][j] = perceptron.activationData[i][j]
+            }
+        }
+
         outputTable.dataObj = outputs;
+        activationTable.dataObj = activations;
+        activationTable.updateTable();
         outputTable.updateTable();
         display.updateDisplay();
         display.outputLine.position();
@@ -2804,6 +2841,7 @@ class Demo {
         display.saveGuessComment();
         display.createGuessTable();
         display.updateHintButton();
+        display.updateTableOutputColumn();
 
         let hintText = document.getElementById("hintText");
         hintText.innerText = "";
@@ -2845,7 +2883,7 @@ async function downloadFile() {
     let table = document.getElementById("output-table");
     for (let i = 1; i < table.rows.length; i++ ) {
         let tr = table.rows[i];
-        let td = tr.cells[2];
+        let td = tr.cells[DESIRED_OUTPUT_COLUMN];
         desiredOutputs.data[i-1] = td.innerText;
     }
     desiredOutputs.rows = table.rows.length-1;
@@ -2995,24 +3033,14 @@ async function uploadFileComputer(event) {
     fileInput.click();
 }
 
-async function provideHint() {
-    //get all the input
-
-    //dataOp.updateDataFromTableNoDisplay(outputs, outputTable);
-    //let desiredOutputs = perceptron.outputData.map(row => row[row.length - 1]);
-    let desiredOutputs = []
-    let outputTable = document.getElementById("output-table")
-    for (let i = 1; i < outputTable.rows.length; i++) {
-        desiredOutputs.push(parseInt(outputTable.rows[i].cells[2].innerText));
-    }
+function getEditableList() {
     const thresholdToggleBtn = document.getElementById(`threshold_toggleBtn`);
-
     let editableList  = [];
 
     let weight_parent = document.getElementById(`input-link-text`);
-    let weight_lebels = weight_parent.querySelectorAll('span.edit-toggle');
-    for( let i = 0; i < weight_lebels.length; i++) {
-        let weight_label = weight_lebels[i];
+    let weight_lebals = weight_parent.querySelectorAll('span.edit-toggle');
+    for( let i = 0; i < weight_lebals.length; i++) {
+        let weight_label = weight_lebals[i];
         if (weight_label.classList.contains("edit-toggle-on")) {
             editableList.push(true);
         }
@@ -3028,6 +3056,22 @@ async function provideHint() {
     else {
         editableList.push(false);
     }
+
+    return editableList
+}
+
+async function provideHint() {
+    //get all the input
+
+    //dataOp.updateDataFromTableNoDisplay(outputs, outputTable);
+    //let desiredOutputs = perceptron.outputData.map(row => row[row.length - 1]);
+    let desiredOutputs = []
+    let outputTable = document.getElementById("output-table")
+    for (let i = 1; i < outputTable.rows.length; i++) {
+        desiredOutputs.push(parseInt(outputTable.rows[i].cells[DESIRED_OUTPUT_COLUMN].innerText));
+    }
+
+    let editableList = getEditableList()
     console.log(editableList)
     let hintProvider = new hintprovider([...perceptron.weights].concat(perceptron.threshold), perceptron.inputData, desiredOutputs, editableList);
     let hintArr = hintProvider.provideHint(prevHintIndex, prevSubset, prevHintLevel);
@@ -3087,6 +3131,7 @@ function addEditOption(c) {
             }
         }
         dataOp.makeEditable(textbox, editable);
+        setupQuestionFields();
     };
     toggleBtn.onclick = weightButtonHandler;
 }
@@ -3116,6 +3161,7 @@ function addThresholdEditOption() {
             }
         }
         dataOp.makeEditable(textbox, editable);
+        setupQuestionFields();
     };
     toggleBtn.onclick = thresholdButtonHandler;
 }
@@ -3184,6 +3230,50 @@ function setImageEditOptions() {
     });
 }
 
+function setupQuestionFields() {
+    let editableList = getEditableList()
+
+    let weightHolder = document.getElementById("input-link-text");
+
+    let fields = [];
+    for (let i = 0; i < editableList.length; i++) {
+        let field = editableList[i];
+        let fieldName = '';
+        if (field) { //editable
+            if (i !== editableList.length - 1) { //weight
+                fieldName = weightHolder?.children[i]?.children[0].innerHTML;
+                fieldName = fieldName.replace("=", "");
+                fieldName = fieldName.replace(" ", "");
+            }
+            else { //threshold
+                let biasToggle = document.getElementById("biasToggle");
+                fieldName = biasToggle.checked ? "the bias" : "the threshold";
+            }
+            fields.push(fieldName)
+        }
+    }
+
+    // set up the text
+    let fieldText = document.getElementById("questionfields");
+    fieldText.innerHTML = "Adjust "
+    if (fields.length === 1) {
+        fieldText.innerHTML += fields[0]
+    }
+    else if (fields.length === 2) {
+        fieldText.innerHTML += fields[0] + " and " + fields[1]
+    }
+    else {
+        for (let i = 0; i < fields.length - 1; i++) {
+            fieldText.innerHTML += fields[i] + ", "
+        }
+        fieldText.innerHTML += "and " + fields[fields.length - 1]
+    }
+    fieldText.innerHTML += " to solve the problem."
+
+
+
+
+}
 
 function setupCloseButtons() {
     let closeIcons = document.querySelectorAll('.close-icon');
@@ -3368,14 +3458,16 @@ function uploadJson(text) {
     dataOp.updateTableFromDesired(desiredOutputs, outputTable);
 
     let outputCol = document.getElementById("output-table");
+    let activationTable = document.getElementById("activation-table");
     let outputTableLength = outputCol.rows.length;
 
     for (let i = 1; i < outputTableLength; i++)
     {
         //var tr = outputCol.rows[i];
-        let output = outputCol.rows[i].cells[1];
-        let desired = outputCol.rows[i].cells[2];
-        let activation = outputCol.rows[i].cells[0]
+        let output = outputCol.rows[i].cells[OUTPUT_COLUMN];
+        let desired = outputCol.rows[i].cells[DESIRED_OUTPUT_COLUMN];
+        let activation = activationTable.rows[i].cells[ACTIVATION_COLUMN]
+
         display.checkDesiredOutput(output, desired, activation);
     }
     display.handleHoverExit();
@@ -3415,6 +3507,7 @@ function uploadJson(text) {
     document.getElementById("DemoToggle").dispatchEvent(new Event("click"));
     isLoading = false;
     perceptron.setBiasUI();
+    setupQuestionFields();
 
     prevHintLevel = 0;
     prevHintIndex = -1;
@@ -3527,6 +3620,7 @@ window.onload = function(){
 
 // initialize all classes
 const demo = new Demo();
+const problemNum = 16;
 var checkAnswerButtonLocationInitialized = false;
 var currentImageType = "";
 var currentImage;
@@ -3545,15 +3639,17 @@ let perceptron = new Perceptron(inputs, demo.weights, demo.threshold, null);
 perceptron.computeOutputs();
 let outputs = new Data(perceptron.outputData);
 const outputTable = new Table(outputs, "output-table", false);
+let activations = new Data(perceptron.activationData);
+const activationTable = new Table(activations, "activation-table", false);
 dataOp.createBinaryData(2);
 perceptron.displayPerceptron();
 const display = new Display();
-display.updateDisplay();
 //uploadFromUrl("SampleModel.json");
 uploadFromZipUrl(encodeURI("problems/Problem 1.sandbox"), true);
 display.createOutputTableColors();
 display.createInputTableEditBorder();
 display.createOutputTableEditBorder();
+display.updateDisplay();
 addThresholdEditOption();
 handleDesiredOutputColumn();
 loadQuestionsAndModels();
@@ -3561,7 +3657,7 @@ document.getElementById("DemoToggle").checked = true;
 display.UpdateDemoToggle();
 document.getElementById("AutoProgressToggle").checked = true;
 
-const problemNum = 16;
+
 
 let prevHintIndex = -1;
 let prevSubset = [];
