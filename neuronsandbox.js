@@ -946,26 +946,35 @@ class Display {
     }
 
     alignTables() {
+        let heights = []
         let maxHeight = 0
 
         const headerCells = document.getElementById("input-table").rows[1].cells;
-        for (let c = 1; c < headerCells.length; c++) {
-            let headerInput = headerCells[c];
-            if (headerInput.id.startsWith("tblinput")) {
+        const headerCellsHeight = getComputedStyle(headerCells[1]).height;
 
-                let heightOfTH = headerInput.offsetHeight
-                //let heightOfTH = parseInt(heightOfTHtext.substring(0, heightOfTHtext.length-2))
-                if (heightOfTH > maxHeight)
-                    maxHeight = heightOfTH
-            }
-            else
-                console.log("missing input")
-        }
         const outputHeaderCells = document.getElementById("output-table").rows[0].cells;
-        outputHeaderCells[0].style.height = maxHeight + 'px';
+        const outputHeaderCellsHeight = getComputedStyle(outputHeaderCells[0]).height;
+
         const guessOutputHeaderCells = document.getElementById("guess-output-table").rows[0].cells;
-        guessOutputHeaderCells[0].style.height = maxHeight + 'px';
+        const guessOutputHeaderCellsHeight = getComputedStyle(guessOutputHeaderCells[0]).height;
+
         const activationHeaderCells = document.getElementById("activation-table").rows[0].cells;
+        const activationHeaderCellsHeight = getComputedStyle(activationHeaderCells[0]).height;
+
+        heights.push(headerCellsHeight);
+        heights.push(outputHeaderCellsHeight);
+        heights.push(guessOutputHeaderCellsHeight);
+        heights.push(activationHeaderCellsHeight);
+
+        for (let i = 0; i < heights.length; i++) {
+            let height = parseFloat(heights[i].replace("px", ""))
+            if (height > maxHeight)
+                maxHeight = height
+        }
+
+        headerCells[1].style.height = maxHeight + 'px';
+        outputHeaderCells[0].style.height = maxHeight + 'px';
+        guessOutputHeaderCells[0].style.height = maxHeight + 'px';
         activationHeaderCells[0].style.height = maxHeight + 'px';
     }
 
@@ -981,7 +990,7 @@ class Display {
         else {
             sigma = parseFloat(document.getElementById("bias-text").innerText) * -1;
         }
-        outputColumn.innerText = "Current Output Sigma > " + sigma.toString();
+        outputColumn.innerHTML = `Current Output<br>&Sigma; > ` + sigma.toString();
     }
 
     toggleProblemDisplay() {
@@ -2112,6 +2121,7 @@ class Display {
             //document.getElementById("generateTruthTable").disabled = true;
             document.getElementById("output-table").style.marginTop = "0px";
             document.getElementById("guess-output-table").style.marginTop = "0px";
+            document.getElementById("activation-table").style.marginTop = "0px";
             document.getElementById("AutoProgressToggleBody").style.display = "none";
             document.getElementById("BinaryToggleBody").style.display= "none";
             document.getElementById("ShowDesiredToggleBody").style.display= "none";
@@ -2130,6 +2140,7 @@ class Display {
             //document.getElementById("generateTruthTable").disabled = false;
             document.getElementById("output-table").style.marginTop = "40px";
             document.getElementById("guess-output-table").style.marginTop = "40px";
+            document.getElementById("activation-table").style.marginTop = "40px";
             document.getElementById("AutoProgressToggleBody").style.display = "flex";
             document.getElementById("BinaryToggleBody").style.display= "flex";
             document.getElementById("ShowDesiredToggleBody").style.display= "flex";
@@ -3252,7 +3263,7 @@ function setupQuestionFields() {
     }
 
     // set up the text
-    let fieldText = document.getElementById("questionfields");
+    let fieldText = document.getElementById("hintText");
     fieldText.innerHTML = "Adjust "
     if (fields.length === 1) {
         fieldText.innerHTML += fields[0]
