@@ -900,6 +900,12 @@ function checkAnswerCorrect() {
     }
     else {
         for (let i = 1; i < tableRows; i++) {
+            let inputRow = inputTable.rows.item(i+1);
+            if(inputRow.classList.contains("red-border")) {
+                inputRow.classList.remove("red-border");
+            }
+        }
+        for (let i = 1; i < tableRows; i++) {
             let cells = outputTable.rows.item(i).cells
             var radioButtonGroup = document.getElementsByName(`guess-radio-${i-1}`);
             let guess_output;
@@ -940,24 +946,31 @@ class Display {
     }
 
     alignTables() {
+        let heights = []
         let maxHeight = 0
 
         const headerCells = document.getElementById("input-table").rows[1].cells;
-        for (let c = 1; c < headerCells.length; c++) {
-            let headerInput = headerCells[c];
-            if (headerInput.id.startsWith("tblinput")) {
+        const headerCellsHeight = getComputedStyle(headerCells[1]).height;
 
-                let heightOfTH = headerInput.offsetHeight
-                //let heightOfTH = parseInt(heightOfTHtext.substring(0, heightOfTHtext.length-2))
-                if (heightOfTH > maxHeight)
-                    maxHeight = heightOfTH
-            }
-            else
-                console.log("missing input")
-        }
         const outputHeaderCells = document.getElementById("output-table").rows[0].cells;
-        outputHeaderCells[0].style.height = maxHeight + 'px';
+        const outputHeaderCellsHeight = getComputedStyle(outputHeaderCells[0]).height;
+
         const guessOutputHeaderCells = document.getElementById("guess-output-table").rows[0].cells;
+        const guessOutputHeaderCellsHeight = getComputedStyle(guessOutputHeaderCells[0]).height;
+
+
+        heights.push(headerCellsHeight);
+        heights.push(outputHeaderCellsHeight);
+        heights.push(guessOutputHeaderCellsHeight);
+
+        for (let i = 0; i < heights.length; i++) {
+            let height = parseFloat(heights[i].replace("px", ""))
+            if (height > maxHeight)
+                maxHeight = height
+        }
+
+        headerCells[1].style.height = maxHeight + 'px';
+        outputHeaderCells[0].style.height = maxHeight + 'px';
         guessOutputHeaderCells[0].style.height = maxHeight + 'px';
     }
 
@@ -2226,6 +2239,7 @@ class Display {
         FixCheckAnswerButtonPosition();
         display.createInputTableEditBorder();
         display.updateHintButton();
+        checkAnswerCorrect();
 
         //reposition lines
         for (let i = 0; i < demo.weightLines.length; i++) {
