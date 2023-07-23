@@ -80,6 +80,7 @@ article > section {
     display: inline-flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
 }
 
 
@@ -175,7 +176,6 @@ article > section {
 
 #th1{
     position: relative;
-    padding: 0px 2px;
 }
 
 /*
@@ -995,8 +995,10 @@ span.guess-comment {
     height: 20px;
 }
 
-.spacer-cell {
-    width: 20px;
-    border: none !important;
+#perceptron-detail {
+    font-size: 23px;
+    height: 20px;
+    text-align: center;
+    transform: translate(0, -2.5vh);
     visibility: hidden;
 }

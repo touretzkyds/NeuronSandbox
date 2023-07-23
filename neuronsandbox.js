@@ -873,6 +873,7 @@ function ConvertToWeightSubscript(weightLabel) {
 function checkAnswerCorrect() {
     let inputTable = document.getElementById("input-table")
     let outputTable = document.getElementById("output-table")
+    let activationTable = document.getElementById("activation-table")
     let guessToggle = document.getElementById("DemoToggle")
     let outputToggleChecked = document.getElementById("OutputToggle").checked
     let tableRows = outputTable.rows.length
@@ -881,6 +882,7 @@ function checkAnswerCorrect() {
         for (let i = 1; i < tableRows; i++) {
             let row = outputTable.rows.item(i);
             let inputRow = inputTable.rows.item(i+1);
+            let activationRow = activationTable.rows.item(i);
             let cells = outputTable.rows.item(i).cells
             let output = cells.item(OUTPUT_COLUMN).innerText;
             let desired = cells.item(DESIRED_OUTPUT_COLUMN).innerText;
@@ -892,6 +894,9 @@ function checkAnswerCorrect() {
                 if(!inputRow.classList.contains("red-border")) {
                     inputRow.classList.add("red-border");
                 }
+                if(!activationRow.classList.contains("red-border")) {
+                    activationRow.classList.add("red-border");
+                }
                 isCorrect = false
             }
             else {
@@ -900,6 +905,9 @@ function checkAnswerCorrect() {
                 }
                 if(inputRow.classList.contains("red-border")) {
                     inputRow.classList.remove("red-border");
+                }
+                if(activationRow.classList.contains("red-border")) {
+                    activationRow.classList.remove("red-border");
                 }
             }
         }
@@ -1680,9 +1688,9 @@ class Display {
             let bias_value = 1;
             if(typeof demo.selectedInput[0] === "string")
             {
-                bias_value = "Bias";
+                bias_value = "";
             }
-            newCell.innerHTML = `<div class=\"bias-content\"><span style="display: inline-flex">${bias_value}<img src="media/ground.png" height="33px" style="transform: translateX(30px);"></span></div>`;
+            newCell.innerHTML = `<div class=\"bias-content\"><img src="media/ground.png" height="33px" style="transform: rotate(-90deg)" ></div>`;
         }
         //removes lines when not hovered
         demo.weightLines.forEach(line => line.remove());
@@ -1700,7 +1708,7 @@ class Display {
                 percentsX = [-3]
                 break
             case 2:
-                percentsX = [0, 0]
+                percentsX = [0, 5]
                 break
             case 3:
                 percentsX = [0, -2.5, 0]
@@ -1784,7 +1792,7 @@ class Display {
             let xposition = 6+ percentsX[real_i];
             demo.weightLines[i] = new LeaderLine(
                 LeaderLine.pointAnchor(selections.rows[real_i].cells[0], {x: '110%', y: '50%'}),
-                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: xposition+'%', y: percentsY[real_i]+'%'})
+                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: xposition+'%', y: (percentsY[real_i]-5)+'%'})
             );
 
             let splitup = weight_labels[i].children[1].textContent.split(" ")
@@ -1905,9 +1913,36 @@ class Display {
 
             //show the activation number
             perceptron.computeAffineOutput();
+            let showDetail = document.getElementById("DetailToggle").checked;
+            if (showDetail) {
+                let headerRowVals = [];
+                this.getHeaderRowVals(headerRowVals);
+                document.getElementById("perceptron-detail").style.visibility = "visible";
+                let activation = perceptron.affineOutput[rowIdx-2];
+                let detail_line = `∑=`;
+                for(let i = 0; i < headerRowVals.length; i++) {
+                    let variable_name = headerRowVals[i];
+                    detail_line += `<span style=\"color: red;\">${variable_name} </span> <span style=\"color: blue;\">&times;</span> w<sub>${i+1}</sub>`;
+                    if(i !== headerRowVals.length - 1) {
+                        detail_line += " + ";
+                    }
+                }
+                detail_line += `= ${activation}`;
+                detail_line += `<p>∑=`;
+                for(let i = 0; i < headerRowVals.length; i++) {
+                    let variable_value = perceptron.inputData[rowIdx-2][i];
+                    detail_line += `<span style=\"color: red;\">${variable_value}</span> <span style=\"color: blue;\"> &times; </span>${perceptron.weights[i]}</sub>`;
+                    if(i !== headerRowVals.length - 1) {
+                        detail_line += " + ";
+                    }
+                }
+                detail_line += `= ${activation}`;
+                document.getElementById("perception_detail_line").innerHTML = detail_line;
+            }
+            else {
+                document.getElementById("perceptron-detail").style.visbility = "hidden";
+            }
             document.getElementById("sigma").innerText = perceptron.affineOutput[rowIdx-2].toString() + "> ";
-
-            //console.log("enter: set outputRow =" + outputRow);
         }
         else {
             if (rowIdx % 2 === 0) {
@@ -1923,7 +1958,8 @@ class Display {
                     this.checkDesiredOutput(outputRow.children[OUTPUT_COLUMN], outputRow.children[DESIRED_OUTPUT_COLUMN], activationRow.children[ACTIVATION_COLUMN])
             }
             document.getElementById("sigma").innerText = "∑> ";
-
+            document.getElementById("perceptron-detail").style.visibility= "hidden";
+            document.getElementById("perceptron-normal").style.display = "inline-flex";
 
         }
         //this.displaySelectedInput();

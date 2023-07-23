@@ -322,14 +322,26 @@
                         <div id = "perceptron1" class="center-perceptron">
                             <div class="circle center">
                                 <div id="threshold-text" class="center">
-                                    <text id="sigma">∑> </text>
-                                    <text id="th1"></text>
-                                    <span id = "threshold_toggleBtn" class="edit-toggle edit-toggle-off">
+                                    <div id="perceptron-normal" style="display: inline-flex">
+                                        <text id="sigma">∑> </text>
+                                        <text id="th1"></text>
+                                        <span id = "threshold_toggleBtn" class="edit-toggle edit-toggle-off">
                                           <i class="fas fa-pencil-alt"></i>
                                           <i class="fas fa-lock"></i>
                                         </span>
+                                    </div>
                                 </div>
                             </div>
+                            <div id="detail-toggle" style="width: 100%; display:flex; flex-direction: row; justify-content: center; align-items: center; column-gap: 10px;">
+                                <label style="width: 50px">Hide Detail</label>
+                                <label id="DetailSwitch" class="switch">
+                                    <input type="checkbox" id="DetailToggle">
+                                    <span id="detail-slider" class="slider round"></span>
+                                </label>
+                                <label style="width: 50px">Show Detail</label>
+                            </div>
+                            <p></p>
+
                         </div>
                         <div id = "output-links" class="center">
                         </div>
@@ -371,7 +383,11 @@
         </tr>
     </table>
 
-
+    <div id="perceptron-detail">
+        <div style="display: inline-block">
+            <text id="perception_detail_line">∑= </text>
+        </div>
+    </div>
     <script src="neuronsandbox.js"></script>
     <script src="hintprovider.js"></script>
 </head>
