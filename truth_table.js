@@ -1,3 +1,4 @@
+
 function saveDesiredValues() {
     desired_values = []
     const outputTable = document.getElementById("output-table");
@@ -34,6 +35,7 @@ function writeTruthTable(truthData) {
         inputTable.insertTableRow(2, false);
         dataOp.insertDataRow(inputs, 0);
         outputTable.insertTableRow(1);
+        activationTable.insertTableRow(1);
         dataOp.insertDataRow(outputs, 0);
     }
 
@@ -47,4 +49,5 @@ function writeTruthTable(truthData) {
     }
 
     demo.update();
+    checkAnswerCorrect();
 }

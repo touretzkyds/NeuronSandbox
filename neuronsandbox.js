@@ -596,6 +596,7 @@ class Perceptron {
     // compute combination column of output table
     computeAffineOutput() {
         this.affineOutput = new Array(this.dataObj.rows).fill(0);
+        this.activationData = new Array(this.dataObj.rows).fill(0).map(() => new Array(1).fill(0));
         for (let r=0; r<this.dataObj.rows; ++r){
             for (let c=0; c<this.dataObj.cols; ++c){
                 const prod = this.inputData[r][c] * this.weights[c];
@@ -2206,7 +2207,7 @@ class Display {
         let checkbox = document.getElementById("OutputToggle");
         let checkboxEditable = document.getElementById("InputToggle");
         display.showDesiredOutput(checkbox.checked, checkboxEditable.checked);
-        let activationTable = document.getElementById("activation-table");
+        let activationCol = document.getElementById("activation-table");
         let outputCol = document.getElementById("output-table");
         let n = outputCol.rows.length;
         display.createOutputTableColors();
@@ -2217,7 +2218,7 @@ class Display {
             //var tr = outputCol.rows[i];
             let output = outputCol.rows[i].cells[OUTPUT_COLUMN];
             let desired = outputCol.rows[i].cells[DESIRED_OUTPUT_COLUMN];
-            let activation = activationTable.rows[i].cells[ACTIVATION_COLUMN];
+            let activation = activationCol.rows[i].cells[ACTIVATION_COLUMN];
 
             let currCorrect = this.checkDesiredOutput(output, desired, activation);
             if (!currCorrect)
@@ -2546,6 +2547,8 @@ class Demo {
         dataOp.insertDataRow(inputs, r-2);
         outputTable.insertTableRow(r-1);
         dataOp.insertDataRow(outputs, r-2);
+        activationTable.insertTableRow(r-1);
+        dataOp.insertDataRow(activations, r-2);
         demo.update(); //TODO: check if efficient
     }
 
@@ -2553,6 +2556,8 @@ class Demo {
         inputTable.insertTableRow(r);
         dataOp.insertDataRow(inputs, r-2);
         outputTable.insertTableRow(r-1);
+        activationTable.insertTableRow(r-1);
+        dataOp.insertDataRow(activations, r-2)
         dataOp.insertDataRow(outputs, r-2);
         if (needUpdate)
             demo.update();
@@ -2564,7 +2569,9 @@ class Demo {
         inputTable.removeTableRow(r);
         dataOp.removeDataRow(inputs, r);
         outputTable.removeTableRow(r-1);
+        activationTable.removeTableRow(r-1);
         dataOp.removeDataRow(outputs, r);
+        dataOp.removeDataRow(activations, r);
         demo.lines.forEach(line => line.remove());
         demo.lines = []
         demo.update(); //TODO: check if efficient
@@ -2582,6 +2589,7 @@ class Demo {
             inputTable.removeTableRow(2);
             dataOp.removeDataRow(inputs, 0);
             outputTable.removeTableRow(1);
+            activationTable.removeTableRow(1);
             dataOp.removeDataRow(outputs, 0);
         }
         if (needUpdate) demo.update();
@@ -3456,6 +3464,8 @@ function uploadJson(text) {
         inputTable.insertTableRow(2);
         outputTable.insertTableRow(1);
         dataOp.insertDataRow(outputs, 0);
+        activationTable.insertTableRow(1);
+        dataOp.insertDataRow(activations, 0);
     }
 
     //dataOp.updateTableFromDesired(desiredOutputs, outputTable);
@@ -3503,7 +3513,7 @@ function uploadJson(text) {
     dataOp.updateTableFromDesired(desiredOutputs, outputTable);
 
     let outputCol = document.getElementById("output-table");
-    let activationTable = document.getElementById("activation-table");
+    let activationCol = document.getElementById("activation-table");
     let outputTableLength = outputCol.rows.length;
 
     for (let i = 1; i < outputTableLength; i++)
@@ -3511,7 +3521,7 @@ function uploadJson(text) {
         //var tr = outputCol.rows[i];
         let output = outputCol.rows[i].cells[OUTPUT_COLUMN];
         let desired = outputCol.rows[i].cells[DESIRED_OUTPUT_COLUMN];
-        let activation = activationTable.rows[i].cells[ACTIVATION_COLUMN]
+        let activation = activationCol.rows[i].cells[ACTIVATION_COLUMN]
 
         display.checkDesiredOutput(output, desired, activation);
     }
