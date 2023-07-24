@@ -459,7 +459,7 @@ class Table {
         if (newCol < 0 || newNameIndex < 0)
             return;
         let th = document.createElement('th'); //column
-        th.innerHTML = "<div class=\"input-content\">" + "x<sub>" + newNameIndex + "</sub>" + "</div>";
+        th.innerHTML = "<div lang=\"en\" class=\"input-content\">" + "x<sub>" + newNameIndex + "</sub>" + "</div>";
         th.setAttribute("id", `tblinput${newCol}`);
         dataOp.makeEditable(th);
 
@@ -1651,7 +1651,7 @@ class Display {
             let newRow = selections.insertRow(i);
             let newCell = newRow.insertCell(0);
             //newCell.innerHTML = `<div class=\"input-content\">${demo.selectedInput[i]}</div>`;
-            newCell.innerHTML = `<div class=\"input-content\">${demo.selectedInput[i]}</div>`;
+            newCell.innerHTML = `<div lang="en" class=\"input-content\">${demo.selectedInput[i]}</div>`;
         }
         if(document.getElementById("biasToggle").checked)
         {
@@ -1929,7 +1929,7 @@ class Display {
                 real_r += 1;
             }
             if (this.hovering) {
-                selections.rows[real_r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</div>`;
+                selections.rows[real_r].cells[0].innerHTML = `<div lang="en" class="input-content">${demo.selectedInput[r]}</div>`;
                 demo.lines[r] = new LeaderLine(
                     LeaderLine.pointAnchor(inputRow.children[r+1], {x: '70%', y: '50%'}),
                     LeaderLine.pointAnchor(selections.rows[real_r].cells[0], {x: '10%', y: '50%'}),
@@ -1938,7 +1938,7 @@ class Display {
                 demo.lines[r].setOptions({startSocket: 'right', endSocket: 'left'});
             }
             else {
-                selections.rows[real_r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</div>`;
+                selections.rows[real_r].cells[0].innerHTML = `<div lang="en" class="input-content">${demo.selectedInput[r]}</div>`;
             }
         }
         display.alignTables()
@@ -3431,6 +3431,7 @@ function uploadJson(text) {
     prevHintLevel = 0;
     prevHintIndex = -1;
     prevSubset = [];
+    checkAnswerCorrect();
 }
 
 async function uploadFile(event) {
@@ -3573,7 +3574,7 @@ document.getElementById("DemoToggle").checked = true;
 display.UpdateDemoToggle();
 document.getElementById("AutoProgressToggle").checked = true;
 
-const problemNum = 16;
+const problemNum = 17;
 
 let prevHintIndex = -1;
 let prevSubset = [];
