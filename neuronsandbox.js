@@ -1651,7 +1651,7 @@ class Display {
             let newRow = selections.insertRow(i);
             let newCell = newRow.insertCell(0);
             //newCell.innerHTML = `<div class=\"input-content\">${demo.selectedInput[i]}</div>`;
-            newCell.innerHTML = `<div lang="en" class=\"input-content\">${demo.selectedInput[i]}</div>`;
+            newCell.innerHTML = `<div lang=\"en\" class=\"input-content\">${demo.selectedInput[i]}</div>`;
         }
         if(document.getElementById("biasToggle").checked)
         {
@@ -3362,11 +3362,12 @@ function uploadJson(text) {
     document.getElementById('OutputToggle').checked = dict["output-toggle-checked"];
     document.getElementById("FanfareToggle").checked = dict["fanfare-toggle-checked"];
 
-    document.getElementById("DemoToggle").checked = dict["guessToggleChecked"];
-    display.UpdateDemoToggle();
+
 
     display.handleHoverExit();
     demo.update();
+    document.getElementById("DemoToggle").checked = dict["guessToggleChecked"];
+    display.UpdateDemoToggle();
     // let headerRows = dict["input-header"];
     // if(headerRows?.length) {
     //     display.setHeaderRowVals(headerRows);
@@ -3574,7 +3575,7 @@ document.getElementById("DemoToggle").checked = true;
 display.UpdateDemoToggle();
 document.getElementById("AutoProgressToggle").checked = true;
 
-const problemNum = 17;
+const problemNum = 18;
 
 let prevHintIndex = -1;
 let prevSubset = [];
