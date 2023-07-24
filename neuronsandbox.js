@@ -996,9 +996,6 @@ class Display {
         if (!biasToggle.checked) {
             sigma = parseFloat(document.getElementById("th1").innerText);
         }
-        else {
-            sigma = parseFloat(document.getElementById("bias-text").innerText) * -1;
-        }
         outputColumn.innerHTML = `Current Output<br>&Sigma; > ` + sigma.toString();
     }
 
