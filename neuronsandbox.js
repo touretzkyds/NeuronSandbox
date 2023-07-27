@@ -1,5 +1,14 @@
 "use strict";
 
+const ERROR_COLOR = '#ffbfcb';
+const OUTPUT_COLOR = '#f8ffcf';
+const INVALID_WEIGHT = '#fc496b';
+const NEGATIVE_WEIGHT = '#c91a0e';
+const ZERO_WEIGHT = 'blue';
+const DEFAULT_LINE_COLOR = 'black';
+const HOVER_COLOR = 'lightblue';
+const HOVER_ERROR = '#c2abc9';
+
 class Data {
     constructor(inputData) {
         this.update(inputData); //default shape: (2, 4)
@@ -937,7 +946,7 @@ class Display {
             LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '99%', y: '50%'}),
             LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '-50%', y: 50+'%'})
         );
-        this.outputLine.color = 'black';
+        this.outputLine.color = DEFAULT_LINE_COLOR;
         this.outputLine.path = 'straight';
         this.outputLine.position();
         this.createOutputTableColors();
@@ -1004,8 +1013,8 @@ class Display {
             td1.style.fontWeight = 'normal';
 
             td2.style.fontWeight = 'bold';
-            if (td2.style.background !== '#ffbfcb') { //error
-                td2.style.background = '#f8ffcf'
+            if (td2.style.background !== ERROR_COLOR) { //error
+                td2.style.background = OUTPUT_COLOR
                 td1.style.background = 'none'
             }
 
@@ -1030,7 +1039,7 @@ class Display {
 
             this.updateGuessTableCommentRow(i);
             if(desired !== guessed) {
-                guessOutputRow.style.background = '#ffbfcb';
+                guessOutputRow.style.background = ERROR_COLOR;
             }
             else {
                 guessOutputRow.style.background = '';
@@ -1744,7 +1753,7 @@ class Display {
                 })
             );
             demo.biasLine.path = "straight";
-            demo.biasLine.color = 'black';
+            demo.biasLine.color = DEFAULT_LINE_COLOR;
         }
         else {
             if (demo.biasLine) {
@@ -1771,17 +1780,17 @@ class Display {
             let splitup = weight_labels[i].children[1].textContent.split(" ")
             let num = splitup[splitup.length-1]
             if (!demo.stringToValidFloat(num)[1]) {
-                demo.weightLines[i].color = '#ffbfcb'
-                demo.weightLines[i].path = 'straight'
+                demo.weightLines[i].color = ERROR_COLOR;
+                demo.weightLines[i].path = 'straight';
                 demo.weightLines[i].position();
             }
             else {
                 if (demo.stringToValidFloat(num)[0] === 0)
-                    demo.weightLines[i].color = 'blue';
+                    demo.weightLines[i].color = ZERO_WEIGHT;
                 else if (demo.stringToValidFloat(num)[0] < 0)
-                    demo.weightLines[i].color = '#c91a0e';
+                    demo.weightLines[i].color = NEGATIVE_WEIGHT;
                 else
-                    demo.weightLines[i].color = 'black';
+                    demo.weightLines[i].color = DEFAULT_LINE_COLOR;
                 demo.weightLines[i].path = 'straight';
                 demo.weightLines[i].position();
                 if (demo.stringToValidFloat(num)[1]) { //value is a valid number
@@ -1805,15 +1814,15 @@ class Display {
 
             let numConvertedArray = demo.stringToValidFloat(num)
             if (!numConvertedArray[1]) { //if weight is invalid
-                child.style.color = '#fc496b'
+                child.style.color = INVALID_WEIGHT
             }
             else {
                 if (numConvertedArray[0] === 0) //value is zer0
-                    child.style.color = 'blue'
+                    child.style.color = ZERO_WEIGHT
                 else if (numConvertedArray[0] < 0) //negative weight
-                    child.style.color = '#c91a0e'
+                    child.style.color = NEGATIVE_WEIGHT
                 else
-                    child.style.color = 'black'
+                    child.style.color = DEFAULT_LINE_COLOR
             }
         }
 
@@ -1870,16 +1879,16 @@ class Display {
             //console.log("enter: set demo.selectedOutput =" + demo.selectedOutput);
 
             // highlight input and output rows corresponding to the hovered input row
-            inputRow.style.background = "lightblue";
+            inputRow.style.background = HOVER_COLOR;
             for (let i = 0; i < outputRow.children.length; i++) {
                 if (outputRow.children[i].style.background === "rgb(255, 191, 203)")
-                    outputRow.children[i].style.background = "#c2abc9";
+                    outputRow.children[i].style.background = HOVER_ERROR;
                 else {
-                    outputRow.children[i].style.background = "lightblue";
+                    outputRow.children[i].style.background = HOVER_COLOR;
                 }
             }
             if(guessOutputRow)
-                guessOutputRow.style.background = "lightblue";
+                guessOutputRow.style.background = HOVER_COLOR;
             display.adjustSelectedInputFontSize();
 
             //show the activation number
@@ -2318,13 +2327,13 @@ class Display {
         display.highlightInvalidText(desired, isValid);
 
         if (outputParsedValue !== parsedValue && document.getElementById("OutputToggle").checked) {
-            output.style.background = "#ffbfcb"; //pink (error)
-            activation.style.background = "#ffbfcb";
+            output.style.background = ERROR_COLOR; //pink (error)
+            activation.style.background = ERROR_COLOR;
             return false
         }
         else {
             //output.style.removeProperty('background-color');
-            output.style.background = "#f8ffcf";
+            output.style.background = OUTPUT_COLOR;
             activation.style.background = "none";
             return true
         }
