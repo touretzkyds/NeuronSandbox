@@ -556,6 +556,9 @@ span {
     min-width: 1em;
 }
 
+.span-work {
+}
+
 #popup {
     text-align: center;
     position: fixed;

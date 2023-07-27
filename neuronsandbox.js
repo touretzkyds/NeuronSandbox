@@ -943,7 +943,7 @@ class Display {
         this.hovering = false;
         this.initializeDisplay();
         this.outputLine = new LeaderLine(
-            LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '99%', y: '50%'}),
+            LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '95%', y: '40%'}),
             LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '-50%', y: 50+'%'})
         );
         this.outputLine.color = 'black';
@@ -995,6 +995,9 @@ class Display {
         let sigma = 0;
         if (!biasToggle.checked) {
             sigma = parseFloat(document.getElementById("th1").innerText);
+        }
+        else {
+            sigma = parseFloat(document.getElementById("bias-text").innerText) * -1;
         }
         outputColumn.innerHTML = `Current Output<br>&Sigma; > ` + sigma.toString();
     }
@@ -1917,24 +1920,24 @@ class Display {
                 this.getHeaderRowVals(headerRowVals);
                 document.getElementById("perceptron-detail").style.visibility = "visible";
                 let activation = perceptron.affineOutput[rowIdx-2];
-                let detail_line = `∑=`;
+                let detail_line = `∑ =`;
                 for(let i = 0; i < headerRowVals.length; i++) {
                     let variable_name = headerRowVals[i];
-                    detail_line += `<span style=\"color: red;\">${variable_name} </span> <span style=\"color: blue;\">&times;</span> w<sub>${i+1}</sub>`;
+                    detail_line += `<span class="span-work" style=\"color: red;\">${variable_name} </span> <span class="span-work" style=\"color: blue;\">&times;</span> w<sub>${i+1}</sub>`;
                     if(i !== headerRowVals.length - 1) {
                         detail_line += " + ";
                     }
                 }
-                detail_line += `= ${activation}`;
-                detail_line += `<p>∑=`;
+                detail_line += ` = ${activation}`;
+                detail_line += `<p>∑ =`;
                 for(let i = 0; i < headerRowVals.length; i++) {
                     let variable_value = perceptron.inputData[rowIdx-2][i];
-                    detail_line += `<span style=\"color: red;\">${variable_value}</span> <span style=\"color: blue;\"> &times; </span>${perceptron.weights[i]}</sub>`;
+                    detail_line += `<span class="span-work" style=\"color: red;\">${variable_value}</span> <span class="span-work" style=\"color: blue;\"> &times; </span>${perceptron.weights[i]}</sub>`;
                     if(i !== headerRowVals.length - 1) {
                         detail_line += " + ";
                     }
                 }
-                detail_line += `= ${activation}`;
+                detail_line += ` = ${activation}`;
                 document.getElementById("perception_detail_line").innerHTML = detail_line;
             }
             else {
@@ -1973,6 +1976,9 @@ class Display {
         //empties lines array
         demo.lines = []
 
+        demo.activationLines?.forEach(line => line.remove());
+        demo.activationLines = []
+
 
         const selections = document.getElementById("selected-inputs");
         //demo.selectedInput = demo.inputData[rowIdx];
@@ -1995,6 +2001,13 @@ class Display {
             else {
                 selections.rows[real_r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</div>`;
             }
+        }
+        if (this.hovering) {
+            demo.activationLines[0] = new LeaderLine(
+                LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '120%', y: '50%'}),
+                LeaderLine.pointAnchor(activationRow.cells[0], {x: '48%', y: '50%'}),
+                {dash: {animation: true}}
+            );
         }
         display.alignTables()
         display.createOutputTableEditBorder();
@@ -2571,6 +2584,7 @@ class Demo {
         dataOp.removeDataRow(activations, r);
         demo.lines.forEach(line => line.remove());
         demo.lines = []
+        demo.activationLines = [];
         demo.update(); //TODO: check if efficient
     }
 

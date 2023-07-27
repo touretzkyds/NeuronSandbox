@@ -319,7 +319,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div id = "perceptron1" class="center-perceptron">
+                        <div style="margin-top: 10%" id = "perceptron1" class="center-perceptron">
                             <div class="circle center">
                                 <div id="threshold-text" class="center">
                                     <div id="perceptron-normal" style="display: inline-flex">
@@ -339,6 +339,11 @@
                                     <span id="detail-slider" class="slider round"></span>
                                 </label>
                                 <label style="width: 50px">Show Work</label>
+                            </div>
+                            <div style='margin-top: 15%; width: 150%' id="perceptron-detail">
+                                <div style="display: inline-block">
+                                    <text id="perception_detail_line">∑= </text>
+                                </div>
                             </div>
                             <p></p>
 
@@ -383,11 +388,6 @@
         </tr>
     </table>
 
-    <div style='margin-top: -5%' id="perceptron-detail">
-        <div style="display: inline-block">
-            <text id="perception_detail_line">∑= </text>
-        </div>
-    </div>
     <script src="neuronsandbox.js"></script>
     <script src="hintprovider.js"></script>
 </head>
