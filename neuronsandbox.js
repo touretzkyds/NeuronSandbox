@@ -2004,7 +2004,7 @@ class Display {
         }
         if (this.hovering) {
             demo.activationLines[0] = new LeaderLine(
-                LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '120%', y: '50%'}),
+                LeaderLine.pointAnchor(document.getElementById("sigma"), {x: '60%', y: '50%'}),
                 LeaderLine.pointAnchor(activationRow.cells[0], {x: '48%', y: '50%'}),
                 {dash: {animation: true}}
             );
