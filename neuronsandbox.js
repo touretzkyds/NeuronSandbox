@@ -1586,21 +1586,30 @@ class Display {
         const headerCells = document.getElementById("input-table").rows[1].cells;
         for (let c = 1; c < headerCells.length; c++) {
             let headerInput = headerCells[c];
-            let newFontSize;
             if (headerInput.id.startsWith("tblinput")) {
                 let length = headerInput.innerText.length
 
-                if (length <= 10) {
-                    newFontSize = 40;
-                }
-                else {
-                    newFontSize = 40 - (length-10);
-                    if (newFontSize < 20)
-                        newFontSize = 20;
+                if (length > maxLength) {
+                    maxLength = length;
+                    maxHeaderIndex = c;
                 }
 
             }
-            const selections = document.getElementById("selected-inputs");
+        }
+
+        let newFontSize = 0;
+        if (maxLength <= 10) {
+            newFontSize = 40;
+        }
+        else {
+            newFontSize = 40 - (maxLength-10);
+            if (newFontSize < 20)
+                newFontSize = 20;
+        }
+
+        const selections = document.getElementById("selected-inputs");
+
+        for (let c = 1; c < headerCells.length; c++) {
             if (!document.getElementById("biasToggle").checked) {
                 if(selections.rows[c-1] && selections.rows[c-1].cells[0] )
                     selections.rows[c-1].cells[0].style.fontSize = newFontSize + "px"
@@ -1609,7 +1618,6 @@ class Display {
                 if(selections.rows[c] && selections.rows[c].cells[0] )
                     selections.rows[c].cells[0].style.fontSize = newFontSize + "px"
             }
-
         }
 
         for (let i = 0; i < demo.weightLines.length; i++)
