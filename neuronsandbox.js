@@ -1,5 +1,14 @@
 "use strict";
 
+const ERROR_COLOR = '#ffbfcb';
+const OUTPUT_COLOR = '#f8ffcf';
+const INVALID_WEIGHT = '#fc496b';
+const NEGATIVE_WEIGHT = '#c91a0e';
+const ZERO_WEIGHT = 'blue';
+const DEFAULT_LINE_COLOR = 'black';
+const HOVER_COLOR = 'lightblue';
+const HOVER_ERROR = '#c2abc9';
+
 class Data {
     constructor(inputData) {
         this.update(inputData); //default shape: (2, 4)
@@ -459,7 +468,7 @@ class Table {
         if (newCol < 0 || newNameIndex < 0)
             return;
         let th = document.createElement('th'); //column
-        th.innerHTML = "<div class=\"input-content\">" + "x<sub>" + newNameIndex + "</sub>" + "</div>";
+        th.innerHTML = "<div lang=\"en\" class=\"input-content\">" + "x<sub>" + newNameIndex + "</sub>" + "</div>";
         th.setAttribute("id", `tblinput${newCol}`);
         dataOp.makeEditable(th);
 
@@ -900,6 +909,12 @@ function checkAnswerCorrect() {
     }
     else {
         for (let i = 1; i < tableRows; i++) {
+            let inputRow = inputTable.rows.item(i+1);
+            if(inputRow.classList.contains("red-border")) {
+                inputRow.classList.remove("red-border");
+            }
+        }
+        for (let i = 1; i < tableRows; i++) {
             let cells = outputTable.rows.item(i).cells
             var radioButtonGroup = document.getElementsByName(`guess-radio-${i-1}`);
             let guess_output;
@@ -931,7 +946,7 @@ class Display {
             LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '99%', y: '50%'}),
             LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '-50%', y: 50+'%'})
         );
-        this.outputLine.color = 'black';
+        this.outputLine.color = DEFAULT_LINE_COLOR;
         this.outputLine.path = 'straight';
         this.outputLine.position();
         this.createOutputTableColors();
@@ -940,24 +955,31 @@ class Display {
     }
 
     alignTables() {
+        let heights = []
         let maxHeight = 0
 
         const headerCells = document.getElementById("input-table").rows[1].cells;
-        for (let c = 1; c < headerCells.length; c++) {
-            let headerInput = headerCells[c];
-            if (headerInput.id.startsWith("tblinput")) {
+        const headerCellsHeight = getComputedStyle(headerCells[1]).height;
 
-                let heightOfTH = headerInput.offsetHeight
-                //let heightOfTH = parseInt(heightOfTHtext.substring(0, heightOfTHtext.length-2))
-                if (heightOfTH > maxHeight)
-                    maxHeight = heightOfTH
-            }
-            else
-                console.log("missing input")
-        }
         const outputHeaderCells = document.getElementById("output-table").rows[0].cells;
-        outputHeaderCells[0].style.height = maxHeight + 'px';
+        const outputHeaderCellsHeight = getComputedStyle(outputHeaderCells[0]).height;
+
         const guessOutputHeaderCells = document.getElementById("guess-output-table").rows[0].cells;
+        const guessOutputHeaderCellsHeight = getComputedStyle(guessOutputHeaderCells[0]).height;
+
+
+        heights.push(headerCellsHeight);
+        heights.push(outputHeaderCellsHeight);
+        heights.push(guessOutputHeaderCellsHeight);
+
+        for (let i = 0; i < heights.length; i++) {
+            let height = parseFloat(heights[i].replace("px", ""))
+            if (height > maxHeight)
+                maxHeight = height
+        }
+
+        headerCells[1].style.height = maxHeight + 'px';
+        outputHeaderCells[0].style.height = maxHeight + 'px';
         guessOutputHeaderCells[0].style.height = maxHeight + 'px';
     }
 
@@ -991,8 +1013,8 @@ class Display {
             td1.style.fontWeight = 'normal';
 
             td2.style.fontWeight = 'bold';
-            if (td2.style.background !== '#ffbfcb') { //error
-                td2.style.background = '#f8ffcf'
+            if (td2.style.background !== ERROR_COLOR) { //error
+                td2.style.background = OUTPUT_COLOR
                 td1.style.background = 'none'
             }
 
@@ -1017,7 +1039,7 @@ class Display {
 
             this.updateGuessTableCommentRow(i);
             if(desired !== guessed) {
-                guessOutputRow.style.background = '#ffbfcb';
+                guessOutputRow.style.background = ERROR_COLOR;
             }
             else {
                 guessOutputRow.style.background = '';
@@ -1564,21 +1586,30 @@ class Display {
         const headerCells = document.getElementById("input-table").rows[1].cells;
         for (let c = 1; c < headerCells.length; c++) {
             let headerInput = headerCells[c];
-            let newFontSize;
             if (headerInput.id.startsWith("tblinput")) {
                 let length = headerInput.innerText.length
 
-                if (length <= 10) {
-                    newFontSize = 40;
-                }
-                else {
-                    newFontSize = 40 - (length-10);
-                    if (newFontSize < 20)
-                        newFontSize = 20;
+                if (length > maxLength) {
+                    maxLength = length;
+                    maxHeaderIndex = c;
                 }
 
             }
-            const selections = document.getElementById("selected-inputs");
+        }
+
+        let newFontSize = 0;
+        if (maxLength <= 10) {
+            newFontSize = 40;
+        }
+        else {
+            newFontSize = 40 - (maxLength-10);
+            if (newFontSize < 20)
+                newFontSize = 20;
+        }
+
+        const selections = document.getElementById("selected-inputs");
+
+        for (let c = 1; c < headerCells.length; c++) {
             if (!document.getElementById("biasToggle").checked) {
                 if(selections.rows[c-1] && selections.rows[c-1].cells[0] )
                     selections.rows[c-1].cells[0].style.fontSize = newFontSize + "px"
@@ -1587,7 +1618,6 @@ class Display {
                 if(selections.rows[c] && selections.rows[c].cells[0] )
                     selections.rows[c].cells[0].style.fontSize = newFontSize + "px"
             }
-
         }
 
         for (let i = 0; i < demo.weightLines.length; i++)
@@ -1638,7 +1668,7 @@ class Display {
             let newRow = selections.insertRow(i);
             let newCell = newRow.insertCell(0);
             //newCell.innerHTML = `<div class=\"input-content\">${demo.selectedInput[i]}</div>`;
-            newCell.innerHTML = `<div class=\"input-content\">${demo.selectedInput[i]}</div>`;
+            newCell.innerHTML = `<div lang=\"en\" class=\"input-content\">${demo.selectedInput[i]}</div>`;
         }
         if(document.getElementById("biasToggle").checked)
         {
@@ -1731,7 +1761,7 @@ class Display {
                 })
             );
             demo.biasLine.path = "straight";
-            demo.biasLine.color = 'black';
+            demo.biasLine.color = DEFAULT_LINE_COLOR;
         }
         else {
             if (demo.biasLine) {
@@ -1758,17 +1788,17 @@ class Display {
             let splitup = weight_labels[i].children[1].textContent.split(" ")
             let num = splitup[splitup.length-1]
             if (!demo.stringToValidFloat(num)[1]) {
-                demo.weightLines[i].color = '#ffbfcb'
-                demo.weightLines[i].path = 'straight'
+                demo.weightLines[i].color = ERROR_COLOR;
+                demo.weightLines[i].path = 'straight';
                 demo.weightLines[i].position();
             }
             else {
                 if (demo.stringToValidFloat(num)[0] === 0)
-                    demo.weightLines[i].color = 'blue';
+                    demo.weightLines[i].color = ZERO_WEIGHT;
                 else if (demo.stringToValidFloat(num)[0] < 0)
-                    demo.weightLines[i].color = '#c91a0e';
+                    demo.weightLines[i].color = NEGATIVE_WEIGHT;
                 else
-                    demo.weightLines[i].color = 'black';
+                    demo.weightLines[i].color = DEFAULT_LINE_COLOR;
                 demo.weightLines[i].path = 'straight';
                 demo.weightLines[i].position();
                 if (demo.stringToValidFloat(num)[1]) { //value is a valid number
@@ -1792,15 +1822,15 @@ class Display {
 
             let numConvertedArray = demo.stringToValidFloat(num)
             if (!numConvertedArray[1]) { //if weight is invalid
-                child.style.color = '#fc496b'
+                child.style.color = INVALID_WEIGHT
             }
             else {
                 if (numConvertedArray[0] === 0) //value is zer0
-                    child.style.color = 'blue'
+                    child.style.color = ZERO_WEIGHT
                 else if (numConvertedArray[0] < 0) //negative weight
-                    child.style.color = '#c91a0e'
+                    child.style.color = NEGATIVE_WEIGHT
                 else
-                    child.style.color = 'black'
+                    child.style.color = DEFAULT_LINE_COLOR
             }
         }
 
@@ -1857,16 +1887,16 @@ class Display {
             //console.log("enter: set demo.selectedOutput =" + demo.selectedOutput);
 
             // highlight input and output rows corresponding to the hovered input row
-            inputRow.style.background = "lightblue";
+            inputRow.style.background = HOVER_COLOR;
             for (let i = 0; i < outputRow.children.length; i++) {
                 if (outputRow.children[i].style.background === "rgb(255, 191, 203)")
-                    outputRow.children[i].style.background = "#c2abc9";
+                    outputRow.children[i].style.background = HOVER_ERROR;
                 else {
-                    outputRow.children[i].style.background = "lightblue";
+                    outputRow.children[i].style.background = HOVER_COLOR;
                 }
             }
             if(guessOutputRow)
-                guessOutputRow.style.background = "lightblue";
+                guessOutputRow.style.background = HOVER_COLOR;
             display.adjustSelectedInputFontSize();
 
             //show the activation number
@@ -1916,7 +1946,7 @@ class Display {
                 real_r += 1;
             }
             if (this.hovering) {
-                selections.rows[real_r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</div>`;
+                selections.rows[real_r].cells[0].innerHTML = `<div lang="en" class="input-content">${demo.selectedInput[r]}</div>`;
                 demo.lines[r] = new LeaderLine(
                     LeaderLine.pointAnchor(inputRow.children[r+1], {x: '70%', y: '50%'}),
                     LeaderLine.pointAnchor(selections.rows[real_r].cells[0], {x: '10%', y: '50%'}),
@@ -1925,7 +1955,7 @@ class Display {
                 demo.lines[r].setOptions({startSocket: 'right', endSocket: 'left'});
             }
             else {
-                selections.rows[real_r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</div>`;
+                selections.rows[real_r].cells[0].innerHTML = `<div lang="en" class="input-content">${demo.selectedInput[r]}</div>`;
             }
         }
         display.alignTables()
@@ -2226,6 +2256,7 @@ class Display {
         FixCheckAnswerButtonPosition();
         display.createInputTableEditBorder();
         display.updateHintButton();
+        checkAnswerCorrect();
 
         //reposition lines
         for (let i = 0; i < demo.weightLines.length; i++) {
@@ -2304,13 +2335,13 @@ class Display {
         display.highlightInvalidText(desired, isValid);
 
         if (outputParsedValue !== parsedValue && document.getElementById("OutputToggle").checked) {
-            output.style.background = "#ffbfcb"; //pink (error)
-            activation.style.background = "#ffbfcb";
+            output.style.background = ERROR_COLOR; //pink (error)
+            activation.style.background = ERROR_COLOR;
             return false
         }
         else {
             //output.style.removeProperty('background-color');
-            output.style.background = "#f8ffcf";
+            output.style.background = OUTPUT_COLOR;
             activation.style.background = "none";
             return true
         }
@@ -3348,11 +3379,12 @@ function uploadJson(text) {
     document.getElementById('OutputToggle').checked = dict["output-toggle-checked"];
     document.getElementById("FanfareToggle").checked = dict["fanfare-toggle-checked"];
 
-    document.getElementById("DemoToggle").checked = dict["guessToggleChecked"];
-    display.UpdateDemoToggle();
+
 
     display.handleHoverExit();
     demo.update();
+    document.getElementById("DemoToggle").checked = dict["guessToggleChecked"];
+    display.UpdateDemoToggle();
     // let headerRows = dict["input-header"];
     // if(headerRows?.length) {
     //     display.setHeaderRowVals(headerRows);
@@ -3417,6 +3449,7 @@ function uploadJson(text) {
     prevHintLevel = 0;
     prevHintIndex = -1;
     prevSubset = [];
+    checkAnswerCorrect();
 }
 
 async function uploadFile(event) {
@@ -3559,7 +3592,7 @@ document.getElementById("DemoToggle").checked = true;
 display.UpdateDemoToggle();
 document.getElementById("AutoProgressToggle").checked = true;
 
-const problemNum = 16;
+const problemNum = 18;
 
 let prevHintIndex = -1;
 let prevSubset = [];

@@ -390,6 +390,9 @@ article > section {
     display: inline-block;
     word-wrap: break-word;
     max-width: 10vw;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+    hyphens: auto;
 }
 
 .draggable{
