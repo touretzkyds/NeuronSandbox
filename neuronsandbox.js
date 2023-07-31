@@ -3,6 +3,16 @@
 const ACTIVATION_COLUMN = 0;
 const OUTPUT_COLUMN = 0;
 const DESIRED_OUTPUT_COLUMN = 1;
+
+const ERROR_COLOR = '#ffbfcb';
+const OUTPUT_COLOR = '#f8ffcf';
+const INVALID_WEIGHT = '#fc496b';
+const NEGATIVE_WEIGHT = '#c91a0e';
+const ZERO_WEIGHT = 'blue';
+const DEFAULT_LINE_COLOR = 'black';
+const HOVER_COLOR = 'lightblue';
+const HOVER_ERROR = '#c2abc9';
+
 class Data {
     constructor(inputData) {
         this.update(inputData); //default shape: (2, 4)
@@ -462,7 +472,7 @@ class Table {
         if (newCol < 0 || newNameIndex < 0)
             return;
         let th = document.createElement('th'); //column
-        th.innerHTML = "<div class=\"input-content\">" + "x<sub>" + newNameIndex + "</sub>" + "</div>";
+        th.innerHTML = "<div lang=\"en\" class=\"input-content\">" + "x<sub>" + newNameIndex + "</sub>" + "</div>";
         th.setAttribute("id", `tblinput${newCol}`);
         dataOp.makeEditable(th);
 
@@ -915,6 +925,12 @@ function checkAnswerCorrect() {
     }
     else {
         for (let i = 1; i < tableRows; i++) {
+            let inputRow = inputTable.rows.item(i+1);
+            if(inputRow.classList.contains("red-border")) {
+                inputRow.classList.remove("red-border");
+            }
+        }
+        for (let i = 1; i < tableRows; i++) {
             let cells = outputTable.rows.item(i).cells
             var radioButtonGroup = document.getElementsByName(`guess-radio-${i-1}`);
             let guess_output;
@@ -946,7 +962,7 @@ class Display {
             LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '95%', y: '40%'}),
             LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '-50%', y: 50+'%'})
         );
-        this.outputLine.color = 'black';
+        this.outputLine.color = DEFAULT_LINE_COLOR;
         this.outputLine.path = 'straight';
         this.outputLine.position();
         this.createOutputTableColors();
@@ -1034,8 +1050,8 @@ class Display {
             td1.style.fontWeight = 'normal';
 
             td2.style.fontWeight = 'bold';
-            if (td2.style.background !== '#ffbfcb') //error
-                td2.style.background = '#f8ffcf'
+            if (td2.style.background !== ERROR_COLOR) //error
+                td2.style.background = ERROR_COLOR
             td2.style.background = 'none'
         }
     }
@@ -1058,7 +1074,7 @@ class Display {
 
             this.updateGuessTableCommentRow(i);
             if(desired !== guessed) {
-                guessOutputRow.style.background = '#ffbfcb';
+                guessOutputRow.style.background = ERROR_COLOR;
             }
             else {
                 guessOutputRow.style.background = '';
@@ -1605,21 +1621,30 @@ class Display {
         const headerCells = document.getElementById("input-table").rows[1].cells;
         for (let c = 1; c < headerCells.length; c++) {
             let headerInput = headerCells[c];
-            let newFontSize;
             if (headerInput.id.startsWith("tblinput")) {
                 let length = headerInput.innerText.length
 
-                if (length <= 10) {
-                    newFontSize = 40;
-                }
-                else {
-                    newFontSize = 40 - (length-10);
-                    if (newFontSize < 20)
-                        newFontSize = 20;
+                if (length > maxLength) {
+                    maxLength = length;
+                    maxHeaderIndex = c;
                 }
 
             }
-            const selections = document.getElementById("selected-inputs");
+        }
+
+        let newFontSize = 0;
+        if (maxLength <= 10) {
+            newFontSize = 40;
+        }
+        else {
+            newFontSize = 40 - (maxLength-10);
+            if (newFontSize < 20)
+                newFontSize = 20;
+        }
+
+        const selections = document.getElementById("selected-inputs");
+
+        for (let c = 1; c < headerCells.length; c++) {
             if (!document.getElementById("biasToggle").checked) {
                 if(selections.rows[c-1] && selections.rows[c-1].cells[0] )
                     selections.rows[c-1].cells[0].style.fontSize = newFontSize + "px"
@@ -1628,7 +1653,6 @@ class Display {
                 if(selections.rows[c] && selections.rows[c].cells[0] )
                     selections.rows[c].cells[0].style.fontSize = newFontSize + "px"
             }
-
         }
 
         for (let i = 0; i < demo.weightLines.length; i++)
@@ -1638,7 +1662,6 @@ class Display {
 
 
     }
-
     displayWeightFromData(wID, idx){
         let weight = document.getElementById(wID);
         if (!weight) {
@@ -1679,7 +1702,7 @@ class Display {
             let newRow = selections.insertRow(i);
             let newCell = newRow.insertCell(0);
             //newCell.innerHTML = `<div class=\"input-content\">${demo.selectedInput[i]}</div>`;
-            newCell.innerHTML = `<div class=\"input-content\">${demo.selectedInput[i]}</div>`;
+            newCell.innerHTML = `<div lang=\"en\" class=\"input-content\">${demo.selectedInput[i]}</div>`;
         }
         if(document.getElementById("biasToggle").checked)
         {
@@ -1772,7 +1795,7 @@ class Display {
                 })
             );
             demo.biasLine.path = "straight";
-            demo.biasLine.color = 'black';
+            demo.biasLine.color = DEFAULT_LINE_COLOR;
         }
         else {
             if (demo.biasLine) {
@@ -1799,17 +1822,17 @@ class Display {
             let splitup = weight_labels[i].children[1].textContent.split(" ")
             let num = splitup[splitup.length-1]
             if (!demo.stringToValidFloat(num)[1]) {
-                demo.weightLines[i].color = '#ffbfcb'
-                demo.weightLines[i].path = 'straight'
+                demo.weightLines[i].color = ERROR_COLOR;
+                demo.weightLines[i].path = 'straight';
                 demo.weightLines[i].position();
             }
             else {
                 if (demo.stringToValidFloat(num)[0] === 0)
-                    demo.weightLines[i].color = 'blue';
+                    demo.weightLines[i].color = ZERO_WEIGHT;
                 else if (demo.stringToValidFloat(num)[0] < 0)
-                    demo.weightLines[i].color = '#c91a0e';
+                    demo.weightLines[i].color = NEGATIVE_WEIGHT;
                 else
-                    demo.weightLines[i].color = 'black';
+                    demo.weightLines[i].color = DEFAULT_LINE_COLOR;
                 demo.weightLines[i].path = 'straight';
                 demo.weightLines[i].position();
                 if (demo.stringToValidFloat(num)[1]) { //value is a valid number
@@ -1833,15 +1856,15 @@ class Display {
 
             let numConvertedArray = demo.stringToValidFloat(num)
             if (!numConvertedArray[1]) { //if weight is invalid
-                child.style.color = '#fc496b'
+                child.style.color = INVALID_WEIGHT
             }
             else {
                 if (numConvertedArray[0] === 0) //value is zer0
-                    child.style.color = 'blue'
+                    child.style.color = ZERO_WEIGHT
                 else if (numConvertedArray[0] < 0) //negative weight
-                    child.style.color = '#c91a0e'
+                    child.style.color = NEGATIVE_WEIGHT
                 else
-                    child.style.color = 'black'
+                    child.style.color = DEFAULT_LINE_COLOR
             }
         }
 
@@ -1884,7 +1907,6 @@ class Display {
         const guessOutputRow = document.querySelector(`#guess-output-table > tbody > tr:nth-child(${outputRowIndex + 1})`)
         const activationRow = document.querySelector(`#activation-table > tbody > tr:nth-child(${outputRowIndex + 1})`)
 
-
         if (rowIdx < 2) //headers, or leave
         {
             this.handleHoverExit();
@@ -1900,16 +1922,16 @@ class Display {
             //console.log("enter: set demo.selectedOutput =" + demo.selectedOutput);
 
             // highlight input and output rows corresponding to the hovered input row
-            inputRow.style.background = "lightblue";
+            inputRow.style.background = HOVER_COLOR;
             for (let i = 0; i < outputRow.children.length; i++) {
                 if (outputRow.children[i].style.background === "rgb(255, 191, 203)")
-                    outputRow.children[i].style.background = "#c2abc9";
+                    outputRow.children[i].style.background = HOVER_ERROR;
                 else {
-                    outputRow.children[i].style.background = "lightblue";
+                    outputRow.children[i].style.background = HOVER_COLOR;
                 }
             }
             if(guessOutputRow)
-                guessOutputRow.style.background = "lightblue";
+                guessOutputRow.style.background = HOVER_COLOR;
             display.adjustSelectedInputFontSize();
 
             //show the activation number
@@ -1982,9 +2004,6 @@ class Display {
         demo.outputLines?.forEach(line => line.remove());
         demo.outputLines = []
 
-
-
-
         const selections = document.getElementById("selected-inputs");
         //demo.selectedInput = demo.inputData[rowIdx];
         //demo.selectedOutput = perceptron.outputData[rowIdx];
@@ -1995,7 +2014,7 @@ class Display {
                 real_r += 1;
             }
             if (this.hovering) {
-                selections.rows[real_r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</div>`;
+                selections.rows[real_r].cells[0].innerHTML = `<div lang="en" class="input-content">${demo.selectedInput[r]}</div>`;
                 demo.lines[r] = new LeaderLine(
                     LeaderLine.pointAnchor(inputRow.children[r+1], {x: '70%', y: '50%'}),
                     LeaderLine.pointAnchor(selections.rows[real_r].cells[0], {x: '10%', y: '50%'}),
@@ -2004,7 +2023,7 @@ class Display {
                 demo.lines[r].setOptions({startSocket: 'right', endSocket: 'left'});
             }
             else {
-                selections.rows[real_r].cells[0].innerHTML = `<div class="input-content">${demo.selectedInput[r]}</div>`;
+                selections.rows[real_r].cells[0].innerHTML = `<div lang="en" class="input-content">${demo.selectedInput[r]}</div>`;
             }
         }
         if (this.hovering) {
@@ -2322,6 +2341,7 @@ class Display {
         FixCheckAnswerButtonPosition();
         display.createInputTableEditBorder();
         display.updateHintButton();
+        checkAnswerCorrect();
 
         //reposition lines
         for (let i = 0; i < demo.weightLines.length; i++) {
@@ -2401,14 +2421,14 @@ class Display {
         display.highlightInvalidText(desired, isValid);
 
         if (outputParsedValue !== parsedValue && document.getElementById("OutputToggle").checked) {
-            output.style.background = "#ffbfcb"; //pink (error)
-            activation.style.background = "#ffbfcb";
+            output.style.background = ERROR_COLOR; //pink (error)
+            //activation.style.background = ERROR_COLOR;
             return false
         }
         else {
             //output.style.removeProperty('background-color');
-            output.style.background = "#f8ffcf";
-            activation.style.background = "none";
+            output.style.background = OUTPUT_COLOR;
+            //activation.style.background = "none";
             return true
         }
         display.createOutputTableEditBorder();
@@ -3589,6 +3609,7 @@ function uploadJson(text) {
     prevHintLevel = 0;
     prevHintIndex = -1;
     prevSubset = [];
+    checkAnswerCorrect();
 }
 
 async function uploadFile(event) {
@@ -3697,7 +3718,6 @@ window.onload = function(){
 
 // initialize all classes
 const demo = new Demo();
-const problemNum = 16;
 var checkAnswerButtonLocationInitialized = false;
 var currentImageType = "";
 var currentImage;
@@ -3721,12 +3741,12 @@ const activationTable = new Table(activations, "activation-table", false);
 dataOp.createBinaryData(2);
 perceptron.displayPerceptron();
 const display = new Display();
+display.updateDisplay();
 //uploadFromUrl("SampleModel.json");
 uploadFromZipUrl(encodeURI("problems/Problem 1.sandbox"), true);
 display.createOutputTableColors();
 display.createInputTableEditBorder();
 display.createOutputTableEditBorder();
-display.updateDisplay();
 addThresholdEditOption();
 handleDesiredOutputColumn();
 loadQuestionsAndModels();
@@ -3734,7 +3754,7 @@ document.getElementById("DemoToggle").checked = true;
 display.UpdateDemoToggle();
 document.getElementById("AutoProgressToggle").checked = true;
 
-
+const problemNum = 16;
 
 let prevHintIndex = -1;
 let prevSubset = [];
