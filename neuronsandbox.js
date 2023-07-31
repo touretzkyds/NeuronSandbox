@@ -1979,6 +1979,11 @@ class Display {
         demo.activationLines?.forEach(line => line.remove());
         demo.activationLines = []
 
+        demo.outputLines?.forEach(line => line.remove());
+        demo.outputLines = []
+
+
+
 
         const selections = document.getElementById("selected-inputs");
         //demo.selectedInput = demo.inputData[rowIdx];
@@ -2006,6 +2011,11 @@ class Display {
             demo.activationLines[0] = new LeaderLine(
                 LeaderLine.pointAnchor(document.getElementById("sigma"), {x: '60%', y: '50%'}),
                 LeaderLine.pointAnchor(activationRow.cells[0], {x: '48%', y: '50%'}),
+                {dash: {animation: true}}
+            );
+            demo.outputLines[0] = new LeaderLine(
+                LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '90%', y: '50%'}),
+                LeaderLine.pointAnchor(outputRow.cells[0], {x: '48%', y: '50%'}),
                 {dash: {animation: true}}
             );
         }
@@ -2585,6 +2595,7 @@ class Demo {
         demo.lines.forEach(line => line.remove());
         demo.lines = []
         demo.activationLines = [];
+        demo.outputLines = [];
         demo.update(); //TODO: check if efficient
     }
 

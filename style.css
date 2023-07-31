@@ -64,6 +64,10 @@ article > section {
     align-items: flex-start;
 }
 
+.center-container {
+    width: 40%;
+    height: 100%;
+}
 .center {
     margin: 1px;
     width: 40%;
@@ -116,7 +120,7 @@ article > section {
 
 #network-container {
     display: inline-flex;
-    width: 75vw;
+    width: 40vw;
     height: 50vh;
 }
 
@@ -554,9 +558,6 @@ mark {
 span {
     padding: 10px 5px;
     min-width: 1em;
-}
-
-.span-work {
 }
 
 #popup {
@@ -997,11 +998,9 @@ span.guess-comment {
     font-size: 23px;
     height: 20px;
 }
-
 #perceptron-detail {
     font-size: 23px;
     height: 20px;
     text-align: center;
     transform: translate(0, -2.5vh);
-    visibility: hidden;
 }
