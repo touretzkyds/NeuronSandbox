@@ -1884,7 +1884,7 @@ class Display {
         //console.log("displaySelectedOutput, selectedOutput = " + demo.selectedOutput);
         for (let r=0; r<table.rows.length; r++){
             let cell = table.rows[r].cells[0];
-            cell.innerHTML = `<mark>${demo.selectedOutput[1]}</mark>`;
+            cell.innerHTML = `<mark>${demo.selectedOutput[OUTPUT_COLUMN]}</mark>`;
         }
     }
 
@@ -2028,15 +2028,18 @@ class Display {
         }
         if (this.hovering) {
             demo.activationLines[0] = new LeaderLine(
-                LeaderLine.pointAnchor(document.getElementById("sigma"), {x: '60%', y: '50%'}),
+                LeaderLine.pointAnchor(document.getElementById("sigma"), {x: '20%', y: '80%'}),
                 LeaderLine.pointAnchor(activationRow.cells[0], {x: '48%', y: '50%'}),
                 {dash: {animation: true}}
             );
+            // demo.activationLines[0].path = "arc";
+            demo.activationLines[0].setOptions({startSocket: 'bottom', endSocket: 'left'});
             demo.outputLines[0] = new LeaderLine(
                 LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '90%', y: '50%'}),
                 LeaderLine.pointAnchor(outputRow.cells[0], {x: '48%', y: '50%'}),
                 {dash: {animation: true}}
             );
+            demo.outputLines[0].path = "arc";
         }
         display.alignTables()
         display.createOutputTableEditBorder();
@@ -2509,7 +2512,7 @@ class Demo {
         this.weights = [1,-2];
         this.threshold = 0;
         this.defaultSelectedInput = [`x<sub>1</sub>`, `x<sub>2</sub>`];
-        this.defaultSelectedOutput = ["activation", "y"];
+        this.defaultSelectedOutput = ["y", "y"];
         this.selectedInput = this.defaultSelectedInput;
         this.selectedOutput = this.defaultSelectedOutput;
         this.lines = [];
