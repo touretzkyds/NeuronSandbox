@@ -1726,8 +1726,6 @@ class Display {
         const circle = document.getElementById("circle");
         let height = getComputedStyle(circle).height;
         let width = getComputedStyle(circle).width;
-        console.log("circle height: ", height);
-        console.log("circle width: ", width);
         //percentage values for weight lines for x-axis
         let percentsX = []
         let intervalX = 1/length
