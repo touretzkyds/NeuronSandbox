@@ -1734,10 +1734,10 @@ class Display {
         let startX = 0
         switch(length) {
             case 1:
-                percentsX = [-3]
+                percentsX = [-2]
                 break
             case 2:
-                percentsX = [0, 5]
+                percentsX = [1, 4]
                 break
             case 3:
                 percentsX = [0, -2.5, 0]
@@ -1763,13 +1763,13 @@ class Display {
         //percentage values for weight lines for y-axis
         let percentsY = [];
         let intervalY = 16/length
-        let startY = 42;
+        let startY = 34;
         if (length === 1)
-            percentsY = [50]
+            percentsY = [42]
         else if (length === 2)
-            percentsY = [42, 58]
+            percentsY = [34, 50]
         else if (length === 3)
-            percentsY = [42, 50, 58]
+            percentsY = [34, 42, 50]
 
         else {
             for (let i = 0; i < length; i++ ) {
@@ -1821,7 +1821,7 @@ class Display {
             let xposition = 6+ percentsX[real_i];
             demo.weightLines[i] = new LeaderLine(
                 LeaderLine.pointAnchor(selections.rows[real_i].cells[0], {x: '110%', y: '50%'}),
-                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: xposition+'%', y: (percentsY[real_i]-5)+'%'})
+                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: xposition+'%', y: (percentsY[real_i])+'%'})
             );
 
             let splitup = weight_labels[i].children[1].textContent.split(" ")
