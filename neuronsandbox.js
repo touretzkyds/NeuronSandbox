@@ -972,7 +972,6 @@ class Display {
 
     alignTables() {
         let heights = []
-        let maxHeight = 0
 
         const headerCells = document.getElementById("input-table").rows[1].cells;
         const headerCellsHeight = getComputedStyle(headerCells[1]).height;
@@ -991,10 +990,11 @@ class Display {
         heights.push(guessOutputHeaderCellsHeight);
         heights.push(activationHeaderCellsHeight);
 
+        let maxHeight = 0;
         for (let i = 0; i < heights.length; i++) {
             let height = parseFloat(heights[i].replace("px", ""))
             if (height > maxHeight)
-                maxHeight = height
+                maxHeight = height;
         }
 
         headerCells[1].style.height = maxHeight + 'px';
@@ -2314,6 +2314,7 @@ class Display {
             document.getElementById("output-container").style.display = "none";
             document.getElementById("activation-container").style.display = "none";
             document.getElementById("bias-toggle").style.display = "none";
+            document.getElementById("hintText").style.display = "none";
             otherHeaders.forEach(header => {
                 header.hidden = true;
             });
@@ -2329,6 +2330,7 @@ class Display {
             document.getElementById("output-container").style.display = "inline-flex";
             document.getElementById("activation-container").style.display = "inline-flex";
             document.getElementById("bias-toggle").style.display = "inline-flex";
+            document.getElementById("hintText").style.display = "block";
             //document.getElementById("edit-menu-section").style.display = "inline-block";
             otherHeaders.forEach(header => {
                 header.hidden = false;
@@ -2357,6 +2359,7 @@ class Display {
             demo.biasLine.position();
         }
         display.outputLine.position()
+        display.alignTables();
 
     }
 
@@ -3354,6 +3357,25 @@ function setupQuestionFields() {
         }
     }
 
+    let logic_operator = "and";
+    let hp = new hintprovider([...perceptron.weights].concat(perceptron.threshold), perceptron.inputData, desiredOutputs.data, editableList);
+    let subsets = hp.getAllSubsets(editableList);
+    // let use_or = true;
+
+    let sols = 0;
+    for (let i = 0; i < subsets.length ; i++) {
+        let subset = subsets[i];
+        let hasSolution = hp.checkForSolution(subset);
+        if (!hasSolution.includes(Number.MIN_VALUE) && subset.length === 1) {
+            sols++;
+        }
+    }
+
+    if (sols > 1) {
+        logic_operator = "or";
+    }
+
+
     // set up the text
     let fieldText = document.getElementById("hintText");
     fieldText.innerHTML = "Adjust "
@@ -3361,13 +3383,13 @@ function setupQuestionFields() {
         fieldText.innerHTML += fields[0]
     }
     else if (fields.length === 2) {
-        fieldText.innerHTML += fields[0] + " and " + fields[1]
+        fieldText.innerHTML += fields[0] + ` ${logic_operator} ` + fields[1]
     }
     else {
         for (let i = 0; i < fields.length - 1; i++) {
             fieldText.innerHTML += fields[i] + ", "
         }
-        fieldText.innerHTML += "and " + fields[fields.length - 1]
+        fieldText.innerHTML += `${logic_operator} ` + fields[fields.length - 1]
     }
     fieldText.innerHTML += " to solve the problem."
 
