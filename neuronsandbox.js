@@ -1951,7 +1951,7 @@ class Display {
                 let detail_line = `∑ =`;
                 for(let i = 0; i < headerRowVals.length; i++) {
                     let variable_name = headerRowVals[i];
-                    detail_line += ` (<span class="span-work" style=\"color: red;\">${variable_name} </span> <span class="span-work" style=\"color: blue;\">&times;</span> w<sub>${i+1}</sub>)`;
+                    detail_line += ` (<span class="span-work" style=\"color: red;\">${variable_name}</span> <span class="span-work" style=\"color: blue;\"> &times; </span>w<sub>${i+1}</sub>)`;
                     if(i !== headerRowVals.length - 1) {
                         detail_line += " + ";
                     }
@@ -1959,7 +1959,7 @@ class Display {
                 detail_line += `<p>∑ =`;
                 for(let i = 0; i < headerRowVals.length; i++) {
                     let variable_value = perceptron.inputData[rowIdx-2][i];
-                    detail_line += `<span class="span-work" style=\"color: red;\">${variable_value}</span> <span class="span-work" style=\"color: blue;\"> &times; </span>${perceptron.weights[i]}</sub>`;
+                    detail_line += `<span class="span-work" style=\"color: red;\">${variable_value}</span> <span class="span-work" style=\"color: blue;\"> &times; </span class="span-work">${perceptron.weights[i]}</sub>`;
                     if(i !== headerRowVals.length - 1) {
                         detail_line += " + ";
                     }
