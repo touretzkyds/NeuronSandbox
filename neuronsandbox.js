@@ -13,6 +13,8 @@ const DEFAULT_LINE_COLOR = 'black';
 const HOVER_COLOR = 'lightblue';
 const HOVER_ERROR = '#c2abc9';
 
+let centerCircle = LeaderLine.pointAnchor(document.getElementById("circle"))
+
 class Data {
     constructor(inputData) {
         this.update(inputData); //default shape: (2, 4)
@@ -959,7 +961,7 @@ class Display {
         this.hovering = false;
         this.initializeDisplay();
         this.outputLine = new LeaderLine(
-            LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '95%', y: '40%'}),
+            LeaderLine.pointAnchor(document.getElementById("circle"), {x: '100%', y: '50%'}),
             LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '-50%', y: 50+'%'})
         );
         this.outputLine.color = DEFAULT_LINE_COLOR;
@@ -1732,10 +1734,10 @@ class Display {
         let startX = 0
         switch(length) {
             case 1:
-                percentsX = [-2]
+                percentsX = [-4]
                 break
             case 2:
-                percentsX = [1, 4]
+                percentsX = [-1, -1]
                 break
             case 3:
                 percentsX = [0, -2.5, 0]
@@ -1761,13 +1763,13 @@ class Display {
         //percentage values for weight lines for y-axis
         let percentsY = [];
         let intervalY = 16/length
-        let startY = 34;
+        let startY = 42;
         if (length === 1)
-            percentsY = [42]
+            percentsY = [52]
         else if (length === 2)
-            percentsY = [34, 50]
+            percentsY = [37, 67]
         else if (length === 3)
-            percentsY = [34, 42, 50]
+            percentsY = [42, 50, 58]
 
         else {
             for (let i = 0; i < length; i++ ) {
@@ -1819,7 +1821,8 @@ class Display {
             let xposition = 6+ percentsX[real_i];
             demo.weightLines[i] = new LeaderLine(
                 LeaderLine.pointAnchor(selections.rows[real_i].cells[0], {x: '110%', y: '50%'}),
-                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: xposition+'%', y: (percentsY[real_i])+'%'})
+                LeaderLine.pointAnchor(document.getElementById("circle"), {x: xposition+'%', y: (percentsY[real_i])+'%'})
+                // LeaderLine.pointAnchor(centerCircle)
             );
 
             let splitup = weight_labels[i].children[1].textContent.split(" ")
@@ -1939,21 +1942,20 @@ class Display {
 
             //show the activation number
             perceptron.computeAffineOutput();
-            let showDetail = document.getElementById("DetailToggle").checked;
+            let showDetail = document.getElementById("detailButton").innerText === "Hide details";
             if (showDetail) {
                 let headerRowVals = [];
                 this.getHeaderRowVals(headerRowVals);
-                document.getElementById("perceptron-detail").style.visibility = "visible";
+                //document.getElementById("perceptron-detail").style.visibility = "visible";
                 let activation = perceptron.affineOutput[rowIdx-2];
                 let detail_line = `∑ =`;
                 for(let i = 0; i < headerRowVals.length; i++) {
                     let variable_name = headerRowVals[i];
-                    detail_line += `<span class="span-work" style=\"color: red;\">${variable_name} </span> <span class="span-work" style=\"color: blue;\">&times;</span> w<sub>${i+1}</sub>`;
+                    detail_line += ` (<span class="span-work" style=\"color: red;\">${variable_name} </span> <span class="span-work" style=\"color: blue;\">&times;</span> w<sub>${i+1}</sub>)`;
                     if(i !== headerRowVals.length - 1) {
                         detail_line += " + ";
                     }
                 }
-                detail_line += ` = ${activation}`;
                 detail_line += `<p>∑ =`;
                 for(let i = 0; i < headerRowVals.length; i++) {
                     let variable_value = perceptron.inputData[rowIdx-2][i];
@@ -1966,7 +1968,8 @@ class Display {
                 document.getElementById("perception_detail_line").innerHTML = detail_line;
             }
             else {
-                document.getElementById("perceptron-detail").style.visbility = "hidden";
+                //document.getElementById("perceptron-detail").style.visbility = "hidden";
+                display.UpdateDetailToggle();
             }
             document.getElementById("sigma").innerText = perceptron.affineOutput[rowIdx-2].toString() + "> ";
         }
@@ -1984,7 +1987,8 @@ class Display {
                     this.checkDesiredOutput(outputRow.children[OUTPUT_COLUMN], outputRow.children[DESIRED_OUTPUT_COLUMN], activationRow.children[ACTIVATION_COLUMN])
             }
             document.getElementById("sigma").innerText = "∑> ";
-            document.getElementById("perceptron-detail").style.visibility= "hidden";
+            display.UpdateDetailToggle();
+            //document.getElementById("perceptron-detail").style.visibility= "hidden";
             document.getElementById("perceptron-normal").style.display = "inline-flex";
 
         }
@@ -2282,6 +2286,29 @@ class Display {
         handleDesiredOutputColumn()
     }
 
+    UpdateDetailToggle() {
+        let detailButton = document.getElementById("detailButton");
+        if(detailButton.innerText === "Hide details") {
+            //we should display the details
+            let headerRowVals = [];
+            this.getHeaderRowVals(headerRowVals);
+            document.getElementById("perceptron-detail").style.visibility = "visible";
+            let detail_line = `∑ =`;
+            for(let i = 0; i < headerRowVals.length; i++) {
+                let variable_name = headerRowVals[i];
+                detail_line += ` (<span class="span-work" style=\"color: red;\">${variable_name} </span> <span class="span-work" style=\"color: blue;\">&times;</span> w<sub>${i+1}</sub>)`;
+                if(i !== headerRowVals.length - 1) {
+                    detail_line += " + ";
+                }
+            }
+            document.getElementById("perception_detail_line").innerHTML = detail_line;
+        }
+        else {
+            document.getElementById("perceptron-detail").style.visibility = "hidden";
+        }
+        this.UpdateDemoToggle();
+    }
+
     UpdateBinaryToggle(columnChanged) {
         let checkbox = document.getElementById("BinaryToggle");
         display.createOutputTableColors();
@@ -2315,6 +2342,7 @@ class Display {
             document.getElementById("activation-container").style.display = "none";
             document.getElementById("bias-toggle").style.display = "none";
             document.getElementById("hintText").style.display = "none";
+            document.getElementById("perceptron-detail").style.visibility = "hidden";
             otherHeaders.forEach(header => {
                 header.hidden = true;
             });
@@ -2331,6 +2359,13 @@ class Display {
             document.getElementById("activation-container").style.display = "inline-flex";
             document.getElementById("bias-toggle").style.display = "inline-flex";
             document.getElementById("hintText").style.display = "block";
+            if(document.getElementById("detailButton").innerText === "Hide details") {
+                document.getElementById("perceptron-detail").style.visibility = "visible";
+            }
+            else {
+                document.getElementById("perceptron-detail").style.visibility = "hidden";
+            }
+
             //document.getElementById("edit-menu-section").style.display = "inline-block";
             otherHeaders.forEach(header => {
                 header.hidden = false;
@@ -3207,6 +3242,16 @@ async function provideHint() {
         demo.biasLine.position();
     }
 }
+
+async function detailButtonClicked() {
+    if(document.getElementById("detailButton").innerText === "Hide details") {
+        document.getElementById("detailButton").innerText = "How does this work?";
+    }
+    else {
+        document.getElementById("detailButton").innerText = "Hide details";
+    }
+    display.UpdateDetailToggle();
+}
 function addEditOption(c) {
     //cannot use getElementById since it is not accurate
     let weight_parent = document.getElementById(`input-link-text`);
@@ -3374,7 +3419,6 @@ function setupQuestionFields() {
     if (sols > 1) {
         logic_operator = "or";
     }
-
 
     // set up the text
     let fieldText = document.getElementById("hintText");
