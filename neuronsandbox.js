@@ -2734,6 +2734,11 @@ class Demo {
     adjustWeightPlacement() {
         if(document.getElementById("DemoToggle").checked)
             return;
+        let headerRowVals = [];
+        display.getHeaderRowVals(headerRowVals);
+        this.selectedInput = headerRowVals;
+        display.updateSelectedInput();
+
         let selections = document.getElementById("selected-inputs");
         let weights = document.getElementById("input-link-text");
         let dimensions = weights.getBoundingClientRect()
