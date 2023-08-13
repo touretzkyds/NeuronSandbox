@@ -1956,10 +1956,10 @@ class Display {
                         detail_line += " + ";
                     }
                 }
-                detail_line += `<p>∑ =`;
+                detail_line += `<p>∑ = `;
                 for(let i = 0; i < headerRowVals.length; i++) {
                     let variable_value = perceptron.inputData[rowIdx-2][i];
-                    detail_line += `<span class="span-work" style=\"color: red;\">${variable_value}</span> <span class="span-work" style=\"color: blue;\"> &times; </span class="span-work">${perceptron.weights[i]}</sub>`;
+                    detail_line += `(<span class="span-work" style=\"color: red;\">${variable_value}</span> <span class="span-work" style=\"color: blue;\"> &times; </span>${perceptron.weights[i]}</sub>)`;
                     if(i !== headerRowVals.length - 1) {
                         detail_line += " + ";
                     }

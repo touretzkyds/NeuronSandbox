@@ -38,6 +38,8 @@ article > section {
 
 .top-table th {
     padding: 15px;
+    padding-top: 0px;
+    padding-bottom: 0px;
 }
 
 .bottom-table {
@@ -863,7 +865,7 @@ span {
 #questiontext {
     margin: auto;
     text-align: center;
-    width: 500px;
+    width: 800px;
 }
 
 #qdiv {
