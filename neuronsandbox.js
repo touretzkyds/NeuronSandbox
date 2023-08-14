@@ -962,7 +962,7 @@ class Display {
         this.initializeDisplay();
         this.outputLine = new LeaderLine(
             LeaderLine.pointAnchor(document.getElementById("circle"), {x: '100%', y: '50%'}),
-            LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '-50%', y: 50+'%'})
+            LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '-50%', y: 35+'%'})
         );
         this.outputLine.color = DEFAULT_LINE_COLOR;
         this.outputLine.path = 'straight';
@@ -972,6 +972,28 @@ class Display {
         this.createOutputTableEditBorder();
     }
 
+    recreateOutputLine() {
+        if(this.outputLine) {
+            this.outputLine.remove()
+            this.outputLine = null;
+        }
+        if (document.getElementById("seloutput-mark")) {
+            this.outputLine = new LeaderLine(
+                LeaderLine.pointAnchor(document.getElementById("circle"), {x: '100%', y: '50%'}),
+                LeaderLine.pointAnchor(document.getElementById("seloutput-mark"), {x: '-50%', y: 50+'%'})
+            );
+        }
+        else {
+            this.outputLine = new LeaderLine(
+                LeaderLine.pointAnchor(document.getElementById("circle"), {x: '100%', y: '50%'}),
+                LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '-50%', y: 35+'%'})
+            );
+        }
+
+        this.outputLine.color = DEFAULT_LINE_COLOR;
+        this.outputLine.path = 'straight';
+        this.outputLine.position();
+    }
     alignTables() {
         let heights = []
 
@@ -1890,8 +1912,18 @@ class Display {
         //console.log("displaySelectedOutput, selectedOutput = " + demo.selectedOutput);
         for (let r=0; r<table.rows.length; r++){
             let cell = table.rows[r].cells[0];
-            cell.innerHTML = `<mark>${demo.selectedOutput[OUTPUT_COLUMN]}</mark>`;
+            cell.innerHTML = `<mark id='seloutput-mark' class="mark">${demo.selectedOutput[OUTPUT_COLUMN]}</mark>`;
         }
+        const referenceElement = document.querySelector('.circle');
+        const adjustElement = document.querySelector('.mark');
+        const referenceRect = referenceElement.getBoundingClientRect();
+        const adjustRect = adjustElement.getBoundingClientRect();
+        const referenceTop = referenceRect.top;
+        const adjustTop = adjustRect.top;
+        const yOffset = referenceTop - adjustTop + (referenceRect.height - adjustRect.height) / 2.0;
+        adjustElement.style.transform = "translateY(" + yOffset + "px)";
+        adjustElement.style.display = "block";
+
     }
 
     isInputTable(tblId) {
@@ -1995,6 +2027,8 @@ class Display {
         //this.displaySelectedInput();
         this.updateSelectedInput();
         this.displaySelectedOutput();
+        display.recreateOutputLine();
+        display.outputLine.position();
 
         const isDemoMode = document.getElementById("DemoToggle").checked;
         if(isDemoMode) {
@@ -3831,7 +3865,7 @@ document.getElementById("DemoToggle").checked = true;
 display.UpdateDemoToggle();
 document.getElementById("AutoProgressToggle").checked = true;
 
-const problemNum = 18;
+const problemNum = 16;
 
 let prevHintIndex = -1;
 let prevSubset = [];
