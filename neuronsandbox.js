@@ -960,13 +960,7 @@ class Display {
     constructor(inpObj=null, percepObj=null, outObj=null){
         this.hovering = false;
         this.initializeDisplay();
-        this.outputLine = new LeaderLine(
-            LeaderLine.pointAnchor(document.getElementById("circle"), {x: '100%', y: '50%'}),
-            LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '-50%', y: 35+'%'})
-        );
-        this.outputLine.color = DEFAULT_LINE_COLOR;
-        this.outputLine.path = 'straight';
-        this.outputLine.position();
+        this.recreateOutputLine();
         this.createOutputTableColors();
         this.createInputTableEditBorder();
         this.createOutputTableEditBorder();
@@ -977,18 +971,10 @@ class Display {
             this.outputLine.remove()
             this.outputLine = null;
         }
-        if (document.getElementById("seloutput-mark")) {
-            this.outputLine = new LeaderLine(
-                LeaderLine.pointAnchor(document.getElementById("circle"), {x: '100%', y: '50%'}),
-                LeaderLine.pointAnchor(document.getElementById("seloutput-mark"), {x: '-50%', y: 50+'%'})
-            );
-        }
-        else {
-            this.outputLine = new LeaderLine(
-                LeaderLine.pointAnchor(document.getElementById("circle"), {x: '100%', y: '50%'}),
-                LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '-50%', y: 35+'%'})
-            );
-        }
+        this.outputLine = new LeaderLine(
+            LeaderLine.pointAnchor(document.getElementById("circle"), {x: '100%', y: '50%'}),
+            LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '-50%', y: 52+'%'})
+        );
 
         this.outputLine.color = DEFAULT_LINE_COLOR;
         this.outputLine.path = 'straight';
@@ -1715,6 +1701,7 @@ class Display {
     }
 
     updateSelectedInput() {
+
         if (!demo.selectedInput)
             return;
         if(document.getElementById("DemoToggle").checked)
@@ -1910,20 +1897,15 @@ class Display {
         let table = document.getElementById("selected-output");
         //console.log("displaySelectedOutput, selections = " + table.outerHTML);
         //console.log("displaySelectedOutput, selectedOutput = " + demo.selectedOutput);
-        for (let r=0; r<table.rows.length; r++){
-            let cell = table.rows[r].cells[0];
-            cell.innerHTML = `<mark id='seloutput-mark' class="mark">${demo.selectedOutput[OUTPUT_COLUMN]}</mark>`;
+        if(document.getElementById("seloutput-mark")) {
+            document.getElementById("seloutput-mark").textContent = demo.selectedOutput[OUTPUT_COLUMN];
         }
-        const referenceElement = document.querySelector('.circle');
-        const adjustElement = document.querySelector('.mark');
-        const referenceRect = referenceElement.getBoundingClientRect();
-        const adjustRect = adjustElement.getBoundingClientRect();
-        const referenceTop = referenceRect.top;
-        const adjustTop = adjustRect.top;
-        const yOffset = referenceTop - adjustTop + (referenceRect.height - adjustRect.height) / 2.0;
-        adjustElement.style.transform = "translateY(" + yOffset + "px)";
-        adjustElement.style.display = "block";
-
+        else {
+            for (let r=0; r<table.rows.length; r++){
+                let cell = table.rows[r].cells[0];
+                cell.innerHTML = `<mark id='seloutput-mark' class="mark">${demo.selectedOutput[OUTPUT_COLUMN]}</mark>`;
+            }
+        }
     }
 
     isInputTable(tblId) {
@@ -2768,9 +2750,9 @@ class Demo {
     adjustWeightPlacement() {
         if(document.getElementById("DemoToggle").checked)
             return;
-        let headerRowVals = [];
-        display.getHeaderRowVals(headerRowVals);
-        this.selectedInput = headerRowVals;
+        // let headerRowVals = [];
+        // display.getHeaderRowVals(headerRowVals);
+        // this.selectedInput = headerRowVals;
         display.updateSelectedInput();
 
         let selections = document.getElementById("selected-inputs");
@@ -3641,6 +3623,10 @@ function uploadJson(text) {
     for (let i = 0; i < desiredOutputs.rows; i++) {
         outputs.data[i][2] = parseInt(desiredOutputs.data[i]);
     }
+
+    let headerRowVals = [];
+    display.getHeaderRowVals(headerRowVals);
+    demo.selectedInput = headerRowVals;
 
     display.displayThresholdFromData(perceptron);
     //document.getElementById('InputToggle').checked = dict["input-toggle-checked"];
