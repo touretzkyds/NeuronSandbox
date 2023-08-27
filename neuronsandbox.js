@@ -1802,9 +1802,9 @@ class Display {
                 demo.biasLine = null;
             }
             demo.biasLine = new LeaderLine(
-                LeaderLine.pointAnchor(selections.rows[0].cells[0], {x: '110%', y: '50%'}),
-                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {
-                    x: 6 + percentsX[0] + '%',
+                LeaderLine.pointAnchor(selections.rows[0].cells[0], {x: '80%', y: '50%'}),
+                LeaderLine.pointAnchor(document.getElementById("circle"), {
+                    x: percentsX[0] -3 + '%',
                     y: percentsY[0] + '%'
                 })
             );
@@ -2040,7 +2040,7 @@ class Display {
                 selections.rows[real_r].cells[0].innerHTML = `<div lang="en" class="input-content">${demo.selectedInput[r]}</div>`;
                 demo.lines[r] = new LeaderLine(
                     LeaderLine.pointAnchor(inputRow.children[r+1], {x: '70%', y: '50%'}),
-                    LeaderLine.pointAnchor(selections.rows[real_r].cells[0], {x: '10%', y: '50%'}),
+                    LeaderLine.pointAnchor(selections.rows[real_r].cells[0], {x: '40%', y: '50%'}),
                     {dash: {animation: true}}
                 );
                 demo.lines[r].setOptions({startSocket: 'right', endSocket: 'left'});
