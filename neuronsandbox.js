@@ -796,6 +796,9 @@ class Perceptron {
                 thresholdToggle.style.display = "inline-block";
 
         }
+        if (demo.biasLine) {
+            demo.biasLine.position();
+        }
     }
 
     updateWeightsFromUI(){
@@ -1669,8 +1672,9 @@ class Display {
         {
             demo.weightLines[i].position();
         }
-
-
+        if (demo.biasLine) {
+            demo.biasLine.position();
+        }
     }
     displayWeightFromData(wID, idx){
         let weight = document.getElementById(wID);
@@ -1725,7 +1729,7 @@ class Display {
             {
                 bias_value = "";
             }
-            newCell.innerHTML = `<div class=\"bias-content\"><img src="media/ground.png" height="33px" style="transform: rotate(-90deg)" ></div>`;
+            newCell.innerHTML = `<div class=\"bias-content\"><img src="media/ground.png" height="33px" style="transform: rotate(-90deg); margin-top: 50%" ></div>`;
         }
         //removes lines when not hovered
         demo.weightLines.forEach(line => line.remove());
@@ -1802,9 +1806,10 @@ class Display {
                 demo.biasLine = null;
             }
             demo.biasLine = new LeaderLine(
-                LeaderLine.pointAnchor(selections.rows[0].cells[0], {x: '80%', y: '50%'}),
+                //LeaderLine.pointAnchor(selections.rows[0].cells[0], {x: '80%', y: '50%'}),
+                LeaderLine.pointAnchor(document.querySelector(".bias-content"), {x: '83%', y: '50%'}),
                 LeaderLine.pointAnchor(document.getElementById("circle"), {
-                    x: percentsX[0] -3 + '%',
+                    x: percentsX[0] + '%',
                     y: percentsY[0] + '%'
                 })
             );
@@ -1817,7 +1822,6 @@ class Display {
                 demo.biasLine = null;
             }
         }
-
         for (let i = 0; i < demo.selectedInput.length; i++) {
 
             // if(i !== 0 && i !== demo.selectedInput.length-1)
@@ -1831,6 +1835,7 @@ class Display {
             demo.weightLines[i] = new LeaderLine(
                 LeaderLine.pointAnchor(selections.rows[real_i].cells[0], {x: '110%', y: '50%'}),
                 LeaderLine.pointAnchor(document.getElementById("circle"), {x: xposition+'%', y: (percentsY[real_i])+'%'})
+                //LeaderLine.areaAnchor({element: document.getElementById("circle"), shape: 'circle', x: 25, y: 25, width: '70%', height: '70%', color: 'rgba(0, 0, 0, 0)'})
                 // LeaderLine.pointAnchor(centerCircle)
             );
 
