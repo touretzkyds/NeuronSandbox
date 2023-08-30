@@ -1010,3 +1010,10 @@ span.guess-comment {
     text-align: center;
     transform: translate(0, -2.5vh);
 }
+
+.bias-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 32px;
+}

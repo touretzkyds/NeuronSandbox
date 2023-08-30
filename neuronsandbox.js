@@ -1729,7 +1729,7 @@ class Display {
             {
                 bias_value = "";
             }
-            newCell.innerHTML = `<div class=\"bias-content\"><img src="media/ground.png" height="33px" style="transform: rotate(-90deg); margin-top: 50%" ></div>`;
+            newCell.innerHTML = `<div class=\"bias-content\"><span style=\"color: black;\">Bias</span><img src="media/ground.png" height="33px" style="transform: rotate(-90deg); margin-top: 0%" ></div>`;
         }
         //removes lines when not hovered
         demo.weightLines.forEach(line => line.remove());
