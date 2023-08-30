@@ -1739,8 +1739,7 @@ class Display {
         const length = document.getElementById("biasToggle").checked ? demo.selectedInput.length + 1 : demo.selectedInput.length
 
         const circle = document.getElementById("circle");
-        let height = getComputedStyle(circle).height;
-        let width = getComputedStyle(circle).width;
+
         //percentage values for weight lines for x-axis
         let percentsX = []
         let intervalX = 1/length
@@ -1822,6 +1821,16 @@ class Display {
                 demo.biasLine = null;
             }
         }
+
+        //let strHeight = getComputedStyle(circle).height;
+        //let strWidth = getComputedStyle(circle).width;
+        let height = circle.getBoundingClientRect().height
+        let width = circle.getBoundingClientRect().width
+        let left = circle.getBoundingClientRect().left;
+        let top = circle.getBoundingClientRect().top;
+        let centerX = left + width/2;
+        let centerY = top +  height/2;
+
         for (let i = 0; i < demo.selectedInput.length; i++) {
 
             // if(i !== 0 && i !== demo.selectedInput.length-1)
@@ -1832,9 +1841,36 @@ class Display {
                 real_i += 1;
             }
             let xposition = 6+ percentsX[real_i];
+            // let x = selections.rows[real_i].offsetLeft
+            // let y = selections.rows[real_i].offsetTop
+
+            let x = selections.rows[real_i].getBoundingClientRect().left +  selections.rows[real_i].offsetWidth
+            let y = selections.rows[real_i].getBoundingClientRect().top + selections.rows[real_i].offsetHeight/2
+
+            let lengthLine = Math.sqrt((centerX-x)*(centerX-x) + (centerY-y)*(centerY-y))
+            let lengthSubLine = lengthLine - width/2
+            let ratio = lengthSubLine / lengthLine
+            let xPoint = x + ratio * (centerX - x)
+            let yPoint = y + ratio * (centerY - y)
+
+            let minX = left
+            let maxX = centerX
+            let minY = top
+            let maxY = top + height
+
+            let rangeMinX = 0
+            let rangeMaxX = 50
+            let rangeMinY = 0
+            let rangeMaxY = 100
+            // range should be 0 - 50 (in percent), we want to scale that so that xPoint and yPoint fit in that
+            let percentX = ((xPoint - minX) / (maxX - minX)) * (rangeMaxX - rangeMinX) + rangeMinX
+            let percentY = ((yPoint - minY) / (maxY - minY)) * (rangeMaxY - rangeMinY) + rangeMinY
+            console.log(percentX)
+            console.log(percentY)
             demo.weightLines[i] = new LeaderLine(
                 LeaderLine.pointAnchor(selections.rows[real_i].cells[0], {x: '110%', y: '50%'}),
-                LeaderLine.pointAnchor(document.getElementById("circle"), {x: xposition+'%', y: (percentsY[real_i])+'%'})
+                //LeaderLine.pointAnchor(document.getElementById("circle"), {x: xposition+'%', y: (percentsY[real_i])+'%'})
+                LeaderLine.pointAnchor(document.getElementById("circle"), {x: percentX+'%', y: percentY+'%'})
                 //LeaderLine.areaAnchor({element: document.getElementById("circle"), shape: 'circle', x: 25, y: 25, width: '70%', height: '70%', color: 'rgba(0, 0, 0, 0)'})
                 // LeaderLine.pointAnchor(centerCircle)
             );
