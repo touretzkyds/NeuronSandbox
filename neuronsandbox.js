@@ -1797,9 +1797,39 @@ class Display {
 
         let weight_labels = document.getElementById("input-link-text").children;
 
+        let height = circle.getBoundingClientRect().height
+        let width = circle.getBoundingClientRect().width
+        let left = circle.getBoundingClientRect().left;
+        let top = circle.getBoundingClientRect().top;
+        let centerX = left + width/2;
+        let centerY = top +  height/2;
+
         //TODO: x values should also be variable
         if(document.getElementById('biasToggle').checked)
         {
+            let biasContent = document.querySelector(".bias-content")
+
+            let x = biasContent.getBoundingClientRect().left +  biasContent.offsetWidth
+            let y = biasContent.getBoundingClientRect().top + biasContent.offsetHeight/2
+
+            let lengthLine = Math.sqrt((centerX-x)*(centerX-x) + (centerY-y)*(centerY-y))
+            let lengthSubLine = lengthLine - width/2
+            let ratio = lengthSubLine / lengthLine
+            let xPoint = x + ratio * (centerX - x)
+            let yPoint = y + ratio * (centerY - y)
+
+            let minX = left
+            let maxX = centerX
+            let minY = top
+            let maxY = top + height
+
+            let rangeMinX = 0
+            let rangeMaxX = 50
+            let rangeMinY = 0
+            let rangeMaxY = 100
+            // range should be 0 - 50 (in percent), we want to scale that so that xPoint and yPoint fit in that
+            let percentX = ((xPoint - minX) / (maxX - minX)) * (rangeMaxX - rangeMinX) + rangeMinX
+            let percentY = ((yPoint - minY) / (maxY - minY)) * (rangeMaxY - rangeMinY) + rangeMinY
             if(demo.biasLine) {
                 demo.biasLine.remove()
                 demo.biasLine = null;
@@ -1808,8 +1838,8 @@ class Display {
                 //LeaderLine.pointAnchor(selections.rows[0].cells[0], {x: '80%', y: '50%'}),
                 LeaderLine.pointAnchor(document.querySelector(".bias-content"), {x: '83%', y: '50%'}),
                 LeaderLine.pointAnchor(document.getElementById("circle"), {
-                    x: percentsX[0] + '%',
-                    y: percentsY[0] + '%'
+                    x: percentX + '%',
+                    y: percentY + '%'
                 })
             );
             demo.biasLine.path = "straight";
@@ -1822,19 +1852,8 @@ class Display {
             }
         }
 
-        //let strHeight = getComputedStyle(circle).height;
-        //let strWidth = getComputedStyle(circle).width;
-        let height = circle.getBoundingClientRect().height
-        let width = circle.getBoundingClientRect().width
-        let left = circle.getBoundingClientRect().left;
-        let top = circle.getBoundingClientRect().top;
-        let centerX = left + width/2;
-        let centerY = top +  height/2;
-
         for (let i = 0; i < demo.selectedInput.length; i++) {
 
-            // if(i !== 0 && i !== demo.selectedInput.length-1)
-            //     xposition = 3;
             let real_i = i;
             if(document.getElementById('biasToggle').checked)
             {
@@ -1865,8 +1884,7 @@ class Display {
             // range should be 0 - 50 (in percent), we want to scale that so that xPoint and yPoint fit in that
             let percentX = ((xPoint - minX) / (maxX - minX)) * (rangeMaxX - rangeMinX) + rangeMinX
             let percentY = ((yPoint - minY) / (maxY - minY)) * (rangeMaxY - rangeMinY) + rangeMinY
-            console.log(percentX)
-            console.log(percentY)
+
             demo.weightLines[i] = new LeaderLine(
                 LeaderLine.pointAnchor(selections.rows[real_i].cells[0], {x: '110%', y: '50%'}),
                 //LeaderLine.pointAnchor(document.getElementById("circle"), {x: xposition+'%', y: (percentsY[real_i])+'%'})
