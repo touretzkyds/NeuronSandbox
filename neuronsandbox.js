@@ -1,5 +1,9 @@
 "use strict";
 
+const ACTIVATION_COLUMN = 0;
+const OUTPUT_COLUMN = 0;
+const DESIRED_OUTPUT_COLUMN = 1;
+
 const ERROR_COLOR = '#ffbfcb';
 const OUTPUT_COLOR = '#f8ffcf';
 const INVALID_WEIGHT = '#fc496b';
@@ -8,6 +12,8 @@ const ZERO_WEIGHT = 'blue';
 const DEFAULT_LINE_COLOR = 'black';
 const HOVER_COLOR = 'lightblue';
 const HOVER_ERROR = '#c2abc9';
+
+let centerCircle = LeaderLine.pointAnchor(document.getElementById("circle"))
 
 class Data {
     constructor(inputData) {
@@ -108,7 +114,7 @@ class DataOperator {
                 const cell = table.rows[row].cells[c];
                 const rawValue = cell.innerText;
                 let [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
-                if (table.id === 'output-table' && c === 2 && (parsedValue !== 1 && parsedValue !== 0) ) {
+                if (table.id === 'output-table' && c === DESIRED_OUTPUT_COLUMN && (parsedValue !== 1 && parsedValue !== 0) ) {
                     isValid = false;
                 }
                 dataObj.data[row-start][c-startCol] = parsedValue;
@@ -127,7 +133,7 @@ class DataOperator {
                 const cell = table.rows[row].cells[c];
                 const rawValue = cell.innerText;
                 let [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
-                if (table.id === 'output-table' && c === 2 && (parsedValue !== 1 && parsedValue !== 0) ) {
+                if (table.id === 'output-table' && c === DESIRED_OUTPUT_COLUMN && (parsedValue !== 1 && parsedValue !== 0) ) {
                     isValid = false;
                 }
                 const regex = '^-?0+$';
@@ -174,7 +180,7 @@ class DataOperator {
         let start = 1;
         //let row = start;
         for (let row = start; row < table.rows.length; row++) {
-            const cell = table.rows[row].cells[2];
+            const cell = table.rows[row].cells[DESIRED_OUTPUT_COLUMN];
             cell.innerText = desiredOutput.data[row-1];
         }
     }
@@ -589,6 +595,7 @@ class Perceptron {
         this.weights = weights;
         this.weightLabels = weight_labels;
         this.threshold = threshold;
+        this.activationData = new Array(this.dataObj.rows).fill(0).map(() => new Array(1).fill(0));
     }
 
     // simple float operations give precision problems (#6)
@@ -601,31 +608,33 @@ class Perceptron {
     // compute combination column of output table
     computeAffineOutput() {
         this.affineOutput = new Array(this.dataObj.rows).fill(0);
+        this.activationData = new Array(this.dataObj.rows).fill(0).map(() => new Array(1).fill(0));
         for (let r=0; r<this.dataObj.rows; ++r){
             for (let c=0; c<this.dataObj.cols; ++c){
                 const prod = this.inputData[r][c] * this.weights[c];
                 // simple float operations give precision problems (#6)
                 const affineOutput = this.correctPrecision(this.affineOutput[r] + prod);
                 this.affineOutput[r] = affineOutput;
-                this.outputData[r][0] = affineOutput;
+                this.activationData[r][ACTIVATION_COLUMN] = affineOutput;
             }
         }
     }
 
     // compute activation column of output table
     computeActivnOutput(activation = "threshold"){
-        this.activnOutput = new Array(this.dataObj.rows).fill(0);
+        this.activationOutput = new Array(this.dataObj.rows).fill(0);
         if (activation === "threshold") {
             for (let r=0; r<this.dataObj.rows; ++r){
                 const res = (this.affineOutput[r] > this.threshold ? 1 : 0);
-                this.activnOutput[r] = res;
-                this.outputData[r][1] = res;
+                this.activationOutput[r] = res;
+                this.outputData[r][OUTPUT_COLUMN] = res;
             }
         }
     }
 
     computeOutputs(){
-        this.outputData = new Array(this.dataObj.rows).fill(0).map(() => new Array(3).fill(0));
+        this.activationData = new Array(this.dataObj.rows).fill(0).map(() => new Array(1).fill(0));
+        this.outputData = new Array(this.dataObj.rows).fill(0).map(() => new Array(2).fill(0));
         this.computeAffineOutput();
         this.computeActivnOutput();
     }
@@ -724,6 +733,7 @@ class Perceptron {
                         }
                     }
                     dataOp.makeEditable(text, editable);
+                    setupQuestionFields();
                 };
 
 
@@ -785,6 +795,9 @@ class Perceptron {
             if (editToggle.checked)
                 thresholdToggle.style.display = "inline-block";
 
+        }
+        if (demo.biasLine) {
+            demo.biasLine.position();
         }
     }
 
@@ -876,6 +889,7 @@ function ConvertToWeightSubscript(weightLabel) {
 function checkAnswerCorrect() {
     let inputTable = document.getElementById("input-table")
     let outputTable = document.getElementById("output-table")
+    let activationTable = document.getElementById("activation-table")
     let guessToggle = document.getElementById("DemoToggle")
     let outputToggleChecked = document.getElementById("OutputToggle").checked
     let tableRows = outputTable.rows.length
@@ -884,9 +898,10 @@ function checkAnswerCorrect() {
         for (let i = 1; i < tableRows; i++) {
             let row = outputTable.rows.item(i);
             let inputRow = inputTable.rows.item(i+1);
+            let activationRow = activationTable.rows.item(i);
             let cells = outputTable.rows.item(i).cells
-            let output = cells.item(1).innerText;
-            let desired = cells.item(2).innerText;
+            let output = cells.item(OUTPUT_COLUMN).innerText;
+            let desired = cells.item(DESIRED_OUTPUT_COLUMN).innerText;
             if (output !== desired && outputToggleChecked) {
                 //highlight the entire row
                 if(!row.classList.contains("red-border")) {
@@ -894,6 +909,9 @@ function checkAnswerCorrect() {
                 }
                 if(!inputRow.classList.contains("red-border")) {
                     inputRow.classList.add("red-border");
+                }
+                if(!activationRow.classList.contains("red-border")) {
+                    activationRow.classList.add("red-border");
                 }
                 isCorrect = false
             }
@@ -903,6 +921,9 @@ function checkAnswerCorrect() {
                 }
                 if(inputRow.classList.contains("red-border")) {
                     inputRow.classList.remove("red-border");
+                }
+                if(activationRow.classList.contains("red-border")) {
+                    activationRow.classList.remove("red-border");
                 }
             }
         }
@@ -926,7 +947,7 @@ function checkAnswerCorrect() {
                 }
             }
 
-            let desired = cells.item(2).innerText;
+            let desired = cells.item(DESIRED_OUTPUT_COLUMN).innerText;
             if (guess_output !== desired) {
 
                 isCorrect = false
@@ -942,21 +963,28 @@ class Display {
     constructor(inpObj=null, percepObj=null, outObj=null){
         this.hovering = false;
         this.initializeDisplay();
-        this.outputLine = new LeaderLine(
-            LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: '99%', y: '50%'}),
-            LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '-50%', y: 50+'%'})
-        );
-        this.outputLine.color = DEFAULT_LINE_COLOR;
-        this.outputLine.path = 'straight';
-        this.outputLine.position();
+        this.recreateOutputLine();
         this.createOutputTableColors();
         this.createInputTableEditBorder();
         this.createOutputTableEditBorder();
     }
 
+    recreateOutputLine() {
+        if(this.outputLine) {
+            this.outputLine.remove()
+            this.outputLine = null;
+        }
+        this.outputLine = new LeaderLine(
+            LeaderLine.pointAnchor(document.getElementById("circle"), {x: '100%', y: '50%'}),
+            LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '-50%', y: 52+'%'})
+        );
+
+        this.outputLine.color = DEFAULT_LINE_COLOR;
+        this.outputLine.path = 'straight';
+        this.outputLine.position();
+    }
     alignTables() {
         let heights = []
-        let maxHeight = 0
 
         const headerCells = document.getElementById("input-table").rows[1].cells;
         const headerCellsHeight = getComputedStyle(headerCells[1]).height;
@@ -967,20 +995,40 @@ class Display {
         const guessOutputHeaderCells = document.getElementById("guess-output-table").rows[0].cells;
         const guessOutputHeaderCellsHeight = getComputedStyle(guessOutputHeaderCells[0]).height;
 
+        const activationHeaderCells = document.getElementById("activation-table").rows[0].cells;
+        const activationHeaderCellsHeight = getComputedStyle(activationHeaderCells[0]).height;
 
         heights.push(headerCellsHeight);
         heights.push(outputHeaderCellsHeight);
         heights.push(guessOutputHeaderCellsHeight);
+        heights.push(activationHeaderCellsHeight);
 
+        let maxHeight = 0;
         for (let i = 0; i < heights.length; i++) {
             let height = parseFloat(heights[i].replace("px", ""))
             if (height > maxHeight)
-                maxHeight = height
+                maxHeight = height;
         }
 
         headerCells[1].style.height = maxHeight + 'px';
         outputHeaderCells[0].style.height = maxHeight + 'px';
         guessOutputHeaderCells[0].style.height = maxHeight + 'px';
+        activationHeaderCells[0].style.height = maxHeight + 'px';
+    }
+
+    updateTableOutputColumn() {
+        let outputTable = document.getElementById("output-table");
+        let outputColumn = outputTable.rows[0].cells[OUTPUT_COLUMN];
+
+        let biasToggle = document.getElementById("biasToggle");
+        let sigma = 0;
+        if (!biasToggle.checked) {
+            sigma = parseFloat(document.getElementById("th1").innerText);
+        }
+        else {
+            sigma = parseFloat(document.getElementById("bias-text").innerText) * -1;
+        }
+        outputColumn.innerHTML = `Current Output<br>&Sigma; > ` + sigma.toString();
     }
 
     toggleProblemDisplay() {
@@ -1005,19 +1053,19 @@ class Display {
 
     createOutputTableColors() {
         const outputTable = document.getElementById("output-table");
+        const activationTable = document.getElementById("activation-table");
         let n = outputTable.rows.length;
         for (let i = 1; i < n; i++) {
             let tr = outputTable.rows[i];
-            let td1 = tr.cells[0];
-            let td2 = tr.cells[1];
+            let tr_activation = activationTable.rows[i];
+            let td1 = tr_activation.cells[ACTIVATION_COLUMN];
+            let td2 = tr.cells[OUTPUT_COLUMN];
             td1.style.fontWeight = 'normal';
 
             td2.style.fontWeight = 'bold';
-            if (td2.style.background !== ERROR_COLOR) { //error
-                td2.style.background = OUTPUT_COLOR
-                td1.style.background = 'none'
-            }
-
+            if (td2.style.background !== ERROR_COLOR) //error
+                td2.style.background = ERROR_COLOR
+            td2.style.background = 'none'
         }
     }
 
@@ -1027,7 +1075,7 @@ class Display {
         for (let i = 1; i < n; i++) {
             const outputRow = document.querySelector(`#output-table > tbody > tr:nth-child(${i+1})`)
             const guessOutputRow = document.querySelector(`#guess-output-table > tbody > tr:nth-child(${i+1})`)
-            let desired = outputRow.children[2].innerText;
+            let desired = outputRow.children[DESIRED_OUTPUT_COLUMN].innerText;
             var radioButtonGroup = document.getElementsByName(`guess-radio-${i-1}`);
             let guessed;
             for (let j = 0; j < radioButtonGroup.length; j++) {
@@ -1073,12 +1121,12 @@ class Display {
         let n = outputTable.rows.length;
         for (let i = 1; i < n; i++) {
             let tr = outputTable.rows[i];
-            for (let j = 1; j < tr.cells.length; j++) {
+            for (let j = OUTPUT_COLUMN; j < tr.cells.length; j++) {
                 let textbox = tr.cells[j]
                 if (textbox.children.length === 0) {
                     textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
                 }
-                if(j == 2) { //desired output
+                if(j === DESIRED_OUTPUT_COLUMN) { //desired output
                     textbox.children[0].classList.add("editable-border")
                     dataOp.makeEditable(textbox.firstChild, editCheckbox.checked)
                 }
@@ -1092,7 +1140,7 @@ class Display {
                         textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
                     }
                     textbox.children[0].classList.remove("editable-border")
-                    if(j === 2)
+                    if(j === DESIRED_OUTPUT_COLUMN)
                     {
                         dataOp.makeEditable(textbox.firstChild, editCheckbox.checked)
                     }
@@ -1319,7 +1367,7 @@ class Display {
             let images = cell.querySelectorAll(".myimage");
             for( let i = 0; i < images.length; i++) {
                 if( i === guessed) {
-                    const imageKey = JSON.stringify({table_name: 'output-table', column: 2, value: ""+i + "_Image"});
+                    const imageKey = JSON.stringify({table_name: 'output-table', column: DESIRED_OUTPUT_COLUMN, value: ""+i + "_Image"});
                     if (imageKey in dictImageMapping) {
                         images[i].src = localStorage.getItem(dictImageMapping[imageKey]);
                         images[i].style.visibility = "visible";
@@ -1355,7 +1403,7 @@ class Display {
         //non-edit mode, we will display the comment for the wrong answer, in read only mode
         if(!outputRow)
             return;
-        let desired = outputRow.children[2].innerText;
+        let desired = outputRow.children[DESIRED_OUTPUT_COLUMN].innerText;
 
         var cell = guessTable.rows[row].cells[0];
         let radioButtonGroup = document.getElementsByName(`guess-radio-${row-1}`);
@@ -1624,10 +1672,10 @@ class Display {
         {
             demo.weightLines[i].position();
         }
-
-
+        if (demo.biasLine) {
+            demo.biasLine.position();
+        }
     }
-
     displayWeightFromData(wID, idx){
         let weight = document.getElementById(wID);
         if (!weight) {
@@ -1657,6 +1705,7 @@ class Display {
     }
 
     updateSelectedInput() {
+
         if (!demo.selectedInput)
             return;
         if(document.getElementById("DemoToggle").checked)
@@ -1678,9 +1727,9 @@ class Display {
             let bias_value = 1;
             if(typeof demo.selectedInput[0] === "string")
             {
-                bias_value = "Bias";
+                bias_value = "";
             }
-            newCell.innerHTML = `<div class=\"bias-content\"><span style="display: inline-flex">${bias_value}<img src="media/ground.png" height="33px" style="transform: translateX(30px);"></span></div>`;
+            newCell.innerHTML = `<div class=\"bias-content\"><span style=\"color: black;\">Bias</span><img src="media/ground.png" height="33px" style="transform: rotate(-90deg); margin-top: 25%" ></div>`;
         }
         //removes lines when not hovered
         demo.weightLines.forEach(line => line.remove());
@@ -1689,16 +1738,18 @@ class Display {
 
         const length = document.getElementById("biasToggle").checked ? demo.selectedInput.length + 1 : demo.selectedInput.length
 
+        const circle = document.getElementById("circle");
+
         //percentage values for weight lines for x-axis
         let percentsX = []
         let intervalX = 1/length
         let startX = 0
         switch(length) {
             case 1:
-                percentsX = [-3]
+                percentsX = [-4]
                 break
             case 2:
-                percentsX = [0, 0]
+                percentsX = [-1, -1]
                 break
             case 3:
                 percentsX = [0, -2.5, 0]
@@ -1726,9 +1777,9 @@ class Display {
         let intervalY = 16/length
         let startY = 42;
         if (length === 1)
-            percentsY = [50]
+            percentsY = [52]
         else if (length === 2)
-            percentsY = [42, 58]
+            percentsY = [37, 67]
         else if (length === 3)
             percentsY = [42, 50, 58]
 
@@ -1746,18 +1797,49 @@ class Display {
 
         let weight_labels = document.getElementById("input-link-text").children;
 
+        let height = circle.getBoundingClientRect().height
+        let width = circle.getBoundingClientRect().width
+        let left = circle.getBoundingClientRect().left;
+        let top = circle.getBoundingClientRect().top;
+        let centerX = left + width/2;
+        let centerY = top +  height/2;
+
         //TODO: x values should also be variable
         if(document.getElementById('biasToggle').checked)
         {
+            let biasContent = document.querySelector(".bias-content")
+
+            let x = biasContent.getBoundingClientRect().left +  biasContent.offsetWidth
+            let y = biasContent.getBoundingClientRect().top + biasContent.offsetHeight/2
+
+            let lengthLine = Math.sqrt((centerX-x)*(centerX-x) + (centerY-y)*(centerY-y))
+            let lengthSubLine = lengthLine - width/2
+            let ratio = lengthSubLine / lengthLine
+            let xPoint = x + ratio * (centerX - x)
+            let yPoint = y + ratio * (centerY - y)
+
+            let minX = left
+            let maxX = centerX
+            let minY = top
+            let maxY = top + height
+
+            let rangeMinX = 0
+            let rangeMaxX = 50
+            let rangeMinY = 0
+            let rangeMaxY = 100
+            // range should be 0 - 50 (in percent), we want to scale that so that xPoint and yPoint fit in that
+            let percentX = ((xPoint - minX) / (maxX - minX)) * (rangeMaxX - rangeMinX) + rangeMinX
+            let percentY = ((yPoint - minY) / (maxY - minY)) * (rangeMaxY - rangeMinY) + rangeMinY
             if(demo.biasLine) {
                 demo.biasLine.remove()
                 demo.biasLine = null;
             }
             demo.biasLine = new LeaderLine(
-                LeaderLine.pointAnchor(selections.rows[0].cells[0], {x: '110%', y: '50%'}),
-                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {
-                    x: 6 + percentsX[0] + '%',
-                    y: percentsY[0] + '%'
+                //LeaderLine.pointAnchor(selections.rows[0].cells[0], {x: '80%', y: '50%'}),
+                LeaderLine.pointAnchor(document.querySelector(".bias-content"), {x: '83%', y: '50%'}),
+                LeaderLine.pointAnchor(document.getElementById("circle"), {
+                    x: percentX + '%',
+                    y: percentY + '%'
                 })
             );
             demo.biasLine.path = "straight";
@@ -1772,17 +1854,43 @@ class Display {
 
         for (let i = 0; i < demo.selectedInput.length; i++) {
 
-            // if(i !== 0 && i !== demo.selectedInput.length-1)
-            //     xposition = 3;
             let real_i = i;
             if(document.getElementById('biasToggle').checked)
             {
                 real_i += 1;
             }
             let xposition = 6+ percentsX[real_i];
+            // let x = selections.rows[real_i].offsetLeft
+            // let y = selections.rows[real_i].offsetTop
+
+            let x = selections.rows[real_i].getBoundingClientRect().left +  selections.rows[real_i].offsetWidth
+            let y = selections.rows[real_i].getBoundingClientRect().top + selections.rows[real_i].offsetHeight/2
+
+            let lengthLine = Math.sqrt((centerX-x)*(centerX-x) + (centerY-y)*(centerY-y))
+            let lengthSubLine = lengthLine - width/2
+            let ratio = lengthSubLine / lengthLine
+            let xPoint = x + ratio * (centerX - x)
+            let yPoint = y + ratio * (centerY - y)
+
+            let minX = left
+            let maxX = centerX
+            let minY = top
+            let maxY = top + height
+
+            let rangeMinX = 0
+            let rangeMaxX = 50
+            let rangeMinY = 0
+            let rangeMaxY = 100
+            // range should be 0 - 50 (in percent), we want to scale that so that xPoint and yPoint fit in that
+            let percentX = ((xPoint - minX) / (maxX - minX)) * (rangeMaxX - rangeMinX) + rangeMinX
+            let percentY = ((yPoint - minY) / (maxY - minY)) * (rangeMaxY - rangeMinY) + rangeMinY
+
             demo.weightLines[i] = new LeaderLine(
                 LeaderLine.pointAnchor(selections.rows[real_i].cells[0], {x: '110%', y: '50%'}),
-                LeaderLine.pointAnchor(document.getElementById("perceptron1"), {x: xposition+'%', y: percentsY[real_i]+'%'})
+                //LeaderLine.pointAnchor(document.getElementById("circle"), {x: xposition+'%', y: (percentsY[real_i])+'%'})
+                LeaderLine.pointAnchor(document.getElementById("circle"), {x: percentX+'%', y: percentY+'%'})
+                //LeaderLine.areaAnchor({element: document.getElementById("circle"), shape: 'circle', x: 25, y: 25, width: '70%', height: '70%', color: 'rgba(0, 0, 0, 0)'})
+                // LeaderLine.pointAnchor(centerCircle)
             );
 
             let splitup = weight_labels[i].children[1].textContent.split(" ")
@@ -1848,9 +1956,14 @@ class Display {
         let table = document.getElementById("selected-output");
         //console.log("displaySelectedOutput, selections = " + table.outerHTML);
         //console.log("displaySelectedOutput, selectedOutput = " + demo.selectedOutput);
-        for (let r=0; r<table.rows.length; r++){
-            let cell = table.rows[r].cells[0];
-            cell.innerHTML = `<mark>${demo.selectedOutput[1]}</mark>`;
+        if(document.getElementById("seloutput-mark")) {
+            document.getElementById("seloutput-mark").textContent = demo.selectedOutput[OUTPUT_COLUMN];
+        }
+        else {
+            for (let r=0; r<table.rows.length; r++){
+                let cell = table.rows[r].cells[0];
+                cell.innerHTML = `<mark id='seloutput-mark' class="mark">${demo.selectedOutput[OUTPUT_COLUMN]}</mark>`;
+            }
         }
     }
 
@@ -1871,6 +1984,7 @@ class Display {
         let outputRowIndex = rowIdx - 1;
         const outputRow = document.querySelector(`#output-table > tbody > tr:nth-child(${outputRowIndex + 1})`)
         const guessOutputRow = document.querySelector(`#guess-output-table > tbody > tr:nth-child(${outputRowIndex + 1})`)
+        const activationRow = document.querySelector(`#activation-table > tbody > tr:nth-child(${outputRowIndex + 1})`)
 
         if (rowIdx < 2) //headers, or leave
         {
@@ -1901,30 +2015,61 @@ class Display {
 
             //show the activation number
             perceptron.computeAffineOutput();
+            let showDetail = document.getElementById("detailButton").innerText === "Hide details";
+            if (showDetail) {
+                let headerRowVals = [];
+                this.getHeaderRowVals(headerRowVals);
+                //document.getElementById("perceptron-detail").style.visibility = "visible";
+                let activation = perceptron.affineOutput[rowIdx-2];
+                let detail_line = `∑ =`;
+                for(let i = 0; i < headerRowVals.length; i++) {
+                    let variable_name = headerRowVals[i];
+                    detail_line += ` (<span class="span-work" style=\"color: red;\">${variable_name}</span> <span class="span-work" style=\"color: blue;\"> &times; </span>w<sub>${i+1}</sub>)`;
+                    if(i !== headerRowVals.length - 1) {
+                        detail_line += " + ";
+                    }
+                }
+                detail_line += `<p>∑ = `;
+                for(let i = 0; i < headerRowVals.length; i++) {
+                    let variable_value = perceptron.inputData[rowIdx-2][i];
+                    detail_line += `(<span class="span-work" style=\"color: red;\">${variable_value}</span> <span class="span-work" style=\"color: blue;\"> &times; </span>${perceptron.weights[i]}</sub>)`;
+                    if(i !== headerRowVals.length - 1) {
+                        detail_line += " + ";
+                    }
+                }
+                detail_line += ` = ${activation}`;
+                document.getElementById("perception_detail_line").innerHTML = detail_line;
+            }
+            else {
+                //document.getElementById("perceptron-detail").style.visbility = "hidden";
+                display.UpdateDetailToggle();
+            }
             document.getElementById("sigma").innerText = perceptron.affineOutput[rowIdx-2].toString() + "> ";
-
-            //console.log("enter: set outputRow =" + outputRow);
         }
         else {
             if (rowIdx % 2 === 0) {
-                this.handleHoverExit(inputRow, outputRow, guessOutputRow );
+                this.handleHoverExit(inputRow, outputRow, guessOutputRow, activationRow );
                 if (isOutputToggleChecked)
-                    this.checkDesiredOutput(outputRow.children[1], outputRow.children[2], outputRow.children[0])
+                    this.checkDesiredOutput(outputRow.children[OUTPUT_COLUMN], outputRow.children[DESIRED_OUTPUT_COLUMN], activationRow.children[ACTIVATION_COLUMN])
 
             }
 
             else {
-                this.handleHoverExit(inputRow, outputRow, guessOutputRow,true ); //if it is odd, reset to gray
+                this.handleHoverExit(inputRow, outputRow, guessOutputRow, activationRow, true ); //if it is odd, reset to gray
                 if (isOutputToggleChecked)
-                    this.checkDesiredOutput(outputRow.children[1], outputRow.children[2], outputRow.children[0])
+                    this.checkDesiredOutput(outputRow.children[OUTPUT_COLUMN], outputRow.children[DESIRED_OUTPUT_COLUMN], activationRow.children[ACTIVATION_COLUMN])
             }
             document.getElementById("sigma").innerText = "∑> ";
-
+            display.UpdateDetailToggle();
+            //document.getElementById("perceptron-detail").style.visibility= "hidden";
+            document.getElementById("perceptron-normal").style.display = "inline-flex";
 
         }
         //this.displaySelectedInput();
         this.updateSelectedInput();
         this.displaySelectedOutput();
+        display.recreateOutputLine();
+        display.outputLine.position();
 
         const isDemoMode = document.getElementById("DemoToggle").checked;
         if(isDemoMode) {
@@ -1935,6 +2080,11 @@ class Display {
         //empties lines array
         demo.lines = []
 
+        demo.activationLines?.forEach(line => line.remove());
+        demo.activationLines = []
+
+        demo.outputLines?.forEach(line => line.remove());
+        demo.outputLines = []
 
         const selections = document.getElementById("selected-inputs");
         //demo.selectedInput = demo.inputData[rowIdx];
@@ -1949,7 +2099,7 @@ class Display {
                 selections.rows[real_r].cells[0].innerHTML = `<div lang="en" class="input-content">${demo.selectedInput[r]}</div>`;
                 demo.lines[r] = new LeaderLine(
                     LeaderLine.pointAnchor(inputRow.children[r+1], {x: '70%', y: '50%'}),
-                    LeaderLine.pointAnchor(selections.rows[real_r].cells[0], {x: '10%', y: '50%'}),
+                    LeaderLine.pointAnchor(selections.rows[real_r].cells[0], {x: '40%', y: '50%'}),
                     {dash: {animation: true}}
                 );
                 demo.lines[r].setOptions({startSocket: 'right', endSocket: 'left'});
@@ -1958,11 +2108,26 @@ class Display {
                 selections.rows[real_r].cells[0].innerHTML = `<div lang="en" class="input-content">${demo.selectedInput[r]}</div>`;
             }
         }
+        if (this.hovering) {
+            demo.activationLines[0] = new LeaderLine(
+                LeaderLine.pointAnchor(document.getElementById("sigma"), {x: '20%', y: '80%'}),
+                LeaderLine.pointAnchor(activationRow.cells[0], {x: '48%', y: '50%'}),
+                {dash: {animation: true}}
+            );
+            // demo.activationLines[0].path = "arc";
+            demo.activationLines[0].setOptions({startSocket: 'bottom', endSocket: 'left'});
+            demo.outputLines[0] = new LeaderLine(
+                LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '90%', y: '50%'}),
+                LeaderLine.pointAnchor(outputRow.cells[0], {x: '48%', y: '50%'}),
+                {dash: {animation: true}}
+            );
+            demo.outputLines[0].path = "arc";
+        }
         display.alignTables()
         display.createOutputTableEditBorder();
     }
 
-    handleHoverExit(inputRow, outputRow, guessOutputRow, isOdd = false) {
+    handleHoverExit(inputRow, outputRow, guessOutputRow, activationRow,  isOdd = false) {
         // reset display panel inputs to user-defined inputs (#11)
         let headerRowVals = [];
         this.getHeaderRowVals(headerRowVals);
@@ -1977,7 +2142,7 @@ class Display {
         if (outputRow) {
             for (let i = 0; i < outputRow.children.length; i++) {
                 outputRow.children[0].style.background = "none";
-                this.checkDesiredOutput(outputRow.children[1], outputRow.children[2], outputRow.children[0])
+                this.checkDesiredOutput(outputRow.children[OUTPUT_COLUMN], outputRow.children[DESIRED_OUTPUT_COLUMN], activationRow.children[ACTIVATION_COLUMN])
             }
         }
         if(guessOutputRow) {
@@ -2117,6 +2282,7 @@ class Display {
             //document.getElementById("generateTruthTable").disabled = true;
             document.getElementById("output-table").style.marginTop = "0px";
             document.getElementById("guess-output-table").style.marginTop = "0px";
+            document.getElementById("activation-table").style.marginTop = "0px";
             document.getElementById("AutoProgressToggleBody").style.display = "none";
             document.getElementById("BinaryToggleBody").style.display= "none";
             document.getElementById("ShowDesiredToggleBody").style.display= "none";
@@ -2135,6 +2301,7 @@ class Display {
             //document.getElementById("generateTruthTable").disabled = false;
             document.getElementById("output-table").style.marginTop = "40px";
             document.getElementById("guess-output-table").style.marginTop = "40px";
+            document.getElementById("activation-table").style.marginTop = "40px";
             document.getElementById("AutoProgressToggleBody").style.display = "flex";
             document.getElementById("BinaryToggleBody").style.display= "flex";
             document.getElementById("ShowDesiredToggleBody").style.display= "flex";
@@ -2164,6 +2331,7 @@ class Display {
         let checkbox = document.getElementById("OutputToggle");
         let checkboxEditable = document.getElementById("InputToggle");
         display.showDesiredOutput(checkbox.checked, checkboxEditable.checked);
+        let activationCol = document.getElementById("activation-table");
         let outputCol = document.getElementById("output-table");
         let n = outputCol.rows.length;
         display.createOutputTableColors();
@@ -2172,9 +2340,9 @@ class Display {
 
         for (let i = 1; i < n; i++) {
             //var tr = outputCol.rows[i];
-            let output = outputCol.rows[i].cells[1];
-            let desired = outputCol.rows[i].cells[2];
-            let activation = outputCol.rows[i].cells[0];
+            let output = outputCol.rows[i].cells[OUTPUT_COLUMN];
+            let desired = outputCol.rows[i].cells[DESIRED_OUTPUT_COLUMN];
+            let activation = activationCol.rows[i].cells[ACTIVATION_COLUMN];
 
             let currCorrect = this.checkDesiredOutput(output, desired, activation);
             if (!currCorrect)
@@ -2191,6 +2359,29 @@ class Display {
         display.outputLine.position();
         display.createOutputTableEditBorder();
         handleDesiredOutputColumn()
+    }
+
+    UpdateDetailToggle() {
+        let detailButton = document.getElementById("detailButton");
+        if(detailButton.innerText === "Hide details") {
+            //we should display the details
+            let headerRowVals = [];
+            this.getHeaderRowVals(headerRowVals);
+            document.getElementById("perceptron-detail").style.visibility = "visible";
+            let detail_line = `∑ =`;
+            for(let i = 0; i < headerRowVals.length; i++) {
+                let variable_name = headerRowVals[i];
+                detail_line += ` (<span class="span-work" style=\"color: red;\">${variable_name} </span> <span class="span-work" style=\"color: blue;\">&times;</span> w<sub>${i+1}</sub>)`;
+                if(i !== headerRowVals.length - 1) {
+                    detail_line += " + ";
+                }
+            }
+            document.getElementById("perception_detail_line").innerHTML = detail_line;
+        }
+        else {
+            document.getElementById("perceptron-detail").style.visibility = "hidden";
+        }
+        this.UpdateDemoToggle();
     }
 
     UpdateBinaryToggle(columnChanged) {
@@ -2223,7 +2414,10 @@ class Display {
             document.getElementById("CheckAnswerBtn").style.display = "inline-block";
             document.getElementById("network-container").style.display = "none";
             document.getElementById("output-container").style.display = "none";
+            document.getElementById("activation-container").style.display = "none";
             document.getElementById("bias-toggle").style.display = "none";
+            document.getElementById("hintText").style.display = "none";
+            document.getElementById("perceptron-detail").style.visibility = "hidden";
             otherHeaders.forEach(header => {
                 header.hidden = true;
             });
@@ -2237,7 +2431,16 @@ class Display {
             document.getElementById("CheckAnswerBtn").style.display = "none";
             document.getElementById("network-container").style.display = "inline-flex";
             document.getElementById("output-container").style.display = "inline-flex";
+            document.getElementById("activation-container").style.display = "inline-flex";
             document.getElementById("bias-toggle").style.display = "inline-flex";
+            document.getElementById("hintText").style.display = "block";
+            if(document.getElementById("detailButton").innerText === "Hide details") {
+                document.getElementById("perceptron-detail").style.visibility = "visible";
+            }
+            else {
+                document.getElementById("perceptron-detail").style.visibility = "hidden";
+            }
+
             //document.getElementById("edit-menu-section").style.display = "inline-block";
             otherHeaders.forEach(header => {
                 header.hidden = false;
@@ -2266,6 +2469,7 @@ class Display {
             demo.biasLine.position();
         }
         display.outputLine.position()
+        display.alignTables();
 
     }
 
@@ -2274,6 +2478,7 @@ class Display {
         perceptron.setBiasUI();
         display.updateSelectedInput();
         demo.adjustWeightPlacement();
+        setupQuestionFields()
     }
 
     UpdateFanfareToggle() {
@@ -2336,13 +2541,13 @@ class Display {
 
         if (outputParsedValue !== parsedValue && document.getElementById("OutputToggle").checked) {
             output.style.background = ERROR_COLOR; //pink (error)
-            activation.style.background = ERROR_COLOR;
+            //activation.style.background = ERROR_COLOR;
             return false
         }
         else {
             //output.style.removeProperty('background-color');
             output.style.background = OUTPUT_COLOR;
-            activation.style.background = "none";
+            //activation.style.background = "none";
             return true
         }
         display.createOutputTableEditBorder();
@@ -2398,7 +2603,7 @@ class Display {
         });
     }
     showDesiredOutput (show, editable) {
-        outputTable.showColumn(2, show, editable);
+        outputTable.showColumn(DESIRED_OUTPUT_COLUMN, show, editable);
         //display.createOutputTableEditBorder()
     }
 }
@@ -2423,7 +2628,7 @@ class Demo {
         this.weights = [1,-2];
         this.threshold = 0;
         this.defaultSelectedInput = [`x<sub>1</sub>`, `x<sub>2</sub>`];
-        this.defaultSelectedOutput = ["activation", "y"];
+        this.defaultSelectedOutput = ["y", "y"];
         this.selectedInput = this.defaultSelectedInput;
         this.selectedOutput = this.defaultSelectedOutput;
         this.lines = [];
@@ -2501,6 +2706,8 @@ class Demo {
         dataOp.insertDataRow(inputs, r-2);
         outputTable.insertTableRow(r-1);
         dataOp.insertDataRow(outputs, r-2);
+        activationTable.insertTableRow(r-1);
+        dataOp.insertDataRow(activations, r-2);
         demo.update(); //TODO: check if efficient
     }
 
@@ -2508,6 +2715,8 @@ class Demo {
         inputTable.insertTableRow(r);
         dataOp.insertDataRow(inputs, r-2);
         outputTable.insertTableRow(r-1);
+        activationTable.insertTableRow(r-1);
+        dataOp.insertDataRow(activations, r-2)
         dataOp.insertDataRow(outputs, r-2);
         if (needUpdate)
             demo.update();
@@ -2519,9 +2728,13 @@ class Demo {
         inputTable.removeTableRow(r);
         dataOp.removeDataRow(inputs, r);
         outputTable.removeTableRow(r-1);
+        activationTable.removeTableRow(r-1);
         dataOp.removeDataRow(outputs, r);
+        dataOp.removeDataRow(activations, r);
         demo.lines.forEach(line => line.remove());
         demo.lines = []
+        demo.activationLines = [];
+        demo.outputLines = [];
         demo.update(); //TODO: check if efficient
     }
 
@@ -2537,6 +2750,7 @@ class Demo {
             inputTable.removeTableRow(2);
             dataOp.removeDataRow(inputs, 0);
             outputTable.removeTableRow(1);
+            activationTable.removeTableRow(1);
             dataOp.removeDataRow(outputs, 0);
         }
         if (needUpdate) demo.update();
@@ -2595,6 +2809,11 @@ class Demo {
     adjustWeightPlacement() {
         if(document.getElementById("DemoToggle").checked)
             return;
+        // let headerRowVals = [];
+        // display.getHeaderRowVals(headerRowVals);
+        // this.selectedInput = headerRowVals;
+        display.updateSelectedInput();
+
         let selections = document.getElementById("selected-inputs");
         let weights = document.getElementById("input-link-text");
         let dimensions = weights.getBoundingClientRect()
@@ -2818,7 +3037,15 @@ class Demo {
                 outputs.data[i][j] = perceptron.outputData[i][j]
             }
         }
+        for (let i = 0; i < perceptron.activationData.length; i++) {
+            for (let j = 0; j < perceptron.activationData[0].length; j++ ) {
+                activations.data[i][j] = perceptron.activationData[i][j]
+            }
+        }
+
         outputTable.dataObj = outputs;
+        activationTable.dataObj = activations;
+        activationTable.updateTable();
         outputTable.updateTable();
         display.updateDisplay();
         display.outputLine.position();
@@ -2833,6 +3060,7 @@ class Demo {
         display.saveGuessComment();
         display.createGuessTable();
         display.updateHintButton();
+        display.updateTableOutputColumn();
 
         let hintText = document.getElementById("hintText");
         hintText.innerText = "";
@@ -2874,7 +3102,7 @@ async function downloadFile() {
     let table = document.getElementById("output-table");
     for (let i = 1; i < table.rows.length; i++ ) {
         let tr = table.rows[i];
-        let td = tr.cells[2];
+        let td = tr.cells[DESIRED_OUTPUT_COLUMN];
         desiredOutputs.data[i-1] = td.innerText;
     }
     desiredOutputs.rows = table.rows.length-1;
@@ -3024,24 +3252,14 @@ async function uploadFileComputer(event) {
     fileInput.click();
 }
 
-async function provideHint() {
-    //get all the input
-
-    //dataOp.updateDataFromTableNoDisplay(outputs, outputTable);
-    //let desiredOutputs = perceptron.outputData.map(row => row[row.length - 1]);
-    let desiredOutputs = []
-    let outputTable = document.getElementById("output-table")
-    for (let i = 1; i < outputTable.rows.length; i++) {
-        desiredOutputs.push(parseInt(outputTable.rows[i].cells[2].innerText));
-    }
+function getEditableList() {
     const thresholdToggleBtn = document.getElementById(`threshold_toggleBtn`);
-
     let editableList  = [];
 
     let weight_parent = document.getElementById(`input-link-text`);
-    let weight_lebels = weight_parent.querySelectorAll('span.edit-toggle');
-    for( let i = 0; i < weight_lebels.length; i++) {
-        let weight_label = weight_lebels[i];
+    let weight_lebals = weight_parent.querySelectorAll('span.edit-toggle');
+    for( let i = 0; i < weight_lebals.length; i++) {
+        let weight_label = weight_lebals[i];
         if (weight_label.classList.contains("edit-toggle-on")) {
             editableList.push(true);
         }
@@ -3057,6 +3275,22 @@ async function provideHint() {
     else {
         editableList.push(false);
     }
+
+    return editableList
+}
+
+async function provideHint() {
+    //get all the input
+
+    //dataOp.updateDataFromTableNoDisplay(outputs, outputTable);
+    //let desiredOutputs = perceptron.outputData.map(row => row[row.length - 1]);
+    let desiredOutputs = []
+    let outputTable = document.getElementById("output-table")
+    for (let i = 1; i < outputTable.rows.length; i++) {
+        desiredOutputs.push(parseInt(outputTable.rows[i].cells[DESIRED_OUTPUT_COLUMN].innerText));
+    }
+
+    let editableList = getEditableList()
     console.log(editableList)
     let hintProvider = new hintprovider([...perceptron.weights].concat(perceptron.threshold), perceptron.inputData, desiredOutputs, editableList);
     let hintArr = hintProvider.provideHint(prevHintIndex, prevSubset, prevHintLevel);
@@ -3088,6 +3322,16 @@ async function provideHint() {
         demo.biasLine.position();
     }
 }
+
+async function detailButtonClicked() {
+    if(document.getElementById("detailButton").innerText === "Hide details") {
+        document.getElementById("detailButton").innerText = "How does this work?";
+    }
+    else {
+        document.getElementById("detailButton").innerText = "Hide details";
+    }
+    display.UpdateDetailToggle();
+}
 function addEditOption(c) {
     //cannot use getElementById since it is not accurate
     let weight_parent = document.getElementById(`input-link-text`);
@@ -3116,6 +3360,7 @@ function addEditOption(c) {
             }
         }
         dataOp.makeEditable(textbox, editable);
+        setupQuestionFields();
     };
     toggleBtn.onclick = weightButtonHandler;
 }
@@ -3145,6 +3390,7 @@ function addThresholdEditOption() {
             }
         }
         dataOp.makeEditable(textbox, editable);
+        setupQuestionFields();
     };
     toggleBtn.onclick = thresholdButtonHandler;
 }
@@ -3213,6 +3459,68 @@ function setImageEditOptions() {
     });
 }
 
+function setupQuestionFields() {
+    let editableList = getEditableList()
+
+    let weightHolder = document.getElementById("input-link-text");
+
+    let fields = [];
+    for (let i = 0; i < editableList.length; i++) {
+        let field = editableList[i];
+        let fieldName = '';
+        if (field) { //editable
+            if (i !== editableList.length - 1) { //weight
+                fieldName = weightHolder?.children[i]?.children[0].innerHTML;
+                fieldName = fieldName.replace("=", "");
+                fieldName = fieldName.replace(" ", "");
+            }
+            else { //threshold
+                let biasToggle = document.getElementById("biasToggle");
+                fieldName = biasToggle.checked ? "the bias" : "the threshold";
+            }
+            fields.push(fieldName)
+        }
+    }
+
+    let logic_operator = "and";
+    let hp = new hintprovider([...perceptron.weights].concat(perceptron.threshold), perceptron.inputData, desiredOutputs.data, editableList);
+    let subsets = hp.getAllSubsets(editableList);
+    // let use_or = true;
+
+    let sols = 0;
+    for (let i = 0; i < subsets.length ; i++) {
+        let subset = subsets[i];
+        let hasSolution = hp.checkForSolution(subset);
+        if (!hasSolution.includes(Number.MIN_VALUE) && subset.length === 1) {
+            sols++;
+        }
+    }
+
+    if (sols > 1) {
+        logic_operator = "or";
+    }
+
+    // set up the text
+    let fieldText = document.getElementById("hintText");
+    fieldText.innerHTML = "Adjust "
+    if (fields.length === 1) {
+        fieldText.innerHTML += fields[0]
+    }
+    else if (fields.length === 2) {
+        fieldText.innerHTML += fields[0] + ` ${logic_operator} ` + fields[1]
+    }
+    else {
+        for (let i = 0; i < fields.length - 1; i++) {
+            fieldText.innerHTML += fields[i] + ", "
+        }
+        fieldText.innerHTML += `${logic_operator} ` + fields[fields.length - 1]
+    }
+    fieldText.innerHTML += " to solve the problem."
+
+
+
+
+}
 
 function setupCloseButtons() {
     let closeIcons = document.querySelectorAll('.close-icon');
@@ -3350,6 +3658,8 @@ function uploadJson(text) {
         inputTable.insertTableRow(2);
         outputTable.insertTableRow(1);
         dataOp.insertDataRow(outputs, 0);
+        activationTable.insertTableRow(1);
+        dataOp.insertDataRow(activations, 0);
     }
 
     //dataOp.updateTableFromDesired(desiredOutputs, outputTable);
@@ -3373,18 +3683,21 @@ function uploadJson(text) {
         outputs.data[i][2] = parseInt(desiredOutputs.data[i]);
     }
 
+    let headerRowVals = [];
+    display.getHeaderRowVals(headerRowVals);
+    demo.selectedInput = headerRowVals;
+
     display.displayThresholdFromData(perceptron);
     //document.getElementById('InputToggle').checked = dict["input-toggle-checked"];
     document.getElementById('InputToggle').checked = false;
     document.getElementById('OutputToggle').checked = dict["output-toggle-checked"];
     document.getElementById("FanfareToggle").checked = dict["fanfare-toggle-checked"];
 
-
+    document.getElementById("DemoToggle").checked = dict["guessToggleChecked"];
+    display.UpdateDemoToggle();
 
     display.handleHoverExit();
     demo.update();
-    document.getElementById("DemoToggle").checked = dict["guessToggleChecked"];
-    display.UpdateDemoToggle();
     // let headerRows = dict["input-header"];
     // if(headerRows?.length) {
     //     display.setHeaderRowVals(headerRows);
@@ -3398,14 +3711,16 @@ function uploadJson(text) {
     dataOp.updateTableFromDesired(desiredOutputs, outputTable);
 
     let outputCol = document.getElementById("output-table");
+    let activationCol = document.getElementById("activation-table");
     let outputTableLength = outputCol.rows.length;
 
     for (let i = 1; i < outputTableLength; i++)
     {
         //var tr = outputCol.rows[i];
-        let output = outputCol.rows[i].cells[1];
-        let desired = outputCol.rows[i].cells[2];
-        let activation = outputCol.rows[i].cells[0]
+        let output = outputCol.rows[i].cells[OUTPUT_COLUMN];
+        let desired = outputCol.rows[i].cells[DESIRED_OUTPUT_COLUMN];
+        let activation = activationCol.rows[i].cells[ACTIVATION_COLUMN]
+
         display.checkDesiredOutput(output, desired, activation);
     }
     display.handleHoverExit();
@@ -3445,6 +3760,7 @@ function uploadJson(text) {
     document.getElementById("DemoToggle").dispatchEvent(new Event("click"));
     isLoading = false;
     perceptron.setBiasUI();
+    setupQuestionFields();
 
     prevHintLevel = 0;
     prevHintIndex = -1;
@@ -3576,6 +3892,8 @@ let perceptron = new Perceptron(inputs, demo.weights, demo.threshold, null);
 perceptron.computeOutputs();
 let outputs = new Data(perceptron.outputData);
 const outputTable = new Table(outputs, "output-table", false);
+let activations = new Data(perceptron.activationData);
+const activationTable = new Table(activations, "activation-table", false);
 dataOp.createBinaryData(2);
 perceptron.displayPerceptron();
 const display = new Display();
@@ -3592,7 +3910,7 @@ document.getElementById("DemoToggle").checked = true;
 display.UpdateDemoToggle();
 document.getElementById("AutoProgressToggle").checked = true;
 
-const problemNum = 18;
+const problemNum = 16;
 
 let prevHintIndex = -1;
 let prevSubset = [];

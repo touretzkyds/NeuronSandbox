@@ -1,8 +1,3 @@
-/*html, body {*/
-/*    max-width: 100%;*/
-/*    overflow-x: hidden;*/
-/*}*/
-
 h1 {
     text-align: center;
 }
@@ -38,6 +33,8 @@ article > section {
 
 .top-table th {
     padding: 15px;
+    padding-top: 0px;
+    padding-bottom: 0px;
 }
 
 .bottom-table {
@@ -64,6 +61,10 @@ article > section {
     align-items: flex-start;
 }
 
+.center-container {
+    width: 40%;
+    height: 100%;
+}
 .center {
     margin: 1px;
     width: 40%;
@@ -80,6 +81,7 @@ article > section {
     display: inline-flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
 }
 
 
@@ -101,7 +103,7 @@ article > section {
 
 .right {
     margin: 1px;
-    width: 40%;
+    width: 25%;
     height: 100%;
     display: inline-flex;
     justify-content: center;
@@ -115,7 +117,7 @@ article > section {
 
 #network-container {
     display: inline-flex;
-    width: 75vw;
+    width: 40vw;
     height: 50vh;
 }
 
@@ -175,7 +177,6 @@ article > section {
 
 #th1{
     position: relative;
-    padding: 0px 2px;
 }
 
 /*
@@ -327,6 +328,12 @@ article > section {
     line-height: 1.7em !important;
 }
 
+#activation-table th {
+    width: 2vw !important;
+    height: 5vw;
+    line-height: 1.7em !important;
+}
+
 .table tr {
     border: 0.05vw solid #ddd;
 }
@@ -390,9 +397,6 @@ article > section {
     display: inline-block;
     word-wrap: break-word;
     max-width: 10vw;
-    -moz-hyphens: auto;
-    -ms-hyphens: auto;
-    hyphens: auto;
 }
 
 .draggable{
@@ -553,6 +557,10 @@ span {
     min-width: 1em;
 }
 
+.span-work {
+    padding: 0;
+    min-width: 0;
+}
 #popup {
     text-align: center;
     position: fixed;
@@ -852,7 +860,7 @@ span {
 #questiontext {
     margin: auto;
     text-align: center;
-    width: 500px;
+    width: 800px;
 }
 
 #qdiv {
@@ -990,4 +998,17 @@ span.guess-comment {
     text-align: center;
     font-size: 23px;
     height: 20px;
+}
+#perceptron-detail {
+    font-size: 23px;
+    height: 20px;
+    text-align: center;
+    transform: translate(0, -2.5vh);
+}
+
+.bias-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 32px;
 }
