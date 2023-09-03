@@ -1729,7 +1729,7 @@ class Display {
             {
                 bias_value = "";
             }
-            newCell.innerHTML = `<div class=\"bias-content\"><span style=\"color: black;\">Bias</span><img src="media/ground.png" height="33px" style="transform: rotate(-90deg); margin-top: 25%" ></div>`;
+            newCell.innerHTML = `<div class=\"bias-content\"><span style=\"color: black; margin-right: 25%\">Bias</span><img src="media/ground.png" height="33px" style="transform: rotate(-90deg); margin-top: 25%; margin-right: 10%" ></div>`;
         }
         //removes lines when not hovered
         demo.weightLines.forEach(line => line.remove());
@@ -1836,7 +1836,7 @@ class Display {
             }
             demo.biasLine = new LeaderLine(
                 //LeaderLine.pointAnchor(selections.rows[0].cells[0], {x: '80%', y: '50%'}),
-                LeaderLine.pointAnchor(document.querySelector(".bias-content"), {x: '83%', y: '50%'}),
+                LeaderLine.pointAnchor(document.querySelector(".bias-content"), {x: '100%', y: '50%'}),
                 LeaderLine.pointAnchor(document.getElementById("circle"), {
                     x: percentX + '%',
                     y: percentY + '%'
@@ -3500,26 +3500,27 @@ function setupQuestionFields() {
         logic_operator = "or";
     }
 
-    // set up the text
     let fieldText = document.getElementById("hintText");
-    fieldText.innerHTML = "Adjust "
-    if (fields.length === 1) {
-        fieldText.innerHTML += fields[0]
-    }
-    else if (fields.length === 2) {
-        fieldText.innerHTML += fields[0] + ` ${logic_operator} ` + fields[1]
+    // set up the text
+    if(fields && fields.length > 0) {
+        fieldText.innerHTML = "Adjust "
+        if (fields.length === 1) {
+            fieldText.innerHTML += fields[0]
+        }
+        else if (fields.length === 2) {
+            fieldText.innerHTML += fields[0] + ` ${logic_operator} ` + fields[1]
+        }
+        else {
+            for (let i = 0; i < fields.length - 1; i++) {
+                fieldText.innerHTML += fields[i] + ", "
+            }
+            fieldText.innerHTML += `${logic_operator} ` + fields[fields.length - 1]
+        }
+        fieldText.innerHTML += " to solve the problem."
     }
     else {
-        for (let i = 0; i < fields.length - 1; i++) {
-            fieldText.innerHTML += fields[i] + ", "
-        }
-        fieldText.innerHTML += `${logic_operator} ` + fields[fields.length - 1]
+        fieldText.innerHTML = "";
     }
-    fieldText.innerHTML += " to solve the problem."
-
-
-
-
 }
 
 function setupCloseButtons() {
@@ -3535,6 +3536,17 @@ function setupCloseButtons() {
     });
 }
 
+async function clearCommentsUI() {
+    let guessTable = document.getElementById("guess-output-table");
+    let tableRows = guessTable.rows.length;
+    for (let row = 1; row < tableRows; row++) {
+        const guessOutputRow = document.querySelector(`#guess-output-table > tbody > tr:nth-child(${row+1})`)
+        let comments = guessOutputRow.querySelectorAll(".guess-comment");
+        for( let i = 0; i < comments.length; i++) {
+            comments[i].innerText = "";
+        }
+    }
+}
 async function uploadZip(zipFile, isProblem = false) {
     // Assume the zip file is stored in a variable called "zipFile" and is a binary string
     try {
@@ -3557,6 +3569,8 @@ async function uploadZip(zipFile, isProblem = false) {
         localStorage.clear();
         const zipObj = new JSZip();
         let jsonModelContent = ""
+        dictCommentMapping = {};
+        await clearCommentsUI();
         await zipObj.loadAsync(zipFile).then(function (zip) {
             // Iterate over each file in the zip
             zip.forEach(function (relativePath, zipEntry) {
@@ -3910,7 +3924,7 @@ document.getElementById("DemoToggle").checked = true;
 display.UpdateDemoToggle();
 document.getElementById("AutoProgressToggle").checked = true;
 
-const problemNum = 16;
+const problemNum = 18;
 
 let prevHintIndex = -1;
 let prevSubset = [];
@@ -4194,6 +4208,10 @@ function FixCheckAnswerButtonPosition() {
 
 
 }
+
+window.onresize = function(event) {
+    display.updateSelectedInput()
+};
 
 
 
