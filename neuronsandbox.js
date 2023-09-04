@@ -1657,7 +1657,7 @@ class Display {
         let line1Width = getComputedStyle(inputLine1).width
         line1Width = parseInt(line1Width.substring(0, line1Width.length - 2))
 
-        while (line1Width < inputLineWidth-20) {
+        while (line1Width < inputLineWidth - 20) {
             inputLine1.innerText += "━"
             line1Width = getComputedStyle(inputLine1).width
             line1Width = parseInt(line1Width.substring(0, line1Width.length - 2))
@@ -1666,7 +1666,7 @@ class Display {
         inputLine2.innerText = ""
         let line2Width = getComputedStyle(inputLine2).width
         line2Width = parseInt(line2Width.substring(0, line2Width.length - 2))
-        while (line2Width < inputLineWidth-20) {
+        while (line2Width < inputLineWidth - 20) {
             inputLine2.innerText += "━"
             line2Width = getComputedStyle(inputLine2).width
             line2Width = parseInt(line2Width.substring(0, line2Width.length - 2))
