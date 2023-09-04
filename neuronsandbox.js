@@ -1909,7 +1909,7 @@ class Display {
             }
             demo.biasLine = new LeaderLine(
                 //LeaderLine.pointAnchor(selections.rows[0].cells[0], {x: '80%', y: '50%'}),
-                LeaderLine.pointAnchor(document.querySelector(".bias-content"), {x: '100%', y: '50%'}),
+                LeaderLine.pointAnchor(document.querySelector(".bias-content"), {x: '96%', y: '50%'}),
                 LeaderLine.pointAnchor(document.getElementById("circle"), {
                     x: percentX + '%',
                     y: percentY + '%'
@@ -2491,6 +2491,7 @@ class Display {
             document.getElementById("bias-toggle").style.display = "none";
             document.getElementById("hintText").style.display = "none";
             document.getElementById("perceptron-detail").style.visibility = "hidden";
+            document.getElementById("output-header-container").style.visibility = "hidden";
             otherHeaders.forEach(header => {
                 header.hidden = true;
             });
@@ -2507,6 +2508,7 @@ class Display {
             document.getElementById("activation-container").style.display = "inline-flex";
             document.getElementById("bias-toggle").style.display = "inline-flex";
             document.getElementById("hintText").style.display = "inline-block";
+            document.getElementById("output-header-container").style.visibility = "visible";
             if(document.getElementById("detailButton").innerText === "Hide details") {
                 document.getElementById("perceptron-detail").style.visibility = "visible";
             }
