@@ -1619,33 +1619,80 @@ class Display {
     }
 
     createInputLabelLines() {
+        //input table and input text
         let inputTable = document.getElementById("input-table");
         let inputText = document.getElementById("input-text");
 
-        let widthTable = getComputedStyle(inputTable).width
-        widthTable = parseInt(widthTable.substring(0, widthTable.length -2))
-        let widthText = getComputedStyle(inputText).width
-        widthText = parseInt(widthText.substring(0, widthText.length -2))
+        //output table and output text
+        let outputTable = document.getElementById("output-table");
+        let activationTable = document.getElementById("activation-table");
+        let outputText = document.getElementById("output-text");
 
-        let lineWidth = (widthTable - widthText)/2
+        let outputHeaderContainer = document.getElementById("output-header-container");
 
-        let line1 = document.getElementById("line1")
-        let line2 = document.getElementById("line2")
+        //compute width for input table
+        let widthInputTable = getComputedStyle(inputTable).width
+        widthInputTable = parseInt(widthInputTable.substring(0, widthInputTable.length -2))
+        let widthInputText = getComputedStyle(inputText).width
+        widthInputText = parseInt(widthInputText.substring(0, widthInputText.length -2))
 
-        let line1Width = getComputedStyle(line1).width
+        //compute width for entire output/activation width + output text
+        let rightOutputTable = outputTable.getBoundingClientRect().right
+        let leftActivTable =  activationTable.getBoundingClientRect().left
+        let widthOutputText = getComputedStyle(outputText).width
+        widthOutputText = parseInt(widthOutputText.substring(0, widthOutputText.length -2))
+
+        let inputLineWidth = (widthInputTable - widthInputText)/2
+
+        let outputTotalWidth = rightOutputTable - leftActivTable
+        let outputLineWidth = (outputTotalWidth - widthOutputText)/2
+
+        outputHeaderContainer.style.width = (rightOutputTable - leftActivTable) + 'px';
+
+        //INPUT LINES
+        let inputLine1 = document.getElementById("line1")
+        let inputLine2 = document.getElementById("line2")
+
+        inputLine1.innerText = ""
+        let line1Width = getComputedStyle(inputLine1).width
         line1Width = parseInt(line1Width.substring(0, line1Width.length - 2))
-        while (line1Width < lineWidth-20) {
-            line1.innerText += "━"
-            line1Width = getComputedStyle(line1).width
+
+        while (line1Width < inputLineWidth-20) {
+            inputLine1.innerText += "━"
+            line1Width = getComputedStyle(inputLine1).width
             line1Width = parseInt(line1Width.substring(0, line1Width.length - 2))
         }
 
-        let line2Width = getComputedStyle(line2).width
+        inputLine2.innerText = ""
+        let line2Width = getComputedStyle(inputLine2).width
         line2Width = parseInt(line2Width.substring(0, line2Width.length - 2))
-        while (line2Width < lineWidth-20) {
-            line2.innerText += "━"
-            line2Width = getComputedStyle(line2).width
+        while (line2Width < inputLineWidth-20) {
+            inputLine2.innerText += "━"
+            line2Width = getComputedStyle(inputLine2).width
             line2Width = parseInt(line2Width.substring(0, line2Width.length - 2))
+        }
+
+        //OUTPUT LINES
+        let outputLine1 = document.getElementById("line1o")
+        let outputLine2 = document.getElementById("line2o")
+
+        outputLine1.innerText = ""
+        let oline1Width = getComputedStyle(outputLine1).width
+        oline1Width = parseInt(oline1Width.substring(0, oline1Width.length - 2))
+
+        while (oline1Width < outputLineWidth-20) {
+            outputLine1.innerText += "━"
+            oline1Width = getComputedStyle(outputLine1).width
+            oline1Width = parseInt(oline1Width.substring(0, oline1Width.length - 2))
+        }
+
+        outputLine2.innerText = ""
+        let oline2Width = getComputedStyle(outputLine2).width
+        oline2Width = parseInt(oline2Width.substring(0, oline2Width.length - 2))
+        while (oline2Width < outputLineWidth-20) {
+            outputLine2.innerText += "━"
+            oline2Width = getComputedStyle(outputLine2).width
+            oline2Width = parseInt(oline2Width.substring(0, oline2Width.length - 2))
         }
 
 
@@ -2325,9 +2372,9 @@ class Display {
                 element.style.display = "flex";
             });
             //document.getElementById("generateTruthTable").disabled = false;
-            document.getElementById("output-table").style.marginTop = "40px";
-            document.getElementById("guess-output-table").style.marginTop = "40px";
-            document.getElementById("activation-table").style.marginTop = "40px";
+            document.getElementById("output-table").style.marginTop = "32px";
+            document.getElementById("guess-output-table").style.marginTop = "32px";
+            document.getElementById("activation-table").style.marginTop = "32px";
             document.getElementById("AutoProgressToggleBody").style.display = "flex";
             document.getElementById("BinaryToggleBody").style.display= "flex";
             document.getElementById("ShowDesiredToggleBody").style.display= "flex";
@@ -2459,7 +2506,7 @@ class Display {
             document.getElementById("output-container").style.display = "inline-flex";
             document.getElementById("activation-container").style.display = "inline-flex";
             document.getElementById("bias-toggle").style.display = "inline-flex";
-            document.getElementById("hintText").style.display = "block";
+            document.getElementById("hintText").style.display = "inline-block";
             if(document.getElementById("detailButton").innerText === "Hide details") {
                 document.getElementById("perceptron-detail").style.visibility = "visible";
             }
@@ -4238,6 +4285,8 @@ function FixCheckAnswerButtonPosition() {
 
 window.onresize = function(event) {
     display.updateSelectedInput()
+    display.createInputLabelLines()
+
 };
 
 
