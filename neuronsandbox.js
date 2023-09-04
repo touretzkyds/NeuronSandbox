@@ -975,7 +975,7 @@ class Display {
             this.outputLine = null;
         }
         this.outputLine = new LeaderLine(
-            LeaderLine.pointAnchor(document.getElementById("circle"), {x: '100%', y: '50%'}),
+            LeaderLine.pointAnchor(document.getElementById("circle"), {x: '99%', y: '53%'}),
             LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '-50%', y: 52+'%'})
         );
 
@@ -1618,13 +1618,39 @@ class Display {
 
     }
 
-    checkCorrectness(tableData) {
-        let rows = tableData.rows;
-        for (let i = 0; i < rows; i++) {
-            if (tableData.data[i][1] !== tableData.data[i][2]) //the actual output and desired output do not match
-                return false
+    createInputLabelLines() {
+        let inputTable = document.getElementById("input-table");
+        let inputText = document.getElementById("input-text");
+
+        let widthTable = getComputedStyle(inputTable).width
+        widthTable = parseInt(widthTable.substring(0, widthTable.length -2))
+        let widthText = getComputedStyle(inputText).width
+        widthText = parseInt(widthText.substring(0, widthText.length -2))
+
+        let lineWidth = (widthTable - widthText)/2
+
+        let line1 = document.getElementById("line1")
+        let line2 = document.getElementById("line2")
+
+        let line1Width = getComputedStyle(line1).width
+        line1Width = parseInt(line1Width.substring(0, line1Width.length - 2))
+        while (line1Width < lineWidth-20) {
+            line1.innerText += "━"
+            line1Width = getComputedStyle(line1).width
+            line1Width = parseInt(line1Width.substring(0, line1Width.length - 2))
         }
-        return true
+
+        let line2Width = getComputedStyle(line2).width
+        line2Width = parseInt(line2Width.substring(0, line2Width.length - 2))
+        while (line2Width < lineWidth-20) {
+            line2.innerText += "━"
+            line2Width = getComputedStyle(line2).width
+            line2Width = parseInt(line2Width.substring(0, line2Width.length - 2))
+        }
+
+
+
+
     }
 
     adjustSelectedInputFontSize() {
@@ -3064,6 +3090,7 @@ class Demo {
 
         let hintText = document.getElementById("hintText");
         hintText.innerText = "";
+        display.createInputLabelLines()
 
     }
 
