@@ -4246,9 +4246,9 @@ function loadQuestionsAndModels() {
         });
 }
 
-function goToAboutPage() {
+function goToInstructionsPage() {
     window.open(
-        'about.html',
+        'instructions.html',
         '_blank'
     );
 }
