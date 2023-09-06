@@ -23,16 +23,16 @@
     <script src = "truth_table.js"></script>
 
 
-    <!--    <script type="text/javascript">-->
-    <!--        (function(window, document, dataLayerName, id) {-->
-    <!--            window[dataLayerName]=window[dataLayerName]||[],window[dataLayerName].push({start:(new Date).getTime(),event:"stg.start"});var scripts=document.getElementsByTagName('script')[0],tags=document.createElement('script');-->
-    <!--            function stgCreateCookie(a,b,c){var d="";if(c){var e=new Date;e.setTime(e.getTime()+24*c*60*60*1e3),d="; expires="+e.toUTCString();f="; SameSite=Strict"}document.cookie=a+"="+b+d+f+"; path=/"}-->
-    <!--            var isStgDebug=(window.location.href.match("stg_debug")||document.cookie.match("stg_debug"))&&!window.location.href.match("stg_disable_debug");stgCreateCookie("stg_debug",isStgDebug?1:"",isStgDebug?14:-1);-->
-    <!--            var qP=[];dataLayerName!=="dataLayer"&&qP.push("data_layer_name="+dataLayerName),isStgDebug&&qP.push("stg_debug");var qPString=qP.length>0?("?"+qP.join("&")):"";-->
-    <!--            tags.async=!0,tags.src="https://touretzky.containers.piwik.pro/"+id+".js"+qPString,scripts.parentNode.insertBefore(tags,scripts);-->
-    <!--            !function(a,n,i){a[n]=a[n]||{};for(var c=0;c<i.length;c++)!function(i){a[n][i]=a[n][i]||{},a[n][i].api=a[n][i].api||function(){var a=[].slice.call(arguments,0);"string"==typeof a[0]&&window[dataLayerName].push({event:n+"."+i+":"+a[0],parameters:[].slice.call(arguments,1)})}}(i[c])}(window,"ppms",["tm","cm"]);-->
-    <!--        })(window, document, 'dataLayer', '2d77e53b-cd17-4d04-8bac-ee43f178bdb8');-->
-    <!--    </script>-->
+    <script type="text/javascript">
+        (function(window, document, dataLayerName, id) {
+            window[dataLayerName]=window[dataLayerName]||[],window[dataLayerName].push({start:(new Date).getTime(),event:"stg.start"});var scripts=document.getElementsByTagName('script')[0],tags=document.createElement('script');
+            function stgCreateCookie(a,b,c){var d="";if(c){var e=new Date;e.setTime(e.getTime()+24*c*60*60*1e3),d="; expires="+e.toUTCString();f="; SameSite=Strict"}document.cookie=a+"="+b+d+f+"; path=/"}
+            var isStgDebug=(window.location.href.match("stg_debug")||document.cookie.match("stg_debug"))&&!window.location.href.match("stg_disable_debug");stgCreateCookie("stg_debug",isStgDebug?1:"",isStgDebug?14:-1);
+            var qP=[];dataLayerName!=="dataLayer"&&qP.push("data_layer_name="+dataLayerName),isStgDebug&&qP.push("stg_debug");var qPString=qP.length>0?("?"+qP.join("&")):"";
+            tags.async=!0,tags.src="https://touretzky.containers.piwik.pro/"+id+".js"+qPString,scripts.parentNode.insertBefore(tags,scripts);
+            !function(a,n,i){a[n]=a[n]||{};for(var c=0;c<i.length;c++)!function(i){a[n][i]=a[n][i]||{},a[n][i].api=a[n][i].api||function(){var a=[].slice.call(arguments,0);"string"==typeof a[0]&&window[dataLayerName].push({event:n+"."+i+":"+a[0],parameters:[].slice.call(arguments,1)})}}(i[c])}(window,"ppms",["tm","cm"]);
+        })(window, document, 'dataLayer', '2d77e53b-cd17-4d04-8bac-ee43f178bdb8');
+    </script>
 
 
     <article>
@@ -52,12 +52,18 @@
             <option value="p1">Problem 3</option>
         </select>
 
-
         <section id="edit-menu-section">
             <div class="dropdown">
                 <button class="dropbtn"><i class="fas fa-bars"></i> Menu</button>
                 <div class="dropdown-content">
                     <div class="button-group">
+                        <div class="menu-row-container">
+                            <label style="margin-right: 10px">Edit</label>
+                            <label id="InputSwitch" class="switch">
+                                <input type="checkbox" id="InputToggle">
+                                <span id="edit-slider" class="slider round"></span>
+                            </label>
+                        </div>
                         <div id="BinaryToggleBody" class="menu-row-container">
                             <label style="margin-right: 10px">Binary</label>
                             <label id="BinarySwitch" class="switch">
@@ -65,11 +71,18 @@
                                 <span id="binary-slider" class="slider round"></span>
                             </label>
                         </div>
-                        <div class="menu-row-container">
-                            <label style="margin-right: 10px">Edit</label>
-                            <label id="InputSwitch" class="switch">
-                                <input type="checkbox" id="InputToggle">
-                                <span id="edit-slider" class="slider round"></span>
+                        <div id="ShowBiasToggleBody" class="menu-row-container">
+                            <label style="margin-right: 10px">Show Bias</label>
+                            <label class="switch" >
+                                <input type="checkbox" id="ShowBiasToggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div id="ShowDesiredToggleBody" class="menu-row-container">
+                            <label style="margin-right: 10px">Show Desired</label>
+                            <label class="switch" >
+                                <input type="checkbox" id="OutputToggle">
+                                <span class="slider round"></span>
                             </label>
                         </div>
                         <div id = "FanfareToggleBody" class="menu-row-container">
@@ -83,20 +96,6 @@
                             <label style="margin-right: 10px">Auto Progress</label>
                             <label id="AutoProgressSwitch" class="switch">
                                 <input type="checkbox" id="AutoProgressToggle">
-                                <span class="slider round"></span>
-                            </label>
-                        </div>
-                        <div id="ShowDesiredToggleBody" class="menu-row-container">
-                            <label style="margin-right: 10px">Show Desired</label>
-                            <label class="switch" >
-                                <input type="checkbox" id="OutputToggle">
-                                <span class="slider round"></span>
-                            </label>
-                        </div>
-                        <div id="ShowBiasToggleBody" class="menu-row-container">
-                            <label style="margin-right: 10px">Show Bias</label>
-                            <label class="switch" >
-                                <input type="checkbox" id="ShowBiasToggle">
                                 <span class="slider round"></span>
                             </label>
                         </div>
@@ -115,12 +114,11 @@
                                 </div>
                             </div>
                         </div>
-
                         <div>
                             <div class="button-border">
                                 <div class="user-input-wrp">
                                     <br/>
-                                    <input type="text" class="inputText" name="url" id="url" size="160" onkeypress="let keyCode = event.keyCode || event.which; if (keyCode == 13) {uploadFileCombined(); return false;}" required/>
+                                    <input type="text" class="inputText" name="url" id="url" size="160" onkeypress="let keyCode = event.keyCode || event.which; if (keyCode === 13) {uploadFileCombined(); return false;}" required/>
                                     <span  class="floating-label">Model URL</span>
                                 </div>
 
@@ -165,7 +163,7 @@
         </section>
         <section>
             <!--                <i onclick="goToAboutPage()" style="margin-left: 50px" class="fa fa-question-circle" aria-hidden="true"></i>-->
-            <button onclick="goToAboutPage()" class="dropbtn"><i class="fas fa-question-circle"></i> About</button>
+            <button onclick="goToAboutPage()" class="dropbtn"><i class="fas fa-question-circle"></i> Instructions</button>
         </section>
 
     </article>
@@ -234,12 +232,26 @@
             </th>
             <th>
                 <a style="margin-top: 19%" id= "CheckAnswerBtn" onmousedown="event.preventDefault();display.checkGuessResult(); " onmouseup="event.preventDefault(); display.removeGuessHighlight();" class="custom-btn myButton">
-                    <i class="fa" aria-hidden="true"></i> Check Answer
+                    <i class="fa" aria-hidden="true"></i> Press to Check
                 </a>
             </th>
         </tr>
     </table>
-    <div class="hint-text" id="hintText"></div>
+    <div style="text-align:center; margin-left: 1.1%">
+        <div style="display:inline-block; float: left" >
+            <!--                                <hr style="display: inline-block; width: 50px">-->
+            <b id="line1" style="display: inline-block;">━</b>
+            <b id="input-text" style="display: inline-block; font-size: 20px;">Inputs</b>
+            <b id="line2" style="display: inline-block;">━</b>
+        </div>
+        <div style="margin: auto" class="hint-text" id="hintText"></div>
+        <div style="float: right; margin-right: 5px" id="output-header-container">
+            <b id="line1o" style="display: inline-block;">━</b>
+            <b id="output-text" style="display: inline-block; font-size: 20px;">Outputs</b>
+            <b id="line2o" style="display: inline-block;">━</b>
+        </div>
+    </div>
+
     <table class="bottom-table"  style="table-layout: fixed;">
         <tr>
             <th colspan="100%">
@@ -251,6 +263,13 @@
                         <!--                    <button class="custom-btn myButton" id="editButton">Edit</button>-->
                         <!--                </div>-->
                         <div class="rows">
+<!--                            <div>-->
+<!--                                &lt;!&ndash;                                <hr style="display: inline-block; width: 50px">&ndash;&gt;-->
+<!--                                <b id="line1p" style="display: inline-block;">━</b>-->
+<!--                                <b id="input-textp" style="display: inline-block; font-size: 20px;">Inputs</b>-->
+<!--                                <b id="line2p" style="display: inline-block;">━</b>-->
+<!--                            </div>-->
+
 
                             <table id="input-table" class="table input-output-table">
                                 <tr>
@@ -292,92 +311,140 @@
                             </tr>
                         </table>
                     </div>
+                    <div class="center-container">
+                        <div id="network-container" class="center">
+                            <div class="center-input">
+                                <table id="selected-inputs" class="selected">
+                                    <tr>
+                                        <td id="biasInput">
+                                            <div id="bias-content" class="bias-content">Bias</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td id="selinput1">
+                                            <div class="input-content">x<sub>1</sub></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td id="selinput2">
+                                            <div class="input-content">x<sub>2</sub></div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div id = "input-links" class="center">
+                                <svg id="svg">
+                                    <marker id="triangle" viewBox="0 0 10 10"
+                                            refX="1" refY="5"
+                                            markerUnits="strokeWidth"
+                                            markerWidth="10" markerHeight="10"
+                                            orient="auto">
+                                        <path d="M 0 0 L 10 5 L 0 10 z" fill="black"/>
+                                    </marker>
+                                    <!--<line id="line" stroke="black" stroke-width="3" x1="0%" y1="30%" x2="80%" y2="40%" marker-end="url(#triangle)"/>-->
+                                    <!--<line id="line" stroke="black" stroke-width="3" x1="0%" y1="70%" x2="80%" y2="60%" marker-end="url(#triangle)"/>-->
+                                </svg>
+                                <div id="bias-link-text" >
+                                    <div id="bias-1" class="weight_label" style="z-index: 10" >
+                                        <text fill="black">w<sub>0</sub> =</text>
+                                        <text id='bias_weight' contenteditable="false" fill="black" class="weights">1</text>
+                                    </div>
+                                </div>
+                                <div id="input-link-text" class="center" style="z-index: 1">
+                                    <div id="weight-1" class="weight_label">
+                                        <text fill="black">w<sub>1</sub> =</text>
+                                        <text contenteditable="true" id="w1" fill="black" class="weights" onkeypress="if (event.which === 13 || event.keyCode === 13) return false;"></text>
+                                    </div>
+                                    <div id="weight-2" class="weight_label">
+                                        <text fill="black">w<sub>2</sub> =</text>
+                                        <text contenteditable="true" id="w2" fill="black" class="weights" onkeypress="if (event.which === 13 || event.keyCode === 13) return false;"></text>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id = "perceptron1" class="center-perceptron" style="margin-top: 15%">
+                                <table>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div id="circle" class="circle center">
+                                                <div id="threshold-text" class="center">
+                                                    <div id="perceptron-normal" style="display: flex; align-items: center;">
+                                                        <text id="sigma">∑> </text>
+                                                        <text id="th1"></text>
+                                                        <span id = "threshold_toggleBtn" class="edit-toggle edit-toggle-off">
+                                                          <i class="fas fa-pencil-alt"></i>
+                                                          <i class="fas fa-lock"></i>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div style="margin-top: 40%;">
+                                                    <text style="font-size: 12px">Activation</text>
+                                                </div>
+                                                <div style="margin-top: 40%; margin-left: 12% ">
+                                                    <text style="font-size: 12px">Threshold</text>
+                                                </div>
 
-                    <div id="network-container" class="center">
-                        <div class="center-input">
-                            <table id="selected-inputs" class="selected">
-                                <tr>
-                                    <td id="biasInput">
-                                        <div class="bias-content">Bias</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td id="selinput1">
-                                        <div class="input-content">x<sub>1</sub></div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td id="selinput2">
-                                        <div class="input-content">x<sub>2</sub></div>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div id = "input-links" class="center">
-                            <svg id="svg">
-                                <marker id="triangle" viewBox="0 0 10 10"
-                                        refX="1" refY="5"
-                                        markerUnits="strokeWidth"
-                                        markerWidth="10" markerHeight="10"
-                                        orient="auto">
-                                    <path d="M 0 0 L 10 5 L 0 10 z" fill="black"/>
-                                </marker>
-                                <!--<line id="line" stroke="black" stroke-width="3" x1="0%" y1="30%" x2="80%" y2="40%" marker-end="url(#triangle)"/>-->
-                                <!--<line id="line" stroke="black" stroke-width="3" x1="0%" y1="70%" x2="80%" y2="60%" marker-end="url(#triangle)"/>-->
-                            </svg>
-                            <div id="bias-link-text" >
-                                <div id="bias-1" class="weight_label" style="z-index: 10" >
-                                    <text fill="black">w<sub>0</sub> =</text>
-                                    <text id='bias_weight' contenteditable="false" fill="black" class="weights">1</text>
-                                </div>
+
+                                            </div>
+
+                                        </td>
+                                        <td>
+                                            <div class="center-output" >
+                                                <table class="selected" id="selected-output">
+                                                    <tr>
+                                                        <td id="seloutput" class = "output-th"></td>
+                                                    </tr>
+                                                </table>
+
+                                            </div>
+                                            <div style="margin-top:-80%">
+                                                <text style="font-size: 12px">Output</text>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div id="detail-toggle" style="width: 100%; display:flex; flex-direction: row; justify-content: center; align-items: center; column-gap: 10px;">
+                                                <a id = 'detailButton' style = "height: 20px" href="javascript:detailButtonClicked();" class="custom-btn myButton">
+                                                    <i class="fa" aria-hidden="true"></i>How does this work?
+                                                </a>
+                                            </div>
+                                            <p></p>
+                                        </td>
+                                        <td>
+
+                                        </td>
+                                    </tr>
+                                    </tbody>
+
+                                </table>
+
                             </div>
-                            <div id="input-link-text" class="center" style="z-index: 1">
-                                <div id="weight-1" class="weight_label">
-                                    <text fill="black">w<sub>1</sub> =</text>
-                                    <text contenteditable="true" id="w1" fill="black" class="weights" onkeypress="if (keyCode == 13) return false;"></text>
-                                </div>
-                                <div id="weight-2" class="weight_label">
-                                    <text fill="black">w<sub>2</sub> =</text>
-                                    <text contenteditable="true" id="w2" fill="black" class="weights" onkeypress="if (keyCode == 13) return false;"></text>
-                                </div>
+                            <div id = "output-links" class="center">
+                            </div>
+
+                        </div>
+                        <div id="perceptron-detail">
+                            <div style="display: inline-block">
+                                <text id="perception_detail_line"> </text>
                             </div>
                         </div>
-                        <div id = "perceptron1" class="center-perceptron">
-                            <div class="circle center">
-                                <div id="threshold-text" class="center">
-                                    <text id="sigma">∑> </text>
-                                    <text id="th1"></text>
-                                    <span id = "threshold_toggleBtn" class="edit-toggle edit-toggle-off">
-                                          <i class="fas fa-pencil-alt"></i>
-                                          <i class="fas fa-lock"></i>
-                                        </span>
-                                </div>
-                            </div>
-                        </div>
-                        <div id = "output-links" class="center">
-                        </div>
-                        <div class="center-output">
-                            <table class="selected" id="selected-output">
+                    </div>
+
+                    <div style="margin-right: 10px" id = "activation-container" class="right">
+                        <div class = "rows">
+                            <table id="activation-table" class="output-table table input-output-table">
                                 <tr>
-                                    <td id="seloutput" class = "output-th"></td>
+                                    <th contenteditable = false id="activation1">Activation<br>&Sigma;</th>
                                 </tr>
                             </table>
                         </div>
                     </div>
-
                     <div id = "output-container" class="right">
-                        <div class = "rows">
-                            <table>
-                                <tr>
-
-                                </tr>
-                            </table>
-                        </div>
                         <b id="unlearnable-msg" class="blink" hidden style="font-size: 20px; color: darkred">This pattern of desired outputs is not learnable.</b>
                         <div class = "rows">
                             <table id="output-table" class="output-table table input-output-table" >
                                 <tr>
-                                    <th contenteditable = false id="activation">Activation<br>&Sigma;</th>
                                     <th contenteditable = false id="output">Current<br>Output<br>y</th>
                                     <th contenteditable = false id="desired" > Desired Output
                                     </th>

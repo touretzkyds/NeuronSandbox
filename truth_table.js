@@ -1,8 +1,9 @@
+
 function saveDesiredValues() {
     desired_values = []
     const outputTable = document.getElementById("output-table");
     for(i = 1; i < outputTable.rows.length; i++) {
-        desired_values.push(outputTable.rows[i].cells[2].innerText);
+        desired_values.push(outputTable.rows[i].cells[DESIRED_OUTPUT_COLUMN].innerText);
     }
     return desired_values
 }
@@ -11,21 +12,21 @@ function restoreDesiredValues( desired_values)
 {
     const outputTable = document.getElementById("output-table");
     for(i = 1; i < outputTable.rows.length; i++) {
-        outputTable.rows[i].cells[2].innerText = desired_values[i-1];
+        outputTable.rows[i].cells[DESIRED_OUTPUT_COLUMN].innerText = desired_values[i-1];
     }
 }
 
 function setupGenerateTruthTable(columnChanged) {
     vars = []
     // document.getElementById('generateTruthTable').addEventListener('click', ()=>{
-        //save desired value before update
-        let desire_values = saveDesiredValues();
-        var truthData = dataOp.createBinaryData(inputTable.numCols);
-        demo.removeAllInputDataRows(false);
-        writeTruthTable(truthData);
-        if(!columnChanged)
-            restoreDesiredValues(desire_values);
-        //restore desired value
+    //save desired value before update
+    let desire_values = saveDesiredValues();
+    var truthData = dataOp.createBinaryData(inputTable.numCols);
+    demo.removeAllInputDataRows(false);
+    writeTruthTable(truthData);
+    if(!columnChanged)
+        restoreDesiredValues(desire_values);
+    //restore desired value
     // });
 }
 
@@ -34,6 +35,7 @@ function writeTruthTable(truthData) {
         inputTable.insertTableRow(2, false);
         dataOp.insertDataRow(inputs, 0);
         outputTable.insertTableRow(1);
+        activationTable.insertTableRow(1);
         dataOp.insertDataRow(outputs, 0);
     }
 
@@ -47,4 +49,5 @@ function writeTruthTable(truthData) {
     }
 
     demo.update();
+    checkAnswerCorrect();
 }
