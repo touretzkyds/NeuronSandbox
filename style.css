@@ -1013,6 +1013,7 @@ span.guess-comment {
     background-color: #f2f2f2;
     border-radius: 10px;
     position: relative;
+    margin: auto;
 }
 
 .progress-bar-fill {

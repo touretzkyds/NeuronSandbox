@@ -3800,8 +3800,13 @@ function uploadJson(text) {
     document.getElementById("FanfareToggle").checked = dict["fanfare-toggle-checked"];
 
     document.getElementById("DemoToggle").checked = dict["guessToggleChecked"];
-    document.getElementById("difficulty_slide").value = dict["difficultyLevel"];
-    document.getElementById("difficulty_level").innerText = "Level: " + dict["difficultyLevel"];
+    let difficultyLevel = 50;
+    if (dict["difficultyLevel"]) {
+        difficultyLevel = dict["difficultyLevel"];
+    }
+    document.getElementById("difficulty_slide").value = difficultyLevel;
+    document.getElementById("difficulty_level").innerText = "Level: " + difficultyLevel;
+    updateProgressBar(difficultyLevel);
     display.UpdateDemoToggle();
 
     display.handleHoverExit();
@@ -4318,7 +4323,7 @@ function updateProgressBar(value) {
     var progressBar = document.querySelector('.progress-bar');
     var progressBarFill = progressBar.querySelector('.progress-bar-fill');
     var progressBarText = progressBar.querySelector('.progress-bar-text');
-    progressBarFill.style.width = value;
+    progressBarFill.style.width = value + '%';
     progressBarText.textContent = value;
 }
 
