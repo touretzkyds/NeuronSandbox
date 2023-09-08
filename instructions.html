@@ -4,14 +4,138 @@
     <meta charset="UTF-8">
 
 </head>
+
 <body>
-<h1>About</h1>
+  <table width=800><tr><td>
+
+<h1>How to Use Neuron Sandbox</h1>
+
+Neuron Sanbdox teaches how a single linear threshold unit
+&mdash; the basic building block of neural network technology powering
+much of modern AI &mdash; computes the answers to decision problems.
+It can be used from upper elementary school through undergraduate
+computing education.  It comes with a set of pre-defined problems of
+increasing difficulty, but it also offers a convenient editing mode
+for creation of new problems without any coding.  New problems can be
+saved to a file and loaded them from either a file path or a URL.<p/>
+
+<h3> Solve for Weights/Threshold </h3>
+
+"Solve for Weights" is the default mode for Neuron Sandbox.  It
+presents a table of example inputs and desired outputs and invites the
+user to modify one or more of the neuron's weights and/or its
+threshold to achieve the desired behavior.  Any rows (examples) that
+are not being processed correctly are flagged in red.<p/>
+
+Problems are presented in order of increasing difficulty.  The
+simplest problems have two symmetric positive weights, a non-negative
+threshold, and only ask the user to modify a single parameter.<p/>
+
+The "<b>How does this work?</b>" button toggles display of an explicit
+equation for the neuron's activation value.  The equation multiplies
+each input by its respective weight.  The Greek letter &Sigma; denotes
+this activation value.  Rather than specifying a summation, &Sigma;
+stands for the result of the summation.<p/>
+
+The <b>Hint</b> button displays a hint about which parameter to
+modify.  Pressing it again provides a more explicit hint: whether the
+parameter should be increased or decreased.  Hints are computed
+automatically based on the current parameter values.<p/>
+
+<h3> Solve for Outputs </h3>
+
+Some students need practice mapping between an English description of
+a problem and the corresponding truth table.  This may impede their
+ability to solve for weights and threshold because they must rely on
+the "Desired Output" display, which may conflict with their mistaken
+intuition about what the output should be.<p/>
+
+"Solve for Outputs" mode allows students to practice predicting the
+correct output for a given input pattern by having them fill in the
+truth table values themselves.  The "Press to Check" button can be
+used to verify the correctness of the user's answers.  Optionally, the
+problem creator can attach a hint to each row of the table to help
+students understand the justification for each answer.  Once the truth
+table is filled correctly the user is invited to switch to solving for
+the weights and threshold.<p/>
+
+If you want a given problem to start out in "Solve for Outputs" mode
+when first loaded, switch to that mode before saving the problem to a
+file.<p/>
+
+<h3> Threshold Display vs. Bias Display </h3>
+
+Normally Neuron Sandbox displays a threshold value inside the neuron
+body.  The activation value is compared against this threshold.  But
+real neural networks don't use adjustable thresholds; they use a bias
+connection instead, with the threshold fixed at 0.  If "bias" mode is
+enabled for a problem, there will be a slider allowing the user to
+switch the display between "Threshold mode" and "Bias mode".<p/>
+
+in "bias" mode the effective threshold value &theta;% is displayed as
+a weight &ndash;&theta; on a bias connection whose input is fixed at
+1, and the actual threshold is fixed at 0.  Note that switching modes
+only affects the display; it does not affect the operation of the
+neuron.  The neuron will produce the same outputs in either mode.  But
+the activation values and threshold are different.<p/>
+
+<h3> Non-Binary Inputs </h3>
+
+By default Neuron Sandbox assumes its inputs are binary values, which
+allows it to automatically generate a complete truth table with
+2<sup>N</sup> rows for N inputs.  However, if "Binary Mode" is turned
+off, then the inputs can be any real value, and the numer of rows in
+the example table, and their content, must be specified by the problem
+designer.<p/>
+
+Note that the neuron is still a linear threshold unit producing binary
+outputs.  But using non-binary inputs allows for the solution of
+problems such as "The class can go on a trip if the number of
+chaperones x<sub>1</sub> is at least as great as the number of chidren
+x<sub>2</sub>."<p/>
+
+<h3> Creating New Problems </h3>
+
+To create a new problem, select "Blank Model" from the problem list,
+and then from the Menu, enabled "Edit Mode".  You can change the names
+of the inputs by editing the text in the input table header.  You can
+control which parameters are user-modifiable by clicking on the pencil
+or lock icon next to that parameter.  There are a variety of other
+settings you can adjust, such as whether to use Threshold Mode or Bias
+Mode, binary inputs or real-valued inputs, and whether a victory
+fanfare should be played when a problem is solved correctly.<p/>
+
+To provide hints for Solve for Outputs mode, switch to that mode and
+edit the contents of the text box associated with each row.  Note that
+this are different than the hint produced by the Hint button when
+solving for weights and threshold; those hints are computed
+automatically.<p/>
+
+Once the problem setup us complete, save the problem to a file on the
+local disk.  It can then be loaded from that location at a later time,
+or placed on a website and oaded via the URL.<p/>
+
+<hr>
+
+
+<h3> Credits and Source Code </h3>
 <text>
     Authors: Angela Chen, Neel Pawar, and David S. Touretzky, Carnegie Mellon University.<p/>
 
-    This work was supported by National Science Foundation awards DRL-2049029 and IIS-2112633.</text>
+    This work was supported by National Science Foundation awards DRL-2049029 and IIS-2112633.<p/>
+
+    Source code for Neuron Sandbox is available on GitHub
+    at <a href="https://github.com/touretzkyds/NeuronSandbox">https://github.com/touretzkyds/NeuronSandbox</a>.
+
+</text>
+
+<!--
 <br>
 <hr>
 <a href="index.html"> <button>Go Back</button> </a>
+-->
+
+  </td></tr></table>
+
 </body>
 </html>
