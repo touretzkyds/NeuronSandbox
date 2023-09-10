@@ -1026,7 +1026,8 @@ class Display {
             sigma = parseFloat(document.getElementById("th1").innerText);
         }
         else {
-            sigma = parseFloat(document.getElementById("bias-text").innerText) * -1;
+            //sigma = parseFloat(document.getElementById("bias-text").innerText) * -1;
+            sigma = 0;
         }
         outputColumn.innerHTML = `Current Output<br>&Sigma; > ` + sigma.toString();
     }
@@ -2102,6 +2103,11 @@ class Display {
                         detail_line += " + ";
                     }
                 }
+                if(document.getElementById("biasToggle").checked)
+                {
+                    detail_line += " + Bias";
+                }
+
                 detail_line += `<p>∑ = `;
                 for(let i = 0; i < headerRowVals.length; i++) {
                     let variable_value = perceptron.inputData[rowIdx-2][i];
@@ -2110,7 +2116,18 @@ class Display {
                         detail_line += " + ";
                     }
                 }
-                detail_line += ` = ${activation}`;
+                if(document.getElementById("biasToggle").checked)
+                {
+                    detail_line += ` + (${-perceptron.threshold})`;
+                }
+
+                if(document.getElementById("biasToggle").checked) {
+                    let newVal = activation - perceptron.threshold;
+                    detail_line += ` = ${newVal}`;
+                }
+                else {
+                    detail_line += ` = ${activation}`;
+                }
                 document.getElementById("perception_detail_line").innerHTML = detail_line;
             }
             else {
@@ -2449,12 +2466,18 @@ class Display {
                     detail_line += " + ";
                 }
             }
+            if(document.getElementById("biasToggle").checked)
+            {
+                detail_line += " + Bias";
+            }
+
             document.getElementById("perception_detail_line").innerHTML = detail_line;
         }
         else {
             document.getElementById("perceptron-detail").style.visibility = "hidden";
         }
         this.UpdateDemoToggle();
+        this.updateTableOutputColumn();
     }
 
     UpdateBinaryToggle(columnChanged) {
@@ -2535,12 +2558,13 @@ class Display {
         display.createInputTableEditBorder();
         display.updateHintButton();
         checkAnswerCorrect();
+        display.createInputLabelLines();
 
         //reposition lines
         for (let i = 0; i < demo.weightLines.length; i++) {
             demo.weightLines[i].position();
         }
-        if (demo.biasLine && !document.getElementById("DemoToggle").checked) {
+        if (demo.biasLine) {
             demo.biasLine.position();
         }
         display.outputLine.position()
@@ -2552,8 +2576,10 @@ class Display {
     {
         perceptron.setBiasUI();
         display.updateSelectedInput();
-        demo.adjustWeightPlacement();
-        setupQuestionFields()
+        demo.update();
+        //demo.adjustWeightPlacement();
+        setupQuestionFields();
+        display.UpdateDetailToggle();
     }
 
     UpdateFanfareToggle() {
@@ -3112,9 +3138,13 @@ class Demo {
                 outputs.data[i][j] = perceptron.outputData[i][j]
             }
         }
+        let biasMode = document.getElementById("biasToggle").checked;
         for (let i = 0; i < perceptron.activationData.length; i++) {
             for (let j = 0; j < perceptron.activationData[0].length; j++ ) {
                 activations.data[i][j] = perceptron.activationData[i][j]
+                if(biasMode) {
+                    activations.data[i][j] += -1 * perceptron.threshold;
+                }
             }
         }
 
@@ -4278,7 +4308,14 @@ function FixCheckAnswerButtonPosition() {
 
     // Set the button's position to fixed
     button.style.position = 'fixed';
-    button.style.left = screenLeft + 200 + 'px';
+    let biasToggleDisplay = document.getElementById("bias-toggle")?.style.display;
+    if(biasToggleDisplay !== "none" && biasToggleDisplay !== "") {
+        button.style.left = screenLeft + 400 + 'px';
+    }
+    else {
+        button.style.left = screenLeft + 200 + 'px';
+    }
+
     button.style.top = screenTop - 10 + 'px';
     button.style.marginTop = "10px";
 
