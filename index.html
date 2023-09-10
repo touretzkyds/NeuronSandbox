@@ -22,6 +22,7 @@
     <script src="leader_line.min.js"></script>
     <script src = "truth_table.js"></script>
 
+
     <script type="text/javascript">
         (function(window, document, dataLayerName, id) {
             window[dataLayerName]=window[dataLayerName]||[],window[dataLayerName].push({start:(new Date).getTime(),event:"stg.start"});var scripts=document.getElementsByTagName('script')[0],tags=document.createElement('script');
@@ -98,6 +99,21 @@
                                 <span class="slider round"></span>
                             </label>
                         </div>
+                        <div id="ShowProgressBarToggleBody" class="menu-row-container">
+                            <label style="margin-right: 10px">Show Progress Bar</label>
+                            <label class="switch" >
+                                <input type="checkbox" id="ShowProgressBarToggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div>
+                            <div id="difficultySlide">
+                                <div class="difficulty_slider">
+                                    <p id="difficulty_level">Level: 50</p>
+                                    Novice <input type="range" min="0" max="100" value="50" step="5" id="difficulty_slide" /> Elite
+                                </div>
+                            </div>
+                        </div>
                         <div>
                             <div class="button-border">
                                 <div class="user-input-wrp">
@@ -156,11 +172,19 @@
         <!--            <div style="width: 400px; height: 100px" class="editable-border">-->
         <!--                <p style="font-size: 20px">this is the word problem</p>-->
         <!--            </div>-->
+        <div style="padding: 10px">
+            <div id="progress-bar" class="progress-bar">
+                <div id="progress_bar" class="progress-bar-fill" style="width: 50%;"></div>
+                <div id="progress_bar_text" class="progress-bar-text">50</div>
+            </div>
+        </div>
+
         <div id="qdiv">
             <!--                <input hidden style="width: 400px; height: 50px;" type="text" id="questionprompt">-->
             <textarea hidden style="width: 400px; height: 50px;" id="questionprompt" cols="40" rows="5"></textarea>
             <p id="questiontext" style="font-size: 23px">Enter question here!</p>
         </div>
+
 
 
 
@@ -208,6 +232,12 @@
                     </div>
                 </div>
             </th>
+<!--            <th>-->
+<!--                <div id="progress-bar" class="progress-bar">-->
+<!--                    <div id="progress_bar" class="progress-bar-fill" style="width: 50%;"></div>-->
+<!--                    <div id="progress_bar_text" class="progress-bar-text">50</div>-->
+<!--                </div>-->
+<!--            </th>-->
             <th>
                 <a style="margin-top: 19%" id= "CheckAnswerBtn" onmousedown="event.preventDefault();display.checkGuessResult(); " onmouseup="event.preventDefault(); display.removeGuessHighlight();" class="custom-btn myButton">
                     <i class="fa" aria-hidden="true"></i> Press to Check

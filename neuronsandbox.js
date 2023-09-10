@@ -2377,6 +2377,8 @@ class Display {
             document.getElementById("BinaryToggleBody").style.display= "none";
             document.getElementById("ShowDesiredToggleBody").style.display= "none";
             document.getElementById("ShowBiasToggleBody").style.display= "none";
+            document.getElementById("ShowProgressBarToggleBody").style.display= "none";
+            document.getElementById("difficultySlide").style.display = "none";
         } else {
             $("#input-table tr:first").show();
             $("#input-table tr td:nth-child(1)").show();
@@ -2396,6 +2398,8 @@ class Display {
             document.getElementById("BinaryToggleBody").style.display= "flex";
             document.getElementById("ShowDesiredToggleBody").style.display= "flex";
             document.getElementById("ShowBiasToggleBody").style.display= "flex";
+            document.getElementById("difficultySlide").style.display = "flex";
+            document.getElementById("ShowProgressBarToggleBody").style.display= "flex";
         }
 
         for (let i = 0; i < demo.weightLines.length; i++) {
@@ -2406,6 +2410,7 @@ class Display {
         // }
         this.UpdateOutputToggle()
         this.UpdateShowBiasToggle();
+        this.UpdateShowProgressBarToggle();
     }
 
     UpdateShowBiasToggle () {
@@ -2414,6 +2419,15 @@ class Display {
         }
         else {
             document.getElementById("bias-toggle").style.display = "none";
+        }
+    }
+
+    UpdateShowProgressBarToggle() {
+        if(document.getElementById("ShowProgressBarToggle").checked) {
+            document.getElementById("progress-bar").style.display = "flex";
+        }
+        else {
+            document.getElementById("progress-bar").style.display = "none";
         }
     }
 
@@ -3222,6 +3236,7 @@ async function downloadFile() {
     let binaryToggleChecked = document.getElementById("BinaryToggle").checked;
     //let thresholdToggleChecked = document.getElementById("checkbox_threshold_editable").checked;
     let thresholdToggleChecked = document.getElementById("threshold_toggleBtn").classList.contains("edit-toggle-on");
+    let difficultyLevel = document.getElementById("difficulty_slide").value;
     let guessToggleChecked = document.getElementById("DemoToggle").checked;
 
     const editToggle = document.getElementById("InputToggle").checked;
@@ -3247,6 +3262,7 @@ async function downloadFile() {
         "input-header-vars" : headerRowVariables,
         "binaryToggleChecked" : binaryToggleChecked,
         "guessToggleChecked" : guessToggleChecked,
+        "difficultyLevel": difficultyLevel,
         "question" : question
         //"input-header": headerRows,
     };
@@ -3814,6 +3830,13 @@ function uploadJson(text) {
     document.getElementById("FanfareToggle").checked = dict["fanfare-toggle-checked"];
 
     document.getElementById("DemoToggle").checked = dict["guessToggleChecked"];
+    let difficultyLevel = 50;
+    if (dict["difficultyLevel"]) {
+        difficultyLevel = dict["difficultyLevel"];
+    }
+    document.getElementById("difficulty_slide").value = difficultyLevel;
+    document.getElementById("difficulty_level").innerText = "Level: " + difficultyLevel;
+    updateProgressBar(difficultyLevel);
     display.UpdateDemoToggle();
 
     display.handleHoverExit();
@@ -3988,6 +4011,7 @@ async function uploadImageFile(event) {
 
 window.onload = function(){
     console.log("window loaded")
+    document.getElementById("difficulty_level").innerText = "Level: " + document.getElementById("difficulty_slide").value;
     $("#input-table tr:first").hide();
     $("#input-table tr td:nth-child(1)").hide();
 }
@@ -4111,6 +4135,10 @@ $('#biasToggle').change(function() { //toggle bias
     display.updateBiasToggle();
 });
 
+$('#ShowProgressBarToggle').change(function() { //toggle bias
+    display.UpdateShowProgressBarToggle();
+});
+
 function PlayHooraySound() {
     //document.getElementById("popup").classList.toggle('active');
     let fanfareToggleChecked = document.getElementById("FanfareToggle").checked;
@@ -4154,6 +4182,12 @@ $('#FanfareToggle').change(function() { //toggle output
     if (demo.biasLine && !$('#DemoToggle').checked) {
         demo.biasLine.position();
     }
+});
+
+$('#difficulty_slide').change(function() {
+    //document.getElementById("difficulty_level").innerText = "Level: " + document.getElementById("difficulty_slide").value;
+    $('#difficulty_level').text("Level: " + $('#difficulty_slide').val());
+    updateProgressBar($('#difficulty_slide').val());
 });
 
 function showMenu(event, img, col, row, table) {
@@ -4320,6 +4354,14 @@ function FixCheckAnswerButtonPosition() {
     button.style.marginTop = "10px";
 
 
+}
+
+function updateProgressBar(value) {
+    var progressBar = document.querySelector('.progress-bar');
+    var progressBarFill = progressBar.querySelector('.progress-bar-fill');
+    var progressBarText = progressBar.querySelector('.progress-bar-text');
+    progressBarFill.style.width = value + '%';
+    progressBarText.textContent = value;
 }
 
 window.onresize = function(event) {
