@@ -2118,7 +2118,7 @@ class Display {
                 }
                 if(document.getElementById("biasToggle").checked)
                 {
-                    detail_line += ` + (${-perceptron.threshold})`;
+                    detail_line += ` + ${-perceptron.threshold}`;
                 }
 
                 if(document.getElementById("biasToggle").checked) {
