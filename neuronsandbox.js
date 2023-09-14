@@ -844,7 +844,7 @@ class Perceptron {
                 //check for leading zeroes
                 const regex = '^-?0+[0-9]+$';
                 if (new RegExp(regex).test(biasCell.innerText)) {
-                    biasCell.innerText = parseInt(biasCell.innerText)
+                    biasCell.children[0].innerText = parseInt(biasCell.innerText)
                 }
             }
             biasCell.children[0].textContent = parsedValue.toString();
@@ -1514,8 +1514,8 @@ class Display {
         for (let r = 0; r < table.rows.length; r++) {
             for (let c = 0; c < table.rows[r].cells.length; c++) {
                 if (table.rows[r].cells[c] === cell) {
-                    console.log('Row: ' + (r + 1));
-                    console.log('Column: ' + (c + 1));
+                    //console.log('Row: ' + (r + 1));
+                    //console.log('Column: ' + (c + 1));
                     return {row:r, col: c};
                 }
             }
@@ -1918,6 +1918,16 @@ class Display {
             );
             demo.biasLine.path = "straight";
             demo.biasLine.color = DEFAULT_LINE_COLOR;
+            if(perceptron.threshold > 0) {
+                demo.biasLine.color = NEGATIVE_WEIGHT;
+            }
+            if(perceptron.threshold === 0) {
+                demo.biasLine.color = ZERO_WEIGHT;
+            }
+            let line_size = ((new_max-new_min)*(Math.abs(perceptron.threshold)-min))/(max-min)+new_min
+            if (line_size >= 10.0)
+                line_size = 10.0;
+            demo.biasLine.size = line_size;
         }
         else {
             if (demo.biasLine) {
@@ -2074,14 +2084,17 @@ class Display {
             //console.log("enter: set demo.selectedInput =" + demo.selectedInput);
             //console.log("enter: set demo.selectedOutput =" + demo.selectedOutput);
 
+
             // highlight input and output rows corresponding to the hovered input row
             inputRow.style.background = HOVER_COLOR;
             for (let i = 0; i < outputRow.children.length; i++) {
-                if (outputRow.children[i].style.background === "rgb(255, 191, 203)")
+                if (outputRow.children[i].style.background === "rgb(255, 191, 203)") {
                     outputRow.children[i].style.background = HOVER_ERROR;
+                }
                 else {
                     outputRow.children[i].style.background = HOVER_COLOR;
                 }
+                activationRow.children[0].style.background = HOVER_COLOR;
             }
             if(guessOutputRow)
                 guessOutputRow.style.background = HOVER_COLOR;
@@ -2134,7 +2147,12 @@ class Display {
                 //document.getElementById("perceptron-detail").style.visbility = "hidden";
                 display.UpdateDetailToggle();
             }
-            document.getElementById("sigma").innerText = perceptron.affineOutput[rowIdx-2].toString() + "> ";
+            let biasMode = document.getElementById("biasToggle").checked;
+            let activation_value = perceptron.affineOutput[rowIdx-2];
+            if(biasMode) {
+                activation_value += -1 * perceptron.threshold;
+            }
+            document.getElementById("sigma").innerText = activation_value.toString() + "> ";
         }
         else {
             if (rowIdx % 2 === 0) {
@@ -2232,6 +2250,7 @@ class Display {
         if (outputRow) {
             for (let i = 0; i < outputRow.children.length; i++) {
                 outputRow.children[0].style.background = "none";
+                activationRow.children[0].style.background = "none";
                 this.checkDesiredOutput(outputRow.children[OUTPUT_COLUMN], outputRow.children[DESIRED_OUTPUT_COLUMN], activationRow.children[ACTIVATION_COLUMN])
             }
         }
@@ -2264,8 +2283,8 @@ class Display {
                 }
                 headerRowVals.push(headerInputHtml);
             }
-            else
-                console.log("missing input")
+            //else
+            //console.log("missing input")
         }
     }
 
@@ -2293,8 +2312,8 @@ class Display {
                 //let weightCheckbox = document.getElementById(`checkbox_weight_editable${c}`);
                 headerRowVals.push(new VariableData(headerInput.innerText, headerInputHtml, editToggle.classList.contains("edit-toggle-on")));
             }
-            else
-                console.log("missing input")
+            //else
+            //    console.log("missing input")
         }
     }
 
@@ -2326,9 +2345,7 @@ class Display {
                     }
                     editToggle.dispatchEvent(new Event("click"));
                 }
-                else {
-                    console.log("missing input")
-                }
+
             }
         }
     }
@@ -2343,9 +2360,7 @@ class Display {
 
                 headerInput.innerHTML = headerRowVals[c-1];
             }
-            else {
-                console.log("missing input")
-            }
+
         }
     }
 
@@ -2404,7 +2419,7 @@ class Display {
         // if (demo.biasLine ) {
         //     demo.biasLine.position();
         // }
-        this.UpdateOutputToggle()
+        //this.UpdateOutputToggle()
         this.UpdateShowBiasToggle();
     }
 
@@ -2898,7 +2913,7 @@ class Demo {
                 toggleBtn.style.display = 'none';
             else
                 toggleBtn.style.display = 'inline-block';
-            console.log(weightElement[i].children[2].innerHTML);
+            //console.log(weightElement[i].children[2].innerHTML);
         }
         let thresholdToggleBtn = document.getElementById("threshold_toggleBtn");
         if (!show)
@@ -3261,7 +3276,7 @@ async function downloadFile() {
     zip.file("CommentMapping.json", new Blob([JSON.stringify(dictCommentMapping)]))
     for (const key in dictImageMapping) {
         let keyStorage = dictImageMapping[key];
-        console.log("localstorage key:" + key);
+        //console.log("localstorage key:" + key);
         const dataURLImage = localStorage.getItem(keyStorage);
         if (dataURLImage !== null) {
             // Convert the data URL to an array buffer
@@ -3331,7 +3346,7 @@ function uploadFromUrl(url) { //TODO: doesn't work if running from hard drive
     })
         .then(res => res.text())
         .then(text => {
-            console.log('Downloaded this JSON! ', text);
+            //console.log('Downloaded this JSON! ', text);
             uploadJson(text);
         })
         .catch(err => {
@@ -3397,7 +3412,7 @@ async function provideHint() {
     }
 
     let editableList = getEditableList()
-    console.log(editableList)
+    //console.log(editableList)
     let hintProvider = new hintprovider([...perceptron.weights].concat(perceptron.threshold), perceptron.inputData, desiredOutputs, editableList);
     let hintArr = hintProvider.provideHint(prevHintIndex, prevSubset, prevHintLevel);
     prevHintIndex = hintArr[1];
@@ -3683,19 +3698,19 @@ async function uploadZip(zipFile, isProblem = false) {
                 // Get the content of the file
                 if (relativePath === "ImageMapping.json") {
                     zipEntry.async('text').then(function (content) {
-                        console.log(content);
+                        //console.log(content);
                         dictImageMapping = JSON.parse(content);
                     });
                 }
                 else if (relativePath === "CommentMapping.json") {
                     zipEntry.async('text').then(function (content) {
-                        console.log(content);
+                        //console.log(content);
                         dictCommentMapping = JSON.parse(content);
                     });
                 }
                 else if (relativePath.endsWith(".json")) {
                     zipEntry.async('text').then(function (content) {
-                        console.log(content);
+                        //console.log(content);
                         jsonModelContent = content;
                         uploadJson(jsonModelContent);
                     });
@@ -3987,7 +4002,7 @@ async function uploadImageFile(event) {
 
 
 window.onload = function(){
-    console.log("window loaded")
+    //("window loaded")
     $("#input-table tr:first").hide();
     $("#input-table tr td:nth-child(1)").hide();
 }
@@ -4094,6 +4109,13 @@ $('#OutputToggle').change(function() { //toggle output
 });
 
 $('#ShowBiasToggle').change(function() { //toggle output
+    if (document.getElementById("ShowBiasToggle").checked) {
+        document.getElementById("biasToggle").checked = true;
+    }
+    else {
+        document.getElementById("biasToggle").checked = false;
+    }
+    display.updateBiasToggle();
     display.UpdateShowBiasToggle();
 });
 
@@ -4284,6 +4306,7 @@ function goToAboutPage() {
 }
 
 function FixCheckAnswerButtonPosition() {
+    // return
     var button = document.getElementById('CheckAnswerBtn');
     var referenceSwitch = document.getElementById('DemoSwitch');
 
