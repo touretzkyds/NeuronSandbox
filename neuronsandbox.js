@@ -8,12 +8,10 @@ const ERROR_COLOR = '#ffbfcb';
 const OUTPUT_COLOR = '#f8ffcf';
 const INVALID_WEIGHT = '#fc496b';
 const NEGATIVE_WEIGHT = '#c91a0e';
-const ZERO_WEIGHT = 'blue';
+const ZERO_WEIGH = 'blue';
 const DEFAULT_LINE_COLOR = 'black';
 const HOVER_COLOR = 'lightblue';
 const HOVER_ERROR = '#c2abc9';
-
-let centerCircle = LeaderLine.pointAnchor(document.getElementById("circle"))
 
 class Data {
     constructor(inputData) {
@@ -201,7 +199,7 @@ class DataOperator {
     // }
 
     // make editable and update demo on edit
-    makeEditable(textbox, editable = true){ // TODO: Move from dataOp to displayOp
+    makeEditable(textbox, editable = true){
         if (textbox.id === "activation" || textbox.id === "output" || textbox.id === "desired")
             return
         textbox.contentEditable = editable;
@@ -334,7 +332,7 @@ class Table {
     }
 
     // create +/- buttons for adding rows to table
-    createRowButtons(all=true, r=null){ // TODO: change function to operate on one row at a time
+    createRowButtons(all=true, r=null){
         const content = '<div class="row-buttons-container">' +
             '<button class="button" onclick="demo.removeRow(this)">–</button>' +
             '<button class="button" onclick="demo.insertRow(this)">+</button>' +
@@ -354,7 +352,7 @@ class Table {
     }
 
     //create +/- buttons for adding columns to input table
-    createColumnButtons(all=true, columnNum=null){ // TODO: change function to operate on one col at a time
+    createColumnButtons(all=true, columnNum=null){
         const content = '<div class="column-buttons-container" >' +
             '<button class="invisible-button button">–</button>' +
             '<button class="row-button button" onclick="demo.removeCol(this)">–</button>' +
@@ -3066,9 +3064,6 @@ class Demo {
     removeAllWeightCol() {
         let parentElement = document.getElementById("input-link-text");
         parentElement.innerHTML = ""
-        // for(let i = demo.weights.length-1; i <= 0; i--) {
-        //     this.removeWeightCol(i);
-        // }
     }
     // add new row at specific location on button click
     insertCol(button){
@@ -3170,8 +3165,6 @@ class Demo {
         display.outputLine.position();
         display.alignTables()
         display.adjustSelectedInputFontSize()
-        //let isCorrect = display.checkCorrectness(outputs)
-        //console.log("isCorrect: " + isCorrect)
         display.outputLine.position()
         display.createInputTableEditBorder();
         display.createOutputTableEditBorder();
@@ -3574,8 +3567,6 @@ function setImageEditOptions() {
             }
             //handleImageClick(this, tdElement.cellIndex);
         };
-        //toggleBtn.addEventListener("click", weightButtonHandler);
-        //image.oncontextmenu = imageMenuHandler;
         image.onmouseover = imageMenuHandler;
 
     });
@@ -3933,24 +3924,6 @@ async function uploadImageFile(event) {
 
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
-    // const reader = new FileReader();
-    // reader.onload = function() {
-    //     const image = new Image();
-    //     image.onload = () => {
-    //         // Resize the image to 32x32 using the canvas
-    //         canvas.width = 32;
-    //         canvas.height = 32;
-    //         ctx.drawImage(image, 0, 0, 32, 32);
-    //         let dataURL = canvas.toDataURL("image/png", 0.9);
-    //         dictImageMapping[JSON.stringify({table_name: currentTable, column: currentColumn, value: currentImageType})] = file.name;
-    //         localStorage.setItem(file.name, dataURL);
-    //         display.createInputTableEditBorder();
-    //         display.createOutputTableEditBorder();
-    //     };
-    //     image.src = reader.result;
-    // };
-    // reader.readAsDataURL(file);
-
 
     //Load the image file into an image object
     const img = new Image();
@@ -3983,29 +3956,6 @@ async function uploadImageFile(event) {
         delete dictImageMapping[JSON.stringify({table_name: currentTable, column: currentColumn, value: currentImageType})];
     };
     img.src = URL.createObjectURL(file);
-
-    // const reader = new FileReader();
-    // reader.onload = function(event) {
-    //     try {
-    //         const arrayBuffer = event.target.result;
-    //         const binaryString = arrayBufferToString(arrayBuffer, 1024);
-    //         const base64String = btoa(binaryString);
-    //         // Use the binary content in the arrayBuffer
-    //         const dataURL = `data:image/png;base64,${base64String}`;
-    //         dictImageMapping[JSON.stringify({table_name: currentTable, column: currentColumn, value: currentImageType})] = file.name;
-    //         localStorage.setItem(file.name, dataURL);
-    //             display.createInputTableEditBorder();
-    //             display.createOutputTableEditBorder();
-    //     }
-    //     catch (e)
-    //     {
-    //         alert("An error occurred: Try uploading a smaller image.");
-    //         localStorage.removeItem(file.name);
-    //             delete dictImageMapping[JSON.stringify({table_name: currentTable, column: currentColumn, value: currentImageType})];
-    //     }
-    //
-    // };
-    // reader.readAsArrayBuffer(file);
 }
 
 
@@ -4139,39 +4089,6 @@ $('#ShowProgressBarToggle').change(function() { //toggle bias
     display.UpdateShowProgressBarToggle();
 });
 
-function PlayHooraySound() {
-    //document.getElementById("popup").classList.toggle('active');
-    let fanfareToggleChecked = document.getElementById("FanfareToggle").checked;
-    if(!fanfareToggleChecked)
-        return;
-    const audio = document.getElementById("hooray_sound");
-    if (audio) {
-        audio.play();
-    }
-}
-
-function PlayBuzzSound() {
-    //document.getElementById("popup").classList.toggle('active');
-    let fanfareToggleChecked = document.getElementById("FanfareToggle").checked;
-    if(!fanfareToggleChecked)
-        return;
-    const audio = document.getElementById("buzz_sound");
-    if (audio) {
-        audio.play();
-    }
-}
-
-function PlayDingSound() {
-    //document.getElementById("popup").classList.toggle('active');
-    let fanfareToggleChecked = document.getElementById("FanfareToggle").checked;
-    if(!fanfareToggleChecked)
-        return;
-    const audio = document.getElementById("ding_sound");
-    if (audio) {
-        audio.play();
-    }
-}
-
 $('#FanfareToggle').change(function() { //toggle output
     display.UpdateFanfareToggle();
     display.outputLine.position();
@@ -4278,44 +4195,6 @@ function fileExists(url) {
     http.send();
     return http.status !== 404;
 }
-function loadQuestionsAndModels() {
-    fetch('questions.json')
-        .then(response => response.json())
-        .then(data => {
-            const dropdown = document.getElementById('problem-list');
-            dropdown.innerHTML = "";
-            data.items.forEach(item => {
-                const option = document.createElement('option');
-                option.value = item.id;
-                option.textContent = item.label;
-                dropdown.appendChild(option);
-            });
-            dropdown.addEventListener('change', event => {
-                const selectedItemId = event.target.value;
-                //console.log(`User selected item with ID ${selectedItemId}`);
-                data.items.forEach(item => {
-                    if (item.id.toString() === selectedItemId) {
-                        //console.log(`Selected item: ${JSON.stringify(item)}`);
-                        //const questiontext = document.getElementById("questiontext");
-                        //questiontext.innerText = item.question;
-                        //load the model associated with the question
-                        let filePath = "problems/" + item.model_name+".sandbox"
-                        if (fileExists(filePath)) {
-                            uploadFromZipUrl(encodeURI(filePath), true);
-
-                        }
-                    }
-                });
-            });
-        });
-}
-
-function goToAboutPage() {
-    window.open(
-        'about.html',
-        '_blank'
-    );
-}
 
 function FixCheckAnswerButtonPosition() {
     var button = document.getElementById('CheckAnswerBtn');
@@ -4364,11 +4243,11 @@ function updateProgressBar(value) {
     progressBarText.textContent = value;
 }
 
-window.onresize = function(event) {
-    display.updateSelectedInput()
-    display.createInputLabelLines()
-
-};
+// window.onresize = function(event) {
+//     display.updateSelectedInput()
+//     display.createInputLabelLines()
+//
+// };
 
 
 
