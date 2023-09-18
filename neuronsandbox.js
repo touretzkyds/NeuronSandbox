@@ -153,8 +153,6 @@ class DataOperator {
             }
         }
         display.createOutputTableColors()
-        //console.log("updateDataFromTable, data = " + dataObj.data);
-        // do not update table, let user see what they have typed wrong (#6)
     }
 
     updateTableFromData(dataObj, tableObj){ //TODO: make more efficient by passing specific location to update
@@ -169,7 +167,6 @@ class DataOperator {
                 cell.innerText = dataObj.data[row-start][c-1];
             }
         }
-        //console.log("updateTableFromData, data = " + dataObj.data);
     }
 
     updateTableFromDesired(desiredOutput, tableObj){ //TODO: make more efficient by passing specific location to update
@@ -182,21 +179,6 @@ class DataOperator {
             cell.innerText = desiredOutput.data[row-1];
         }
     }
-
-    // updateDesiredOutput(dataObj, tableObj) {
-    //     let table = tableObj.table;
-    //     let start = 1;
-    //     let r = start;
-    //     for (let n = table.rows.length; r < n; r++) {
-    //         let c = 2;
-    //         const cell = table.rows[r].cells[c];
-    //         const rawValue = cell.innerHTML;
-    //         const [parsedValue, isValid] = demo.stringToValidFloat(rawValue);
-    //         display.highlightInvalidText(cell, isValid);
-    //         dataObj[r-start] = parsedValue;
-    //     }
-    //     console.log("updateDesiredOutput, data = " + dataObj);
-    // }
 
     // make editable and update demo on edit
     makeEditable(textbox, editable = true){
@@ -390,7 +372,6 @@ class Table {
             makeEditable = false
         else
             makeEditable = true
-        //console.log("insertTableRow, trying to add new row at row=" + r);
         let newRow = this.table.insertRow(r);
         this.makeHoverable(newRow, this.tblId);
         for (let c = 0; c < this.numCols; c++) {
@@ -1512,8 +1493,6 @@ class Display {
         for (let r = 0; r < table.rows.length; r++) {
             for (let c = 0; c < table.rows[r].cells.length; c++) {
                 if (table.rows[r].cells[c] === cell) {
-                    console.log('Row: ' + (r + 1));
-                    console.log('Column: ' + (c + 1));
                     return {row:r, col: c};
                 }
             }
@@ -1523,27 +1502,10 @@ class Display {
 
     checkForSuccess() {
         let isCorrect = checkAnswerCorrect();
-        //let fanfareToggleChecked = document.getElementById("FanfareToggle").checked
         let autoProgressChecked = document.getElementById("AutoProgressToggle").checked;
         let fanfareHidden =  document.getElementById("congrats-msg").hidden
         let outputToggleChecked = document.getElementById("OutputToggle").checked
-        let guessToggleChecked = document.getElementById("DemoToggle").checked;
-        if(guessToggleChecked) {
-            // if (isCorrect) {
-            //     PlayHooraySound();
-            //     if (!document.getElementById("popup").classList.contains("active"))
-            //         document.getElementById("popup").classList.toggle('active');
-            //     const questionDropDown = document.getElementById("problem-list");
-            //     const selectedIndex = questionDropDown.selectedIndex;
-            //     const nextIndex = selectedIndex + 1;
-            //     let button = document.getElementById("next-question-btn");
-            //     button.style.display = nextIndex < questionDropDown.options.length - 1 ? "inline-block" : "none";
-            // }
-            // else {
-            //     alert("You guessed incorrectly, please try again");
-            // }
-        }
-        else if (outputToggleChecked) {
+        if (outputToggleChecked) {
             if (fanfareHidden) {
                 if (isCorrect) {
                     PlayHooraySound();
@@ -1604,15 +1566,10 @@ class Display {
             //dataOp.makeEditable(weight);
         });
         this.displayThresholdFromData(perceptron);
-        //const threshold = document.getElementById(`th${1}`);
-        //dataOp.makeEditable(threshold);
-        //this.displaySelectedInput();
         this.updateSelectedInput();
         this.displaySelectedOutput();
         // edit buttons hover functionality
         this.initializeButtonHover(inputTable);
-        //$( ".weight_label" ).draggable();
-        //$( ".weight" ).draggable();
         $( ".draggable" ).draggable();
 
     }
@@ -1693,10 +1650,6 @@ class Display {
             oline2Width = getComputedStyle(outputLine2).width
             oline2Width = parseInt(oline2Width.substring(0, oline2Width.length - 2))
         }
-
-
-
-
     }
 
     adjustSelectedInputFontSize() {
@@ -1713,7 +1666,6 @@ class Display {
                     maxLength = length;
                     maxHeaderIndex = c;
                 }
-
             }
         }
 
@@ -1812,56 +1764,6 @@ class Display {
 
         const circle = document.getElementById("circle");
 
-        //percentage values for weight lines for x-axis
-        let percentsX = []
-        let intervalX = 1/length
-        let startX = 0
-        switch(length) {
-            case 1:
-                percentsX = [-4]
-                break
-            case 2:
-                percentsX = [-1, -1]
-                break
-            case 3:
-                percentsX = [0, -2.5, 0]
-                break
-            case 4:
-                percentsX = [0, -4, -4.5, -3.5]
-                break
-            case 5:
-                percentsX = [0, -3, -5, -5, -4]
-                break
-            default:
-                for (let i = 0; i < Math.floor(length/2); i++) {
-                    percentsX.push(startX);
-                    startX -= intervalX;
-                }
-                startX += intervalX;
-                for (let i = Math.floor(length/2); i < length; i++) {
-                    percentsX.push(startX);
-                    startX += intervalX;
-                }
-        }
-
-        //percentage values for weight lines for y-axis
-        let percentsY = [];
-        let intervalY = 16/length
-        let startY = 42;
-        if (length === 1)
-            percentsY = [52]
-        else if (length === 2)
-            percentsY = [37, 67]
-        else if (length === 3)
-            percentsY = [42, 50, 58]
-
-        else {
-            for (let i = 0; i < length; i++ ) {
-                percentsY.push(startY);
-                startY += intervalY;
-            }
-        }
-
         const min = 0.0
         const max = 6.0
         const new_min = 2.0
@@ -1907,7 +1809,6 @@ class Display {
                 demo.biasLine = null;
             }
             demo.biasLine = new LeaderLine(
-                //LeaderLine.pointAnchor(selections.rows[0].cells[0], {x: '80%', y: '50%'}),
                 LeaderLine.pointAnchor(document.querySelector(".bias-content"), {x: '96%', y: '50%'}),
                 LeaderLine.pointAnchor(document.getElementById("circle"), {
                     x: percentX + '%',
@@ -1931,9 +1832,6 @@ class Display {
             {
                 real_i += 1;
             }
-            let xposition = 6+ percentsX[real_i];
-            // let x = selections.rows[real_i].offsetLeft
-            // let y = selections.rows[real_i].offsetTop
 
             let x = selections.rows[real_i].getBoundingClientRect().left +  selections.rows[real_i].offsetWidth
             let y = selections.rows[real_i].getBoundingClientRect().top + selections.rows[real_i].offsetHeight/2
@@ -1959,10 +1857,7 @@ class Display {
 
             demo.weightLines[i] = new LeaderLine(
                 LeaderLine.pointAnchor(selections.rows[real_i].cells[0], {x: '110%', y: '50%'}),
-                //LeaderLine.pointAnchor(document.getElementById("circle"), {x: xposition+'%', y: (percentsY[real_i])+'%'})
                 LeaderLine.pointAnchor(document.getElementById("circle"), {x: percentX+'%', y: percentY+'%'})
-                //LeaderLine.areaAnchor({element: document.getElementById("circle"), shape: 'circle', x: 25, y: 25, width: '70%', height: '70%', color: 'rgba(0, 0, 0, 0)'})
-                // LeaderLine.pointAnchor(centerCircle)
             );
 
             let splitup = weight_labels[i].children[1].textContent.split(" ")
@@ -2015,8 +1910,6 @@ class Display {
         }
 
         $( ".draggable" ).draggable();
-        //$( ".weight_label" ).draggable();
-        //$( ".weight" ).draggable();
         this.adjustSelectedInputFontSize();
 
 
@@ -2026,8 +1919,6 @@ class Display {
     displaySelectedOutput() {
         // replace variable names in selected output display with values on hover (#3)
         let table = document.getElementById("selected-output");
-        //console.log("displaySelectedOutput, selections = " + table.outerHTML);
-        //console.log("displaySelectedOutput, selectedOutput = " + demo.selectedOutput);
         if(document.getElementById("seloutput-mark")) {
             document.getElementById("seloutput-mark").textContent = demo.selectedOutput[OUTPUT_COLUMN];
         }
@@ -2049,7 +1940,6 @@ class Display {
         let rowIdx = row.rowIndex || 0;
         if (!this.isInputTable(tblId)) //output table, convert to corresponding input row index
             rowIdx += 1;
-        //console.log(`hoverInput tblId=${tblId },input row=${rowIdx}, mode=${mode}`);
 
         const inputRow = document.querySelector(`#input-table > tbody > tr:nth-child(${rowIdx+1})`)
         //let outputRowIndex = (rowIdx <= 0) ? 1 : rowIdx;
@@ -2069,8 +1959,6 @@ class Display {
             // update the active inputs and outputs to display in perceptron diagram
             demo.selectedInput = inputs.data[rowIdx-2];
             demo.selectedOutput = outputs.data[rowIdx-2];
-            //console.log("enter: set demo.selectedInput =" + demo.selectedInput);
-            //console.log("enter: set demo.selectedOutput =" + demo.selectedOutput);
 
             // highlight input and output rows corresponding to the hovered input row
             inputRow.style.background = HOVER_COLOR;
@@ -2175,8 +2063,6 @@ class Display {
         demo.outputLines = []
 
         const selections = document.getElementById("selected-inputs");
-        //demo.selectedInput = demo.inputData[rowIdx];
-        //demo.selectedOutput = perceptron.outputData[rowIdx];
         for (let r=0; r<demo.selectedInput.length; r++) {
             let real_r = r;
             if(document.getElementById("biasToggle").checked)
@@ -2910,7 +2796,6 @@ class Demo {
                 toggleBtn.style.display = 'none';
             else
                 toggleBtn.style.display = 'inline-block';
-            console.log(weightElement[i].children[2].innerHTML);
         }
         let thresholdToggleBtn = document.getElementById("threshold_toggleBtn");
         if (!show)
@@ -3127,7 +3012,6 @@ class Demo {
         let bEditOutput = false;
         if (sender && sender.closest('table')?.id === "output-table") { //must be the desired output cell, no need to calculate
             bEditOutput = true;
-            //console.log(sender.previousSibling)
             display.checkDesiredOutput(sender.previousSibling, sender, sender.previousSibling.previousSibling);
             //dataOp.updateDesiredOutput(demo.desiredOutput, outputTable);
             return;
@@ -3270,7 +3154,7 @@ async function downloadFile() {
     zip.file("CommentMapping.json", new Blob([JSON.stringify(dictCommentMapping)]))
     for (const key in dictImageMapping) {
         let keyStorage = dictImageMapping[key];
-        console.log("localstorage key:" + key);
+        // console.log("localstorage key:" + key);
         const dataURLImage = localStorage.getItem(keyStorage);
         if (dataURLImage !== null) {
             // Convert the data URL to an array buffer
@@ -3340,7 +3224,7 @@ function uploadFromUrl(url) { //TODO: doesn't work if running from hard drive
     })
         .then(res => res.text())
         .then(text => {
-            console.log('Downloaded this JSON! ', text);
+            // console.log('Downloaded this JSON! ', text);
             uploadJson(text);
         })
         .catch(err => {
@@ -3406,7 +3290,6 @@ async function provideHint() {
     }
 
     let editableList = getEditableList()
-    console.log(editableList)
     let hintProvider = new hintprovider([...perceptron.weights].concat(perceptron.threshold), perceptron.inputData, desiredOutputs, editableList);
     let hintArr = hintProvider.provideHint(prevHintIndex, prevSubset, prevHintLevel);
     prevHintIndex = hintArr[1];
@@ -3539,7 +3422,6 @@ function hideCameraImages() {
 function setImageEditOptions() {
     let images = document.querySelectorAll(`.myimage`);
     images.forEach((image) => {
-        //console.log(image);
         if(findAncestorTable(image)?.id === "guess-output-table") {
             return;
         }
@@ -3690,19 +3572,19 @@ async function uploadZip(zipFile, isProblem = false) {
                 // Get the content of the file
                 if (relativePath === "ImageMapping.json") {
                     zipEntry.async('text').then(function (content) {
-                        console.log(content);
+                        // console.log(content);
                         dictImageMapping = JSON.parse(content);
                     });
                 }
                 else if (relativePath === "CommentMapping.json") {
                     zipEntry.async('text').then(function (content) {
-                        console.log(content);
+                        // console.log(content);
                         dictCommentMapping = JSON.parse(content);
                     });
                 }
                 else if (relativePath.endsWith(".json")) {
                     zipEntry.async('text').then(function (content) {
-                        console.log(content);
+                        // console.log(content);
                         jsonModelContent = content;
                         uploadJson(jsonModelContent);
                     });
@@ -3948,9 +3830,6 @@ async function uploadImageFile(event) {
         }
     };
     img.onerror = function() {
-        //console.log('Error loading image');
-        //console.log('Image URL:', img.src);
-        //console.log('Image dimensions:', img.naturalWidth, 'x', img.naturalHeight);
         alert("This is not a valid image. Valid types are: .bmp, .gif, .jpg, .jpeg, .png, .webp. Apple .HEIC files are not supported.");
         localStorage.removeItem(file.name);
         delete dictImageMapping[JSON.stringify({table_name: currentTable, column: currentColumn, value: currentImageType})];
