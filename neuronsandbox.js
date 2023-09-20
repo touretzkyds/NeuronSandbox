@@ -1764,6 +1764,10 @@ class Display {
 
         const circle = document.getElementById("circle");
 
+        let c = document.getElementById('circle');
+        console.log(getComputedStyle(c).width, getComputedStyle(c).height, getComputedStyle(c).top, getComputedStyle(c).left)
+
+        //TODO: refactor names to minLineSize
         const min = 0.0
         const max = 6.0
         const new_min = 2.0
@@ -1828,12 +1832,12 @@ class Display {
         for (let i = 0; i < demo.selectedInput.length; i++) {
 
             let real_i = i;
-            if(document.getElementById('biasToggle').checked)
-            {
+            if(document.getElementById('biasToggle').checked) {
                 real_i += 1;
             }
 
-            let x = selections.rows[real_i].getBoundingClientRect().left +  selections.rows[real_i].offsetWidth
+            //TODO: take into account 110% offset
+            let x = selections.rows[real_i].getBoundingClientRect().right
             let y = selections.rows[real_i].getBoundingClientRect().top + selections.rows[real_i].offsetHeight/2
 
             let lengthLine = Math.sqrt((centerX-x)*(centerX-x) + (centerY-y)*(centerY-y))
@@ -1856,7 +1860,7 @@ class Display {
             let percentY = ((yPoint - minY) / (maxY - minY)) * (rangeMaxY - rangeMinY) + rangeMinY
 
             demo.weightLines[i] = new LeaderLine(
-                LeaderLine.pointAnchor(selections.rows[real_i].cells[0], {x: '110%', y: '50%'}),
+                LeaderLine.pointAnchor(selections.rows[real_i].cells[0], {x: '100%', y: '50%'}),
                 LeaderLine.pointAnchor(document.getElementById("circle"), {x: percentX+'%', y: percentY+'%'})
             );
 
@@ -3746,6 +3750,9 @@ loadQuestionsAndModels();
 document.getElementById("DemoToggle").checked = true;
 display.UpdateDemoToggle();
 document.getElementById("AutoProgressToggle").checked = true;
+
+
+
 
 const problemNum = 18;
 

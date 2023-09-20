@@ -1034,6 +1034,17 @@ span.guess-comment {
     font-size: 14px;
     height: 20px;
 }
+
+.progress-bar-title {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    height: 20px;
+    z-index: 10;
+}
 #perceptron-detail {
     font-size: 23px;
     height: 20px;
