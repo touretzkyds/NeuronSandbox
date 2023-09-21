@@ -234,18 +234,15 @@ class Display {
                 }
             }
         }
-        if (editCheckbox.checked)
-        {
+        if (editCheckbox.checked) {
             setImageEditOptions();
         }
-        else
-        {
+        else  {
             hideCameraImages();
         }
     }
 
-    updateHintButton()
-    {
+    updateHintButton() {
         const hintButton = document.getElementById("hintButton");
         hintButton.style.display = !document.getElementById("DemoToggle").checked? "inline-block" : "none";
     }
@@ -262,14 +259,13 @@ class Display {
         for (let i = 2; i < n; i++) {
             let tr = inputTable.rows[i];
             for (let j = 1; j < tr.cells.length; j++) {
-                let textbox = tr.cells[j]
-                //textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
+                let textbox = tr.cells[j];
                 if (editable) {
                     if (textbox.children.length === 0) {
-                        textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
+                        textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`;
                     }
-                    textbox.children[0].classList.add("editable-border")
-                    dataOp.makeEditable(textbox.firstChild)
+                    textbox.children[0].classList.add("editable-border");
+                    dataOp.makeEditable(textbox.firstChild);
                     while (textbox.children.length > 1) {
                         textbox.removeChild(textbox.children[1]);
                     }
@@ -337,12 +333,10 @@ class Display {
                 }
             }
         }
-        if (!editable && editCheckbox.checked)
-        {
+        if (!editable && editCheckbox.checked) {
             setImageEditOptions();
         }
-        else
-        {
+        else {
             hideCameraImages();
         }
     }
@@ -367,7 +361,7 @@ class Display {
 
     getOutputImageHtml(value) {
         const img = document.createElement("img");
-        if(value == 1) {
+        if(value === 1) {
             img.alt = "1_Image";
             img.src = "media/1_image.svg";
             img.style.visibility = "hidden";
@@ -377,7 +371,7 @@ class Display {
             img.classList.add("myimage");
             return img.outerHTML;
         }
-        else if( value == 0) {
+        else if( value === 0) {
             img.alt = "0_Image";
             const imageKey = JSON.stringify({table_name: 'output-table', column: 2, value: img.alt});
             img.src = "media/0_image.svg";
@@ -401,7 +395,7 @@ class Display {
                 break;
             }
         }
-        if(guessed != undefined) {
+        if(guessed !== undefined) {
             guessed = Number(guessed);
 
             let images = cell.querySelectorAll(".myimage");
@@ -579,8 +573,7 @@ class Display {
                     button.style.display = (nextIndex < questionDropDown.options.length - 1) && autoProgressChecked ? "inline-block" : "none";
                     //document.getElementById("congrats-msg").hidden = false;
                     display.outputLine.position()
-                    for (let i = 0; i < demo.weightLines.length; i++)
-                    {
+                    for (let i = 0; i < demo.weightLines.length; i++) {
                         demo.weightLines[i].position();
                     }
                     if (demo.biasLine) {
@@ -590,8 +583,7 @@ class Display {
                 else {
                     document.getElementById("congrats-msg").hidden = true;
                     display.outputLine.position()
-                    for (let i = 0; i < demo.weightLines.length; i++)
-                    {
+                    for (let i = 0; i < demo.weightLines.length; i++) {
                         demo.weightLines[i].position();
                     }
                     if (demo.biasLine) {
@@ -604,16 +596,13 @@ class Display {
                 if (!isCorrect) {
                     document.getElementById("congrats-msg").hidden = true;
                     display.outputLine.position()
-                    for (let i = 0; i < demo.weightLines.length; i++)
-                    {
+                    for (let i = 0; i < demo.weightLines.length; i++) {
                         demo.weightLines[i].position();
                     }
                     if (demo.biasLine) {
                         demo.biasLine.position();
                     }
-
                 }
-
             }
         }
     }
@@ -623,7 +612,6 @@ class Display {
         demo.weights.map((w, idx) => {
             this.displayWeightFromData(`w${idx+1}`, idx);
             const weight = document.getElementById(`w${idx+1}`);
-            //dataOp.makeEditable(weight);
         });
         this.displayThresholdFromData(perceptron);
         this.updateSelectedInput();
@@ -752,8 +740,7 @@ class Display {
             }
         }
 
-        for (let i = 0; i < demo.weightLines.length; i++)
-        {
+        for (let i = 0; i < demo.weightLines.length; i++) {
             demo.weightLines[i].position();
         }
         if (demo.biasLine) {
@@ -796,15 +783,13 @@ class Display {
             return;
         let selections = document.getElementById("selected-inputs");
         selections.innerHTML = "";
-        for (let i = 0; i < demo.selectedInput.length; i++)
-        {
+        for (let i = 0; i < demo.selectedInput.length; i++) {
             let newRow = selections.insertRow(i);
             let newCell = newRow.insertCell(0);
             //newCell.innerHTML = `<div class=\"input-content\">${demo.selectedInput[i]}</div>`;
             newCell.innerHTML = `<div lang=\"en\" class=\"input-content\">${demo.selectedInput[i]}</div>`;
         }
-        if(document.getElementById("biasToggle").checked)
-        {
+        if(document.getElementById("biasToggle").checked) {
             let newRow = selections.insertRow(0);
             let newCell = newRow.insertCell(0);
 
@@ -828,10 +813,10 @@ class Display {
         console.log(getComputedStyle(c).width, getComputedStyle(c).height, getComputedStyle(c).top, getComputedStyle(c).left)
 
         //TODO: refactor names to minLineSize
-        const min = 0.0
-        const max = 6.0
-        const new_min = 2.0
-        const new_max = 10.0
+        const minLineSize = 0.0
+        const maxLineSize = 6.0
+        const newMinLineSize = 2.0
+        const newMaxLineSize = 10.0
 
         let weight_labels = document.getElementById("input-link-text").children;
 
@@ -842,9 +827,7 @@ class Display {
         let centerX = left + width/2;
         let centerY = top +  height/2;
 
-        //TODO: x values should also be variable
-        if(document.getElementById('biasToggle').checked)
-        {
+        if(document.getElementById('biasToggle').checked) {
             let biasContent = document.querySelector(".bias-content")
 
             let x = biasContent.getBoundingClientRect().left +  biasContent.offsetWidth
@@ -941,7 +924,7 @@ class Display {
                 demo.weightLines[i].path = 'straight';
                 demo.weightLines[i].position();
                 if (demo.stringToValidFloat(num)[1]) { //value is a valid number
-                    let line_size = ((new_max-new_min)*(Math.abs(demo.stringToValidFloat(num)[0])-min))/(max-min)+new_min
+                    let line_size = ((newMaxLineSize-newMinLineSize)*(Math.abs(demo.stringToValidFloat(num)[0])-minLineSize))/(maxLineSize-minLineSize)+newMinLineSize
                     if (line_size >= 10.0)
                         line_size = 10.0;
                     demo.weightLines[i].size = line_size;
@@ -1012,14 +995,13 @@ class Display {
         const guessOutputRow = document.querySelector(`#guess-output-table > tbody > tr:nth-child(${outputRowIndex + 1})`)
         const activationRow = document.querySelector(`#activation-table > tbody > tr:nth-child(${outputRowIndex + 1})`)
 
-        if (rowIdx < 2) //headers, or leave
-        {
+        if (rowIdx < 2) {  //headers, or leave
             this.handleHoverExit();
             display.adjustSelectedInputFontSize();
             return;
         }
 
-        if (mode === "enter"){
+        if (mode === "enter") {
             // update the active inputs and outputs to display in perceptron diagram
             demo.selectedInput = inputs.data[rowIdx-2];
             demo.selectedOutput = outputs.data[rowIdx-2];
@@ -1053,8 +1035,7 @@ class Display {
                         detail_line += " + ";
                     }
                 }
-                if(document.getElementById("biasToggle").checked)
-                {
+                if(document.getElementById("biasToggle").checked) {
                     detail_line += " + Bias";
                 }
 
@@ -1066,8 +1047,7 @@ class Display {
                         detail_line += " + ";
                     }
                 }
-                if(document.getElementById("biasToggle").checked)
-                {
+                if(document.getElementById("biasToggle").checked) {
                     detail_line += ` + (${-perceptron.threshold})`;
                 }
 
@@ -1332,9 +1312,6 @@ class Display {
         for (let i = 0; i < demo.weightLines.length; i++) {
             demo.weightLines[i].position();
         }
-        // if (demo.biasLine ) {
-        //     demo.biasLine.position();
-        // }
         this.UpdateOutputToggle()
         this.UpdateShowBiasToggle();
         this.UpdateShowProgressBarToggle();
@@ -1383,9 +1360,6 @@ class Display {
         for (let i = 0; i < demo.weightLines.length; i++) {
             demo.weightLines[i].position();
         }
-        // if (demo.biasLine) {
-        //     demo.biasLine.position();
-        // }
 
         display.outputLine.position();
         display.createOutputTableEditBorder();
@@ -1407,8 +1381,7 @@ class Display {
                     detail_line += " + ";
                 }
             }
-            if(document.getElementById("biasToggle").checked)
-            {
+            if(document.getElementById("biasToggle").checked) {
                 detail_line += " + Bias";
             }
 
@@ -1513,8 +1486,7 @@ class Display {
 
     }
 
-    updateBiasToggle()
-    {
+    updateBiasToggle() {
         perceptron.setBiasUI();
         display.updateSelectedInput();
         demo.update();
