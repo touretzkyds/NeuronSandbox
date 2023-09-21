@@ -40,6 +40,13 @@ function PlayDingSound() {
 ///////////////////////////////////////////////////////////////////////////////
 // --- UTIL FUNCTIONS FOR LOADING/DOWNLOADING PROBLEMS ---
 ///////////////////////////////////////////////////////////////////////////////
+function fileExists(url) {
+    let http = new XMLHttpRequest();
+    http.open('HEAD', encodeURI(url), false);
+    http.send();
+    return http.status !== 404;
+}
+
 async function downloadFile() {
     let inputToggleChecked=document.getElementById("InputToggle").checked;
     let outputToggleChecked=document.getElementById("OutputToggle").checked;
