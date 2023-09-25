@@ -1008,7 +1008,7 @@ span.guess-comment {
 }
 
 .progress-bar {
-    width: 300px;
+    width: 175px;
     height: 20px;
     background-color: #f2f2f2;
     border-radius: 10px;
@@ -1026,13 +1026,12 @@ span.guess-comment {
 
 .progress-bar-text {
     position: absolute;
-    top: -25px;
-    left: 0;
     width: 100%;
-    text-align: center;
+    text-align: right;
     font-weight: bold;
     font-size: 14px;
     height: 20px;
+    transform: translate(20px, 0);
 }
 
 .progress-bar-title {

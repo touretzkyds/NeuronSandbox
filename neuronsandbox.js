@@ -1292,14 +1292,13 @@ function uploadJson(text) {
     demo.weights = []; //clear weight array first, due to the insertWeightCol below
     demo.threshold = dict["threshold"];
     desiredOutputs = dict["desired-output"];
-    document.getElementById('fname').innerText  = dict["model-name"];
+    document.getElementById('fname').innerText = dict["model-name"];
     document.getElementById("questiontext").innerText = dict["question"];
     document.getElementById("questionprompt").hidden = true;
     document.getElementById("questiontext").hidden = false;
 
     document.getElementById("biasToggle").checked = false;
     document.getElementById("hintText").innerText = "";
-
 
 
     inputs = new Data(demo.inputData);
@@ -1381,8 +1380,7 @@ function uploadJson(text) {
     let activationCol = document.getElementById("activation-table");
     let outputTableLength = outputCol.rows.length;
 
-    for (let i = 1; i < outputTableLength; i++)
-    {
+    for (let i = 1; i < outputTableLength; i++) {
         //var tr = outputCol.rows[i];
         let output = outputCol.rows[i].cells[OUTPUT_COLUMN];
         let desired = outputCol.rows[i].cells[DESIRED_OUTPUT_COLUMN];
@@ -1407,18 +1405,15 @@ function uploadJson(text) {
     display.UpdateBinaryToggle(false);
     addThresholdEditOption();
     const thresholdToggle = document.getElementById("threshold_toggleBtn");
-    if (dict["binaryToggleChecked"] && document.getElementById('InputToggle').checked)
-    {
+    if (dict["binaryToggleChecked"] && document.getElementById('InputToggle').checked) {
         thresholdToggle.style.display = 'inline-block';
-    }
-    else {
+    } else {
         thresholdToggle.style.display = "none";
     }
     if (dict["threshold-editable"]) {
         thresholdToggle.classList.remove("edit-toggle-on"); //reversed here since we will dispatch a click event
         thresholdToggle.classList.add("edit-toggle-off");
-    }
-    else {
+    } else {
         thresholdToggle.classList.remove("edit-toggle-off"); //reversed here since we will dispatch a click event
         thresholdToggle.classList.add("edit-toggle-on");
     }
@@ -1433,6 +1428,8 @@ function uploadJson(text) {
     prevHintIndex = -1;
     prevSubset = [];
     checkAnswerCorrect();
+    document.getElementById("ShowProgressBarToggle").checked = true
+    display.UpdateShowProgressBarToggle();
 }
 
 async function uploadFile(event) {

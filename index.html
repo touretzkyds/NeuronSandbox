@@ -28,7 +28,6 @@
     <script src = "DataOperator.js"></script>
     <script src = "Table.js"></script>
 
-
     <script type="text/javascript">
         (function(window, document, dataLayerName, id) {
             window[dataLayerName]=window[dataLayerName]||[],window[dataLayerName].push({start:(new Date).getTime(),event:"stg.start"});var scripts=document.getElementsByTagName('script')[0],tags=document.createElement('script');
@@ -48,15 +47,22 @@
             </div>
         </section>
         <section>
-            <b class="model-name">Model Name: </b>
-        </section>
-        <section>
             <b id ="fname" class="model-name">model</b></section>
         <select name="problem-list" id="problem-list">
             <option value="p1">Problem 1</option>
             <option value="p1">Problem 2</option>
             <option value="p1">Problem 3</option>
         </select>
+
+        <section>
+            <div style="padding-right: 20px">
+                <div id="progress-bar" class="progress-bar">
+                    <div id="progress_bar_title" class="progress-bar-title">Difficulty Level</div>
+                    <div id="progress_bar" class="progress-bar-fill" style="width: 50%;"></div>
+                    <div id="progress_bar_text" class="progress-bar-text">50</div>
+                </div>
+            </div>
+        </section>
 
         <section id="edit-menu-section">
             <div class="dropdown">
@@ -106,7 +112,7 @@
                             </label>
                         </div>
                         <div id="ShowProgressBarToggleBody" class="menu-row-container">
-                            <label style="margin-right: 10px">Show Progress Bar</label>
+                            <label style="margin-right: 10px">Show Difficulty</label>
                             <label class="switch" >
                                 <input type="checkbox" id="ShowProgressBarToggle">
                                 <span class="slider round"></span>
@@ -116,7 +122,7 @@
                             <div id="difficultySlide">
                                 <div class="difficulty_slider">
                                     <p id="difficulty_level">Level: 50</p>
-                                    Novice <input type="range" min="0" max="100" value="50" step="5" id="difficulty_slide" /> Elite
+                                    Novice <input type="range" min="0" max="100" value="50" step="5" id="difficulty_slide" /> Expert
                                 </div>
                             </div>
                         </div>
@@ -178,13 +184,7 @@
         <!--            <div style="width: 400px; height: 100px" class="editable-border">-->
         <!--                <p style="font-size: 20px">this is the word problem</p>-->
         <!--            </div>-->
-        <div style="padding: 10px">
-            <div id="progress-bar" class="progress-bar">
-                <div id="progress_bar_title" class="progress-bar-title">Difficulty Level</div>
-                <div id="progress_bar" class="progress-bar-fill" style="width: 50%;"></div>
-                <div id="progress_bar_text" class="progress-bar-text">50</div>
-            </div>
-        </div>
+
 
         <div id="qdiv">
             <!--                <input hidden style="width: 400px; height: 50px;" type="text" id="questionprompt">-->
@@ -239,12 +239,12 @@
                     </div>
                 </div>
             </th>
-<!--            <th>-->
-<!--                <div id="progress-bar" class="progress-bar">-->
-<!--                    <div id="progress_bar" class="progress-bar-fill" style="width: 50%;"></div>-->
-<!--                    <div id="progress_bar_text" class="progress-bar-text">50</div>-->
-<!--                </div>-->
-<!--            </th>-->
+            <!--            <th>-->
+            <!--                <div id="progress-bar" class="progress-bar">-->
+            <!--                    <div id="progress_bar" class="progress-bar-fill" style="width: 50%;"></div>-->
+            <!--                    <div id="progress_bar_text" class="progress-bar-text">50</div>-->
+            <!--                </div>-->
+            <!--            </th>-->
             <th>
                 <a style="margin-top: 19%" id= "CheckAnswerBtn" onmousedown="event.preventDefault();display.checkGuessResult(); " onmouseup="event.preventDefault(); display.removeGuessHighlight();" class="custom-btn myButton">
                     <i class="fa" aria-hidden="true"></i> Press to Check
