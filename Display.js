@@ -809,8 +809,7 @@ class Display {
 
         const circle = document.getElementById("circle");
 
-        let c = document.getElementById('circle');
-        console.log(getComputedStyle(c).width, getComputedStyle(c).height, getComputedStyle(c).top, getComputedStyle(c).left)
+        // console.log(getComputedStyle(c).width, getComputedStyle(c).height, getComputedStyle(c).top, getComputedStyle(c).left)
 
         //TODO: refactor names to minLineSize
         const minLineSize = 0.0
