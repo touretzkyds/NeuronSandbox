@@ -224,8 +224,8 @@ function loadQuestionsAndModels() {
 
 //Automatically adjusts arrows and table headers to fit the screen
 window.onresize = function(event) {
-    display.updateSelectedInput()
     display.createInputLabelLines()
+    display.updateSelectedInput()
 
 };
 

@@ -614,11 +614,11 @@ class Display {
             const weight = document.getElementById(`w${idx+1}`);
         });
         this.displayThresholdFromData(perceptron);
-        this.updateSelectedInput();
         this.displaySelectedOutput();
         // edit buttons hover functionality
         this.initializeButtonHover(inputTable);
         $( ".draggable" ).draggable();
+        this.updateSelectedInput();
 
     }
 
@@ -1085,7 +1085,6 @@ class Display {
 
         }
         //this.displaySelectedInput();
-        this.updateSelectedInput();
         this.displaySelectedOutput();
         display.recreateOutputLine();
         display.outputLine.position();
@@ -1142,6 +1141,7 @@ class Display {
         }
         display.alignTables()
         display.createOutputTableEditBorder();
+        this.updateSelectedInput();
     }
 
     handleHoverExit(inputRow, outputRow, guessOutputRow, activationRow,  isOdd = false) {
@@ -1165,11 +1165,10 @@ class Display {
         if(guessOutputRow) {
             guessOutputRow.style.background = "none";
         }
-
-        this.updateSelectedInput();
         display.adjustSelectedInputFontSize();
         display.alignTables();
         display.createOutputTableEditBorder();
+        this.updateSelectedInput();
     }
 
     getHeaderRowVals(headerRowVals) {
@@ -1263,7 +1262,6 @@ class Display {
         // document.getElementById("OutputToggle").style.display =  checkbox.checked? "inline-block" : "none";
 
         //display.createOutputTableColors();
-        this.updateSelectedInput();
         if (!checkbox.checked || checkboxDemo.checked) {
             $("#input-table tr:first").hide();
             $("#input-table tr td:nth-child(1)").hide();
@@ -1314,6 +1312,7 @@ class Display {
         this.UpdateOutputToggle()
         this.UpdateShowBiasToggle();
         this.UpdateShowProgressBarToggle();
+        this.updateSelectedInput();
     }
 
     UpdateShowBiasToggle () {
@@ -1487,11 +1486,11 @@ class Display {
 
     updateBiasToggle() {
         perceptron.setBiasUI();
-        display.updateSelectedInput();
         demo.update();
         //demo.adjustWeightPlacement();
         setupQuestionFields();
         display.UpdateDetailToggle();
+        display.updateSelectedInput();
     }
 
     UpdateFanfareToggle() {
@@ -1569,12 +1568,12 @@ class Display {
 // update display panel
     updateDisplay() {
         //this.displaySelectedInput();
-        this.updateSelectedInput();
         this.displaySelectedOutput();
         this.UpdateInputToggle();
         this.UpdateOutputToggle();
         this.adjustSelectedInputFontSize()
         this.alignTables()
+        this.updateSelectedInput();
 
     }
 
