@@ -1005,7 +1005,44 @@ span.guess-comment {
 .hint-text {
     text-align: center;
     font-size: 23px;
+}
+
+.progress-bar {
+    width: 175px;
     height: 20px;
+    background-color: #f2f2f2;
+    border-radius: 10px;
+    position: relative;
+    margin: auto;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    background-color: #3498db;
+    position: absolute;
+    transition: width 0.3s ease-in-out;
+}
+
+.progress-bar-text {
+    position: absolute;
+    width: 100%;
+    text-align: right;
+    font-weight: bold;
+    font-size: 14px;
+    height: 20px;
+    transform: translate(20px, 0);
+}
+
+.progress-bar-title {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    height: 20px;
+    z-index: 10;
 }
 #perceptron-detail {
     font-size: 23px;
