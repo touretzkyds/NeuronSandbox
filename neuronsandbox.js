@@ -1430,6 +1430,7 @@ function uploadJson(text) {
     checkAnswerCorrect();
     document.getElementById("ShowProgressBarToggle").checked = true
     display.UpdateShowProgressBarToggle();
+    document.getElementById("AutoProgressToggle").checked = true
 }
 
 async function uploadFile(event) {
@@ -1765,3 +1766,10 @@ function updateProgressBar(value) {
     progressBarFill.style.width = value + '%';
     progressBarText.textContent = value;
 }
+
+// $("#problem-list").on("click", function() {
+//     let problemList = document.getElementById("problem-list");
+//     let options = document.getElementById("problem-list").options
+//
+//
+// });
