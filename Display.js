@@ -809,9 +809,6 @@ class Display {
 
         const circle = document.getElementById("circle");
 
-        // console.log(getComputedStyle(c).width, getComputedStyle(c).height, getComputedStyle(c).top, getComputedStyle(c).left)
-
-        //TODO: refactor names to minLineSize
         const minLineSize = 0.0
         const maxLineSize = 6.0
         const newMinLineSize = 2.0
@@ -829,8 +826,8 @@ class Display {
         if(document.getElementById('biasToggle').checked) {
             let biasContent = document.querySelector(".bias-content")
 
-            let x = biasContent.getBoundingClientRect().left +  biasContent.offsetWidth
-            let y = biasContent.getBoundingClientRect().top + biasContent.offsetHeight/2
+            let x = biasContent.getBoundingClientRect().right
+            let y = biasContent.getBoundingClientRect().top + biasContent.getBoundingClientRect().height/2
 
             let lengthLine = Math.sqrt((centerX-x)*(centerX-x) + (centerY-y)*(centerY-y))
             let lengthSubLine = lengthLine - width/2
@@ -878,9 +875,8 @@ class Display {
                 real_i += 1;
             }
 
-            //TODO: take into account 110% offset
             let x = selections.rows[real_i].getBoundingClientRect().right
-            let y = selections.rows[real_i].getBoundingClientRect().top + selections.rows[real_i].offsetHeight/2
+            let y = selections.rows[real_i].getBoundingClientRect().top + (selections.rows[real_i].getBoundingClientRect().height)/2
 
             let lengthLine = Math.sqrt((centerX-x)*(centerX-x) + (centerY-y)*(centerY-y))
             let lengthSubLine = lengthLine - width/2
@@ -1306,6 +1302,12 @@ class Display {
             document.getElementById("ShowProgressBarToggleBody").style.display= "flex";
         }
 
+        let editToggleChecked = document.getElementById("InputToggle").checked;
+        for (let c = 1, m = inputTable.table.rows[1].cells.length; c < m; c++) {
+            const cell = inputTable.table.rows[1].cells[c];
+            dataOp.makeEditable(cell, editToggleChecked);
+        }
+
         for (let i = 0; i < demo.weightLines.length; i++) {
             demo.weightLines[i].position();
         }
@@ -1318,6 +1320,7 @@ class Display {
     UpdateShowBiasToggle () {
         if(document.getElementById("ShowBiasToggle").checked) {
             document.getElementById("bias-toggle").style.display = "flex";
+            document.getElementById("biasToggle").checked = "true"
         }
         else {
             document.getElementById("bias-toggle").style.display = "none";
