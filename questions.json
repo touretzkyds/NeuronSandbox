@@ -2,27 +2,27 @@
   "items": [
     {
       "id": 1,
-      "label": "Problem 1 - Difficulty 0",
+      "label": "Problem 1 - Difficulty 5",
       "model_name": "Problem 1"
     },
     {
       "id": 2,
-      "label": "Problem 2 - Difficulty 0",
+      "label": "Problem 2 - Difficulty 5",
       "model_name": "Problem 2"
     },
     {
       "id": 3,
-      "label": "Problem 3 - Difficulty 0",
+      "label": "Problem 3 - Difficulty 5",
       "model_name": "Problem 3"
     },
     {
       "id": 4,
-      "label": "Problem 4 - Difficulty 0",
+      "label": "Problem 4 - Difficulty 5",
       "model_name": "Problem 4"
     },
     {
       "id": 5,
-      "label": "Problem 5 - Difficulty 0",
+      "label": "Problem 5 - Difficulty 5",
       "model_name": "Problem 5"
     },
     {
