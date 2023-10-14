@@ -1008,7 +1008,7 @@ span.guess-comment {
 }
 
 .progress-bar {
-    width: 175px;
+    width: 100px;
     height: 20px;
     background-color: #f2f2f2;
     border-radius: 10px;

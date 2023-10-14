@@ -1430,7 +1430,6 @@ function uploadJson(text) {
     checkAnswerCorrect();
     document.getElementById("ShowProgressBarToggle").checked = true
     display.UpdateShowProgressBarToggle();
-    document.getElementById("AutoProgressToggle").checked = true
 }
 
 async function uploadFile(event) {
@@ -1599,6 +1598,13 @@ $('#OutputToggle').change(function() { //toggle output
 });
 
 $('#ShowBiasToggle').change(function() { //toggle output
+    if (document.getElementById("ShowBiasToggle").checked) {
+        document.getElementById("biasToggle").checked = true;
+    }
+    else {
+        document.getElementById("biasToggle").checked = false;
+    }
+    display.updateBiasToggle();
     display.UpdateShowBiasToggle();
 });
 
@@ -1766,10 +1772,3 @@ function updateProgressBar(value) {
     progressBarFill.style.width = value + '%';
     progressBarText.textContent = value;
 }
-
-// $("#problem-list").on("click", function() {
-//     let problemList = document.getElementById("problem-list");
-//     let options = document.getElementById("problem-list").options
-//
-//
-// });
