@@ -2,87 +2,87 @@
   "items": [
     {
       "id": 1,
-      "label": "Problem 1 - Difficulty 0",
+      "label": "problem-1",
       "model_name": "Problem 1"
     },
     {
       "id": 2,
-      "label": "Problem 2 - Difficulty 0",
+      "label": "problem-2",
       "model_name": "Problem 2"
     },
     {
       "id": 3,
-      "label": "Problem 3 - Difficulty 0",
+      "label": "problem-3",
       "model_name": "Problem 3"
     },
     {
       "id": 4,
-      "label": "Problem 4 - Difficulty 0",
+      "label": "problem-4",
       "model_name": "Problem 4"
     },
     {
       "id": 5,
-      "label": "Problem 5 - Difficulty 0",
+      "label": "problem-5",
       "model_name": "Problem 5"
     },
     {
       "id": 6,
-      "label": "Problem 6 - Difficulty 25",
+      "label": "problem-6",
       "model_name": "Problem 6"
     },
     {
       "id": 7,
-      "label": "Problem 7 - Difficulty 20",
+      "label": "problem-7",
       "model_name": "Problem 7"
     },
     {
       "id": 8,
-      "label": "Problem 8 - Difficulty 30",
+      "label": "problem-8",
       "model_name": "Problem 8"
     },
     {
       "id": 9,
-      "label": "Problem 9 - Difficulty 30",
+      "label": "problem-9",
       "model_name": "Problem 9"
     },
     {
       "id": 10,
-      "label": "Problem 10 - Difficulty 30",
+      "label": "problem-10",
       "model_name": "Problem 10"
     },
     {
       "id": 11,
-      "label": "Problem 11 - Difficulty 65",
+      "label": "problem-11",
       "model_name": "Problem 11"
     },
     {
       "id": 12,
-      "label": "Problem 12 - Difficulty 65",
+      "label": "problem-12",
       "model_name": "Problem 12"
     },
     {
       "id": 13,
-      "label": "Problem 13 - Difficulty 20",
+      "label": "problem-13",
       "model_name": "Problem 13"
     },
     {
       "id": 14,
-      "label": "Problem 14 - Difficulty 20",
+      "label": "problem-14",
       "model_name": "Problem 14"
     },
     {
       "id": 15,
-      "label": "Problem 15 - Difficulty 70",
+      "label": "problem-15",
       "model_name": "Problem 15"
     },
     {
       "id": 16,
-      "label": "Problem 16 - Difficulty 30",
+      "label": "problem-16",
       "model_name": "Problem 16"
     },
     {
       "id": 17,
-      "label": "Problem 17 - Difficulty 60",
+      "label": "problem-17",
       "model_name": "Problem 17"
     },
     {

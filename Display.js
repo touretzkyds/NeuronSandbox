@@ -614,11 +614,11 @@ class Display {
             const weight = document.getElementById(`w${idx+1}`);
         });
         this.displayThresholdFromData(perceptron);
+        this.updateSelectedInput();
         this.displaySelectedOutput();
         // edit buttons hover functionality
         this.initializeButtonHover(inputTable);
         $( ".draggable" ).draggable();
-        this.updateSelectedInput();
 
     }
 
@@ -809,6 +809,10 @@ class Display {
 
         const circle = document.getElementById("circle");
 
+        let c = document.getElementById('circle');
+        console.log(getComputedStyle(c).width, getComputedStyle(c).height, getComputedStyle(c).top, getComputedStyle(c).left)
+
+        //TODO: refactor names to minLineSize
         const minLineSize = 0.0
         const maxLineSize = 6.0
         const newMinLineSize = 2.0
@@ -826,8 +830,8 @@ class Display {
         if(document.getElementById('biasToggle').checked) {
             let biasContent = document.querySelector(".bias-content")
 
-            let x = biasContent.getBoundingClientRect().right
-            let y = biasContent.getBoundingClientRect().top + biasContent.getBoundingClientRect().height/2
+            let x = biasContent.getBoundingClientRect().left +  biasContent.offsetWidth
+            let y = biasContent.getBoundingClientRect().top + biasContent.offsetHeight/2
 
             let lengthLine = Math.sqrt((centerX-x)*(centerX-x) + (centerY-y)*(centerY-y))
             let lengthSubLine = lengthLine - width/2
@@ -875,8 +879,9 @@ class Display {
                 real_i += 1;
             }
 
+            //TODO: take into account 110% offset
             let x = selections.rows[real_i].getBoundingClientRect().right
-            let y = selections.rows[real_i].getBoundingClientRect().top + (selections.rows[real_i].getBoundingClientRect().height)/2
+            let y = selections.rows[real_i].getBoundingClientRect().top + selections.rows[real_i].offsetHeight/2
 
             let lengthLine = Math.sqrt((centerX-x)*(centerX-x) + (centerY-y)*(centerY-y))
             let lengthSubLine = lengthLine - width/2
@@ -1081,6 +1086,7 @@ class Display {
 
         }
         //this.displaySelectedInput();
+        this.updateSelectedInput();
         this.displaySelectedOutput();
         display.recreateOutputLine();
         display.outputLine.position();
@@ -1137,7 +1143,6 @@ class Display {
         }
         display.alignTables()
         display.createOutputTableEditBorder();
-        this.updateSelectedInput();
     }
 
     handleHoverExit(inputRow, outputRow, guessOutputRow, activationRow,  isOdd = false) {
@@ -1161,10 +1166,11 @@ class Display {
         if(guessOutputRow) {
             guessOutputRow.style.background = "none";
         }
+
+        this.updateSelectedInput();
         display.adjustSelectedInputFontSize();
         display.alignTables();
         display.createOutputTableEditBorder();
-        this.updateSelectedInput();
     }
 
     getHeaderRowVals(headerRowVals) {
@@ -1258,6 +1264,7 @@ class Display {
         // document.getElementById("OutputToggle").style.display =  checkbox.checked? "inline-block" : "none";
 
         //display.createOutputTableColors();
+        this.updateSelectedInput();
         if (!checkbox.checked || checkboxDemo.checked) {
             $("#input-table tr:first").hide();
             $("#input-table tr td:nth-child(1)").hide();
@@ -1302,25 +1309,18 @@ class Display {
             document.getElementById("ShowProgressBarToggleBody").style.display= "flex";
         }
 
-        let editToggleChecked = document.getElementById("InputToggle").checked;
-        for (let c = 1, m = inputTable.table.rows[1].cells.length; c < m; c++) {
-            const cell = inputTable.table.rows[1].cells[c];
-            dataOp.makeEditable(cell, editToggleChecked);
-        }
-
         for (let i = 0; i < demo.weightLines.length; i++) {
             demo.weightLines[i].position();
         }
         this.UpdateOutputToggle()
         this.UpdateShowBiasToggle();
         this.UpdateShowProgressBarToggle();
-        this.updateSelectedInput();
     }
 
     UpdateShowBiasToggle () {
         if(document.getElementById("ShowBiasToggle").checked) {
             document.getElementById("bias-toggle").style.display = "flex";
-            document.getElementById("biasToggle").checked = "true"
+
         }
         else {
             document.getElementById("bias-toggle").style.display = "none";
@@ -1489,11 +1489,11 @@ class Display {
 
     updateBiasToggle() {
         perceptron.setBiasUI();
+        display.updateSelectedInput();
         demo.update();
         //demo.adjustWeightPlacement();
         setupQuestionFields();
         display.UpdateDetailToggle();
-        display.updateSelectedInput();
     }
 
     UpdateFanfareToggle() {
@@ -1571,12 +1571,12 @@ class Display {
 // update display panel
     updateDisplay() {
         //this.displaySelectedInput();
+        this.updateSelectedInput();
         this.displaySelectedOutput();
         this.UpdateInputToggle();
         this.UpdateOutputToggle();
         this.adjustSelectedInputFontSize()
         this.alignTables()
-        this.updateSelectedInput();
 
     }
 
