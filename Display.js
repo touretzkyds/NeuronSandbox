@@ -1418,7 +1418,7 @@ class Display {
     UpdateDemoToggle() {
         let hintText = document.getElementById("hintText");
         let checkbox = document.getElementById("DemoToggle");
-        const otherHeaders = document.querySelectorAll('.top-table th:not(:first-child):not(:nth-child(2)):not(:last-child)');
+        const otherHeaders = document.querySelectorAll('.top-table th:not(:first-child):not(:last-child)');
         if (checkbox.checked) {
             document.getElementById("guess-output-container").style.display = "inline-block";
 
