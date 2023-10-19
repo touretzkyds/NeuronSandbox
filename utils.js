@@ -230,9 +230,9 @@ window.onresize = function(event) {
 };
 
 //Goes to Instructions page
-function goToAboutPage() {
+function goToInstructionsPage() {
     window.open(
-        'about.html',
+        'instructions.html',
         '_blank'
     );
 }
