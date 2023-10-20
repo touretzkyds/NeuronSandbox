@@ -103,9 +103,9 @@ class Display {
             td1.style.fontWeight = 'normal';
 
             td2.style.fontWeight = 'bold';
-            if (td2.style.background !== ERROR_COLOR) //error
-                td2.style.background = ERROR_COLOR
-            td2.style.background = 'none'
+            // if (td2.style.background !== ERROR_COLOR) //error
+            //     td2.style.background = ERROR_COLOR
+            // td2.style.background = 'none'
         }
     }
 
@@ -1014,6 +1014,7 @@ class Display {
                 else {
                     outputRow.children[i].style.background = HOVER_COLOR;
                 }
+                activationRow.children[i].style.background = HOVER_COLOR;
             }
             if(guessOutputRow)
                 guessOutputRow.style.background = HOVER_COLOR;
@@ -1160,6 +1161,7 @@ class Display {
         if (outputRow) {
             for (let i = 0; i < outputRow.children.length; i++) {
                 outputRow.children[0].style.background = "none";
+                activationRow.children[0].style.background = "none";
                 this.checkDesiredOutput(outputRow.children[OUTPUT_COLUMN], outputRow.children[DESIRED_OUTPUT_COLUMN], activationRow.children[ACTIVATION_COLUMN])
             }
         }
@@ -1312,7 +1314,7 @@ class Display {
         for (let i = 0; i < demo.weightLines.length; i++) {
             demo.weightLines[i].position();
         }
-        this.UpdateOutputToggle()
+        //this.UpdateOutputToggle()
         this.UpdateShowBiasToggle();
         this.UpdateShowProgressBarToggle();
     }
