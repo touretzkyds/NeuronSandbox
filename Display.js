@@ -1014,7 +1014,7 @@ class Display {
                 else {
                     outputRow.children[i].style.background = HOVER_COLOR;
                 }
-                activationRow.children[i].style.background = HOVER_COLOR;
+                activationRow.children[0].style.background = HOVER_COLOR;
             }
             if(guessOutputRow)
                 guessOutputRow.style.background = HOVER_COLOR;
