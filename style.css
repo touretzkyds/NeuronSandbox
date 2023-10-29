@@ -1057,3 +1057,11 @@ span.guess-comment {
     align-items: center;
     font-size: 32px;
 }
+
+.red-text {
+    color: #c91a0e;
+}
+
+.blue-text {
+    color: blue;
+}

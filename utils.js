@@ -183,6 +183,8 @@ async function uploadFromZipUrl(url, isProblem = false) {
     }
 }
 
+let selectedProblemListValue = null;
+
 // Loads problem list
 function loadQuestionsAndModels() {
     fetch('questions.json')
@@ -213,6 +215,24 @@ function loadQuestionsAndModels() {
                     }
                 });
             });
+            // dropdown.addEventListener('mousedown', event => {
+            //     selectedProblemListValue = dropdown.value;
+            // });
+            //
+            // dropdown.addEventListener('mouseup', event => {
+            //     if (selectedProblemListValue === dropdown.value) //select the same problem again
+            //     {
+            //         data.items.forEach(item => {
+            //             if (item.id.toString() === dropdown.value) {
+            //                 let filePath = "problems/" + item.model_name+".sandbox"
+            //                 if (fileExists(filePath)) {
+            //                     uploadFromZipUrl(encodeURI(filePath), true);
+            //                 }
+            //             }
+            //         });
+            //     }
+            // });
+
         });
 }
 

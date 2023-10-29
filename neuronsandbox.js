@@ -326,14 +326,38 @@ function checkAnswerCorrect() {
     let outputTable = document.getElementById("output-table")
     let activationTable = document.getElementById("activation-table")
     let guessToggle = document.getElementById("DemoToggle")
+    let thresholdText = document.getElementById("th1")
     let outputToggleChecked = document.getElementById("OutputToggle").checked
     let tableRows = outputTable.rows.length
     let isCorrect = true;
+    let thresholdValue = parseFloat(thresholdText.textContent);
+    if (thresholdValue > 0) {
+        thresholdText.classList.remove('blue-text', 'red-text');
+    } else if (thresholdValue < 0) {
+        thresholdText.classList.remove('blue-text');
+        thresholdText.classList.add('red-text');
+    } else {
+        thresholdText.classList.remove('red-text');
+        thresholdText.classList.add('blue-text');
+    }
+
     if(!guessToggle.checked) {
         for (let i = 1; i < tableRows; i++) {
             let row = outputTable.rows.item(i);
             let inputRow = inputTable.rows.item(i+1);
             let activationRow = activationTable.rows.item(i);
+            let activationValue = parseInt(activationRow.children[0].textContent);
+            if (activationValue > 0) {
+                activationRow.children[0].classList.remove('blue-text', 'red-text');
+            } else if (activationValue < 0) {
+                activationRow.children[0].classList.remove('blue-text');
+                activationRow.children[0].classList.add('red-text');
+            } else {
+                activationRow.children[0].classList.remove('red-text');
+                activationRow.children[0].classList.add('blue-text');
+            }
+
+
             let cells = outputTable.rows.item(i).cells
             let output = cells.item(OUTPUT_COLUMN).innerText;
             let desired = cells.item(DESIRED_OUTPUT_COLUMN).innerText;
@@ -1223,7 +1247,7 @@ async function uploadZip(zipFile, isProblem = false) {
                 // Get the content of the file
                 if (relativePath === "ImageMapping.json") {
                     zipEntry.async('text').then(function (content) {
-                        // console.log(content);
+                        console.log(content);
                         dictImageMapping = JSON.parse(content);
                     });
                 }
