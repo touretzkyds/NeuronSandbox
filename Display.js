@@ -260,12 +260,13 @@ class Display {
             let tr = inputTable.rows[i];
             for (let j = 1; j < tr.cells.length; j++) {
                 let textbox = tr.cells[j];
+
                 if (editable) {
                     if (textbox.children.length === 0) {
                         textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`;
                     }
                     textbox.children[0].classList.add("editable-border");
-                    dataOp.makeEditable(textbox.firstChild);
+                    dataOp.makeEditable(textbox.firstChild, true, false);
                     while (textbox.children.length > 1) {
                         textbox.removeChild(textbox.children[1]);
                     }
@@ -276,7 +277,7 @@ class Display {
                         textbox.innerHTML = `<span>` + textbox.innerHTML + `</span>`
                     }
                     textbox.children[0].classList.remove("editable-border")
-                    dataOp.makeEditable(textbox.firstChild, false)
+                    dataOp.makeEditable(textbox.firstChild, false, false)
                     while (textbox.children.length > 1) {
                         textbox.removeChild(textbox.children[1]);
                     }
@@ -331,6 +332,7 @@ class Display {
                         textbox.appendChild(img);
                     }
                 }
+                dataOp.setFocusoutEventListener(textbox);
             }
         }
         if (!editable && editCheckbox.checked) {
