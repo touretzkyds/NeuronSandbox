@@ -357,6 +357,22 @@ function checkAnswerCorrect() {
                 activationRow.children[0].classList.add('blue-text');
             }
 
+            if (!document.getElementById("BinaryToggle").checked)
+            {
+                for(let j = 0; j < inputRow.children.length; j++)
+                {
+                    let inputValue = parseFloat(inputRow.children[j].textContent);
+                    if (inputValue > 0) {
+                        inputRow.children[j].classList.remove('blue-text', 'red-text');
+                    } else if (inputValue < 0) {
+                        inputRow.children[j].classList.remove('blue-text');
+                        inputRow.children[j].classList.add('red-text');
+                    } else {
+                        inputRow.children[j].classList.remove('red-text');
+                        inputRow.children[j].classList.add('blue-text');
+                    }
+                }
+            }
 
             let cells = outputTable.rows.item(i).cells
             let output = cells.item(OUTPUT_COLUMN).innerText;
@@ -1247,7 +1263,7 @@ async function uploadZip(zipFile, isProblem = false) {
                 // Get the content of the file
                 if (relativePath === "ImageMapping.json") {
                     zipEntry.async('text').then(function (content) {
-                        console.log(content);
+                        // console.log(content);
                         dictImageMapping = JSON.parse(content);
                     });
                 }

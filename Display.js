@@ -346,6 +346,19 @@ class Display {
         let label = document.createElement("span");
         label.classList.add("guess-comment");
         label.style.display = "none";
+        label.addEventListener("focus", function() {
+            if (label.textContent === "Text") {
+                label.textContent = "";
+                label.style.color = "rgba(0, 0, 0)";
+            }
+        });
+
+        label.addEventListener("blur", function() {
+            if (label.textContent === "") {
+                label.textContent = "Text";
+                label.style.color = "rgba(0, 0, 0, 0.5)";
+            }
+        });
         const imageKey = JSON.stringify({table_name: 'guess-output-table', row: row});
         if (imageKey in dictCommentMapping) {
             let htmlText = dictCommentMapping[imageKey].replace(/\n/g, '<br>');
@@ -1412,6 +1425,7 @@ class Display {
                 }
             }
         }
+        checkAnswerCorrect();
         display.createInputTableEditBorder();
         display.createOutputTableEditBorder();
         this.UpdateInputToggle();
