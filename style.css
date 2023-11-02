@@ -924,9 +924,6 @@ select option:checked {
     text-align: left;
 }
 
-.dropdown:hover .dropdown-content {
-    display: block;
-}
 
 .dropdown-content label {
     display: inline-block;

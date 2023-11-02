@@ -1531,6 +1531,24 @@ window.onload = function(){
     document.getElementById("difficulty_level").innerText = "Level: " + document.getElementById("difficulty_slide").value;
     $("#input-table tr:first").hide();
     $("#input-table tr td:nth-child(1)").hide();
+    $(".dropbtn").click(function(){
+        $(".dropdown-content").toggle();
+    });
+    $(".dropbtn").mouseenter(function(){
+        $(".dropdown-content").show();
+    });
+
+    $(document).click(function(event) {
+        if (!$(event.target).closest('.dropdown').length) {
+            $(".dropdown-content").hide();
+        }
+    });
+
+    $(".dropdown-content").click(function(event) {
+        event.stopPropagation();
+    });
+
+    $(".dropdown-content").hide();
 }
 
 // initialize all classes
