@@ -463,7 +463,6 @@ article > section {
 .weights {
     padding:0.5vw;
     font-size: 2vw;
-    background-color: #f2f2f2;
 }
 
 .weight_label {
@@ -549,7 +548,7 @@ mark {
     margin: auto;
     /*height: 1em;*/
     line-height: 1em;
-
+    background-color: #f2f2f2;
 }
 
 span {
@@ -924,6 +923,9 @@ select option:checked {
     text-align: left;
 }
 
+/*.dropdown:hover .dropdown-content {*/
+/*    display: block;*/
+/*}*/
 
 .dropdown-content label {
     display: inline-block;

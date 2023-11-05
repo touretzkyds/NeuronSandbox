@@ -1068,15 +1068,8 @@ function addThresholdEditOption() {
         const textbox = document.getElementById(`th1`);
         let editable = toggleBtn.classList.contains("edit-toggle-on");
         textbox.contentEditable = editable;
-        if (editable) {
-            if (!textbox.classList.contains("weights")) {
-                textbox.classList.add("weights");
-            }
-        }
-        else {
-            if (textbox.classList.contains("weights")) {
-                textbox.classList.remove("weights");
-            }
+        if (!textbox.classList.contains("weights")) {
+            textbox.classList.add("weights");
         }
         dataOp.makeEditable(textbox, editable);
         setupQuestionFields();
@@ -1534,9 +1527,6 @@ window.onload = function(){
     $(".dropbtn").click(function(){
         $(".dropdown-content").toggle();
     });
-    $(".dropbtn").mouseenter(function(){
-        $(".dropdown-content").show();
-    });
 
     $(document).click(function(event) {
         if (!$(event.target).closest('.dropdown').length) {
@@ -1544,11 +1534,15 @@ window.onload = function(){
         }
     });
 
+    $('.dropbtn').on('keydown', function (event) {
+        if (event.key === 'Escape' || event.keyCode === 27) {
+            $(".dropdown-content").hide();
+        }
+    })
+
     $(".dropdown-content").click(function(event) {
         event.stopPropagation();
     });
-
-    $(".dropdown-content").hide();
 }
 
 // initialize all classes
