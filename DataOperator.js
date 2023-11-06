@@ -131,7 +131,7 @@ class DataOperator {
     }
 
     // make editable and update demo on edit
-    makeEditable(textbox, editable = true){
+    makeEditable(textbox, editable = true, setFocusoutHandler = true){
         if (textbox.id === "activation" || textbox.id === "output" || textbox.id === "desired")
             return
         textbox.contentEditable = editable;
@@ -154,20 +154,20 @@ class DataOperator {
             if (document.getElementById('OutputToggle').checked)
                 demo.hasNoSolution();
 
-
             //console.trace()
-            textbox.addEventListener("focusout", function(event){
-                demo.update(this);
-                display.checkForSuccess();
-                let identify = this?.id
-                if (identify !== "th1" && !(new RegExp('^w[0-9]+$', 'gm').test(identify))) { //checks if not threshold, or any of the weight textboxes
-                    if (this?.tagName !== 'TH' && this.parentNode?.tagName !== 'TH') {
-                        if (!textbox.innerHTML)
-                            textbox.innerHTML = 0;
+            if(setFocusoutHandler) {
+                textbox.addEventListener("focusout", function (event) {
+                    demo.update(this);
+                    display.checkForSuccess();
+                    let identify = this?.id
+                    if (identify !== "th1" && !(new RegExp('^w[0-9]+$', 'gm').test(identify))) { //checks if not threshold, or any of the weight textboxes
+                        if (this?.tagName !== 'TH' && this.parentNode?.tagName !== 'TH') {
+                            if (!textbox.innerHTML)
+                                textbox.innerHTML = 0;
+                        }
                     }
-                }
-            });
-
+                });
+            }
         }
         if (editable) {
             if (textbox.nodeName !== "TH" && !textbox.classList.contains("editable-border"))
@@ -187,6 +187,24 @@ class DataOperator {
                 demo.update(this);
             }
         };
+
     }
 
+    setFocusoutEventListener(textbox) {
+        if(textbox && !textbox.classList.contains("focus-listener-installed"))
+        {
+            textbox.classList.add("focus-listener-installed");
+            textbox.addEventListener("focusout", function (event) {
+                demo.update(this);
+                display.checkForSuccess();
+                let identify = this?.id
+                if (identify !== "th1" && !(new RegExp('^w[0-9]+$', 'gm').test(identify))) { //checks if not threshold, or any of the weight textboxes
+                    if (this?.tagName !== 'TH' && this.parentNode?.tagName !== 'TH') {
+                        if (!textbox.innerHTML)
+                            textbox.innerHTML = 0;
+                    }
+                }
+            });
+        }
+    }
 }

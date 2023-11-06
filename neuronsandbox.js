@@ -357,6 +357,22 @@ function checkAnswerCorrect() {
                 activationRow.children[0].classList.add('blue-text');
             }
 
+            if (!document.getElementById("BinaryToggle").checked)
+            {
+                for(let j = 0; j < inputRow.children.length; j++)
+                {
+                    let inputValue = parseFloat(inputRow.children[j].textContent);
+                    if (inputValue > 0) {
+                        inputRow.children[j].classList.remove('blue-text', 'red-text');
+                    } else if (inputValue < 0) {
+                        inputRow.children[j].classList.remove('blue-text');
+                        inputRow.children[j].classList.add('red-text');
+                    } else {
+                        inputRow.children[j].classList.remove('red-text');
+                        inputRow.children[j].classList.add('blue-text');
+                    }
+                }
+            }
 
             let cells = outputTable.rows.item(i).cells
             let output = cells.item(OUTPUT_COLUMN).innerText;
@@ -1052,15 +1068,8 @@ function addThresholdEditOption() {
         const textbox = document.getElementById(`th1`);
         let editable = toggleBtn.classList.contains("edit-toggle-on");
         textbox.contentEditable = editable;
-        if (editable) {
-            if (!textbox.classList.contains("weights")) {
-                textbox.classList.add("weights");
-            }
-        }
-        else {
-            if (textbox.classList.contains("weights")) {
-                textbox.classList.remove("weights");
-            }
+        if (!textbox.classList.contains("weights")) {
+            textbox.classList.add("weights");
         }
         dataOp.makeEditable(textbox, editable);
         setupQuestionFields();
@@ -1247,7 +1256,7 @@ async function uploadZip(zipFile, isProblem = false) {
                 // Get the content of the file
                 if (relativePath === "ImageMapping.json") {
                     zipEntry.async('text').then(function (content) {
-                        console.log(content);
+                        // console.log(content);
                         dictImageMapping = JSON.parse(content);
                     });
                 }
@@ -1515,6 +1524,25 @@ window.onload = function(){
     document.getElementById("difficulty_level").innerText = "Level: " + document.getElementById("difficulty_slide").value;
     $("#input-table tr:first").hide();
     $("#input-table tr td:nth-child(1)").hide();
+    $(".dropbtn").click(function(){
+        $(".dropdown-content").toggle();
+    });
+
+    $(document).click(function(event) {
+        if (!$(event.target).closest('.dropdown').length) {
+            $(".dropdown-content").hide();
+        }
+    });
+
+    $('.dropbtn').on('keydown', function (event) {
+        if (event.key === 'Escape' || event.keyCode === 27) {
+            $(".dropdown-content").hide();
+        }
+    })
+
+    $(".dropdown-content").click(function(event) {
+        event.stopPropagation();
+    });
 }
 
 // initialize all classes
