@@ -150,10 +150,10 @@
 
                         </div>
                         <div>
-                            <input id="upload-file" style="display:none;" type="file" accept=".sandbox" onchange="console.log('event = ', event); uploadFile(event)"/>
+                            <input id="upload-file" style="display:none;" type="file" accept=".sandbox" onchange="uploadFile(event)"/>
                         </div>
                         <div>
-                            <input id="upload-image_file" style="display:none;" type="file" accept="image/*" onchange="console.log('event = ', event); uploadImageFile(event)"/>
+                            <input id="upload-image_file" style="display:none;" type="file" accept="image/*" onchange="uploadImageFile(event)"/>
                         </div>
                         <div>
                             <a style = "margin-top: 19%" href="javascript:uploadFileComputer();" class="custom-btn myButton">
@@ -239,12 +239,12 @@
                     </div>
                 </div>
             </th>
-<!--            <th>-->
-<!--                <div id="progress-bar" class="progress-bar">-->
-<!--                    <div id="progress_bar" class="progress-bar-fill" style="width: 50%;"></div>-->
-<!--                    <div id="progress_bar_text" class="progress-bar-text">50</div>-->
-<!--                </div>-->
-<!--            </th>-->
+            <!--            <th>-->
+            <!--                <div id="progress-bar" class="progress-bar">-->
+            <!--                    <div id="progress_bar" class="progress-bar-fill" style="width: 50%;"></div>-->
+            <!--                    <div id="progress_bar_text" class="progress-bar-text">50</div>-->
+            <!--                </div>-->
+            <!--            </th>-->
             <th>
                 <a style="margin-top: 19%" id= "CheckAnswerBtn" onmousedown="event.preventDefault();display.checkGuessResult(); " onmouseup="event.preventDefault(); display.removeGuessHighlight();" class="custom-btn myButton">
                     <i class="fa" aria-hidden="true"></i> Press to Check

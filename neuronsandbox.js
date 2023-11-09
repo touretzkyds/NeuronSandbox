@@ -326,7 +326,10 @@ function checkAnswerCorrect() {
     let outputTable = document.getElementById("output-table")
     let activationTable = document.getElementById("activation-table")
     let guessToggle = document.getElementById("DemoToggle")
+    let editToggle = document.getElementById("InputToggle")
     let thresholdText = document.getElementById("th1")
+    let biasContent = document.getElementById("bias-text")
+
     let outputToggleChecked = document.getElementById("OutputToggle").checked
     let tableRows = outputTable.rows.length
     let isCorrect = true;
@@ -339,6 +342,26 @@ function checkAnswerCorrect() {
     } else {
         thresholdText.classList.remove('red-text');
         thresholdText.classList.add('blue-text');
+    }
+
+    if(biasContent) {
+        let biasValue = parseFloat(biasContent.textContent);
+        if (biasValue > 0) {
+            biasContent.classList.remove('blue-text', 'red-text');
+        } else if (biasValue < 0) {
+            biasContent.classList.remove('blue-text');
+            biasContent.classList.add('red-text');
+        } else {
+            biasContent.classList.remove('red-text');
+            biasContent.classList.add('blue-text');
+        }
+    }
+
+    let inputTableHeaders = document.querySelectorAll(".input-table-th");
+    if(inputTableHeaders) {
+        for( let i = 0; i < inputTableHeaders.length; i++) {
+            dataOp.makeEditable(inputTableHeaders[i], editToggle.checked);
+        }
     }
 
     if(!guessToggle.checked) {
@@ -1520,7 +1543,7 @@ async function uploadImageFile(event) {
 
 
 window.onload = function(){
-    console.log("window loaded")
+    //console.log("window loaded")
     document.getElementById("difficulty_level").innerText = "Level: " + document.getElementById("difficulty_slide").value;
     $("#input-table tr:first").hide();
     $("#input-table tr td:nth-child(1)").hide();
@@ -1619,7 +1642,6 @@ function addTooltips()
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    demo.main().catch(e => console.error(e));
     addTooltips();
 });
 

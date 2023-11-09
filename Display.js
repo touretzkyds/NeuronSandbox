@@ -253,7 +253,7 @@ class Display {
         let binaryCheckbox = document.getElementById("BinaryToggle");
         let editCheckbox = document.getElementById("InputToggle");
         let editable = false
-        if (!binaryCheckbox.checked)
+        if (!binaryCheckbox.checked )
             editable = true
         let n = inputTable.rows.length;
         for (let i = 2; i < n; i++) {
@@ -825,7 +825,7 @@ class Display {
         const circle = document.getElementById("circle");
 
         let c = document.getElementById('circle');
-        console.log(getComputedStyle(c).width, getComputedStyle(c).height, getComputedStyle(c).top, getComputedStyle(c).left)
+        //console.log(getComputedStyle(c).width, getComputedStyle(c).height, getComputedStyle(c).top, getComputedStyle(c).left)
 
         //TODO: refactor names to minLineSize
         const minLineSize = 0.0
@@ -1203,8 +1203,7 @@ class Display {
                 }
                 headerRowVals.push(headerInputHtml);
             }
-            else
-                console.log("missing input")
+
         }
     }
 
@@ -1227,8 +1226,7 @@ class Display {
                 //let weightCheckbox = document.getElementById(`checkbox_weight_editable${c}`);
                 headerRowVals.push(new VariableData(headerInput.innerText, headerInputHtml, editToggle.classList.contains("edit-toggle-on")));
             }
-            else
-                console.log("missing input")
+
         }
     }
 
