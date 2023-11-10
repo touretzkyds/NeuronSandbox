@@ -357,10 +357,10 @@ function checkAnswerCorrect() {
         }
     }
 
-    let inputTableHeaders = document.querySelectorAll(".input-table-th");
+    let inputTableHeaders = document.querySelectorAll('[id^="tblinput"]');
     if(inputTableHeaders) {
         for( let i = 0; i < inputTableHeaders.length; i++) {
-            dataOp.makeEditable(inputTableHeaders[i], editToggle.checked);
+            dataOp.makeEditable(inputTableHeaders[i], editToggle.checked, true);
         }
     }
 
