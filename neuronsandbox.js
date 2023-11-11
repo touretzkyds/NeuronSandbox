@@ -369,7 +369,7 @@ function checkAnswerCorrect() {
             let row = outputTable.rows.item(i);
             let inputRow = inputTable.rows.item(i+1);
             let activationRow = activationTable.rows.item(i);
-            let activationValue = parseInt(activationRow.children[0].textContent);
+            let activationValue = parseFloat(activationRow.children[0].textContent);
             if (activationValue > 0) {
                 activationRow.children[0].classList.remove('blue-text', 'red-text');
             } else if (activationValue < 0) {
