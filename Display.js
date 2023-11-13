@@ -824,10 +824,6 @@ class Display {
 
         const circle = document.getElementById("circle");
 
-        let c = document.getElementById('circle');
-        //console.log(getComputedStyle(c).width, getComputedStyle(c).height, getComputedStyle(c).top, getComputedStyle(c).left)
-
-        //TODO: refactor names to minLineSize
         const minLineSize = 0.0
         const maxLineSize = 6.0
         const newMinLineSize = 2.0
@@ -878,7 +874,13 @@ class Display {
                 })
             );
             demo.biasLine.path = "straight";
-            demo.biasLine.color = DEFAULT_LINE_COLOR;
+            let biasValue = parseFloat(document.getElementById("bias-text").innerText)
+            if (biasValue === 0)
+                demo.biasLine.color = ZERO_WEIGHT;
+            else if (biasValue > 0)
+                demo.biasLine.color = DEFAULT_LINE_COLOR;
+            else
+                demo.biasLine.color = NEGATIVE_WEIGHT;
         }
         else {
             if (demo.biasLine) {
