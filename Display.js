@@ -253,7 +253,7 @@ class Display {
         let binaryCheckbox = document.getElementById("BinaryToggle");
         let editCheckbox = document.getElementById("InputToggle");
         let editable = false
-        if (!binaryCheckbox.checked)
+        if (!binaryCheckbox.checked )
             editable = true
         let n = inputTable.rows.length;
         for (let i = 2; i < n; i++) {
@@ -824,10 +824,6 @@ class Display {
 
         const circle = document.getElementById("circle");
 
-        let c = document.getElementById('circle');
-        console.log(getComputedStyle(c).width, getComputedStyle(c).height, getComputedStyle(c).top, getComputedStyle(c).left)
-
-        //TODO: refactor names to minLineSize
         const minLineSize = 0.0
         const maxLineSize = 6.0
         const newMinLineSize = 2.0
@@ -878,7 +874,13 @@ class Display {
                 })
             );
             demo.biasLine.path = "straight";
-            demo.biasLine.color = DEFAULT_LINE_COLOR;
+            let biasValue = parseFloat(document.getElementById("bias-text").innerText)
+            if (biasValue === 0)
+                demo.biasLine.color = ZERO_WEIGHT;
+            else if (biasValue > 0)
+                demo.biasLine.color = DEFAULT_LINE_COLOR;
+            else
+                demo.biasLine.color = NEGATIVE_WEIGHT;
         }
         else {
             if (demo.biasLine) {
@@ -1203,8 +1205,7 @@ class Display {
                 }
                 headerRowVals.push(headerInputHtml);
             }
-            else
-                console.log("missing input")
+
         }
     }
 
@@ -1227,8 +1228,7 @@ class Display {
                 //let weightCheckbox = document.getElementById(`checkbox_weight_editable${c}`);
                 headerRowVals.push(new VariableData(headerInput.innerText, headerInputHtml, editToggle.classList.contains("edit-toggle-on")));
             }
-            else
-                console.log("missing input")
+
         }
     }
 

@@ -212,7 +212,7 @@ class Table {
         let th = document.createElement('th'); //column
         th.innerHTML = "<div lang=\"en\" class=\"input-content\">" + "x<sub>" + newNameIndex + "</sub>" + "</div>";
         th.setAttribute("id", `tblinput${newCol}`);
-        dataOp.makeEditable(th);
+        dataOp.makeEditable(th, makeEditable);
 
         this.table.rows[1].insertBefore(th, this.table.rows[1].children[c]);
 
