@@ -14,6 +14,18 @@ function restoreDesiredValues( desired_values)
     for(i = 1; i < outputTable.rows.length; i++) {
         outputTable.rows[i].cells[DESIRED_OUTPUT_COLUMN].innerText = desired_values[i-1];
     }
+
+    let activationCol = document.getElementById("activation-table");
+    let outputTableLength = outputTable.rows.length;
+
+    for (let i = 1; i < outputTableLength; i++) {
+        //var tr = outputCol.rows[i];
+        let output = outputTable.rows[i].cells[OUTPUT_COLUMN];
+        let desired = outputTable.rows[i].cells[DESIRED_OUTPUT_COLUMN];
+        let activation = activationCol.rows[i].cells[ACTIVATION_COLUMN]
+
+        display.checkDesiredOutput(output, desired, activation);
+    }
 }
 
 function setupGenerateTruthTable(columnChanged) {
@@ -24,8 +36,10 @@ function setupGenerateTruthTable(columnChanged) {
     var truthData = dataOp.createBinaryData(inputTable.numCols);
     demo.removeAllInputDataRows(false);
     writeTruthTable(truthData);
-    if(!columnChanged)
+    if(!columnChanged) {
         restoreDesiredValues(desire_values);
+    }
+
     //restore desired value
     // });
 }
