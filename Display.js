@@ -1524,6 +1524,32 @@ class Display {
         }
     }
 
+    UpdatePlotlyToggle() {
+        let plotlyToggle = document.getElementById("PlotlyToggle");
+        let outputTable = document.getElementById("output-table");
+        let activationTable = document.getElementById("activation-table");
+        let plotlyContainer = document.getElementById("plotly-container");
+        if (plotlyToggle.checked) { // in graph mode
+            // remove/make invisible output table
+            outputTable.style.display = "none";
+            activationTable.style.display = "none";
+            plotlyContainer.style.display = "block";
+
+        } else {
+            outputTable.style.display = "block";
+            activationTable.style.display = "block";
+            plotlyContainer.style.display = "none";
+        }
+
+        this.outputLine.position();
+        for (let i = 0; i < demo.weightLines.length; i++) {
+            demo.weightLines[i].position();
+        }
+        if (demo.biasLine) {
+            demo.biasLine.position();
+        }
+    }
+
     checkDesiredOutput(output, desired, activation) {
         //TODO: do extra testing with the regex and make changes if necessary
         if (!output)

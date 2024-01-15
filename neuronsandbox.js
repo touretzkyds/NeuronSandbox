@@ -1685,6 +1685,10 @@ $('#DemoToggle').change(function() { //toggle output
     display.UpdateDemoToggle();
 });
 
+$('#PlotlyToggle').change(function() { //toggle plotly
+    display.UpdatePlotlyToggle();
+});
+
 $('#biasToggle').change(function() { //toggle bias
     display.updateBiasToggle();
 });
