@@ -2,6 +2,7 @@
     position: relative;
     width: 300px;
     margin: 50px;
+    left: 30%;
 }
 
 .slider-plotly {

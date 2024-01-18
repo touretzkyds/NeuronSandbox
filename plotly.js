@@ -798,6 +798,9 @@ function updatePlotlyData(div, newData, traceNum) {
 }
 
 function initialize () {
+    initAllSliders();
+    updateAllSliders();
+
     let w1 = document.getElementById('weight1').value
     let w2 = document.getElementById('weight2').value
     let t = document.getElementById('threshold').value
@@ -1298,4 +1301,56 @@ function reverseSign() {
     weight1Value.innerText = weights[0] + "";
     weight2Value.innerText= weights[1] + "";
     thresholdValue.innerText = threshold[0] + "";
+}
+
+function updateSlider(slider, colorBar, sliderValueDisplay) {
+    var value = parseFloat(slider.value);
+    var percentage = Math.abs(value * 10); // Scale the percentage for 200-unit range
+
+    // Update color bar
+    if (value >= 0) {
+        colorBar.style.left = '50%';
+        colorBar.style.right = (50 - percentage) + '%';
+        colorBar.style.backgroundColor = value === 0 ? 'blue' : 'black'; // Black for positive, blue for zero
+    } else {
+        colorBar.style.right = '50%';
+        colorBar.style.left = (50 - percentage) + '%';
+        colorBar.style.backgroundColor = 'red'; // Red for negative
+    }
+
+    // Update slider value and color
+    sliderValueDisplay.textContent = value;
+    sliderValueDisplay.style.color = value === 0 ? 'blue' : (value > 0 ? 'black' : 'red');
+
+    // Calculate the position for the value display
+    var sliderWidth = slider.offsetWidth === 0? 300 : slider.offsetWidth;
+    var newLeft = (((10 * value) / 100)) * sliderWidth + 130;
+    if (value > 0) {
+        newLeft = (((10 * value) / 100)) * sliderWidth + 130;
+    }
+    sliderValueDisplay.style.left = newLeft + 'px';
+}
+
+function updateAllSliders() {
+    let sliders = document.getElementsByClassName("slider-plotly"); // gets all sliders
+    let colorBars = document.getElementsByClassName("color-bar");
+    let sliderValueDisplays = document.getElementsByClassName("slider-value");
+
+    for (let i = 0; i < sliders.length; i++) {
+        updateSlider(sliders[i], colorBars[i], sliderValueDisplays[i]);
+
+    }
+}
+
+function initAllSliders() {
+    let sliders = document.getElementsByClassName("slider-plotly"); // gets all sliders
+    let colorBars = document.getElementsByClassName("color-bar");
+    let sliderValueDisplays = document.getElementsByClassName("slider-value");
+
+    for (let i = 0; i < sliders.length; i++) {
+        sliders[i].oninput = function() {
+            updateSlider(sliders[i], colorBars[i], sliderValueDisplays[i]);
+        };
+    }
+
 }
