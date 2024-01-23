@@ -469,26 +469,35 @@
                     <div id="plotly-container" style="display: none; margin-right: 10%" class="right">
                         <div id="tester"></div>
                         <button type="button" id="revSignButton" onclick="reverseSign(); updateAllSliders()">Flip Sign</button>
-                        <div class="slider-container">
-                            <label for="weight1">Peanut Butter</label>
-                            <div class="color-bar" id="colorBar"></div>
-                            <input type="range" min="-5" max="5" value="1" class="slider-plotly" step="0.01" id="weight1">
-                            <span id="weight1_val" class="slider-value">1</span> <!-- Value display -->
+
+                        <div style="display:flex; flex-direction: row; justify-content: center; align-items: center">
+                            <label style="margin-right: -30%" for="weight1">Peanut Butter</label>
+                            <div class="slider-container">
+                                <div class="color-bar" id="colorBar"></div>
+                                <input type="range" min="-5" max="5" value="1" class="slider-plotly" step="0.01" id="weight1">
+                                <span id="weight1_val" class="slider-value">1</span> <!-- Value display -->
+                            </div>
                         </div>
 
-                        <div class="slider-container">
-                            <label for="weight2">Jelly</label>
-                            <div class="color-bar" id="colorBar2"></div>
-                            <input type="range" min="-5" max="5" value="1" class="slider-plotly" step="0.01" id="weight2">
-                            <span id="weight2_val" class="slider-value">1</span> <!-- Value display -->
+
+                        <div style="display:flex; flex-direction: row; justify-content: center; align-items: center">
+                            <label style="margin-right: -30%" for="weight2">Jelly</label>
+                            <div class="slider-container">
+                                <div class="color-bar" id="colorBar2"></div>
+                                <input type="range" min="-5" max="5" value="1" class="slider-plotly" step="0.01" id="weight2">
+                                <span id="weight2_val" class="slider-value">1</span> <!-- Value display -->
+                            </div>
                         </div>
 
-                        <div class="slider-container">
-                            <label for="threshold">Threshold</label>
-                            <div class="color-bar" id="colorBar3"></div>
-                            <input type="range" min="-5" max="5" value="1.5" class="slider-plotly" step="0.01" id="threshold">
-                            <span id="threshold_val" class="slider-value">1.5</span> <!-- Value display -->
+                        <div style="display:flex; flex-direction: row; justify-content: center; align-items: center">
+                            <label style="margin-right: -30%" for="threshold">Threshold</label>
+                            <div class="slider-container">
+                                <div class="color-bar" id="colorBar3"></div>
+                                <input type="range" min="-5" max="5" value="1.5" class="slider-plotly" step="0.01" id="threshold">
+                                <span id="threshold_val" class="slider-value">1.5</span> <!-- Value display -->
+                            </div>
                         </div>
+
                     </div>
                 </div>
 

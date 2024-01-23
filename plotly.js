@@ -24,6 +24,16 @@ let LINE_COLOR_ACTIVE = 'rgb(55, 128, 191)';
 let LINE_COLOR_INACTIVE = 'rgb(163, 163, 162)'; // CURRENTLY NOT USED
 let INCORRECT_COLOR = 'rgba(0, 0, 0, 0.95)';
 
+function generateOutputData() {
+    let outputTable = document.getElementById('output-table');
+    let outputData = Array(outputs.data.length).fill(0);
+    for (let i = 1; i < outputTable.rows.length; i++) {
+        outputData[i-1] = parseFloat(outputTable.rows[i].cells[1].innerText);
+
+    }
+    return outputData;
+}
+
 function main() {
     initialize();
     document.getElementById('tester2').on('plotly_relayout', function(eventData) {
@@ -68,6 +78,7 @@ function main() {
 }
 
 function createTraces(inputs, outputs, weights, threshold) {
+
     // let ranges = [[-0.5, -0.5], [-0.5, 1.5], [1.5, -0.5], [1.5, 1.5]]
     let calculatedVals = calculateInputs(inputs, outputs, weights, threshold, ranges)
     let trueX = calculatedVals[0] // input x-coords that are marked true
@@ -258,6 +269,7 @@ function createTraces(inputs, outputs, weights, threshold) {
     let data = [boundsX, boundsY, line, lineEndpoints, lineMidpoint, falsePoints, truePoints, incorrectlyTrue, incorrectlyFalse, plus, minus];
 
     let layout = {
+        autosize: false,
         title: 'Problem Name',
         xaxis: {
             title: "Peanut Butter",
@@ -277,6 +289,9 @@ function createTraces(inputs, outputs, weights, threshold) {
             },
             range: [-0.5, 1.5],
             tickvals: [0, 1]
+        },
+        margin: {
+            t: 50
         },
         width: 600,
         height: 600,
@@ -807,7 +822,8 @@ function initialize () {
     let weights = [w1, w2]
     let threshold = [t]
 
-    let result = createTraces(inputs, outputs, weights, threshold);
+    let outputData = generateOutputData();
+    let result = createTraces(inputs.data, outputData, weights, threshold);
     let data = result[0];
     let layout = result[1];
     let data2 = result[2];
@@ -897,7 +913,8 @@ function initialize () {
                         let newThreshold = [roundedC];
 
                         // update the traces
-                        let updated = createTraces(inputs, outputs, newWeights, newThreshold)
+                        let outputData = generateOutputData();
+                        let updated = createTraces(inputs.data, outputData, newWeights, newThreshold)
                         let updatedData = updated[0];
                         let updatedLayout = updated[1];
 
@@ -930,7 +947,8 @@ function initialize () {
                 let weight2Slider = document.getElementById('weight2');
                 let thresholdSlider = document.getElementById('threshold');
 
-                let updated = createTraces(inputs, outputs, [weight1Slider.value, weight2Slider.value], [thresholdSlider.value])
+                let outputData = generateOutputData();
+                let updated = createTraces(inputs.data, outputData, [weight1Slider.value, weight2Slider.value], [thresholdSlider.value])
 
                 let updatedData = updated[0];
                 let updatedLayout = updated[1];
@@ -1050,6 +1068,9 @@ function initialize () {
 
                     else if (clickedData.points[i].data.nsLineMidpoint)
                         pointClicked = 1;
+                }
+                else {
+                    correctTrace = false;
                 }
                 colors = clickedData.points[i].data.marker.color;
                 sizeC = clickedData.points[i].data.marker.size;
@@ -1250,20 +1271,21 @@ function checkDist(x, y) {
 }
 
 function run () {
-    let inputs = [
-        [0, 0],
-        [0, 1],
-        [1, 0],
-        [1, 1]
-    ]
-    let outputs = [0, 0, 0, 1]
+    // let inputs = [
+    //     [0, 0],
+    //     [0, 1],
+    //     [1, 0],
+    //     [1, 1]
+    // ]
+    // let outputs = [0, 0, 0, 1]
     let w1 = document.getElementById('weight1').value;
     let w2 = document.getElementById('weight2').value;
     let t = document.getElementById('threshold').value;
     let weights = [w1, w2];
     let threshold = [t];
 
-    let result = createTraces(inputs, outputs, weights, threshold);
+    let outputData = generateOutputData();
+    let result = createTraces(inputs.data, outputData, weights, threshold);
     let data = result[0];
     let layout = result[1];
     let data2 = result[2];
@@ -1283,7 +1305,8 @@ function reverseSign() {
     let weights = [-1 * weight1Slider.value, -1 * weight2Slider.value]
     let threshold = [-1 * thresholdSlider.value]
 
-    let updated = createTraces(inputs, outputs, weights, threshold)
+    let outputData = generateOutputData();
+    let updated = createTraces(inputs.data, outputData, weights, threshold)
     let updatedData = updated[0];
     let updatedLayout = updated[1];
 
