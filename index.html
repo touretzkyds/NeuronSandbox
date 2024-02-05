@@ -467,8 +467,10 @@
                         </div>
                     </div>
                     <div id="plotly-container" style="display: none; margin-right: 10%" class="right">
-                        <div id="tester"></div>
-                        <button type="button" id="revSignButton" onclick="reverseSign(); updateAllSliders()">Flip Sign</button>
+                        <div style="position: relative">
+                            <div id="tester"></div>
+                            <button style="position: absolute; margin-top: -15%; left: 90px" type="button" id="revSignButton" onclick="reverseSign(); updateAllSliders()">Flip Sign</button>
+                        </div>
 
                         <div style="display:flex; flex-direction: row; justify-content: center; align-items: center">
                             <label style="margin-right: -30%" for="weight1">Peanut Butter</label>

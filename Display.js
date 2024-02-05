@@ -668,6 +668,21 @@ class Display {
 
         outputHeaderContainer.style.width = (rightOutputTable - leftActivTable) + 'px';
 
+        let plotlySlider = document.getElementById("PlotlyToggle");
+        if (plotlySlider.checked) {
+            let plotlyDisplay = document.getElementById('tester');
+            rightOutputTable = plotlyDisplay.getBoundingClientRect().right + 70;
+            leftActivTable =  plotlyDisplay.getBoundingClientRect().left;
+            widthOutputText = getComputedStyle(outputText).width;
+            widthOutputText = parseInt(widthOutputText.substring(0, widthOutputText.length -2));
+
+
+            outputTotalWidth = rightOutputTable - leftActivTable;
+            outputLineWidth = (outputTotalWidth - widthOutputText)/2;
+
+            outputHeaderContainer.style.width = (rightOutputTable - leftActivTable) + 'px';
+        }
+
         //INPUT LINES
         let inputLine1 = document.getElementById("line1")
         let inputLine2 = document.getElementById("line2")
@@ -692,8 +707,8 @@ class Display {
         }
 
         //OUTPUT LINES
-        let outputLine1 = document.getElementById("line1o")
-        let outputLine2 = document.getElementById("line2o")
+        let outputLine1 = document.getElementById("line1o");
+        let outputLine2 = document.getElementById("line2o");
 
         outputLine1.innerText = ""
         let oline1Width = getComputedStyle(outputLine1).width
