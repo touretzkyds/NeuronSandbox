@@ -912,6 +912,9 @@ class Demo {
         hintText.innerText = "";
         display.createInputLabelLines()
 
+        //TODO: instead of initialize, change to an "update" function
+        initialize();
+
     }
 
     // convert to valid inputs for processing and keep track of invalid parts of input

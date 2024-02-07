@@ -274,7 +274,8 @@ function createTraces(inputs, outputs, weights, threshold) {
             title: "Peanut Butter",
             nticks: 2,
             range: [-0.5, 1.5],
-            tickvals: [0, 1]
+            tickvals: [0, 1],
+            fixedrange: true,
         },
         yaxis: {
             title: "Jelly",
@@ -287,7 +288,8 @@ function createTraces(inputs, outputs, weights, threshold) {
                 }
             },
             range: [-0.5, 1.5],
-            tickvals: [0, 1]
+            tickvals: [0, 1],
+            fixedrange: true
         },
         margin: {
             t: 50
@@ -316,6 +318,7 @@ function createTraces(inputs, outputs, weights, threshold) {
                 opacity: 0.2, layer: 'below'
             },
         ],
+        doubleClick: false
 
 
     };
@@ -815,6 +818,19 @@ function initialize () {
     initAllSliders();
     updateAllSliders();
 
+    // The selected-inputs table will give us all the input header names
+    let inputTable = document.getElementById('selected-inputs');
+
+    let labels = document.getElementsByClassName('slider-label');
+    for (let i = 0; i < inputTable.rows.length; i++) {
+        let row = inputTable.rows[i];
+        let cell = row.cells[0];
+
+        labels[i].innerText = cell.innerText;
+    }
+    // document.getElementById('weight1-label').innerText =
+
+
     let w1 = document.getElementById('weight1').value
     let w2 = document.getElementById('weight2').value
     let t = document.getElementById('threshold').value
@@ -871,6 +887,7 @@ function initialize () {
                         // check if we placed point in an illegal place (both points on one of the border axes)
 
                         let newData = changeLineByEndpoint(plotlyDiv.data, coords); //changes the line based on what loc we pressed on the graph
+
                         let traceNum = 0;
                         for (let i = 0; i < plotlyDiv.data.length; i++) {
                             if (plotlyDiv.data[i].nsLine)
@@ -915,25 +932,6 @@ function initialize () {
                         let updatedData = updated[0];
                         let updatedLayout = updated[1];
 
-                        // update the values in sliders + text
-                        // let weight1Value = document.getElementById('weight1_val');
-                        // let weight2Value = document.getElementById('weight2_val');
-                        // let thresholdValue = document.getElementById('threshold_val');
-
-                        // weight1Slider.value = roundedA;
-                        // weight2Slider.value = roundedB;
-                        // thresholdSlider.value = roundedC;
-                        // weight1Value.innerText = roundedA + "";
-                        // weight2Value.innerText = roundedB + "";
-                        // thresholdValue.innerText = roundedC + "";
-                        //
-                        // let th1 = document.getElementById("th1");
-                        // let w1 = document.getElementById("w1");
-                        // let w2 = document.getElementById("w2");
-                        // th1.innerText = thresholdValue.innerText;
-                        // w1.innerText = weight1Value.innerText;
-                        // w2.innerText = weight2Value.innerText;
-                        //
                         updateValues(roundedA, roundedB, roundedC)
 
                         Plotly.react('tester', updatedData, updatedLayout);
@@ -959,8 +957,8 @@ function initialize () {
                 let updatedData = updated[0];
                 let updatedLayout = updated[1];
 
-                let traceNum = updatedData.findIndex(obj => obj.nsLine);
-                let traceNumPoint = updatedData.findIndex(obj => obj.nsLineMidpoint);
+                // let traceNum = updatedData.findIndex(obj => obj.nsLine);
+                // let traceNumPoint = updatedData.findIndex(obj => obj.nsLineMidpoint);
 
                 // TODO: add throw error statements in case trace numbers are -1 (findIndex did not find)
 
@@ -979,8 +977,8 @@ function initialize () {
                 }
 
                 Plotly.react('tester', updatedData, updatedLayout);
-                updatePlotlyData('tester', newData, traceNum)
-                updatePlotlyData('tester', linePoint, traceNumPoint)
+                // updatePlotlyData('tester', newData, traceNum)
+                // updatePlotlyData('tester', linePoint, traceNumPoint)
                 data = plotlyDiv.data;
 
                 pointClicked = -1;
@@ -1148,29 +1146,29 @@ function changeLineByMidpoint(data, coords) {
 
     let inBounds = true;
 
-    // get endpoints of line
-    // intersection w/ x = 0
-    let y_x0 = c/b
-    if (y_x0 <= 1 && y_x0 >= 0) {
-        intersections.push([0, y_x0])
-    }
-    // intersection w/ y = 0
-    let x_y0 = c/a
-    if (x_y0 <= 1 && x_y0 >= 0) {
-        intersections.push([x_y0, 0])
-    }
-    // intersection w/ x = 1
-    let y_x1 = (c-a)/b
-    if (y_x1 <= 1 && y_x1 >= 0) {
-        intersections.push([1, y_x1])
-    }
-    // intersection w/ y = 1
-    let x_y1 = (c-b)/a
-    if (x_y1 <= 1 && x_y1 >= 0) {
-        intersections.push([x_y1, 1])
-    }
+    // // get endpoints of line
+    // // intersection w/ x = 0
+    // let y_x0 = c/b
+    // if (y_x0 <= 1 && y_x0 >= 0) {
+    //     intersections.push([0, y_x0])
+    // }
+    // // intersection w/ y = 0
+    // let x_y0 = c/a
+    // if (x_y0 <= 1 && x_y0 >= 0) {
+    //     intersections.push([x_y0, 0])
+    // }
+    // // intersection w/ x = 1
+    // let y_x1 = (c-a)/b
+    // if (y_x1 <= 1 && y_x1 >= 0) {
+    //     intersections.push([1, y_x1])
+    // }
+    // // intersection w/ y = 1
+    // let x_y1 = (c-b)/a
+    // if (x_y1 <= 1 && x_y1 >= 0) {
+    //     intersections.push([x_y1, 1])
+    // }
 
-    if (intersections.length === 0) {
+    if (true) {
         inBounds = false;
         let y_x0b = (c+0.5*a)/b
         if (y_x0b <= 1.5 && y_x0b >= -0.5) {
@@ -1210,20 +1208,13 @@ function changeLineByMidpoint(data, coords) {
         lineObj.marker.size = Array(intersectionX.length).fill(0);
     }
 
-
-    // update the values in sliders
-
-    // let weight1Value = document.getElementById('weight1_val');
-    // let weight2Value = document.getElementById('weight2_val');
-    // let thresholdValue = document.getElementById('threshold_val');
-
     let roundedA = Math.ceil(a * 100) / 100;
     let roundedB = Math.ceil(b * 100) / 100;
     let roundedC = Math.ceil(c * 100) / 100;
 
     updateValues(roundedA, roundedB, roundedC)
 
-    return {type: lineObj.type, line: lineObj.line, marker: lineObj.marker, x: intersectionX, y:intersectionY, nsLine: true, inBounds: inBounds, hoverinfo: 'skip'}
+    return {type: lineObj.type, line: lineObj.line, marker: lineObj.marker, nsX: intersectionX, nsY: intersectionY, x: intersectionX, y:intersectionY, nsLine: true, inBounds: inBounds, hoverinfo: 'skip'}
 
 }
 
@@ -1345,19 +1336,6 @@ function reverseSign() {
     let updatedLayout = updated[1];
 
     Plotly.react('tester', updatedData, updatedLayout);
-
-    // update the values in sliders + text
-    // let weight1Value = document.getElementById('weight1_val');
-    // let weight2Value = document.getElementById('weight2_val');
-    // let thresholdValue = document.getElementById('threshold_val');
-    //
-    //
-    // weight1Slider.value = weights[0] ;
-    // weight2Slider.value = weights[1];
-    // thresholdSlider.value = threshold[0] ;
-    // weight1Value.innerText = weights[0] + "";
-    // weight2Value.innerText= weights[1] + "";
-    // thresholdValue.innerText = threshold[0] + "";
 
     updateValues(weights[0], weights[1], threshold[0])
 }

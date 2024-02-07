@@ -472,8 +472,8 @@
                             <button style="position: absolute; margin-top: -15%; left: 90px" type="button" id="revSignButton" onclick="reverseSign(); updateAllSliders()">Flip Sign</button>
                         </div>
 
-                        <div style="display:flex; flex-direction: row; justify-content: center; align-items: center">
-                            <label style="margin-right: -30%" for="weight1">Peanut Butter</label>
+                        <div style="display:flex; flex-direction: row; justify-content: right; align-items: center">
+                            <label class="slider-label" id="weight1-label" style="margin-right: -30%" for="weight1">Peanut Butter</label>
                             <div class="slider-container">
                                 <div class="color-bar" id="colorBar"></div>
                                 <input type="range" min="-5" max="5" value="1" class="slider-plotly" step="0.01" id="weight1">
@@ -482,8 +482,8 @@
                         </div>
 
 
-                        <div style="display:flex; flex-direction: row; justify-content: center; align-items: center">
-                            <label style="margin-right: -30%" for="weight2">Jelly</label>
+                        <div style="display:flex; flex-direction: row; justify-content: right; align-items: center">
+                            <label class="slider-label" id="weight2-label" style="margin-right: -30%" for="weight2">Jelly</label>
                             <div class="slider-container">
                                 <div class="color-bar" id="colorBar2"></div>
                                 <input type="range" min="-5" max="5" value="1" class="slider-plotly" step="0.01" id="weight2">
@@ -491,8 +491,8 @@
                             </div>
                         </div>
 
-                        <div style="display:flex; flex-direction: row; justify-content: center; align-items: center">
-                            <label style="margin-right: -30%" for="threshold">Threshold</label>
+                        <div style="display:flex; flex-direction: row; justify-content: right; align-items: center">
+                            <label class="slider-label" id="threshold-label" style="margin-right: -30%" for="threshold">Threshold</label>
                             <div class="slider-container">
                                 <div class="color-bar" id="colorBar3"></div>
                                 <input type="range" min="-5" max="5" value="1.5" class="slider-plotly" step="0.01" id="threshold">
