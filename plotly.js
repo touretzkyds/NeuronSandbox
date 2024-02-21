@@ -120,9 +120,9 @@ function createTraces(inputs, outputs, weights, threshold) {
         name: 'True',
         nsPoints: true,
         marker: {
-            color: Array(falseX.length).fill(TRUE_COLOR),
+            color: Array(trueX.length).fill(TRUE_COLOR),
             symbol: 'circle',
-            size: Array(falseX.length).fill(16)
+            size: Array(trueX.length).fill(16)
         }
     };
 
@@ -268,17 +268,26 @@ function createTraces(inputs, outputs, weights, threshold) {
     }
     let data = [boundsX, boundsY, line, lineEndpoints, lineMidpoint, falsePoints, truePoints, incorrectlyTrue, incorrectlyFalse, plus, minus];
 
+    let inputTable = document.getElementById('selected-inputs');
+    let labels = document.getElementsByClassName('slider-label');
+    for (let i = 0; i < inputTable.rows.length; i++) {
+        let row = inputTable.rows[i];
+        let cell = row.cells[0];
+
+        labels[i].innerText = cell.innerText;
+    }
+
     let layout = {
         autosize: false,
         xaxis: {
-            title: "Peanut Butter",
+            title: labels[0].innerText,
             nticks: 2,
             range: [-0.5, 1.5],
             tickvals: [0, 1],
             fixedrange: true,
         },
         yaxis: {
-            title: "Jelly",
+            title: labels[1].innerText,
             nticks: 2,
             tickcolor: 'rgb(102, 102, 102)',
             ticks: 'outside',
@@ -292,7 +301,11 @@ function createTraces(inputs, outputs, weights, threshold) {
             fixedrange: true
         },
         margin: {
-            t: 50
+            l: 50,
+            r: 20,
+            t: 0,
+            b: 75,
+            pad: 0
         },
         width: 600,
         height: 600,
@@ -830,6 +843,7 @@ function initialize () {
     }
     // document.getElementById('weight1-label').innerText =
 
+    updateValuesDisplayToPlotly();
 
     let w1 = document.getElementById('weight1').value
     let w2 = document.getElementById('weight2').value
@@ -932,7 +946,7 @@ function initialize () {
                         let updatedData = updated[0];
                         let updatedLayout = updated[1];
 
-                        updateValues(roundedA, roundedB, roundedC)
+                        updateValuesPlotlyToDisplay(roundedA, roundedB, roundedC)
 
                         Plotly.react('tester', updatedData, updatedLayout);
                         data = plotlyDiv.data;
@@ -1212,13 +1226,34 @@ function changeLineByMidpoint(data, coords) {
     let roundedB = Math.ceil(b * 100) / 100;
     let roundedC = Math.ceil(c * 100) / 100;
 
-    updateValues(roundedA, roundedB, roundedC)
+    updateValuesPlotlyToDisplay(roundedA, roundedB, roundedC)
 
     return {type: lineObj.type, line: lineObj.line, marker: lineObj.marker, nsX: intersectionX, nsY: intersectionY, x: intersectionX, y:intersectionY, nsLine: true, inBounds: inBounds, hoverinfo: 'skip'}
 
 }
+function updateValuesDisplayToPlotly() {
+    let th1 = document.getElementById("th1");
+    let w1 = document.getElementById("w1");
+    let w2 = document.getElementById("w2");
 
-function updateValues(weight1, weight2, threshold) {
+    let weight1Value = document.getElementById('weight1_val');
+    let weight2Value = document.getElementById('weight2_val');
+    let thresholdValue = document.getElementById('threshold_val');
+
+    let weight1Slider = document.getElementById('weight1');
+    let weight2Slider = document.getElementById('weight2');
+    let thresholdSlider = document.getElementById('threshold');
+
+    weight1Slider.value = parseFloat(w1.innerText);
+    weight2Slider.value = parseFloat(w2.innerText);
+    thresholdSlider.value = parseFloat(th1.innerText);
+    weight1Value.innerText = w1.innerText;
+    weight2Value.innerText = w2.innerText
+    thresholdValue.innerText = th1.innerText;
+
+}
+
+function updateValuesPlotlyToDisplay(weight1, weight2, threshold) {
     // IMPORTANT: CURRENTLY ONLY 2D
     // TODO: make into 3D later
     let weight1Value = document.getElementById('weight1_val');
@@ -1242,6 +1277,9 @@ function updateValues(weight1, weight2, threshold) {
     th1.innerText = thresholdValue.innerText;
     w1.innerText = weight1Value.innerText;
     w2.innerText = weight2Value.innerText;
+
+    demo.update();
+    perceptron.computeAffineOutput();
 }
 
 function changeLineByEndpoint(data, coords) {
@@ -1290,22 +1328,13 @@ function checkDist(x, y) {
 }
 
 function run () {
-    // let inputs = [
-    //     [0, 0],
-    //     [0, 1],
-    //     [1, 0],
-    //     [1, 1]
-    // ]
-    // let outputs = [0, 0, 0, 1]
     let w1 = document.getElementById('weight1').value;
     let w2 = document.getElementById('weight2').value;
     let t = document.getElementById('threshold').value;
     let weights = [w1, w2];
     let threshold = [t];
 
-    document.getElementById("th1").innerText = t;
-    document.getElementById("w1").innerText = w1;
-    document.getElementById("w2").innerText = w2;
+    updateValuesPlotlyToDisplay(w1, w2, t)
 
     let outputData = generateOutputData();
     let result = createTraces(inputs.data, outputData, weights, threshold);
@@ -1337,7 +1366,7 @@ function reverseSign() {
 
     Plotly.react('tester', updatedData, updatedLayout);
 
-    updateValues(weights[0], weights[1], threshold[0])
+    updateValuesPlotlyToDisplay(weights[0], weights[1], threshold[0])
 }
 
 function updateSlider(slider, colorBar, sliderValueDisplay) {

@@ -1544,16 +1544,23 @@ class Display {
         let outputTable = document.getElementById("output-table");
         let activationTable = document.getElementById("activation-table");
         let plotlyContainer = document.getElementById("plotly-container");
+        let outputContainer = document.getElementById("output-container");
+        let activationContainer = document.getElementById("activation-container");
         if (plotlyToggle.checked) { // in graph mode
             // remove/make invisible output table
             outputTable.style.display = "none";
             activationTable.style.display = "none";
             plotlyContainer.style.display = "block";
+            outputContainer.style.display = "none";
+            activationContainer.style.display = "none";
+            initialize();
 
         } else {
             outputTable.style.display = "block";
             activationTable.style.display = "block";
             plotlyContainer.style.display = "none";
+            outputContainer.style.display = "inline-flex";
+            activationContainer.style.display = "inline-flex";
         }
 
         this.outputLine.position();

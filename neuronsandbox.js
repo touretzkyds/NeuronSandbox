@@ -1489,6 +1489,10 @@ function uploadJson(text) {
     checkAnswerCorrect();
     document.getElementById("ShowProgressBarToggle").checked = true
     display.UpdateShowProgressBarToggle();
+
+    document.getElementById("PlotlyToggle").checked = false;
+    display.UpdatePlotlyToggle()
+    // initialize();
 }
 
 async function uploadFile(event) {
