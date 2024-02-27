@@ -1490,8 +1490,9 @@ function uploadJson(text) {
     document.getElementById("ShowProgressBarToggle").checked = true
     display.UpdateShowProgressBarToggle();
 
-    document.getElementById("PlotlyToggle").checked = false;
-    display.UpdatePlotlyToggle()
+    // document.getElementById("PlotlyToggle").checked = false;
+    document.getElementById("DisplayToggle").value = '2';
+    display.UpdatePlotlyToggle();
     // initialize();
 }
 
@@ -1692,9 +1693,11 @@ $('#DemoToggle').change(function() { //toggle output
     display.UpdateDemoToggle();
 });
 
-$('#PlotlyToggle').change(function() { //toggle plotly
+$('#DisplayToggle').change(function() {
     display.UpdatePlotlyToggle();
-});
+    if (document.getElementById("DisplayToggle").value !== '3')
+        display.UpdateDemoToggle();
+})
 
 $('#biasToggle').change(function() { //toggle bias
     display.updateBiasToggle();
@@ -1711,7 +1714,7 @@ $('#FanfareToggle').change(function() { //toggle output
     {
         demo.weightLines[i].position();
     }
-    if (demo.biasLine && !$('#DemoToggle').checked) {
+    if (demo.biasLine && !($('#DemoToggle').checked || $('#DisplayToggle').value === '1')) {
         demo.biasLine.position();
     }
 });

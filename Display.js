@@ -244,7 +244,8 @@ class Display {
 
     updateHintButton() {
         const hintButton = document.getElementById("hintButton");
-        hintButton.style.display = !document.getElementById("DemoToggle").checked? "inline-block" : "none";
+        // hintButton.style.display = !document.getElementById("DemoToggle").checked? "inline-block" : "none";
+        hintButton.style.display = !(document.getElementById("DisplayToggle").value === '1') ? "inline-block" : "none";
     }
 
     createInputTableEditBorder() {
@@ -321,14 +322,14 @@ class Display {
                     img.width = 48;
                     img.height = 48;
                     img.classList.add("myimage");
-                    if (document.getElementById("InputToggle").checked && !document.getElementById("DemoToggle").checked) {
+                    if (document.getElementById("InputToggle").checked && (document.getElementById("DisplayToggle").value === '0')) {
                         img.classList.add("editable-border")
                     }
                     else {
                         if (img.classList.contains("editable-border"))
                             img.classList.remove("editable-border")
                     }
-                    if(!(document.getElementById("DemoToggle").checked && (img.src.endsWith("media/0_image.svg") ||img.src.endsWith("media/1_image.svg")))) {
+                    if(!(document.getElementById("DisplayToggle").value === '1' && (img.src.endsWith("media/0_image.svg") ||img.src.endsWith("media/1_image.svg")))) {
                         textbox.appendChild(img);
                     }
                 }
@@ -668,8 +669,9 @@ class Display {
 
         outputHeaderContainer.style.width = (rightOutputTable - leftActivTable) + 'px';
 
-        let plotlySlider = document.getElementById("PlotlyToggle");
-        if (plotlySlider.checked) {
+        // let plotlySlider = document.getElementById("PlotlyToggle");
+        let displaySlider = document.getElementById("DisplayToggle");
+        if (displaySlider.value === "3") {
             let plotlyDisplay = document.getElementById('tester');
             rightOutputTable = plotlyDisplay.getBoundingClientRect().right + 70;
             leftActivTable =  plotlyDisplay.getBoundingClientRect().left;
@@ -809,7 +811,7 @@ class Display {
 
         if (!demo.selectedInput)
             return;
-        if(document.getElementById("DemoToggle").checked)
+        if(document.getElementById("DemoToggle").checked || (document.getElementById("DisplayToggle").value === '1'))
             return;
         let selections = document.getElementById("selected-inputs");
         selections.innerHTML = "";
@@ -1125,7 +1127,8 @@ class Display {
         display.outputLine.position();
 
         const isDemoMode = document.getElementById("DemoToggle").checked;
-        if(isDemoMode) {
+        const isDemoMode2 = document.getElementById("DisplayToggle").value === '1';
+        if(isDemoMode || isDemoMode2) {
             return;
         }
         //removes lines when not hovered
@@ -1160,19 +1163,24 @@ class Display {
             }
         }
         if (this.hovering) {
-            demo.activationLines[0] = new LeaderLine(
-                LeaderLine.pointAnchor(document.getElementById("sigma"), {x: '20%', y: '80%'}),
-                LeaderLine.pointAnchor(activationRow.cells[0], {x: '48%', y: '50%'}),
-                {dash: {animation: true}}
-            );
-            // demo.activationLines[0].path = "arc";
-            demo.activationLines[0].setOptions({startSocket: 'bottom', endSocket: 'left'});
-            demo.outputLines[0] = new LeaderLine(
-                LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '90%', y: '50%'}),
-                LeaderLine.pointAnchor(outputRow.cells[0], {x: '48%', y: '50%'}),
-                {dash: {animation: true}}
-            );
-            demo.outputLines[0].path = "arc";
+            if (!(document.getElementById("DisplayToggle").value === '3')) {
+                demo.activationLines[0] = new LeaderLine(
+                    LeaderLine.pointAnchor(document.getElementById("sigma"), {x: '20%', y: '80%'}),
+                    LeaderLine.pointAnchor(activationRow.cells[0], {x: '48%', y: '50%'}),
+                    {dash: {animation: true}}
+                );
+                // demo.activationLines[0].path = "arc";
+                demo.activationLines[0].setOptions({startSocket: 'bottom', endSocket: 'left'});
+                demo.outputLines[0] = new LeaderLine(
+                    LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '90%', y: '50%'}),
+                    LeaderLine.pointAnchor(outputRow.cells[0], {x: '48%', y: '50%'}),
+                    {dash: {animation: true}}
+                );
+                demo.outputLines[0].path = "arc";
+                // document.getElementById("activation-container").style.display = "inline-flex";
+                // document.getElementById("output-container").style.display = "inline-flex";
+            }
+
         }
         display.alignTables()
         display.createOutputTableEditBorder();
@@ -1291,13 +1299,14 @@ class Display {
     UpdateInputToggle() {
         let checkbox = document.getElementById("InputToggle");
         let checkboxBinary = document.getElementById(("BinaryToggle"));
-        let checkboxDemo = document.getElementById("DemoToggle")
+        //let checkboxDemo = document.getElementById("DemoToggle")
+        let checkboxDemo = document.getElementById("DisplayToggle").value === '1'
         // checkboxBinary.style.display = checkbox.checked? "inline-block" : "none";
         // document.getElementById("OutputToggle").style.display =  checkbox.checked? "inline-block" : "none";
 
         //display.createOutputTableColors();
         this.updateSelectedInput();
-        if (!checkbox.checked || checkboxDemo.checked) {
+        if (!checkbox.checked || checkboxDemo) {
             $("#input-table tr:first").hide();
             $("#input-table tr td:nth-child(1)").hide();
             const buttonRows = document.getElementsByClassName("row-buttons-container");
@@ -1449,10 +1458,15 @@ class Display {
     }
 
     UpdateDemoToggle() {
+
+        console.log("updating demo")
         let hintText = document.getElementById("hintText");
         let checkbox = document.getElementById("DemoToggle");
+        let displaySlider = document.getElementById("DisplayToggle");
         const otherHeaders = document.querySelectorAll('.top-table th:not(:first-child):not(:last-child)');
-        if (checkbox.checked) {
+        if (checkbox.checked || displaySlider.value === '1') {
+            console.log("in demo toggle")
+            console.log(displaySlider.value === '1')
             document.getElementById("guess-output-container").style.display = "inline-block";
 
             document.getElementById("CheckAnswerBtn").style.display = "inline-block";
@@ -1518,6 +1532,11 @@ class Display {
         display.outputLine.position()
         display.alignTables();
 
+        if (displaySlider.value === '3') {
+            document.getElementById("output-container").style.display = "none";
+            document.getElementById("activation-container").style.display = "none";
+        }
+
     }
 
     updateBiasToggle() {
@@ -1540,13 +1559,14 @@ class Display {
     }
 
     UpdatePlotlyToggle() {
-        let plotlyToggle = document.getElementById("PlotlyToggle");
+        // let plotlyToggle = document.getElementById("PlotlyToggle");
+        let displaySlider = document.getElementById("DisplayToggle")
         let outputTable = document.getElementById("output-table");
         let activationTable = document.getElementById("activation-table");
         let plotlyContainer = document.getElementById("plotly-container");
         let outputContainer = document.getElementById("output-container");
         let activationContainer = document.getElementById("activation-container");
-        if (plotlyToggle.checked) { // in graph mode
+        if (displaySlider.value === '3') { // in graph mode
             // remove/make invisible output table
             outputTable.style.display = "none";
             activationTable.style.display = "none";
@@ -1563,7 +1583,8 @@ class Display {
             activationContainer.style.display = "inline-flex";
         }
 
-        this.outputLine.position();
+        if (this.outputLine != null)
+            this.outputLine.position();
         for (let i = 0; i < demo.weightLines.length; i++) {
             demo.weightLines[i].position();
         }
