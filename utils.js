@@ -83,7 +83,7 @@ async function downloadFile() {
     //let thresholdToggleChecked = document.getElementById("checkbox_threshold_editable").checked;
     let thresholdToggleChecked = document.getElementById("threshold_toggleBtn").classList.contains("edit-toggle-on");
     let difficultyLevel = document.getElementById("difficulty_slide").value;
-    let guessToggleChecked = document.getElementById("DemoToggle").checked;
+    let guessToggleChecked = document.getElementById("DisplayToggle").value === '1'
 
     const editToggle = document.getElementById("InputToggle").checked;
     let question = "";

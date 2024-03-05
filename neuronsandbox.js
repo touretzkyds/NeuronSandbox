@@ -325,7 +325,7 @@ function checkAnswerCorrect() {
     let inputTable = document.getElementById("input-table")
     let outputTable = document.getElementById("output-table")
     let activationTable = document.getElementById("activation-table")
-    let guessToggle = document.getElementById("DemoToggle")
+    let guessToggle = document.getElementById("DisplayToggle")
     let editToggle = document.getElementById("InputToggle")
     let thresholdText = document.getElementById("th1")
     let biasContent = document.getElementById("bias-text")
@@ -364,7 +364,7 @@ function checkAnswerCorrect() {
         }
     }
 
-    if(!guessToggle.checked) {
+    if(guessToggle.value === '2') {
         for (let i = 1; i < tableRows; i++) {
             let row = outputTable.rows.item(i);
             let inputRow = inputTable.rows.item(i+1);
@@ -655,7 +655,7 @@ class Demo {
     }
 
     adjustWeightPlacement() {
-        if(document.getElementById("DemoToggle").checked)
+        if(document.getElementById("DisplayToggle").value === '1')
             return;
         // let headerRowVals = [];
         // display.getHeaderRowVals(headerRowVals);
@@ -1140,7 +1140,7 @@ function setImageEditOptions() {
         while (tdElement && tdElement.tagName !== 'TD') {
             tdElement = tdElement.parentNode;
         }
-        if(document.getElementById("InputToggle").checked && !document.getElementById("DemoToggle").checked) {
+        if(document.getElementById("InputToggle").checked && (document.getElementById("DisplayToggle").value === '2')) {
             if(!image.classList.contains("editable-border")) {
                 image.classList.add("editable-border")
             }
@@ -1152,7 +1152,7 @@ function setImageEditOptions() {
         }
         let imageMenuHandler = function (event) {
             //make the dialog box visible
-            if (document.getElementById("InputToggle").checked && !document.getElementById("DemoToggle").checked) {
+            if (document.getElementById("InputToggle").checked && (document.getElementById("DisplayToggle").value !== '1')) {
                 let table = tdElement.closest('table');
                 event.preventDefault();
                 showMenu(event, this, tdElement.cellIndex, tdElement.rowIndex, table)
@@ -1411,7 +1411,9 @@ function uploadJson(text) {
     document.getElementById('OutputToggle').checked = dict["output-toggle-checked"];
     document.getElementById("FanfareToggle").checked = dict["fanfare-toggle-checked"];
 
-    document.getElementById("DemoToggle").checked = dict["guessToggleChecked"];
+
+
+    document.getElementById("DisplayToggle").value = dict["guessToggleChecked"] ? '1' : '2';
     let difficultyLevel = 50;
     if (dict["difficultyLevel"]) {
         difficultyLevel = dict["difficultyLevel"];
@@ -1478,7 +1480,8 @@ function uploadJson(text) {
     }
     thresholdToggle.dispatchEvent(new Event("click"));
     handleDesiredOutputColumn();
-    document.getElementById("DemoToggle").dispatchEvent(new Event("click"));
+   // document.getElementById("DemoToggle").dispatchEvent(new Event("click"));
+    document.getElementById("DisplayToggle").dispatchEvent(new Event("change"));
     isLoading = false;
     perceptron.setBiasUI();
     setupQuestionFields();
@@ -1610,7 +1613,7 @@ display.createOutputTableEditBorder();
 addThresholdEditOption();
 handleDesiredOutputColumn();
 loadQuestionsAndModels();
-document.getElementById("DemoToggle").checked = true;
+// document.getElementById("DemoToggle").checked = true;
 display.UpdateDemoToggle();
 document.getElementById("AutoProgressToggle").checked = true;
 
@@ -1665,7 +1668,7 @@ $('#InputToggle').change(function() { //toggle edit
     for (let i = 0; i < demo.weightLines.length; i++) {
         demo.weightLines[i].position();
     }
-    if (demo.biasLine && !document.getElementById("DemoToggle").checked) {
+    if (demo.biasLine && (document.getElementById("DisplayToggle").value === '2')) {
         demo.biasLine.position();
     }
     display.outputLine.position()
@@ -1689,9 +1692,9 @@ $('#BinaryToggle').change(function() { //toggle output
     display.outputLine.position();
 });
 
-$('#DemoToggle').change(function() { //toggle output
-    display.UpdateDemoToggle();
-});
+// $('#DemoToggle').change(function() { //toggle output
+//     display.UpdateDemoToggle();
+// });
 
 $('#DisplayToggle').change(function() {
     display.UpdatePlotlyToggle();
@@ -1714,7 +1717,7 @@ $('#FanfareToggle').change(function() { //toggle output
     {
         demo.weightLines[i].position();
     }
-    if (demo.biasLine && !($('#DemoToggle').checked || $('#DisplayToggle').value === '1')) {
+    if ($('#DisplayToggle').value === '1') {
         demo.biasLine.position();
     }
 });
@@ -1809,7 +1812,7 @@ function handleDesiredOutputColumn() {
 }
 function FixCheckAnswerButtonPosition() {
     var button = document.getElementById('CheckAnswerBtn');
-    var referenceSwitch = document.getElementById('DemoSwitch');
+    var referenceSwitch = document.getElementById('label-reference');
 
     // Get the initial position of the button relative to the document
     var buttonRect = button.getBoundingClientRect();

@@ -811,7 +811,7 @@ class Display {
 
         if (!demo.selectedInput)
             return;
-        if(document.getElementById("DemoToggle").checked || (document.getElementById("DisplayToggle").value === '1'))
+        if(document.getElementById("DisplayToggle").value === '1')
             return;
         let selections = document.getElementById("selected-inputs");
         selections.innerHTML = "";
@@ -1126,9 +1126,9 @@ class Display {
         display.recreateOutputLine();
         display.outputLine.position();
 
-        const isDemoMode = document.getElementById("DemoToggle").checked;
+        // const isDemoMode = document.getElementById("DemoToggle").checked;
         const isDemoMode2 = document.getElementById("DisplayToggle").value === '1';
-        if(isDemoMode || isDemoMode2) {
+        if(isDemoMode2) {
             return;
         }
         //removes lines when not hovered
@@ -1461,10 +1461,10 @@ class Display {
 
         console.log("updating demo")
         let hintText = document.getElementById("hintText");
-        let checkbox = document.getElementById("DemoToggle");
+        // let checkbox = document.getElementById("DemoToggle");
         let displaySlider = document.getElementById("DisplayToggle");
         const otherHeaders = document.querySelectorAll('.top-table th:not(:first-child):not(:last-child)');
-        if (checkbox.checked || displaySlider.value === '1') {
+        if (displaySlider.value === '1') {
             console.log("in demo toggle")
             console.log(displaySlider.value === '1')
             document.getElementById("guess-output-container").style.display = "inline-block";
