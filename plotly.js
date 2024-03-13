@@ -280,11 +280,15 @@ function createTraces(inputs, outputs, weights, threshold) {
     let layout = {
         autosize: false,
         xaxis: {
-            title: labels[0].innerText,
+            title: {
+                text: labels[0].innerText,
+                standoff: -500
+            },
             nticks: 2,
             range: [-0.5, 1.5],
             tickvals: [0, 1],
             fixedrange: true,
+            // standoff: 100
         },
         yaxis: {
             title: labels[1].innerText,
@@ -298,17 +302,18 @@ function createTraces(inputs, outputs, weights, threshold) {
             },
             range: [-0.5, 1.5],
             tickvals: [0, 1],
-            fixedrange: true
+            fixedrange: true,
+            // standoff: 10
         },
         margin: {
-            l: 50,
+            l: 30,
             r: 20,
             t: 0,
-            b: 75,
+            b: 30,
             pad: 0
         },
-        width: 600,
-        height: 600,
+        width: 500,
+        height: 500,
         hovermode: 'closest',
         showlegend: false,
         shapes: [
@@ -1279,6 +1284,7 @@ function updateValuesPlotlyToDisplay(weight1, weight2, threshold) {
     w2.innerText = weight2Value.innerText;
 
     demo.update();
+    checkAnswerCorrect();
     perceptron.computeAffineOutput();
 }
 

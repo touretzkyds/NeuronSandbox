@@ -364,7 +364,7 @@ function checkAnswerCorrect() {
         }
     }
 
-    if(guessToggle.value === '2') {
+    if(guessToggle.value !== '1') {
         for (let i = 1; i < tableRows; i++) {
             let row = outputTable.rows.item(i);
             let inputRow = inputTable.rows.item(i+1);
@@ -380,8 +380,7 @@ function checkAnswerCorrect() {
                 activationRow.children[0].classList.add('blue-text');
             }
 
-            if (!document.getElementById("BinaryToggle").checked)
-            {
+            if (!document.getElementById("BinaryToggle").checked) {
                 for(let j = 0; j < inputRow.children.length; j++)
                 {
                     let inputValue = parseFloat(inputRow.children[j].textContent);
@@ -1016,13 +1015,16 @@ async function provideHint() {
     let hintText = document.getElementById("hintText");
     let weightHolder = document.getElementById("input-link-text");
     let weightName = "";
-    if (hintIndex < weightHolder.children.length) { //weight
+    if (hintIndex < 0) { // no hint is needed, problem already solved
+        hintText.innerHTML = hintArr[0];
+    }
+    else if (hintIndex < weightHolder.children.length) { //weight hint
         weightName = weightHolder?.children[hintIndex]?.children[0].innerHTML;
         weightName = weightName.replace("=", "");
         weightName = weightName.replace(" ", "");
         hintText.innerHTML = hintArr[0] + " " + weightName + ".";
     }
-    else {
+    else { //threshold hint
         hintText.innerHTML = hintArr[0];
     }
 
