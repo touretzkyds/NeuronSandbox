@@ -1016,6 +1016,25 @@ class Display {
     }
     // respond to user hovering over table
 
+    findIndexOfPlotlyTrace(plotlyData, name) {
+        for (let i = 0; i < plotlyData.length; i++) {
+            if (plotlyData[i].name === name) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    includesLines(plotlyData) {
+        for (let i = 0; i < plotlyData.length; i++) {
+            if (plotlyData[i].nsLine) {
+                return true;
+            }
+        }
+        return false;
+
+    }
+
     hoverInput(row, tblId, mode) {
         const isOutputToggleChecked = document.getElementById("OutputToggle").checked
         let rowIdx = row.rowIndex || 0;
@@ -1179,6 +1198,56 @@ class Display {
                 demo.outputLines[0].path = "arc";
                 // document.getElementById("activation-container").style.display = "inline-flex";
                 // document.getElementById("output-container").style.display = "inline-flex";
+            } else {
+                let x = '48%', y = '50%';
+                let fullPlot = document.getElementsByClassName('scatterlayer')[0];
+
+                let plotlyData = document.getElementById('tester').data;
+                let falseIdx = display.findIndexOfPlotlyTrace(plotlyData, "falsePoints");
+                let trueIdx = display.findIndexOfPlotlyTrace(plotlyData, "truePoints");
+
+                let allTraces = fullPlot.children;
+                let falsePoints = fullPlot.children[falseIdx].children[3].children;
+                let truePoints = fullPlot.children[trueIdx].children[3].children;
+                if (fullPlot.children.length < 9) {
+                    falsePoints = fullPlot.children[falseIdx-2].children[3].children;
+                    truePoints = fullPlot.children[trueIdx-2].children[3].children;
+                }
+                // console.log(falsePoints);
+                // console.log(truePoints);
+
+                let desiredOutputForPoint = parseFloat(outputRow.children[DESIRED_OUTPUT_COLUMN].innerText);
+
+                let inputsData = inputs.data[rowIdx - 2]
+
+                let falsePointsPlotly = plotlyData[falseIdx];
+                let truePointsPlotly = plotlyData[trueIdx];
+
+                // console.log(truePointsPlotly);
+                // console.log(trueIdx);
+
+                let pointsUsed = desiredOutputForPoint === 0 ? falsePoints : truePoints;
+                let pointsUsedPlotly = desiredOutputForPoint === 0 ? falsePointsPlotly : truePointsPlotly;
+
+                // for now, the order of points [0, 0], [0, 1], [1, 0], [1, 1]
+                // console.log(outputs.data)
+
+                console.log(allTraces);
+                let pointedTo = null;
+
+                for (let i = 0; i < pointsUsed.length; i++) {
+                    if (pointsUsedPlotly.x[i] === inputsData[0] && pointsUsedPlotly.y[i] === inputsData[1]) {
+                        pointedTo = pointsUsed[i];
+                        console.log(pointedTo)
+                        break;
+                    }
+                }
+                demo.activationLines[0] = new LeaderLine(
+                    LeaderLine.pointAnchor(document.getElementById("output-links"), {x: '20%', y: '50%'}),
+                    LeaderLine.pointAnchor(pointedTo),
+                    {dash: {animation: true}}
+                );
+
             }
 
         }

@@ -100,30 +100,51 @@ function createTraces(inputs, outputs, weights, threshold) {
     let intersectionBoundsX = calculatedVals[16]
     let intersectionBoundsY = calculatedVals[17]
 
+    let inputTable = document.getElementById('selected-inputs');
+    let labels = document.getElementsByClassName('slider-label');
+    for (let i = 0; i < inputTable.rows.length; i++) {
+        let row = inputTable.rows[i];
+        let cell = row.cells[0];
+
+        labels[i].innerText = cell.innerText;
+    }
+
     let falsePoints = {
         type: 'scatter',
         x: falseX,
         y: falseY,
         mode: 'markers',
-        name: 'False',
+        name: 'falsePoints',
         nsPoints: true,
         marker: {
             color: Array(falseX.length).fill(FALSE_COLOR),
             symbol: 'circle',
             size: Array(falseX.length).fill(16)
-        }
+        },
+        customdata: Array(falseX.length).fill([labels[0].innerText, labels[1].innerText]),
+
+        hovertemplate: '%{customdata[0]}: %{x}' +
+            '<br>%{customdata[1]}: %{y}' +
+            '<br>Desired Output: 0<extra></extra>'
     };
     let truePoints = {
         x: trueX,
         y: trueY,
         mode: 'markers',
-        name: 'True',
+        name: 'truePoints',
         nsPoints: true,
         marker: {
             color: Array(trueX.length).fill(TRUE_COLOR),
             symbol: 'circle',
             size: Array(trueX.length).fill(16)
-        }
+        },
+
+        customdata: Array(trueX.length).fill([labels[0].innerText, labels[1].innerText]),
+
+        hovertemplate: '%{customdata[0]}: %{x}' +
+            '<br>%{customdata[1]}: %{y}' +
+            '<br>Desired Output: 1<extra></extra>'
+
     };
 
     let lineColor = LINE_COLOR_ACTIVE;
@@ -267,15 +288,6 @@ function createTraces(inputs, outputs, weights, threshold) {
         }
     }
     let data = [boundsX, boundsY, line, lineEndpoints, lineMidpoint, falsePoints, truePoints, incorrectlyTrue, incorrectlyFalse, plus, minus];
-
-    let inputTable = document.getElementById('selected-inputs');
-    let labels = document.getElementsByClassName('slider-label');
-    for (let i = 0; i < inputTable.rows.length; i++) {
-        let row = inputTable.rows[i];
-        let cell = row.cells[0];
-
-        labels[i].innerText = cell.innerText;
-    }
 
     let layout = {
         autosize: false,
@@ -896,7 +908,6 @@ function initialize () {
 
         //NOTE: mouse is always "heard" first, before plot click
         gd.addEventListener('mousedown', function(evt) {
-            console.log("in mousedown, move point")
             let plotlyDiv = document.getElementById('tester')
             if (pointClicked === 0) {
                 let coords = checkDist(xInDataCoord, yInDataCoord);
@@ -1029,10 +1040,11 @@ function initialize () {
             sizeC = data.points[i].data.marker.size;
         };
         if (correctTrace) {
-            sizeC[pn] += 5
+            sizeC[pn] = 20
 
             var update = {'marker':{color: colors, size:sizeC}};
             Plotly.restyle('tester', update, [tn]);
+            // display.hoverInput(row, tblId, mode)
         }
 
     });
@@ -1050,7 +1062,7 @@ function initialize () {
             sizeC = data.points[i].data.marker.size;
         };
         if (correctTrace) {
-            sizeC[pn] -= 5
+            sizeC[pn] = 16
 
             var update = {'marker':{color: colors, size:sizeC}};
             Plotly.restyle('tester', update, [tn]);

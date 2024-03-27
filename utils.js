@@ -246,6 +246,7 @@ function loadQuestionsAndModels() {
 window.onresize = function(event) {
     display.updateSelectedInput()
     display.createInputLabelLines()
+    demo.activationLines[0].position();
 
 };
 
