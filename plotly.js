@@ -226,7 +226,8 @@ function createTraces(inputs, outputs, weights, threshold) {
             },
             fillcolor: 'transparent'
         },
-        showlegend: false
+        showlegend: false,
+        hoverinfo: 'skip'
     }
     let incorrectlyFalse = {
         x: incorrectlyFalseX,
@@ -241,7 +242,8 @@ function createTraces(inputs, outputs, weights, threshold) {
             },
             fillcolor: 'transparent'
         },
-        showlegend: false
+        showlegend: false,
+        hoverinfo: 'skip'
     }
     let plus = {
         x: [centerXTrue],
@@ -319,7 +321,7 @@ function createTraces(inputs, outputs, weights, threshold) {
         },
         margin: {
             l: 30,
-            r: 20,
+            r: 0,
             t: 0,
             b: 30,
             pad: 0
@@ -1030,6 +1032,7 @@ function initialize () {
             colors=[];
 
         let correctTrace = true;
+        let point_data = null;
         for(var i=0; i < data.points.length; i++) {
             pn = data.points[i].pointNumber;
             tn = data.points[i].curveNumber;
@@ -1038,13 +1041,29 @@ function initialize () {
 
             colors = data.points[i].data.marker.color;
             sizeC = data.points[i].data.marker.size;
+            point_data = data.points[i];
         };
         if (correctTrace) {
             sizeC[pn] = 20
 
             var update = {'marker':{color: colors, size:sizeC}};
             Plotly.restyle('tester', update, [tn]);
-            // display.hoverInput(row, tblId, mode)
+            if (point_data) {
+                let string = point_data.data.x[pn].toString() + point_data.data.y[pn].toString()
+                let dict = {
+                    '00' : 2,
+                    '01' : 3,
+                    '10' : 4,
+                    '11' : 5,
+                };
+                display.hovering = true;
+                let row = document.getElementById("input-table").rows[dict[string]]
+                display.hoverInput(row, "input-table", "enter")
+            }
+
+
+
+
         }
 
     });
@@ -1060,12 +1079,26 @@ function initialize () {
                 correctTrace = false;
             colors = data.points[i].data.marker.color;
             sizeC = data.points[i].data.marker.size;
+            point_data = data.points[i];
         };
         if (correctTrace) {
             sizeC[pn] = 16
 
             var update = {'marker':{color: colors, size:sizeC}};
             Plotly.restyle('tester', update, [tn]);
+
+            if (point_data) {
+                let string = point_data.data.x[pn].toString() + point_data.data.y[pn].toString()
+                let dict = {
+                    '00' : 2,
+                    '01' : 3,
+                    '10' : 4,
+                    '11' : 5,
+                };
+                display.hovering = false;
+                let row = document.getElementById("input-table").rows[dict[string]]
+                display.hoverInput(row, "input-table", "exit")
+            }
         }
 
     });

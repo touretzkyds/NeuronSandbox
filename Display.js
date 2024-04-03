@@ -673,7 +673,7 @@ class Display {
         let displaySlider = document.getElementById("DisplayToggle");
         if (displaySlider.value === "3") {
             let plotlyDisplay = document.getElementById('tester');
-            rightOutputTable = plotlyDisplay.getBoundingClientRect().right + 70;
+            rightOutputTable = plotlyDisplay.getBoundingClientRect().right + 90;
             leftActivTable =  plotlyDisplay.getBoundingClientRect().left;
             widthOutputText = getComputedStyle(outputText).width;
             widthOutputText = parseInt(widthOutputText.substring(0, widthOutputText.length -2));
@@ -683,6 +683,7 @@ class Display {
             outputLineWidth = (outputTotalWidth - widthOutputText)/2;
 
             outputHeaderContainer.style.width = (rightOutputTable - leftActivTable) + 'px';
+            outputHeaderContainer.style.marginRight = '20px';
         }
 
         //INPUT LINES
