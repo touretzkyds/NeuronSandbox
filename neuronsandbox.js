@@ -1667,14 +1667,25 @@ $('#InputToggle').change(function() { //toggle edit
     display.createOutputTableEditBorder();
     display.updateGuessTable();
     display.toggleProblemDisplay();
+    display.outputLine.position()
+    display.updateBiasToggle()
+
+
+    let displaySlider = document.getElementById("DisplayToggle");
+    if (displaySlider.value === '3') {
+        document.getElementById("output-container").style.display = "none";
+        document.getElementById("activation-container").style.display = "none";
+    }
+
     for (let i = 0; i < demo.weightLines.length; i++) {
         demo.weightLines[i].position();
     }
-    if (demo.biasLine && (document.getElementById("DisplayToggle").value === '2')) {
+    if (demo.biasLine) {
         demo.biasLine.position();
     }
-    display.outputLine.position()
-    display.updateBiasToggle()
+    if (display.outputLine) {
+        display.outputLine.position();
+    }
 });
 
 $('#OutputToggle').change(function() { //toggle output
@@ -1699,6 +1710,7 @@ $('#BinaryToggle').change(function() { //toggle output
 // });
 
 $('#DisplayToggle').change(function() {
+
     display.UpdatePlotlyToggle();
     display.createInputLabelLines()
     if (document.getElementById("DisplayToggle").value !== '3')
@@ -1707,6 +1719,24 @@ $('#DisplayToggle').change(function() {
 
 $('#biasToggle').change(function() { //toggle bias
     display.updateBiasToggle();
+
+    for (let i = 0; i < demo.weightLines.length; i++) {
+        demo.weightLines[i].position();
+    }
+    if (demo.biasLine) {
+        demo.biasLine.position();
+    }
+    display.outputLine.position();
+
+    let displaySlider = document.getElementById("DisplayToggle");
+    if (displaySlider.value === '3') {
+        document.getElementById("output-container").style.display = "none";
+        document.getElementById("activation-container").style.display = "none";
+        initialize();
+    }
+
+
+
 });
 
 $('#ShowProgressBarToggle').change(function() { //toggle bias

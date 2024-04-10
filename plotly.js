@@ -1,12 +1,5 @@
 
 window.addEventListener('load', main, false);
-// let inputs = [
-//     [0, 0],
-//     [0, 1],
-//     [1, 0],
-//     [1, 1]
-// ];
-// let outputs = [0, 0, 0, 1];
 let ranges = [[-0.5, -0.5], [-0.5, 1.5], [1.5, -0.5], [1.5, 1.5]];
 let camera = null;
 let xInDataCoord = 0;
@@ -101,12 +94,19 @@ function createTraces(inputs, outputs, weights, threshold) {
     let intersectionBoundsY = calculatedVals[17]
 
     let inputTable = document.getElementById('selected-inputs');
+    let start = document.getElementById("biasToggle").checked ? 1 : 0;
+
     let labels = document.getElementsByClassName('slider-label');
-    for (let i = 0; i < inputTable.rows.length; i++) {
+    for (let i = start; i < inputTable.rows.length; i++) {
         let row = inputTable.rows[i];
         let cell = row.cells[0];
 
-        labels[i].innerText = cell.innerText;
+        labels[i-start].innerText = cell.innerText;
+    }
+    if (start > 0) {
+        labels[labels.length - 1].innerText = "Bias";
+    } else {
+        labels[labels.length - 1].innerText = "Threshold";
     }
 
     let falsePoints = {
@@ -488,7 +488,6 @@ function createTraces(inputs, outputs, weights, threshold) {
         linedata.push(t)
     }
 
-
     let surface = {
         type: 'surface',
         x: x,
@@ -847,29 +846,40 @@ function updatePlotlyData(div, newData, traceNum) {
 }
 
 function initialize () {
-    initAllSliders();
-    updateAllSliders();
 
     // The selected-inputs table will give us all the input header names
+    let biasToggleChecked = document.getElementById("biasToggle").checked
     let inputTable = document.getElementById('selected-inputs');
+    let start = biasToggleChecked ? 1 : 0;
 
     let labels = document.getElementsByClassName('slider-label');
-    for (let i = 0; i < inputTable.rows.length; i++) {
+    for (let i = start; i < inputTable.rows.length; i++) {
         let row = inputTable.rows[i];
         let cell = row.cells[0];
 
-        labels[i].innerText = cell.innerText;
+        labels[i-start].innerText = cell.innerText;
     }
-    // document.getElementById('weight1-label').innerText =
+    if (start > 0) {
+        labels[labels.length - 1].innerText = "Bias";
+    } else {
+        labels[labels.length -1].innerText = "Threshold";
+    }
 
     updateValuesDisplayToPlotly();
+    initAllSliders();
+    updateAllSliders();
 
-    let w1 = document.getElementById('weight1').value
-    let w2 = document.getElementById('weight2').value
-    let t = document.getElementById('threshold').value
-    let weights = [w1, w2]
-    let threshold = [t]
+    let w1 = document.getElementById('weight1').value;
+    let w2 = document.getElementById('weight2').value;
+    let t =  document.getElementById('threshold').value;
 
+
+    let weights = [w1, w2];
+    let threshold = [t];
+
+    if (biasToggleChecked) {
+        threshold = [-t];
+    }
     let outputData = generateOutputData();
     let result = createTraces(inputs.data, outputData, weights, threshold);
     let data = result[0];
@@ -891,20 +901,11 @@ function initialize () {
         var l = gd._fullLayout.margin.l;
         var t = gd._fullLayout.margin.t;
 
-        // gd.addEventListener('scroll', function(evt) {
-        //     console.log("SCROLL2")
-        //     xInDataCoord = xaxis.p2c(evt.x - l);
-        //     yInDataCoord = yaxis.p2c(evt.y - t);
-        // });
-
         gd.addEventListener('mousemove', function(e) {
             let myPlot = document.getElementById('tester')
             let bgrect = document.getElementsByClassName('gridlayer')[0].getBoundingClientRect();
             xInDataCoord = ((e.x - bgrect['x']) / (bgrect['width'])) * (myPlot.layout.xaxis.range[1] - myPlot.layout.xaxis.range[0]) + myPlot.layout.xaxis.range[0];
             yInDataCoord =((e.y - bgrect['y']) / (bgrect['height'])) * (myPlot.layout.yaxis.range[0] - myPlot.layout.yaxis.range[1]) + myPlot.layout.yaxis.range[1];
-
-            // var x = ((e.x - bgrect['x']) / (bgrect['width'])) * (myPlot.layout.xaxis.range[1] - myPlot.layout.xaxis.range[0]) + myPlot.layout.xaxis.range[0];
-            // var y = ((e.y - bgrect['y']) / (bgrect['height'])) * (myPlot.layout.yaxis.range[0] - myPlot.layout.yaxis.range[1]) + myPlot.layout.yaxis.range[1];
 
         });
 
@@ -988,9 +989,6 @@ function initialize () {
 
                 let updatedData = updated[0];
                 let updatedLayout = updated[1];
-
-                // let traceNum = updatedData.findIndex(obj => obj.nsLine);
-                // let traceNumPoint = updatedData.findIndex(obj => obj.nsLineMidpoint);
 
                 // TODO: add throw error statements in case trace numbers are -1 (findIndex did not find)
 
@@ -1210,28 +1208,6 @@ function changeLineByMidpoint(data, coords) {
 
     let inBounds = true;
 
-    // // get endpoints of line
-    // // intersection w/ x = 0
-    // let y_x0 = c/b
-    // if (y_x0 <= 1 && y_x0 >= 0) {
-    //     intersections.push([0, y_x0])
-    // }
-    // // intersection w/ y = 0
-    // let x_y0 = c/a
-    // if (x_y0 <= 1 && x_y0 >= 0) {
-    //     intersections.push([x_y0, 0])
-    // }
-    // // intersection w/ x = 1
-    // let y_x1 = (c-a)/b
-    // if (y_x1 <= 1 && y_x1 >= 0) {
-    //     intersections.push([1, y_x1])
-    // }
-    // // intersection w/ y = 1
-    // let x_y1 = (c-b)/a
-    // if (x_y1 <= 1 && x_y1 >= 0) {
-    //     intersections.push([x_y1, 1])
-    // }
-
     if (true) {
         inBounds = false;
         let y_x0b = (c+0.5*a)/b
@@ -1282,6 +1258,9 @@ function changeLineByMidpoint(data, coords) {
 
 }
 function updateValuesDisplayToPlotly() {
+    let biasToggleChecked = document.getElementById("biasToggle").checked;
+    let biasText = document.getElementById("bias-text");
+
     let th1 = document.getElementById("th1");
     let w1 = document.getElementById("w1");
     let w2 = document.getElementById("w2");
@@ -1301,11 +1280,22 @@ function updateValuesDisplayToPlotly() {
     weight2Value.innerText = w2.innerText
     thresholdValue.innerText = th1.innerText;
 
+    if (biasToggleChecked && biasText) {
+        thresholdSlider.value = parseFloat(biasText.innerText);
+        thresholdValue.innerText = biasText.innerText;
+
+    }
+
+    // updateAllSliders();
+
 }
 
 function updateValuesPlotlyToDisplay(weight1, weight2, threshold) {
     // IMPORTANT: CURRENTLY ONLY 2D
     // TODO: make into 3D later
+
+    let biasToggleChecked = document.getElementById("biasToggle").checked;
+
     let weight1Value = document.getElementById('weight1_val');
     let weight2Value = document.getElementById('weight2_val');
     let thresholdValue = document.getElementById('threshold_val');
@@ -1322,9 +1312,16 @@ function updateValuesPlotlyToDisplay(weight1, weight2, threshold) {
     thresholdValue.innerText = threshold + "";
 
     let th1 = document.getElementById("th1");
+    let bias = document.getElementById("bias-text");
     let w1 = document.getElementById("w1");
     let w2 = document.getElementById("w2");
-    th1.innerText = thresholdValue.innerText;
+
+    if (biasToggleChecked) {
+        bias.innerText = thresholdValue.innerText;
+    } else {
+        th1.innerText = thresholdValue.innerText;
+    }
+
     w1.innerText = weight1Value.innerText;
     w2.innerText = weight2Value.innerText;
 
@@ -1386,6 +1383,10 @@ function run () {
     let threshold = [t];
 
     updateValuesPlotlyToDisplay(w1, w2, t)
+
+    let biasToggleChecked = document.getElementById('biasToggle').checked
+    if (biasToggleChecked)
+        threshold = [-t]
 
     let outputData = generateOutputData();
     let result = createTraces(inputs.data, outputData, weights, threshold);
