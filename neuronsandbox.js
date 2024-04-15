@@ -1711,8 +1711,8 @@ $('#BinaryToggle').change(function() { //toggle output
 
 $('#DisplayToggle').change(function() {
 
-    display.UpdatePlotlyToggle()
-    // display.createInputLabelLines();
+    display.UpdatePlotlyToggle();
+    display.createInputLabelLines();
     if (document.getElementById("DisplayToggle").value !== '3')
         display.UpdateDemoToggle();
 })

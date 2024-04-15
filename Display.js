@@ -717,20 +717,25 @@ class Display {
         let oline1Width = getComputedStyle(outputLine1).width
         oline1Width = parseInt(oline1Width.substring(0, oline1Width.length - 2))
 
-        while (oline1Width < outputLineWidth-20) {
-            outputLine1.innerText += "━";
-            let oline1WidthText = getComputedStyle(outputLine1).width
-            oline1Width = parseInt(oline1WidthText.substring(0, oline1WidthText.length - 2))
-        }
+        console.log(outputLineWidth, oline1Width)
+        console.log(Math.floor((outputLineWidth - oline1Width - 20)/2))
+        outputLine1.innerText = "━".repeat(Math.floor((outputLineWidth - oline1Width - 20)/15));
+        // while (oline1Width < outputLineWidth-20) {
+        //     outputLine1.innerText += "━";
+        //     let oline1WidthText = getComputedStyle(outputLine1).width
+        //     oline1Width = parseInt(oline1WidthText.substring(0, oline1WidthText.length - 2))
+        // }
+
 
         outputLine2.innerText = ""
         let oline2Width = getComputedStyle(outputLine2).width
         oline2Width = parseInt(oline2Width.substring(0, oline2Width.length - 2))
-        while (oline2Width < outputLineWidth-20) {
-            outputLine2.innerText += "━"
-            oline2Width = getComputedStyle(outputLine2).width
-            oline2Width = parseInt(oline2Width.substring(0, oline2Width.length - 2))
-        }
+        outputLine2.innerText = "━".repeat(Math.floor((outputLineWidth - oline2Width -20)/15));
+        // while (oline2Width < outputLineWidth-20) {
+        //     outputLine2.innerText += "━"
+        //     oline2Width = getComputedStyle(outputLine2).width
+        //     oline2Width = parseInt(oline2Width.substring(0, oline2Width.length - 2))
+        // }
     }
 
     adjustSelectedInputFontSize() {
@@ -1535,8 +1540,6 @@ class Display {
         let displaySlider = document.getElementById("DisplayToggle");
         const otherHeaders = document.querySelectorAll('.top-table th:not(:first-child):not(:last-child)');
         if (displaySlider.value === '1') {
-            console.log("in demo toggle")
-            console.log(displaySlider.value === '1')
             document.getElementById("guess-output-container").style.display = "inline-block";
 
             document.getElementById("CheckAnswerBtn").style.display = "inline-block";
@@ -1554,6 +1557,11 @@ class Display {
             buttonRows.forEach(element => {
                 element.style.display = "none"
             });
+
+            if(this.outputLine) {
+                this.outputLine.remove()
+                this.outputLine = null;
+            }
         }
         else {
             document.getElementById("guess-output-container").style.display = "none";
@@ -1580,6 +1588,7 @@ class Display {
             buttonRows.forEach(element => {
                 element.style.display = binaryCheck.checked? "none" : "flex";
             });
+            this.recreateOutputLine();
 
             //document.getElementById("demo-toggle").style.marginLeft = '60%';
         }
