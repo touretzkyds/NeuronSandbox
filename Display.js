@@ -718,9 +718,9 @@ class Display {
         oline1Width = parseInt(oline1Width.substring(0, oline1Width.length - 2))
 
         while (oline1Width < outputLineWidth-20) {
-            outputLine1.innerText += "━"
-            oline1Width = getComputedStyle(outputLine1).width
-            oline1Width = parseInt(oline1Width.substring(0, oline1Width.length - 2))
+            outputLine1.innerText += "━";
+            let oline1WidthText = getComputedStyle(outputLine1).width
+            oline1Width = parseInt(oline1WidthText.substring(0, oline1WidthText.length - 2))
         }
 
         outputLine2.innerText = ""
@@ -1583,6 +1583,7 @@ class Display {
 
             //document.getElementById("demo-toggle").style.marginLeft = '60%';
         }
+        console.log("before bunch of function calls")
         this.UpdateInputToggle();
         display.updateGuessTable();
         demo.adjustWeightPlacement();
@@ -1591,6 +1592,7 @@ class Display {
         display.updateHintButton();
         checkAnswerCorrect();
         display.createInputLabelLines();
+        console.log("after a bunch of function calls")
 
         //reposition lines
         for (let i = 0; i < demo.weightLines.length; i++) {
@@ -1606,6 +1608,7 @@ class Display {
             document.getElementById("output-container").style.display = "none";
             document.getElementById("activation-container").style.display = "none";
         }
+        console.log("end of update demo toggle")
 
     }
 
