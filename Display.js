@@ -244,7 +244,8 @@ class Display {
 
     updateHintButton() {
         const hintButton = document.getElementById("hintButton");
-        hintButton.style.display = !document.getElementById("DemoToggle").checked? "inline-block" : "none";
+        // hintButton.style.display = !document.getElementById("DemoToggle").checked? "inline-block" : "none";
+        hintButton.style.display = !(document.getElementById("DisplayToggle").value === '1') ? "inline-block" : "none";
     }
 
     createInputTableEditBorder() {
@@ -321,14 +322,14 @@ class Display {
                     img.width = 48;
                     img.height = 48;
                     img.classList.add("myimage");
-                    if (document.getElementById("InputToggle").checked && !document.getElementById("DemoToggle").checked) {
+                    if (document.getElementById("InputToggle").checked && (document.getElementById("DisplayToggle").value === '0')) {
                         img.classList.add("editable-border")
                     }
                     else {
                         if (img.classList.contains("editable-border"))
                             img.classList.remove("editable-border")
                     }
-                    if(!(document.getElementById("DemoToggle").checked && (img.src.endsWith("media/0_image.svg") ||img.src.endsWith("media/1_image.svg")))) {
+                    if(!(document.getElementById("DisplayToggle").value === '1' && (img.src.endsWith("media/0_image.svg") ||img.src.endsWith("media/1_image.svg")))) {
                         textbox.appendChild(img);
                     }
                 }
@@ -668,6 +669,23 @@ class Display {
 
         outputHeaderContainer.style.width = (rightOutputTable - leftActivTable) + 'px';
 
+        // let plotlySlider = document.getElementById("PlotlyToggle");
+        let displaySlider = document.getElementById("DisplayToggle");
+        if (displaySlider.value === "3") {
+            let plotlyDisplay = document.getElementById('plotly-container');
+            rightOutputTable = plotlyDisplay.getBoundingClientRect().right + 90;
+            leftActivTable =  plotlyDisplay.getBoundingClientRect().left;
+            widthOutputText = getComputedStyle(outputText).width;
+            widthOutputText = parseInt(widthOutputText.substring(0, widthOutputText.length -2));
+
+
+            outputTotalWidth = rightOutputTable - leftActivTable;
+            outputLineWidth = (outputTotalWidth - widthOutputText)/2;
+
+            outputHeaderContainer.style.width = (rightOutputTable - leftActivTable) + 'px';
+            outputHeaderContainer.style.marginRight = '20px';
+        }
+
         //INPUT LINES
         let inputLine1 = document.getElementById("line1")
         let inputLine2 = document.getElementById("line2")
@@ -692,26 +710,28 @@ class Display {
         }
 
         //OUTPUT LINES
-        let outputLine1 = document.getElementById("line1o")
-        let outputLine2 = document.getElementById("line2o")
+        let outputLine1 = document.getElementById("line1o");
+        let outputLine2 = document.getElementById("line2o");
 
-        outputLine1.innerText = ""
-        let oline1Width = getComputedStyle(outputLine1).width
-        oline1Width = parseInt(oline1Width.substring(0, oline1Width.length - 2))
+        outputLine1.innerText = "";
+        let oline1Width = getComputedStyle(outputLine1).width;
+        oline1Width = parseInt(oline1Width.substring(0, oline1Width.length - 2));
 
-        while (oline1Width < outputLineWidth-20) {
-            outputLine1.innerText += "━"
-            oline1Width = getComputedStyle(outputLine1).width
-            oline1Width = parseInt(oline1Width.substring(0, oline1Width.length - 2))
+        console.log(outputLineWidth, oline1Width);
+        console.log(Math.floor((outputLineWidth - oline1Width - 20)/2));
+        const repeatNum = Math.floor((outputLineWidth - oline1Width - 20)/15);
+        if (repeatNum > 0) {
+            outputLine1.innerText = "━".repeat(repeatNum);
         }
 
-        outputLine2.innerText = ""
-        let oline2Width = getComputedStyle(outputLine2).width
-        oline2Width = parseInt(oline2Width.substring(0, oline2Width.length - 2))
-        while (oline2Width < outputLineWidth-20) {
-            outputLine2.innerText += "━"
-            oline2Width = getComputedStyle(outputLine2).width
-            oline2Width = parseInt(oline2Width.substring(0, oline2Width.length - 2))
+
+        outputLine2.innerText = "";
+        let oline2Width = getComputedStyle(outputLine2).width;
+        oline2Width = parseInt(oline2Width.substring(0, oline2Width.length - 2));
+
+        const repeatNum2 = Math.floor((outputLineWidth - oline2Width - 20)/15);
+        if (repeatNum2 > 0) {
+            outputLine2.innerText = "━".repeat(repeatNum2);
         }
     }
 
@@ -794,7 +814,7 @@ class Display {
 
         if (!demo.selectedInput)
             return;
-        if(document.getElementById("DemoToggle").checked)
+        if(document.getElementById("DisplayToggle").value === '1')
             return;
         let selections = document.getElementById("selected-inputs");
         selections.innerHTML = "";
@@ -999,6 +1019,25 @@ class Display {
     }
     // respond to user hovering over table
 
+    findIndexOfPlotlyTrace(plotlyData, name) {
+        for (let i = 0; i < plotlyData.length; i++) {
+            if (plotlyData[i].name === name) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    includesLines(plotlyData) {
+        for (let i = 0; i < plotlyData.length; i++) {
+            if (plotlyData[i].nsLine) {
+                return true;
+            }
+        }
+        return false;
+
+    }
+
     hoverInput(row, tblId, mode) {
         const isOutputToggleChecked = document.getElementById("OutputToggle").checked
         let rowIdx = row.rowIndex || 0;
@@ -1109,20 +1148,21 @@ class Display {
         display.recreateOutputLine();
         display.outputLine.position();
 
-        const isDemoMode = document.getElementById("DemoToggle").checked;
-        if(isDemoMode) {
+        // const isDemoMode = document.getElementById("DemoToggle").checked;
+        const isDemoMode2 = document.getElementById("DisplayToggle").value === '1';
+        if(isDemoMode2) {
             return;
         }
         //removes lines when not hovered
         demo.lines.forEach(line => line.remove());
         //empties lines array
-        demo.lines = []
+        demo.lines = [];
 
         demo.activationLines?.forEach(line => line.remove());
-        demo.activationLines = []
+        demo.activationLines = [];
 
         demo.outputLines?.forEach(line => line.remove());
-        demo.outputLines = []
+        demo.outputLines = [];
 
         const selections = document.getElementById("selected-inputs");
         for (let r=0; r<demo.selectedInput.length; r++) {
@@ -1145,19 +1185,75 @@ class Display {
             }
         }
         if (this.hovering) {
-            demo.activationLines[0] = new LeaderLine(
-                LeaderLine.pointAnchor(document.getElementById("sigma"), {x: '20%', y: '80%'}),
-                LeaderLine.pointAnchor(activationRow.cells[0], {x: '48%', y: '50%'}),
-                {dash: {animation: true}}
-            );
-            // demo.activationLines[0].path = "arc";
-            demo.activationLines[0].setOptions({startSocket: 'bottom', endSocket: 'left'});
-            demo.outputLines[0] = new LeaderLine(
-                LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '90%', y: '50%'}),
-                LeaderLine.pointAnchor(outputRow.cells[0], {x: '48%', y: '50%'}),
-                {dash: {animation: true}}
-            );
-            demo.outputLines[0].path = "arc";
+            if (!(document.getElementById("DisplayToggle").value === '3')) {
+                demo.activationLines[0] = new LeaderLine(
+                    LeaderLine.pointAnchor(document.getElementById("sigma"), {x: '20%', y: '80%'}),
+                    LeaderLine.pointAnchor(activationRow.cells[0], {x: '48%', y: '50%'}),
+                    {dash: {animation: true}}
+                );
+                // demo.activationLines[0].path = "arc";
+                demo.activationLines[0].setOptions({startSocket: 'bottom', endSocket: 'left'});
+                demo.outputLines[0] = new LeaderLine(
+                    LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '90%', y: '50%'}),
+                    LeaderLine.pointAnchor(outputRow.cells[0], {x: '48%', y: '50%'}),
+                    {dash: {animation: true}}
+                );
+                demo.outputLines[0].path = "arc";
+                // document.getElementById("activation-container").style.display = "inline-flex";
+                // document.getElementById("output-container").style.display = "inline-flex";
+            } else {
+                if (document.getElementById('plotly-div').style.display === 'none')
+                    return;
+                let x = '48%', y = '50%';
+                let fullPlot = document.getElementsByClassName('scatterlayer')[0];
+
+                let plotlyData = document.getElementById('tester').data;
+                let falseIdx = display.findIndexOfPlotlyTrace(plotlyData, "falsePoints");
+                let trueIdx = display.findIndexOfPlotlyTrace(plotlyData, "truePoints");
+
+                let allTraces = fullPlot.children;
+                let falsePoints = fullPlot.children[falseIdx].children[3].children;
+                let truePoints = fullPlot.children[trueIdx].children[3].children;
+                if (fullPlot.children.length < 9) {
+                    falsePoints = fullPlot.children[falseIdx-2].children[3].children;
+                    truePoints = fullPlot.children[trueIdx-2].children[3].children;
+                }
+                // console.log(falsePoints);
+                // console.log(truePoints);
+
+                let desiredOutputForPoint = parseFloat(outputRow.children[DESIRED_OUTPUT_COLUMN].innerText);
+
+                let inputsData = inputs.data[rowIdx - 2]
+
+                let falsePointsPlotly = plotlyData[falseIdx];
+                let truePointsPlotly = plotlyData[trueIdx];
+
+                // console.log(truePointsPlotly);
+                // console.log(trueIdx);
+
+                let pointsUsed = desiredOutputForPoint === 0 ? falsePoints : truePoints;
+                let pointsUsedPlotly = desiredOutputForPoint === 0 ? falsePointsPlotly : truePointsPlotly;
+
+                // for now, the order of points [0, 0], [0, 1], [1, 0], [1, 1]
+                // console.log(outputs.data)
+
+                let pointedTo = null;
+
+                for (let i = 0; i < pointsUsed.length; i++) {
+                    if (pointsUsedPlotly.x[i] === inputsData[0] && pointsUsedPlotly.y[i] === inputsData[1]) {
+                        pointedTo = pointsUsed[i];
+                        console.log(pointedTo)
+                        break;
+                    }
+                }
+                demo.activationLines[0] = new LeaderLine(
+                    LeaderLine.pointAnchor(document.getElementById("output-links"), {x: '20%', y: '50%'}),
+                    LeaderLine.pointAnchor(pointedTo),
+                    {dash: {animation: true}}
+                );
+
+            }
+
         }
         display.alignTables()
         display.createOutputTableEditBorder();
@@ -1276,13 +1372,14 @@ class Display {
     UpdateInputToggle() {
         let checkbox = document.getElementById("InputToggle");
         let checkboxBinary = document.getElementById(("BinaryToggle"));
-        let checkboxDemo = document.getElementById("DemoToggle")
+        //let checkboxDemo = document.getElementById("DemoToggle")
+        let checkboxDemo = document.getElementById("DisplayToggle").value === '1'
         // checkboxBinary.style.display = checkbox.checked? "inline-block" : "none";
         // document.getElementById("OutputToggle").style.display =  checkbox.checked? "inline-block" : "none";
 
         //display.createOutputTableColors();
         this.updateSelectedInput();
-        if (!checkbox.checked || checkboxDemo.checked) {
+        if (!checkbox.checked || checkboxDemo) {
             $("#input-table tr:first").hide();
             $("#input-table tr td:nth-child(1)").hide();
             const buttonRows = document.getElementsByClassName("row-buttons-container");
@@ -1434,10 +1531,13 @@ class Display {
     }
 
     UpdateDemoToggle() {
+
+        console.log("updating demo")
         let hintText = document.getElementById("hintText");
-        let checkbox = document.getElementById("DemoToggle");
+        // let checkbox = document.getElementById("DemoToggle");
+        let displaySlider = document.getElementById("DisplayToggle");
         const otherHeaders = document.querySelectorAll('.top-table th:not(:first-child):not(:last-child)');
-        if (checkbox.checked) {
+        if (displaySlider.value === '1') {
             document.getElementById("guess-output-container").style.display = "inline-block";
 
             document.getElementById("CheckAnswerBtn").style.display = "inline-block";
@@ -1453,8 +1553,13 @@ class Display {
             });
             const buttonRows = document.getElementsByClassName("row-buttons-container");
             buttonRows.forEach(element => {
-                element.style.display = "none"
+                element.style.display = "none";
             });
+
+            if(this.outputLine) {
+                this.outputLine.remove();
+                this.outputLine = null;
+            }
         }
         else {
             document.getElementById("guess-output-container").style.display = "none";
@@ -1481,8 +1586,7 @@ class Display {
             buttonRows.forEach(element => {
                 element.style.display = binaryCheck.checked? "none" : "flex";
             });
-
-            //document.getElementById("demo-toggle").style.marginLeft = '60%';
+            this.recreateOutputLine();
         }
         this.UpdateInputToggle();
         display.updateGuessTable();
@@ -1492,6 +1596,7 @@ class Display {
         display.updateHintButton();
         checkAnswerCorrect();
         display.createInputLabelLines();
+        console.log("after a bunch of function calls")
 
         //reposition lines
         for (let i = 0; i < demo.weightLines.length; i++) {
@@ -1502,6 +1607,12 @@ class Display {
         }
         display.outputLine.position()
         display.alignTables();
+
+        if (displaySlider.value === '3') {
+            document.getElementById("output-container").style.display = "none";
+            document.getElementById("activation-container").style.display = "none";
+        }
+        console.log("end of update demo toggle")
 
     }
 
@@ -1515,19 +1626,82 @@ class Display {
     }
 
     UpdateFanfareToggle() {
-        let checkbox = document.getElementById("FanfareToggle")
+        let checkbox = document.getElementById("FanfareToggle");
         if (!checkbox.checked) {
             //document.getElementById("congrats-msg").hidden = true;
-            display.outputLine.position()
+            display.outputLine.position();
         } else {
-            display.checkForSuccess()
+            display.checkForSuccess();
+        }
+    }
+
+    UpdatePlotlyToggle() {
+        // currently only supports 2D
+        let inputTable = document.getElementById('input-table');
+        let numVariables = inputTable.rows[0].cells.length;
+
+
+        // let plotlyToggle = document.getElementById("PlotlyToggle");
+        let displaySlider = document.getElementById("DisplayToggle");
+        let outputTable = document.getElementById("output-table");
+        let activationTable = document.getElementById("activation-table");
+        let plotlyContainer = document.getElementById("plotly-container");
+        let outputContainer = document.getElementById("output-container");
+        let activationContainer = document.getElementById("activation-container");
+        if (displaySlider.value === '3') { // in graph mode
+            // remove/make invisible output table
+
+            outputTable.style.display = "none";
+            activationTable.style.display = "none";
+            outputContainer.style.display = "none";
+            activationContainer.style.display = "none";
+            plotlyContainer.style.display = "block";
+
+            let plotlyDiv = document.getElementById('plotly-div');
+            let sliders = document.getElementsByClassName('plotly-slider-class');
+            let errorText = document.getElementById('plotly-error');
+
+            if (numVariables !== 3) {
+
+                errorText.style.display =  "block";
+                plotlyDiv.style.display = "none";
+
+                for (let i = 0; i < sliders.length; i++) {
+                    sliders[i].style.display = "none";
+                }
+                demo.activationLines?.forEach(line => line.remove());
+                demo.activationLines = [];
+
+            } else {
+                errorText.style.display =  "none";
+                plotlyDiv.style.display = "block";
+                for (let i = 0; i < sliders.length; i++) {
+                    sliders[i].style.display = "flex";
+                }
+                initialize();
+            }
+        } else {
+            outputTable.style.display = "block";
+            activationTable.style.display = "block";
+            plotlyContainer.style.display = "none";
+            outputContainer.style.display = "inline-flex";
+            activationContainer.style.display = "inline-flex";
+        }
+
+        if (this.outputLine != null)
+            this.outputLine.position();
+        for (let i = 0; i < demo.weightLines.length; i++) {
+            demo.weightLines[i].position();
+        }
+        if (demo.biasLine) {
+            demo.biasLine.position();
         }
     }
 
     checkDesiredOutput(output, desired, activation) {
         //TODO: do extra testing with the regex and make changes if necessary
         if (!output)
-            return
+            return;
         const regex = '/^0*1?$/gm'; //detects leading zeros
 
         let checkboxEdit = document.getElementById("InputToggle");
@@ -1575,15 +1749,15 @@ class Display {
         if (outputParsedValue !== parsedValue && document.getElementById("OutputToggle").checked) {
             output.style.background = ERROR_COLOR; //pink (error)
             //activation.style.background = ERROR_COLOR;
-            return false
+            return false;
         }
         else {
             //output.style.removeProperty('background-color');
             output.style.background = OUTPUT_COLOR;
             //activation.style.background = "none";
-            return true
+            return true;
         }
-        display.createOutputTableEditBorder();
+        // display.createOutputTableEditBorder();
     }
 
 // update display panel
@@ -1630,6 +1804,5 @@ class Display {
     }
     showDesiredOutput (show, editable) {
         outputTable.showColumn(DESIRED_OUTPUT_COLUMN, show, editable);
-        //display.createOutputTableEditBorder()
     }
 }

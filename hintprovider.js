@@ -190,7 +190,7 @@ class hintprovider {
         //first check if no change works
         let sol = this.checkForSolution([]);
         if (!sol.includes(Number.MIN_VALUE)) //solution present!
-            return ["This problem is solved, try choosing another problem.", -1, [], 0, -1]
+            return ["You've solved the problem!", -1, [], 0, -1]
         //create subsets
         let subsets = this.getAllSubsets();
         if(prevHintIndex === -1) { //previous hint not relevant

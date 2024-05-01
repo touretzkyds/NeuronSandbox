@@ -152,11 +152,11 @@ class Table {
             let style = $(this).attr('style');
             if (style)
             {
-                style += '; animation-delay: 0.2s;'
+                style += '; animation-delay: 0.1s;'
                 $(this).attr('style',style);
             }
             else
-                $(this).css('animation-delay',0.2 +'s');
+                $(this).css('animation-delay',0.1 +'s');
             $(this).classList?.remove("animation");
         });
         display.createInputTableEditBorder()
@@ -232,11 +232,11 @@ class Table {
             let style = $(this).attr('style');
             if (style)
             {
-                style += '; animation-delay: 0.2s;'
+                style += '; animation-delay: 0.1s;'
                 $(this).attr('style',style);
             }
             else
-                $(this).css('animation-delay',0.2 +'s');
+                $(this).css('animation-delay',0.1+'s');
             $(this).classList?.remove("animation");
         });
 

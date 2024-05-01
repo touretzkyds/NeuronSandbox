@@ -325,7 +325,7 @@ function checkAnswerCorrect() {
     let inputTable = document.getElementById("input-table")
     let outputTable = document.getElementById("output-table")
     let activationTable = document.getElementById("activation-table")
-    let guessToggle = document.getElementById("DemoToggle")
+    let guessToggle = document.getElementById("DisplayToggle")
     let editToggle = document.getElementById("InputToggle")
     let thresholdText = document.getElementById("th1")
     let biasContent = document.getElementById("bias-text")
@@ -364,7 +364,7 @@ function checkAnswerCorrect() {
         }
     }
 
-    if(!guessToggle.checked) {
+    if(guessToggle.value !== '1') {
         for (let i = 1; i < tableRows; i++) {
             let row = outputTable.rows.item(i);
             let inputRow = inputTable.rows.item(i+1);
@@ -380,8 +380,7 @@ function checkAnswerCorrect() {
                 activationRow.children[0].classList.add('blue-text');
             }
 
-            if (!document.getElementById("BinaryToggle").checked)
-            {
+            if (!document.getElementById("BinaryToggle").checked) {
                 for(let j = 0; j < inputRow.children.length; j++)
                 {
                     let inputValue = parseFloat(inputRow.children[j].textContent);
@@ -655,7 +654,7 @@ class Demo {
     }
 
     adjustWeightPlacement() {
-        if(document.getElementById("DemoToggle").checked)
+        if(document.getElementById("DisplayToggle").value === '1')
             return;
         // let headerRowVals = [];
         // display.getHeaderRowVals(headerRowVals);
@@ -912,6 +911,14 @@ class Demo {
         hintText.innerText = "";
         display.createInputLabelLines()
 
+        //TODO: instead of initialize, change to an "update" function
+
+        let inputTableObj = document.getElementById('input-table');
+        let numVariables = inputTableObj.rows[0].cells.length;
+        if (numVariables === 2) {
+            initialize();
+        }
+
     }
 
     // convert to valid inputs for processing and keep track of invalid parts of input
@@ -1013,13 +1020,16 @@ async function provideHint() {
     let hintText = document.getElementById("hintText");
     let weightHolder = document.getElementById("input-link-text");
     let weightName = "";
-    if (hintIndex < weightHolder.children.length) { //weight
+    if (hintIndex < 0) { // no hint is needed, problem already solved
+        hintText.innerHTML = hintArr[0];
+    }
+    else if (hintIndex < weightHolder.children.length) { //weight hint
         weightName = weightHolder?.children[hintIndex]?.children[0].innerHTML;
         weightName = weightName.replace("=", "");
         weightName = weightName.replace(" ", "");
         hintText.innerHTML = hintArr[0] + " " + weightName + ".";
     }
-    else {
+    else { //threshold hint
         hintText.innerHTML = hintArr[0];
     }
 
@@ -1137,7 +1147,7 @@ function setImageEditOptions() {
         while (tdElement && tdElement.tagName !== 'TD') {
             tdElement = tdElement.parentNode;
         }
-        if(document.getElementById("InputToggle").checked && !document.getElementById("DemoToggle").checked) {
+        if(document.getElementById("InputToggle").checked && (document.getElementById("DisplayToggle").value === '2')) {
             if(!image.classList.contains("editable-border")) {
                 image.classList.add("editable-border")
             }
@@ -1149,7 +1159,7 @@ function setImageEditOptions() {
         }
         let imageMenuHandler = function (event) {
             //make the dialog box visible
-            if (document.getElementById("InputToggle").checked && !document.getElementById("DemoToggle").checked) {
+            if (document.getElementById("InputToggle").checked && (document.getElementById("DisplayToggle").value !== '1')) {
                 let table = tdElement.closest('table');
                 event.preventDefault();
                 showMenu(event, this, tdElement.cellIndex, tdElement.rowIndex, table)
@@ -1408,7 +1418,9 @@ function uploadJson(text) {
     document.getElementById('OutputToggle').checked = dict["output-toggle-checked"];
     document.getElementById("FanfareToggle").checked = dict["fanfare-toggle-checked"];
 
-    document.getElementById("DemoToggle").checked = dict["guessToggleChecked"];
+
+
+    document.getElementById("DisplayToggle").value = dict["guessToggleChecked"] ? '1' : '2';
     let difficultyLevel = 50;
     if (dict["difficultyLevel"]) {
         difficultyLevel = dict["difficultyLevel"];
@@ -1475,7 +1487,8 @@ function uploadJson(text) {
     }
     thresholdToggle.dispatchEvent(new Event("click"));
     handleDesiredOutputColumn();
-    document.getElementById("DemoToggle").dispatchEvent(new Event("click"));
+   // document.getElementById("DemoToggle").dispatchEvent(new Event("click"));
+    document.getElementById("DisplayToggle").dispatchEvent(new Event("change"));
     isLoading = false;
     perceptron.setBiasUI();
     setupQuestionFields();
@@ -1486,6 +1499,11 @@ function uploadJson(text) {
     checkAnswerCorrect();
     document.getElementById("ShowProgressBarToggle").checked = true
     display.UpdateShowProgressBarToggle();
+
+    // document.getElementById("PlotlyToggle").checked = false;
+    document.getElementById("DisplayToggle").value = '2';
+    display.UpdatePlotlyToggle();
+    // initialize();
 }
 
 async function uploadFile(event) {
@@ -1602,7 +1620,7 @@ display.createOutputTableEditBorder();
 addThresholdEditOption();
 handleDesiredOutputColumn();
 loadQuestionsAndModels();
-document.getElementById("DemoToggle").checked = true;
+// document.getElementById("DemoToggle").checked = true;
 display.UpdateDemoToggle();
 document.getElementById("AutoProgressToggle").checked = true;
 
@@ -1654,14 +1672,25 @@ $('#InputToggle').change(function() { //toggle edit
     display.createOutputTableEditBorder();
     display.updateGuessTable();
     display.toggleProblemDisplay();
+    display.outputLine.position()
+    display.updateBiasToggle()
+
+
+    let displaySlider = document.getElementById("DisplayToggle");
+    if (displaySlider.value === '3') {
+        document.getElementById("output-container").style.display = "none";
+        document.getElementById("activation-container").style.display = "none";
+    }
+
     for (let i = 0; i < demo.weightLines.length; i++) {
         demo.weightLines[i].position();
     }
-    if (demo.biasLine && !document.getElementById("DemoToggle").checked) {
+    if (demo.biasLine) {
         demo.biasLine.position();
     }
-    display.outputLine.position()
-    display.updateBiasToggle()
+    if (display.outputLine) {
+        display.outputLine.position();
+    }
 });
 
 $('#OutputToggle').change(function() { //toggle output
@@ -1681,12 +1710,38 @@ $('#BinaryToggle').change(function() { //toggle output
     display.outputLine.position();
 });
 
-$('#DemoToggle').change(function() { //toggle output
-    display.UpdateDemoToggle();
-});
+// $('#DemoToggle').change(function() { //toggle output
+//     display.UpdateDemoToggle();
+// });
+
+$('#DisplayToggle').change(function() {
+
+    display.UpdatePlotlyToggle();
+    display.createInputLabelLines();
+    if (document.getElementById("DisplayToggle").value !== '3')
+        display.UpdateDemoToggle();
+})
 
 $('#biasToggle').change(function() { //toggle bias
     display.updateBiasToggle();
+
+    for (let i = 0; i < demo.weightLines.length; i++) {
+        demo.weightLines[i].position();
+    }
+    if (demo.biasLine) {
+        demo.biasLine.position();
+    }
+    display.outputLine.position();
+
+    let displaySlider = document.getElementById("DisplayToggle");
+    if (displaySlider.value === '3') {
+        document.getElementById("output-container").style.display = "none";
+        document.getElementById("activation-container").style.display = "none";
+        initialize();
+    }
+
+
+
 });
 
 $('#ShowProgressBarToggle').change(function() { //toggle bias
@@ -1700,7 +1755,7 @@ $('#FanfareToggle').change(function() { //toggle output
     {
         demo.weightLines[i].position();
     }
-    if (demo.biasLine && !$('#DemoToggle').checked) {
+    if ($('#DisplayToggle').value === '1') {
         demo.biasLine.position();
     }
 });
@@ -1795,7 +1850,7 @@ function handleDesiredOutputColumn() {
 }
 function FixCheckAnswerButtonPosition() {
     var button = document.getElementById('CheckAnswerBtn');
-    var referenceSwitch = document.getElementById('DemoSwitch');
+    var referenceSwitch = document.getElementById('label-reference');
 
     // Get the initial position of the button relative to the document
     var buttonRect = button.getBoundingClientRect();
