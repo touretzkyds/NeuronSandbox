@@ -30,7 +30,11 @@
     <script src = "VariableData.js"></script>
     <script src = "DataOperator.js"></script>
     <script src = "Table.js"></script>
+
+<!--    plotly scripts-->
     <script src = "plotly.js"></script>
+    <script src = "plotly1d.js"></script>
+
     <script src = "slider.js"></script>
 
     <script type="text/javascript">
@@ -247,7 +251,7 @@
 <!--                            <option value="3" label="3"></option>-->
 <!--                        </datalist>-->
 
-                        <label id="label-reference" style="width: 50px">Graphical Display</label>
+                        <label id="label-reference" style="width: 50px">Solve for Boundary</label>
 
                     </div>
                 </div>
@@ -491,12 +495,14 @@
                         </div>
                     </div>
                     <div id="plotly-container" style="display: none; margin-right: 10%" class="right">
-                        <div style="position: relative">
+                        <p id="plotly-error" style="display: none">Currently not available for this number of inputs. Please select a problem with 2 inputs.</p>
+                        <div id="plotly-div" style="position: relative">
                             <div id="tester"></div>
+                            <div style="display: none" id="plotly-1d"></div>
                             <button style="position: absolute; margin-top: -15%; left: 90px" type="button" id="revSignButton" onclick="reverseSign(); updateAllSliders()">Flip Sign</button>
                         </div>
 
-                        <div style="display:flex; flex-direction: row; justify-content: right; align-items: center; margin-top: 0px">
+                        <div class="plotly-slider-class" style="display:flex; flex-direction: row; justify-content: right; align-items: center; margin-top: 0px">
                             <label class="slider-label" id="weight1-label" style="margin-right: -30%" for="weight1">Peanut Butter</label>
                             <div class="slider-container">
                                 <div class="color-bar" id="colorBar"></div>
@@ -505,7 +511,7 @@
                             </div>
                         </div>
 
-                        <div style="display:flex; flex-direction: row; justify-content: right; align-items: center; margin-top: -20px">
+                        <div class="plotly-slider-class" style="display:flex; flex-direction: row; justify-content: right; align-items: center; margin-top: -20px">
                             <label class="slider-label" id="weight2-label" style="margin-right: -30%" for="weight2">Jelly</label>
                             <div class="slider-container">
                                 <div class="color-bar" id="colorBar2"></div>
@@ -514,7 +520,7 @@
                             </div>
                         </div>
 
-                        <div style="display:flex; flex-direction: row; justify-content: right; align-items: center; margin-top: -20px">
+                        <div class="plotly-slider-class" style="display:flex; flex-direction: row; justify-content: right; align-items: center; margin-top: -20px">
                             <label class="slider-label" id="threshold-label" style="margin-right: -30%" for="threshold">Threshold</label>
                             <div class="slider-container">
                                 <div class="color-bar" id="colorBar3"></div>

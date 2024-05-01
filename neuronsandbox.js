@@ -912,7 +912,12 @@ class Demo {
         display.createInputLabelLines()
 
         //TODO: instead of initialize, change to an "update" function
-        initialize();
+
+        let inputTableObj = document.getElementById('input-table');
+        let numVariables = inputTableObj.rows[0].cells.length;
+        if (numVariables === 2) {
+            initialize();
+        }
 
     }
 

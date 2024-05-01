@@ -672,7 +672,7 @@ class Display {
         // let plotlySlider = document.getElementById("PlotlyToggle");
         let displaySlider = document.getElementById("DisplayToggle");
         if (displaySlider.value === "3") {
-            let plotlyDisplay = document.getElementById('tester');
+            let plotlyDisplay = document.getElementById('plotly-container');
             rightOutputTable = plotlyDisplay.getBoundingClientRect().right + 90;
             leftActivTable =  plotlyDisplay.getBoundingClientRect().left;
             widthOutputText = getComputedStyle(outputText).width;
@@ -713,29 +713,26 @@ class Display {
         let outputLine1 = document.getElementById("line1o");
         let outputLine2 = document.getElementById("line2o");
 
-        outputLine1.innerText = ""
-        let oline1Width = getComputedStyle(outputLine1).width
-        oline1Width = parseInt(oline1Width.substring(0, oline1Width.length - 2))
+        outputLine1.innerText = "";
+        let oline1Width = getComputedStyle(outputLine1).width;
+        oline1Width = parseInt(oline1Width.substring(0, oline1Width.length - 2));
 
-        console.log(outputLineWidth, oline1Width)
-        console.log(Math.floor((outputLineWidth - oline1Width - 20)/2))
-        outputLine1.innerText = "━".repeat(Math.floor((outputLineWidth - oline1Width - 20)/15));
-        // while (oline1Width < outputLineWidth-20) {
-        //     outputLine1.innerText += "━";
-        //     let oline1WidthText = getComputedStyle(outputLine1).width
-        //     oline1Width = parseInt(oline1WidthText.substring(0, oline1WidthText.length - 2))
-        // }
+        console.log(outputLineWidth, oline1Width);
+        console.log(Math.floor((outputLineWidth - oline1Width - 20)/2));
+        const repeatNum = Math.floor((outputLineWidth - oline1Width - 20)/15);
+        if (repeatNum > 0) {
+            outputLine1.innerText = "━".repeat(repeatNum);
+        }
 
 
-        outputLine2.innerText = ""
-        let oline2Width = getComputedStyle(outputLine2).width
-        oline2Width = parseInt(oline2Width.substring(0, oline2Width.length - 2))
-        outputLine2.innerText = "━".repeat(Math.floor((outputLineWidth - oline2Width -20)/15));
-        // while (oline2Width < outputLineWidth-20) {
-        //     outputLine2.innerText += "━"
-        //     oline2Width = getComputedStyle(outputLine2).width
-        //     oline2Width = parseInt(oline2Width.substring(0, oline2Width.length - 2))
-        // }
+        outputLine2.innerText = "";
+        let oline2Width = getComputedStyle(outputLine2).width;
+        oline2Width = parseInt(oline2Width.substring(0, oline2Width.length - 2));
+
+        const repeatNum2 = Math.floor((outputLineWidth - oline2Width - 20)/15);
+        if (repeatNum2 > 0) {
+            outputLine2.innerText = "━".repeat(repeatNum2);
+        }
     }
 
     adjustSelectedInputFontSize() {
@@ -1159,13 +1156,13 @@ class Display {
         //removes lines when not hovered
         demo.lines.forEach(line => line.remove());
         //empties lines array
-        demo.lines = []
+        demo.lines = [];
 
         demo.activationLines?.forEach(line => line.remove());
-        demo.activationLines = []
+        demo.activationLines = [];
 
         demo.outputLines?.forEach(line => line.remove());
-        demo.outputLines = []
+        demo.outputLines = [];
 
         const selections = document.getElementById("selected-inputs");
         for (let r=0; r<demo.selectedInput.length; r++) {
@@ -1205,6 +1202,8 @@ class Display {
                 // document.getElementById("activation-container").style.display = "inline-flex";
                 // document.getElementById("output-container").style.display = "inline-flex";
             } else {
+                if (document.getElementById('plotly-div').style.display === 'none')
+                    return;
                 let x = '48%', y = '50%';
                 let fullPlot = document.getElementsByClassName('scatterlayer')[0];
 
@@ -1238,7 +1237,6 @@ class Display {
                 // for now, the order of points [0, 0], [0, 1], [1, 0], [1, 1]
                 // console.log(outputs.data)
 
-                console.log(allTraces);
                 let pointedTo = null;
 
                 for (let i = 0; i < pointsUsed.length; i++) {
@@ -1555,11 +1553,11 @@ class Display {
             });
             const buttonRows = document.getElementsByClassName("row-buttons-container");
             buttonRows.forEach(element => {
-                element.style.display = "none"
+                element.style.display = "none";
             });
 
             if(this.outputLine) {
-                this.outputLine.remove()
+                this.outputLine.remove();
                 this.outputLine = null;
             }
         }
@@ -1589,10 +1587,7 @@ class Display {
                 element.style.display = binaryCheck.checked? "none" : "flex";
             });
             this.recreateOutputLine();
-
-            //document.getElementById("demo-toggle").style.marginLeft = '60%';
         }
-        console.log("before bunch of function calls")
         this.UpdateInputToggle();
         display.updateGuessTable();
         demo.adjustWeightPlacement();
@@ -1631,18 +1626,23 @@ class Display {
     }
 
     UpdateFanfareToggle() {
-        let checkbox = document.getElementById("FanfareToggle")
+        let checkbox = document.getElementById("FanfareToggle");
         if (!checkbox.checked) {
             //document.getElementById("congrats-msg").hidden = true;
-            display.outputLine.position()
+            display.outputLine.position();
         } else {
-            display.checkForSuccess()
+            display.checkForSuccess();
         }
     }
 
     UpdatePlotlyToggle() {
+        // currently only supports 2D
+        let inputTable = document.getElementById('input-table');
+        let numVariables = inputTable.rows[0].cells.length;
+
+
         // let plotlyToggle = document.getElementById("PlotlyToggle");
-        let displaySlider = document.getElementById("DisplayToggle")
+        let displaySlider = document.getElementById("DisplayToggle");
         let outputTable = document.getElementById("output-table");
         let activationTable = document.getElementById("activation-table");
         let plotlyContainer = document.getElementById("plotly-container");
@@ -1650,13 +1650,36 @@ class Display {
         let activationContainer = document.getElementById("activation-container");
         if (displaySlider.value === '3') { // in graph mode
             // remove/make invisible output table
+
             outputTable.style.display = "none";
             activationTable.style.display = "none";
-            plotlyContainer.style.display = "block";
             outputContainer.style.display = "none";
             activationContainer.style.display = "none";
-            initialize();
+            plotlyContainer.style.display = "block";
 
+            let plotlyDiv = document.getElementById('plotly-div');
+            let sliders = document.getElementsByClassName('plotly-slider-class');
+            let errorText = document.getElementById('plotly-error');
+
+            if (numVariables !== 3) {
+
+                errorText.style.display =  "block";
+                plotlyDiv.style.display = "none";
+
+                for (let i = 0; i < sliders.length; i++) {
+                    sliders[i].style.display = "none";
+                }
+                demo.activationLines?.forEach(line => line.remove());
+                demo.activationLines = [];
+
+            } else {
+                errorText.style.display =  "none";
+                plotlyDiv.style.display = "block";
+                for (let i = 0; i < sliders.length; i++) {
+                    sliders[i].style.display = "flex";
+                }
+                initialize();
+            }
         } else {
             outputTable.style.display = "block";
             activationTable.style.display = "block";
@@ -1678,7 +1701,7 @@ class Display {
     checkDesiredOutput(output, desired, activation) {
         //TODO: do extra testing with the regex and make changes if necessary
         if (!output)
-            return
+            return;
         const regex = '/^0*1?$/gm'; //detects leading zeros
 
         let checkboxEdit = document.getElementById("InputToggle");
@@ -1726,15 +1749,15 @@ class Display {
         if (outputParsedValue !== parsedValue && document.getElementById("OutputToggle").checked) {
             output.style.background = ERROR_COLOR; //pink (error)
             //activation.style.background = ERROR_COLOR;
-            return false
+            return false;
         }
         else {
             //output.style.removeProperty('background-color');
             output.style.background = OUTPUT_COLOR;
             //activation.style.background = "none";
-            return true
+            return true;
         }
-        display.createOutputTableEditBorder();
+        // display.createOutputTableEditBorder();
     }
 
 // update display panel
@@ -1781,6 +1804,5 @@ class Display {
     }
     showDesiredOutput (show, editable) {
         outputTable.showColumn(DESIRED_OUTPUT_COLUMN, show, editable);
-        //display.createOutputTableEditBorder()
     }
 }
