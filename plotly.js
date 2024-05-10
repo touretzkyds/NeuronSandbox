@@ -34,7 +34,6 @@ function main() {
     const weight2 = document.getElementById("weight2");
     const threshold = document.getElementById("threshold");
 
-
     weight1.addEventListener("input", (event) => {
         run();
     });
@@ -268,6 +267,39 @@ function createTraces(inputs, outputs, weights, threshold) {
     }
     let data = [boundsX, boundsY, line, lineEndpoints, lineMidpoint, falsePoints, truePoints, incorrectlyTrue, incorrectlyFalse, plus, minus];
 
+    /*
+        Drawing the red/green regions (i.e. shapes attribute in layout).
+        Only draw valid regions (don't attempt to draw a green/red region when
+        no green/red region exists
+    */
+    let shapes = [];
+    if (trueShape !== 'MZ') // true region exists
+        shapes.push(
+            {
+                type: 'path',
+                path: trueShape,
+                fillcolor: 'green',
+                line: {
+                    color: 'green'
+                },
+                opacity: 0.2, layer: 'below'
+            }
+        )
+    if(falseShape !== 'MZ') // false region exists
+        shapes.push(
+            {
+                type: 'path',
+                path: falseShape,
+                fillcolor: 'red',
+                line: {
+                    color: 'red'
+                },
+                opacity: 0.2, layer: 'below'
+            }
+        )
+
+
+
     let layout = {
         autosize: false,
         xaxis: {
@@ -307,26 +339,7 @@ function createTraces(inputs, outputs, weights, threshold) {
         height: 500,
         hovermode: 'closest',
         showlegend: false,
-        shapes: [
-            {
-                type: 'path',
-                path: trueShape,
-                fillcolor: 'green',
-                line: {
-                    color: 'green'
-                },
-                opacity: 0.2, layer: 'below'
-            },
-            {
-                type: 'path',
-                path: falseShape,
-                fillcolor: 'red',
-                line: {
-                    color: 'red'
-                },
-                opacity: 0.2, layer: 'below'
-            },
-        ],
+        shapes: shapes,
         doubleClick: false
 
 
@@ -484,19 +497,19 @@ function calculateInputs(inputs, outputs, weights, threshold, ranges) {
 
     for (let i = 0; i < sortedTruePoints.length; i++) {
         if (i === 0) {
-            trueShape += sortedTruePoints[i] + "," + sortedTruePoints[i] + ", "
+            trueShape += sortedTruePoints[i] + "," + sortedTruePoints[i] + ", ";
         }
-        trueShape += "L " + sortedTruePoints[i] + "," + sortedTruePoints[i] + ", "
+        trueShape += "L " + sortedTruePoints[i] + "," + sortedTruePoints[i] + ", ";
     }
-    trueShape += "Z"
+    trueShape += "Z";
 
     for (let i = 0; i < sortedFalsePoints.length; i++) {
         if (i === 0) {
-            falseShape += sortedFalsePoints[i] + "," + sortedFalsePoints[i] + ", "
+            falseShape += sortedFalsePoints[i] + "," + sortedFalsePoints[i] + ", ";
         }
-        falseShape += "L " + sortedFalsePoints[i] + "," + sortedFalsePoints[i] + ", "
+        falseShape += "L " + sortedFalsePoints[i] + "," + sortedFalsePoints[i] + ", ";
     }
-    falseShape += "Z"
+    falseShape += "Z";
 
     return [
         trueX, trueY, falseX, falseY,
@@ -776,7 +789,7 @@ function initialize () {
 
     myPlot.on('plotly_click', function(clickedData){
         if (!justMouseDown) {
-            console.log("in plotly_click, clicked on point")
+            // console.log("in plotly_click, clicked on point")
             if (pointClicked < 0) {
                 dragLayer.style.cursor = 'pointer'
             } else {
@@ -834,7 +847,7 @@ function initialize () {
         justMouseDown = false;
     });
 
-    console.log(data.find(e => e.nsLine))
+    // console.log(data.find(e => e.nsLine))
 
 }
 

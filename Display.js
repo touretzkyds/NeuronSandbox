@@ -717,8 +717,6 @@ class Display {
         let oline1Width = getComputedStyle(outputLine1).width;
         oline1Width = parseInt(oline1Width.substring(0, oline1Width.length - 2));
 
-        console.log(outputLineWidth, oline1Width);
-        console.log(Math.floor((outputLineWidth - oline1Width - 20)/2));
         const repeatNum = Math.floor((outputLineWidth - oline1Width - 20)/15);
         if (repeatNum > 0) {
             outputLine1.innerText = "━".repeat(repeatNum);
@@ -1218,8 +1216,6 @@ class Display {
                     falsePoints = fullPlot.children[falseIdx-2].children[3].children;
                     truePoints = fullPlot.children[trueIdx-2].children[3].children;
                 }
-                // console.log(falsePoints);
-                // console.log(truePoints);
 
                 let desiredOutputForPoint = parseFloat(outputRow.children[DESIRED_OUTPUT_COLUMN].innerText);
 
@@ -1228,21 +1224,15 @@ class Display {
                 let falsePointsPlotly = plotlyData[falseIdx];
                 let truePointsPlotly = plotlyData[trueIdx];
 
-                // console.log(truePointsPlotly);
-                // console.log(trueIdx);
-
                 let pointsUsed = desiredOutputForPoint === 0 ? falsePoints : truePoints;
                 let pointsUsedPlotly = desiredOutputForPoint === 0 ? falsePointsPlotly : truePointsPlotly;
 
                 // for now, the order of points [0, 0], [0, 1], [1, 0], [1, 1]
-                // console.log(outputs.data)
-
                 let pointedTo = null;
 
                 for (let i = 0; i < pointsUsed.length; i++) {
                     if (pointsUsedPlotly.x[i] === inputsData[0] && pointsUsedPlotly.y[i] === inputsData[1]) {
                         pointedTo = pointsUsed[i];
-                        console.log(pointedTo)
                         break;
                     }
                 }
@@ -1532,7 +1522,6 @@ class Display {
 
     UpdateDemoToggle() {
 
-        console.log("updating demo")
         let hintText = document.getElementById("hintText");
         // let checkbox = document.getElementById("DemoToggle");
         let displaySlider = document.getElementById("DisplayToggle");
@@ -1596,7 +1585,6 @@ class Display {
         display.updateHintButton();
         checkAnswerCorrect();
         display.createInputLabelLines();
-        console.log("after a bunch of function calls")
 
         //reposition lines
         for (let i = 0; i < demo.weightLines.length; i++) {
@@ -1612,7 +1600,6 @@ class Display {
             document.getElementById("output-container").style.display = "none";
             document.getElementById("activation-container").style.display = "none";
         }
-        console.log("end of update demo toggle")
 
     }
 
