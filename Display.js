@@ -1648,7 +1648,7 @@ class Display {
             let sliders = document.getElementsByClassName('plotly-slider-class');
             let errorText = document.getElementById('plotly-error');
 
-            if (numVariables !== 3) {
+            if (numVariables > 3) {
 
                 errorText.style.display =  "block";
                 plotlyDiv.style.display = "none";
@@ -1658,6 +1658,7 @@ class Display {
                 }
                 demo.activationLines?.forEach(line => line.remove());
                 demo.activationLines = [];
+
 
             } else {
                 errorText.style.display =  "none";

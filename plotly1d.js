@@ -1,85 +1,58 @@
 
 window.addEventListener('load', main, false);
-let ranges = [[-0.5, -0.5], [-0.5, 1.5], [1.5, -0.5], [1.5, 1.5]];
-let camera = null;
-let xInDataCoord = 0;
-let yInDataCoord = 0;
-let distToRegister = 0.05;
-let pointClickedX = Number.MIN_VALUE;
-let pointClickedY = Number.MIN_VALUE;
-let pointClicked = -1; // 0 = endpoint, 1 = midpoint
-let justMouseDown = false;
+// let ranges1d = [[-0.5, -0.5], [-0.5, 1.5], [1.5, -0.5], [1.5, 1.5]];
+let ranges1d = [[0, 0], [0, 1], [1, 0], [1, 1]];
+// let camera = null;
 
-// Colors
-let FALSE_COLOR = 'rgba(255, 0, 21, 1)';
-let TRUE_COLOR = 'rgba(0, 255, 60, 1)';
-let LINE_COLOR_ACTIVE = 'rgb(55, 128, 191)';
-let LINE_COLOR_INACTIVE = 'rgb(163, 163, 162)'; // CURRENTLY NOT USED
-let INCORRECT_COLOR = 'rgba(0, 0, 0, 0.95)';
 
-function generateOutputData() {
-    let outputTable = document.getElementById('output-table');
-    let outputData = Array(outputs.data.length).fill(0);
-    for (let i = 1; i < outputTable.rows.length; i++) {
-        outputData[i-1] = parseFloat(outputTable.rows[i].cells[1].innerText);
-
-    }
-    return outputData;
-}
 
 function main() {
-    initialize();
+    // clear all event listeners on all sliders
+    let sliders = document.getElementsByClassName('slider-plotly');
+
+    for (let i = 0; i < sliders.length; i++) {
+        let slider = sliders[i];
+        let newElem = slider.cloneNode(true);
+        slider.parentNode.replaceChild(newElem, slider);
+    }
+
+    initialize1d();
 
     const weight1 = document.getElementById("weight1");
     // const weight2 = document.getElementById("weight2");
     const threshold = document.getElementById("threshold");
 
     weight1.addEventListener("input", (event) => {
-        run();
-    });
-    weight2.addEventListener("input", (event) => {
-        run();
+        run1d();
     });
     threshold.addEventListener("input", (event) => {
-        run();
+        run1d();
     });
-    weight1_3d.addEventListener("input", (event) => {
-        run();
-    });
-    weight2_3d.addEventListener("input", (event) => {
-        run();
-    });
-    weight3_3d.addEventListener("input", (event) => {
-        run();
-    });
-    threshold_3d.addEventListener("input", (event) => {
-        run();
-    });
+
 
 }
 
-function createTraces(inputs, outputs, weights, threshold) {
+function createTraces1d(inputs, outputs, weights, threshold) {
 
     // let ranges = [[-0.5, -0.5], [-0.5, 1.5], [1.5, -0.5], [1.5, 1.5]]
-    let calculatedVals = calculateInputs(inputs, outputs, weights, threshold, ranges)
-    let trueX = calculatedVals[0] // input x-coords that are marked true
-    let trueY = calculatedVals[1] // input y-coords that are marked true
-    let falseX = calculatedVals[2] // input x-coords that are marked false
-    let falseY = calculatedVals[3] // input y-coords that are marked false
-    let intersectionX = calculatedVals[4]
-    let intersectionY = calculatedVals[5]
-    let trueShape = calculatedVals[6]
-    let falseShape = calculatedVals[7]
-    let incorrectlyTrueX = calculatedVals[8]
-    let incorrectlyTrueY = calculatedVals[9]
-    let incorrectlyFalseX = calculatedVals[10]
-    let incorrectlyFalseY = calculatedVals[11]
-    let centerXTrue = calculatedVals[12]
-    let centerYTrue = calculatedVals[13]
-    let centerXFalse = calculatedVals[14]
-    let centerYFalse = calculatedVals[15]
-    let intersectionBoundsX = calculatedVals[16]
-    let intersectionBoundsY = calculatedVals[17]
+    let calculatedVals = calculateInputs1d(inputs, outputs, weights, threshold, ranges1d)
+
+    let trueX = calculatedVals[0];
+    let trueY = calculatedVals[1];
+    let falseX = calculatedVals[2];
+    let falseY = calculatedVals[3];
+    let intersectionX = calculatedVals[4];
+    let intersectionY = calculatedVals[5];
+    let incorrectlyTrueX = calculatedVals[6];
+    let incorrectlyTrueY = calculatedVals[7];
+    let incorrectlyFalseX = calculatedVals[8];
+    let incorrectlyFalseY = calculatedVals[9];
+    let centerXTrue = calculatedVals[10];
+    let centerYTrue = calculatedVals[11];
+    let centerXFalse = calculatedVals[12];
+    let centerYFalse = calculatedVals[13];
+    let trueShape = calculatedVals[14];
+    let falseShape = calculatedVals[15];
 
     let inputTable = document.getElementById('selected-inputs');
     let start = document.getElementById("biasToggle").checked ? 1 : 0;
@@ -96,6 +69,8 @@ function createTraces(inputs, outputs, weights, threshold) {
     } else {
         labels[labels.length - 1].innerText = "Threshold";
     }
+
+
 
     let falsePoints = {
         type: 'scatter',
@@ -138,16 +113,16 @@ function createTraces(inputs, outputs, weights, threshold) {
     let lineColor = LINE_COLOR_ACTIVE;
     let markerSize = 10;
     let inBounds = true;
-    // check if line is within the bounds of the unit square
-    if (intersectionX.length === 0 || intersectionY.length === 0) { // out of bounds
-        inBounds = false;
-        intersectionX = intersectionBoundsX;
-        intersectionY = intersectionBoundsY;
-        markerSize = 0;
-    }
+    // // check if line is within the bounds of the unit square
+    // if (intersectionX.length === 0 || intersectionY.length === 0) { // out of bounds
+    //     inBounds = false;
+    //     intersectionX = intersectionBoundsX;
+    //     intersectionY = intersectionBoundsY;
+    //     markerSize = 0;
+    // }
     let line = {
-        x: intersectionBoundsX,
-        y: intersectionBoundsY,
+        x: intersectionX,
+        y: intersectionY,
         nsX: intersectionX,
         nsY: intersectionY,
         type: 'scatter',
@@ -233,6 +208,7 @@ function createTraces(inputs, outputs, weights, threshold) {
         showlegend: false,
         hoverinfo: 'skip'
     }
+
     let plus = {
         x: [centerXTrue],
         y: [centerYTrue],
@@ -277,6 +253,8 @@ function createTraces(inputs, outputs, weights, threshold) {
             color: 'black'
         }
     }
+
+    console.log(falsePoints);
     let data = [boundsX, boundsY, line, lineEndpoints, lineMidpoint, falsePoints, truePoints, incorrectlyTrue, incorrectlyFalse, plus, minus];
 
     let layout = {
@@ -287,7 +265,7 @@ function createTraces(inputs, outputs, weights, threshold) {
                 standoff: -500
             },
             nticks: 2,
-            range: [-0.5, 1.5],
+            range: [-0.2, 1.2],
             tickvals: [0, 1],
             fixedrange: true,
             // standoff: 100
@@ -302,7 +280,7 @@ function createTraces(inputs, outputs, weights, threshold) {
                     color: 'rgb(102, 102, 102)'
                 }
             },
-            range: [-0.5, 1.5],
+            range: [-0.2, 1.2],
             tickvals: [0, 1],
             fixedrange: true,
             // standoff: 10
@@ -343,251 +321,11 @@ function createTraces(inputs, outputs, weights, threshold) {
 
     };
 
-    let inputs3d = [
-        [0, 0, 0],
-        [0, 0, 1],
-        [0, 1, 0],
-        [0, 1, 1],
-        [1, 0, 0],
-        [1, 0, 1],
-        [1, 1, 0],
-        [1, 1, 1],
-    ]
-    //
-    let w1_3d = parseFloat(document.getElementById('weight1_3d').value)
-    let w2_3d = parseFloat(document.getElementById('weight2_3d').value)
-    let w3_3d = parseFloat(document.getElementById('weight3_3d').value)
-    let t_3d = parseFloat(document.getElementById('threshold_3d').value)
-    let outputs3d = [0, 0, 0, 0, 0, 0, 0, 1]
-    let weights3d = [w1_3d, w2_3d, w3_3d]
-    let threshold3d = t_3d
-
-    let calculatedVals3d = calculateInputs3D(inputs3d, outputs3d, weights3d, threshold3d)
-    let x = calculatedVals3d[0]
-    let y = calculatedVals3d[1]
-    let z = calculatedVals3d[2]
-
-    let xTrue = calculatedVals3d[3]
-    let yTrue = calculatedVals3d[4]
-    let zTrue = calculatedVals3d[5]
-
-    let xFalse = calculatedVals3d[6]
-    let yFalse = calculatedVals3d[7]
-    let zFalse= calculatedVals3d[8]
-
-    let incorrectX = calculatedVals3d[9]
-    let incorrectY = calculatedVals3d[10]
-    let incorrectZ = calculatedVals3d[11]
-
-
-    let trueTrace = {
-        x: xTrue, y: yTrue, z: zTrue,
-        mode: 'markers',
-        marker: {
-            color: TRUE_COLOR,
-            symbol: 'circle',
-            size: 12
-        },
-        type: 'scatter3d',
-        name: 'True',
-        showlegend: false
-    }
-
-    let falseTrace = {
-        x: xFalse, y: yFalse, z: zFalse,
-        mode: 'markers',
-        marker: {
-            color: FALSE_COLOR,
-            symbol: 'circle',
-            size: 12
-        },
-        type: 'scatter3d',
-        name: 'False',
-        showlegend: false
-    }
-
-    let incorrect = {
-        x: incorrectX,
-        y: incorrectY,
-        z: incorrectZ,
-        mode: "markers",
-        marker: {
-            color: 'rgba(0, 0, 0,0)',
-            size: 20,
-            line: {
-                color: INCORRECT_COLOR,
-                width: 20,
-            },
-            fillcolor: 'transparent'
-        },
-        type: 'scatter3d',
-        showlegend: false
-    }
-
-    let linedata = []
-    let point1 = [
-        [0, 0, 0],
-        [0, 1, 0],
-        [0, 0, 1],
-        [0, 1, 1],
-        [0, 0, 0],
-        [1, 0, 0],
-        [0, 0, 1],
-        [1, 0, 1],
-        [0, 0, 0],
-        [1, 0, 0],
-        [0, 1, 0],
-        [1, 1, 0]
-    ]
-    let point2 = [
-        [1, 0, 0],
-        [1, 1, 0],
-        [1, 0, 1],
-        [1, 1, 1],
-        [0, 1, 0],
-        [1, 1, 0],
-        [0, 1, 1],
-        [1, 1, 1],
-        [0, 0, 1],
-        [1, 0, 1],
-        [0, 1, 1],
-        [1, 1, 1]
-    ]
-
-    for (let i = 0; i < 12; i++) {
-        let t = {
-            x: [point1[i][0], point2[i][0]],
-            y: [point1[i][1], point2[i][1]],
-            z: [point1[i][2], point2[i][2]],
-            type : 'scatter3d',
-            line: {
-                color: 'black',
-                width: 2,
-                opacity: 0.5
-            },
-            marker: {
-                size: 0,
-                opacity: 0
-            },
-            hoverinfo: 'skip',
-            showlegend: false,
-
-        }
-        linedata.push(t)
-    }
-
-    let surface = {
-        type: 'surface',
-        x: x,
-        y: y,
-        z: z,
-        opacity: 0.3,
-        showscale: false,
-        hoverinfo: 'skip',
-    }
-
-    var intensity = [0, 1, 1, 1, 1, 1, 0, 1];
-    let test = {
-        type: "mesh3d",
-        x: [0, 0, 1, 1, 0, 0, 1, 1],
-        y: [0, 1, 1, 0, 0, 1, 1, 0],
-        z: [0, 0, 0, 0, 1, 1, 1, 1],
-        i: [7, 0, 0, 0, 4, 4, 6, 2, 4, 0, 3, 2],
-        j: [3, 4, 1, 2, 5, 6, 5, 6, 0, 1, 6, 6],
-        k: [0, 7, 2, 3, 6, 7, 1, 1, 5, 5, 7, 3],
-        intensity: intensity,
-        colorscale: [
-            [0, 'rgb(255, 0, 255)'],
-            // [0.5, 'rgb(0, 255, 0)'],
-            [1, 'rgb(0, 0, 255)']
-        ],
-        opacity: 0.3,
-        showscale: false,
-        showlegend: false,
-        hoverinfo: 'skip',
-    }
-
-
-    let data2 = linedata.concat([incorrect, surface, trueTrace, falseTrace]);
-    let layout2 = {margin: {
-            l: 0,
-            r: 0,
-            b: 0,
-            t: 0
-        },
-        scene: {
-            camera: camera,
-            zaxis: {
-                automargin: true,
-                title: {
-                    text: '',
-                    standoff: -10,
-                },
-                range: [-0.5, 1.5],  // Set the z-axis range to control what's displayed
-                // tickvals: [0, 1],
-                showgrid: false,
-                showticklabels: false,
-                showline: false,
-                zeroline: false,
-
-            },
-            xaxis: {
-                title: '',
-                range: [-0.5, 1.5],
-                // tickvals: [0, 1],
-                showgrid: false,
-                showticklabels: false,
-                showline: false,
-                zeroline: false,
-            },
-            yaxis: {
-                title: '',
-                range: [-0.5, 1.5],
-                showgrid: false,
-                showticklabels: false,
-                showline: false,
-                zeroline: false,
-            },
-            annotations: [{
-                x: 1.25,
-                y: 0.5,
-                z: 0,
-                text: "X",
-                font: {
-                    color: "black",
-                    size: 12
-                },
-                showarrow :false
-            }, {
-                x: 0.5,
-                y: 1.25,
-                z: 0,
-                text: "Y",
-                font: {
-                    color: "black",
-                    size: 12
-                },
-                showarrow :false
-            }, {
-                x: 1.25,
-                y: 0,
-                z: 0.5,
-                text: "Z",
-                font: {
-                    color: "black",
-                    size: 12
-                },
-                showarrow :false
-            }
-            ],
-            aspectmode: "cube",
-        },
-    };
-
-    return [data, layout, data2, layout2];
+    return [data, layout, null, null];
 
 }
-function calculateInputs(inputs, outputs, weights, threshold, ranges) {
+
+function calculateInputs1d(inputs, outputs, weights, threshold, ranges) {
     //preliminary step: from the bounds given in ranges, find the max/min X/Y values
     let minX = Number.MAX_VALUE;
     let minY = Number.MAX_VALUE;
@@ -617,25 +355,16 @@ function calculateInputs(inputs, outputs, weights, threshold, ranges) {
     }
 
     //need to find line endpoints
+    // in the 1d case, we only care about the intersection w/ y = 0 and y = 1
     let intersections = []
-    // ax + by = threshold, [a, b] = weights
-    // intersection w/ x = 0
-    let y_x0 = threshold/weights[1]
-    if (y_x0 <= 1 && y_x0 >= 0) {
-        intersections.push([0, y_x0])
-    }
     // intersection w/ y = 0
     let x_y0 = threshold/weights[0]
     if (x_y0 <= 1 && x_y0 >= 0) {
         intersections.push([x_y0, 0])
     }
-    // intersection w/ x = 1
-    let y_x1 = (threshold-weights[0])/weights[1]
-    if (y_x1 <= 1 && y_x1 >= 0) {
-        intersections.push([1, y_x1])
-    }
+
     // intersection w/ y = 1
-    let x_y1 = (threshold-weights[1])/weights[0]
+    let x_y1 = threshold/weights[0]
     if (x_y1 <= 1 && x_y1 >= 0) {
         intersections.push([x_y1, 1])
     }
@@ -647,47 +376,19 @@ function calculateInputs(inputs, outputs, weights, threshold, ranges) {
         intersectionY.push(intersections[i][1])
     }
 
-    // find where line intersects the bounds
-    let intersectionsBounds = []
+
+
     // ax + by = threshold, [a, b] = weights
     // intersection w/ x = -0.5
     let c = parseFloat(threshold)
     let a = parseFloat(weights[0])
-    let b = parseFloat(weights[1])
-    let y_x0b = (c+0.5*a)/b
-    if (y_x0b <= maxY && y_x0b >= minY) {
-        intersectionsBounds.push([minX, y_x0b])
-    }
-    // intersection w/ y = -0.5
-    let x_y0b = (c+0.5*b)/a
-    if (x_y0b <= maxX && x_y0b >= minX) {
-        intersectionsBounds.push([x_y0b, minY])
-    }
-    // intersection w/ x = 1.5
-    let y_x1b = (c-1.5*a)/b
-    if (y_x1b <= maxY && y_x1b >= minY) {
-        intersectionsBounds.push([maxX, y_x1b])
-    }
-    // intersection w/ y = 1
-    let x_y1b = (c-1.5*b)/a
-    if (x_y1b <= maxX && x_y1b >= minX) {
-        intersectionsBounds.push([x_y1b, maxY])
-    }
 
-
-    let intersectionBoundsX = []
-    let intersectionBoundsY = []
-    for (let i = 0; i < intersectionsBounds.length; i++) {
-        intersectionBoundsX.push(intersectionsBounds[i][0])
-        intersectionBoundsY.push(intersectionsBounds[i][1])
-    }
-
-    let truePoints = [...intersectionsBounds];
-    let falsePoints = [...intersectionsBounds];
+    let truePoints = [...intersections];
+    let falsePoints = [...intersections];
 
     // check if the end ranges are in the true or false points
     for (let i = 0; i < ranges.length; i++) {
-        if (a * ranges[i][0] + b * ranges[i][1] > c) {
+        if (a * ranges[i][0] > c) {
             truePoints.push(ranges[i])
         } else {
             falsePoints.push(ranges[i])
@@ -699,7 +400,7 @@ function calculateInputs(inputs, outputs, weights, threshold, ranges) {
     let incorrectlyFalseX = []
     let incorrectlyFalseY = []
     for (let i = 0; i < inputs.length; i++) {
-        if (weights[0] * inputs[i][0] + weights[1] * inputs[i][1] > threshold ) {
+        if (weights[0] * inputs[i][0] > threshold ) {
             // truePoints.push(inputs[i])
             if (outputs[i] === 0) {
                 incorrectlyTrueX.push(inputs[i][0])
@@ -753,76 +454,12 @@ function calculateInputs(inputs, outputs, weights, threshold, ranges) {
     return [
         trueX, trueY, falseX, falseY,
         intersectionX, intersectionY,
-        trueShape, falseShape,
         incorrectlyTrueX, incorrectlyTrueY,
         incorrectlyFalseX, incorrectlyFalseY,
         centerXTrue, centerYTrue,
         centerXFalse, centerYFalse,
-        intersectionBoundsX, intersectionBoundsY
+        trueShape, falseShape,
     ]
-
-}
-function calculateInputs3D(inputs, outputs, weights, threshold) {
-    // generate all unique x and y-values
-    let xSet = new Set();
-    let ySet = new Set();
-    for (let i = 0; i < inputs.length; i++) {
-        xSet.add(inputs[i][0]);
-        ySet.add(inputs[i][1]);
-    }
-    let xList = Array.from(xSet);
-    let yList = Array.from(ySet);
-    xList = [-0.2, 1.2]
-    yList = [-0.2, 1.2]
-
-    // ax + by + cz = threshold
-    // therefore, z = (threshold - by - ax) / c
-    //TODO: bug: weight2 can be 0
-    // if weight is 0, set it to 1e-5
-    let zValues = []
-    for (let i = 0; i < yList.length; i++) {
-        let row = []
-        for (let j = 0; j < xList.length; j++) {
-            let zVal = (threshold - weights[1]*yList[i] - weights[0]*xList[j]) / weights[2];
-            if(weights[2] === 0)
-                zVal = 0
-            row.push(zVal)
-
-        }
-        zValues.push(row)
-    }
-
-
-    let incorrectX = []
-    let incorrectY = []
-    let incorrectZ = []
-
-    let xTrue = [], yTrue  = [], zTrue = [], xFalse  = [], yFalse  = [], zFalse = [];
-    for (let i = 0; i < outputs.length; i++) {
-        let actualValue = 0;
-        if (threshold < (inputs[i][0] * weights[0] + inputs[i][1] * weights[1] + inputs[i][2] * weights[2]))
-            actualValue = 1;
-
-        if (outputs[i] === 1) { //true
-            xTrue.push(inputs[i][0]);
-            yTrue.push(inputs[i][1]);
-            zTrue.push(inputs[i][2]);
-        } else {
-            xFalse.push(inputs[i][0]);
-            yFalse.push(inputs[i][1]);
-            zFalse.push(inputs[i][2]);
-        }
-
-        if (actualValue !== outputs[i]) { //incorrect
-            incorrectX.push(inputs[i][0]);
-            incorrectY.push(inputs[i][1]);
-            incorrectZ.push(inputs[i][2]);
-        }
-    }
-
-
-
-    return [xList, yList, zValues, xTrue, yTrue, zTrue, xFalse, yFalse, zFalse, incorrectX, incorrectY, incorrectZ]
 
 }
 
@@ -833,53 +470,55 @@ function updatePlotlyData(div, newData, traceNum) {
     Plotly.addTraces(div, newData, traceNum)
 }
 
-function initialize () {
+function initialize1d() {
 
     // The selected-inputs table will give us all the input header names
     let biasToggleChecked = document.getElementById("biasToggle").checked
     let inputTable = document.getElementById('selected-inputs');
     let start = biasToggleChecked ? 1 : 0;
 
-    let labels = document.getElementsByClassName('slider-label');
-    for (let i = start; i < inputTable.rows.length; i++) {
-        let row = inputTable.rows[i];
-        let cell = row.cells[0];
+    //make plotly weight 2 container invisible
+    let weight2 = document.getElementById('weight-2-container');
+    weight2.style.display = "none";
 
-        labels[i-start].innerText = cell.innerText;
-    }
+    //relabel weight 1
+    let weightLabel = document.getElementById('weight1-label');
+    let cell = inputTable.rows[start].cells[0];
+    weightLabel.innerText = cell.innerText;
+
+    //depending on bias/threshold mode, change label of last slider
+    let lastLabel = document.getElementById('threshold-label');
+
     if (start > 0) {
-        labels[labels.length - 1].innerText = "Bias";
+        lastLabel.innerText = "Bias";
     } else {
-        labels[labels.length -1].innerText = "Threshold";
+        lastLabel.innerText = "Threshold";
     }
 
-    updateValuesDisplayToPlotly();
-    initAllSliders();
-    updateAllSliders();
+    updateValuesDisplayToPlotly1d();
+    initAllSliders(1);
+    updateAllSliders(1);
 
     let w1 = document.getElementById('weight1').value;
-    let w2 = document.getElementById('weight2').value;
     let t =  document.getElementById('threshold').value;
 
-
-    let weights = [w1, w2];
+    let weights = [w1];
     let threshold = [t];
 
     if (biasToggleChecked) {
         threshold = [-t];
     }
     let outputData = generateOutputData();
-    let result = createTraces(inputs.data, outputData, weights, threshold);
+    let result = createTraces1d(inputs.data, outputData, weights, threshold);
     let data = result[0];
     let layout = result[1];
-    let data2 = result[2];
-    let layout2 = result[3];
 
 
-    Plotly.newPlot('tester', data, layout, {displayModeBar: false}).then(attach);
+
+    Plotly.newPlot('plotly-1d', data, layout, {displayModeBar: false}).then(attach);
 
     let d3 = Plotly.d3;
-    let gd = document.getElementById('tester');
+    let gd = document.getElementById('plotly-1d');
 
     let dragLayer = document.getElementsByClassName('nsewdrag')[0]
 
@@ -890,7 +529,7 @@ function initialize () {
         var t = gd._fullLayout.margin.t;
 
         gd.addEventListener('mousemove', function(e) {
-            let myPlot = document.getElementById('tester')
+            let myPlot = document.getElementById('plotly-1d');
             let bgrect = document.getElementsByClassName('gridlayer')[0].getBoundingClientRect();
             xInDataCoord = ((e.x - bgrect['x']) / (bgrect['width'])) * (myPlot.layout.xaxis.range[1] - myPlot.layout.xaxis.range[0]) + myPlot.layout.xaxis.range[0];
             yInDataCoord =((e.y - bgrect['y']) / (bgrect['height'])) * (myPlot.layout.yaxis.range[0] - myPlot.layout.yaxis.range[1]) + myPlot.layout.yaxis.range[1];
@@ -899,7 +538,7 @@ function initialize () {
 
         //NOTE: mouse is always "heard" first, before plot click
         gd.addEventListener('mousedown', function(evt) {
-            let plotlyDiv = document.getElementById('tester')
+            let plotlyDiv = document.getElementById('plotly-1d');
             if (pointClicked === 0) {
                 let coords = checkDist(xInDataCoord, yInDataCoord);
                 // want to move point
@@ -949,13 +588,13 @@ function initialize () {
 
                         // update the traces
                         let outputData = generateOutputData();
-                        let updated = createTraces(inputs.data, outputData, newWeights, newThreshold)
+                        let updated = createTraces1d(inputs.data, outputData, newWeights, newThreshold)
                         let updatedData = updated[0];
                         let updatedLayout = updated[1];
 
-                        updateValuesPlotlyToDisplay(roundedA, roundedB, roundedC)
+                        updateValuesPlotlyToDisplay1d(roundedA, roundedB, roundedC)
 
-                        Plotly.react('tester', updatedData, updatedLayout);
+                        Plotly.react('plotly-1d', updatedData, updatedLayout);
                         data = plotlyDiv.data;
                         pointClicked = -1;
                         justMouseDown = true;
@@ -966,14 +605,14 @@ function initialize () {
             }
             else if (pointClicked === 1) {
                 let newData = changeLineByMidpoint(plotlyDiv.data, [xInDataCoord, yInDataCoord]);
-                updatePlotlyData('tester', newData, 0)
+                updatePlotlyData('plotly-1d', newData, 0)
 
                 let weight1Slider = document.getElementById('weight1');
                 let weight2Slider = document.getElementById('weight2');
                 let thresholdSlider = document.getElementById('threshold');
 
                 let outputData = generateOutputData();
-                let updated = createTraces(inputs.data, outputData, [weight1Slider.value, weight2Slider.value], [thresholdSlider.value])
+                let updated = createTraces1d(inputs.data, outputData, [weight1Slider.value, weight2Slider.value], [thresholdSlider.value])
 
                 let updatedData = updated[0];
                 let updatedLayout = updated[1];
@@ -994,9 +633,9 @@ function initialize () {
                     showlegend: false
                 }
 
-                Plotly.react('tester', updatedData, updatedLayout);
-                // updatePlotlyData('tester', newData, traceNum)
-                // updatePlotlyData('tester', linePoint, traceNumPoint)
+                Plotly.react('plotly-1d', updatedData, updatedLayout);
+                // updatePlotlyData('plotly-1d', newData, traceNum)
+                // updatePlotlyData('plotly-1d', linePoint, traceNumPoint)
                 data = plotlyDiv.data;
 
                 pointClicked = -1;
@@ -1010,7 +649,7 @@ function initialize () {
 
     }
 
-    var myPlot = document.getElementById('tester')
+    var myPlot = document.getElementById('plotly-1d')
 
     myPlot.on('plotly_hover', function(data){
         var pn='',
@@ -1033,7 +672,7 @@ function initialize () {
             sizeC[pn] = 20
 
             var update = {'marker':{color: colors, size:sizeC}};
-            Plotly.restyle('tester', update, [tn]);
+            Plotly.restyle('plotly-1d', update, [tn]);
             if (point_data) {
                 let string = point_data.data.x[pn].toString() + point_data.data.y[pn].toString()
                 let dict = {
@@ -1071,7 +710,7 @@ function initialize () {
             sizeC[pn] = 16
 
             var update = {'marker':{color: colors, size:sizeC}};
-            Plotly.restyle('tester', update, [tn]);
+            Plotly.restyle('plotly-1d', update, [tn]);
 
             if (point_data) {
                 let string = point_data.data.x[pn].toString() + point_data.data.y[pn].toString()
@@ -1140,7 +779,7 @@ function initialize () {
                 opacity[pn] = 1;
 
                 var update = {'marker':{color: colors, size: sizeC, symbol: shape, opacity: opacity}};
-                Plotly.restyle('tester', update, [tn]);
+                Plotly.restyle('plotly-1d', update, [tn]);
             }
 
         }
@@ -1240,32 +879,27 @@ function changeLineByMidpoint(data, coords) {
     let roundedB = Math.ceil(b * 100) / 100;
     let roundedC = Math.ceil(c * 100) / 100;
 
-    updateValuesPlotlyToDisplay(roundedA, roundedB, roundedC)
+    updateValuesPlotlyToDisplay1d(roundedA, roundedB, roundedC)
 
     return {type: lineObj.type, line: lineObj.line, marker: lineObj.marker, nsX: intersectionX, nsY: intersectionY, x: intersectionX, y:intersectionY, nsLine: true, inBounds: inBounds, hoverinfo: 'skip'}
 
 }
-function updateValuesDisplayToPlotly() {
+function updateValuesDisplayToPlotly1d() {
     let biasToggleChecked = document.getElementById("biasToggle").checked;
     let biasText = document.getElementById("bias-text");
 
     let th1 = document.getElementById("th1");
     let w1 = document.getElementById("w1");
-    let w2 = document.getElementById("w2");
 
     let weight1Value = document.getElementById('weight1_val');
-    let weight2Value = document.getElementById('weight2_val');
     let thresholdValue = document.getElementById('threshold_val');
 
     let weight1Slider = document.getElementById('weight1');
-    let weight2Slider = document.getElementById('weight2');
     let thresholdSlider = document.getElementById('threshold');
 
     weight1Slider.value = parseFloat(w1.innerText);
-    weight2Slider.value = parseFloat(w2.innerText);
     thresholdSlider.value = parseFloat(th1.innerText);
     weight1Value.innerText = w1.innerText;
-    weight2Value.innerText = w2.innerText
     thresholdValue.innerText = th1.innerText;
 
     if (biasToggleChecked && biasText) {
@@ -1274,35 +908,26 @@ function updateValuesDisplayToPlotly() {
 
     }
 
-    // updateAllSliders();
-
 }
 
-function updateValuesPlotlyToDisplay(weight1, weight2, threshold) {
-    // IMPORTANT: CURRENTLY ONLY 2D
-    // TODO: make into 3D later
+function updateValuesPlotlyToDisplay1d(weight1, threshold) {
 
     let biasToggleChecked = document.getElementById("biasToggle").checked;
 
     let weight1Value = document.getElementById('weight1_val');
-    let weight2Value = document.getElementById('weight2_val');
     let thresholdValue = document.getElementById('threshold_val');
 
     let weight1Slider = document.getElementById('weight1');
-    let weight2Slider = document.getElementById('weight2');
     let thresholdSlider = document.getElementById('threshold');
 
     weight1Slider.value = weight1;
-    weight2Slider.value = weight2;
     thresholdSlider.value = threshold;
     weight1Value.innerText = weight1 + "";
-    weight2Value.innerText = weight2 + "";
     thresholdValue.innerText = threshold + "";
 
     let th1 = document.getElementById("th1");
     let bias = document.getElementById("bias-text");
     let w1 = document.getElementById("w1");
-    let w2 = document.getElementById("w2");
 
     if (biasToggleChecked) {
         bias.innerText = thresholdValue.innerText;
@@ -1311,7 +936,6 @@ function updateValuesPlotlyToDisplay(weight1, weight2, threshold) {
     }
 
     w1.innerText = weight1Value.innerText;
-    w2.innerText = weight2Value.innerText;
 
     demo.update();
     checkAnswerCorrect();
@@ -1363,27 +987,24 @@ function checkDist(x, y) {
 
 }
 
-function run () {
+function run1d () {
     let w1 = document.getElementById('weight1').value;
-    let w2 = document.getElementById('weight2').value;
     let t = document.getElementById('threshold').value;
-    let weights = [w1, w2];
+    let weights = [w1];
     let threshold = [t];
 
-    updateValuesPlotlyToDisplay(w1, w2, t)
+    updateValuesPlotlyToDisplay1d(w1, t)
 
     let biasToggleChecked = document.getElementById('biasToggle').checked
     if (biasToggleChecked)
         threshold = [-t]
 
     let outputData = generateOutputData();
-    let result = createTraces(inputs.data, outputData, weights, threshold);
+    let result = createTraces1d(inputs.data, outputData, weights, threshold);
     let data = result[0];
     let layout = result[1];
-    let data2 = result[2];
-    let layout2 = result[3];
 
-    Plotly.react('tester', data, layout);
+    Plotly.react('plotly-1d', data, layout);
 }
 
 function reverseSign() {
@@ -1397,63 +1018,11 @@ function reverseSign() {
     let threshold = [-1 * thresholdSlider.value]
 
     let outputData = generateOutputData();
-    let updated = createTraces(inputs.data, outputData, weights, threshold)
+    let updated = createTraces1d(inputs.data, outputData, weights, threshold)
     let updatedData = updated[0];
     let updatedLayout = updated[1];
 
-    Plotly.react('tester', updatedData, updatedLayout);
+    Plotly.react('plotly-1d', updatedData, updatedLayout);
 
-    updateValuesPlotlyToDisplay(weights[0], weights[1], threshold[0])
-}
-
-function updateSlider(slider, colorBar, sliderValueDisplay) {
-    var value = parseFloat(slider.value);
-    var percentage = Math.abs(value * 10); // Scale the percentage for 200-unit range
-
-    // Update color bar
-    if (value >= 0) {
-        colorBar.style.left = '50%';
-        colorBar.style.right = (50 - percentage) + '%';
-        colorBar.style.backgroundColor = value === 0 ? 'blue' : 'black'; // Black for positive, blue for zero
-    } else {
-        colorBar.style.right = '50%';
-        colorBar.style.left = (50 - percentage) + '%';
-        colorBar.style.backgroundColor = 'red'; // Red for negative
-    }
-
-    // Update slider value and color
-    sliderValueDisplay.textContent = value;
-    sliderValueDisplay.style.color = value === 0 ? 'blue' : (value > 0 ? 'black' : 'red');
-
-    // Calculate the position for the value display
-    var sliderWidth = slider.offsetWidth === 0? 300 : slider.offsetWidth;
-    var newLeft = (((10 * value) / 100)) * sliderWidth + 130;
-    if (value > 0) {
-        newLeft = (((10 * value) / 100)) * sliderWidth + 130;
-    }
-    sliderValueDisplay.style.left = newLeft + 'px';
-}
-
-function updateAllSliders() {
-    let sliders = document.getElementsByClassName("slider-plotly"); // gets all sliders
-    let colorBars = document.getElementsByClassName("color-bar");
-    let sliderValueDisplays = document.getElementsByClassName("slider-value");
-
-    for (let i = 0; i < sliders.length; i++) {
-        updateSlider(sliders[i], colorBars[i], sliderValueDisplays[i]);
-
-    }
-}
-
-function initAllSliders() {
-    let sliders = document.getElementsByClassName("slider-plotly"); // gets all sliders
-    let colorBars = document.getElementsByClassName("color-bar");
-    let sliderValueDisplays = document.getElementsByClassName("slider-value");
-
-    for (let i = 0; i < sliders.length; i++) {
-        sliders[i].oninput = function() {
-            updateSlider(sliders[i], colorBars[i], sliderValueDisplays[i]);
-        };
-    }
-
+    updateValuesPlotlyToDisplay1d(weights[0], weights[1], threshold[0])
 }

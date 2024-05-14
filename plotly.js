@@ -11,11 +11,10 @@ let pointClicked = -1; // 0 = endpoint, 1 = midpoint
 let justMouseDown = false;
 
 // Colors
-let FALSE_COLOR = 'rgba(255, 0, 21, 1)';
-let TRUE_COLOR = 'rgba(0, 255, 60, 1)';
-let LINE_COLOR_ACTIVE = 'rgb(55, 128, 191)';
-let LINE_COLOR_INACTIVE = 'rgb(163, 163, 162)'; // CURRENTLY NOT USED
-let INCORRECT_COLOR = 'rgba(0, 0, 0, 0.95)';
+const FALSE_COLOR = 'rgba(255, 0, 21, 1)';
+const TRUE_COLOR = 'rgba(0, 255, 60, 1)';
+const LINE_COLOR_ACTIVE = 'rgb(55, 128, 191)';
+const INCORRECT_COLOR = 'rgba(0, 0, 0, 0.95)';
 
 function generateOutputData() {
     let outputTable = document.getElementById('output-table');
@@ -28,7 +27,7 @@ function generateOutputData() {
 }
 
 function main() {
-    initialize();
+    initialize2d();
 
     const weight1 = document.getElementById("weight1");
     const weight2 = document.getElementById("weight2");
@@ -531,27 +530,30 @@ function updatePlotlyData(div, newData, traceNum) {
     Plotly.addTraces(div, newData, traceNum)
 }
 
-function initialize () {
+function initialize2d () {
 
     // The selected-inputs table will give us all the input header names
     let biasToggleChecked = document.getElementById("biasToggle").checked
     let inputTable = document.getElementById('selected-inputs');
     let start = biasToggleChecked ? 1 : 0;
 
+    let weight2 = document.getElementById('weight-2-container');
+    weight2.style.display = "flex";
+
     let labels = document.getElementsByClassName('slider-label');
-    let ending = 0;
     for (let i = start; i < inputTable.rows.length; i++) {
         let row = inputTable.rows[i];
         let cell = row.cells[0];
 
         labels[i-start].innerText = cell.innerText;
-        ending++;
     }
 
+    let lastLabel = document.getElementById('threshold-label');
+
     if (start > 0) {
-        labels[ending].innerText = "Bias";
+        lastLabel.innerText = "Bias";
     } else {
-        labels[ending].innerText = "Threshold";
+        lastLabel.innerText = "Threshold";
     }
 
     updateValuesDisplayToPlotly2D();
@@ -1130,26 +1132,58 @@ function updateSlider(slider, colorBar, sliderValueDisplay) {
     sliderValueDisplay.style.left = newLeft + 'px';
 }
 
-function updateAllSliders() {
+function updateAllSliders(numInputs = 2) {
     let sliders = document.getElementsByClassName("slider-plotly"); // gets all sliders
     let colorBars = document.getElementsByClassName("color-bar");
     let sliderValueDisplays = document.getElementsByClassName("slider-value");
 
-    for (let i = 0; i < sliders.length; i++) {
+    for (let i = 0; i < numInputs; i++) {
         updateSlider(sliders[i], colorBars[i], sliderValueDisplays[i]);
 
     }
+
+    let lastSlider = document.getElementById('threshold');
+    let lastColorBar = document.getElementById('colorBar3');
+    let lastValueDisplay = document.getElementById('threshold_val');
+    updateSlider(lastSlider, lastColorBar, lastValueDisplay);
 }
 
-function initAllSliders() {
+function initAllSliders(numInputs= 2) {
     let sliders = document.getElementsByClassName("slider-plotly"); // gets all sliders
     let colorBars = document.getElementsByClassName("color-bar");
     let sliderValueDisplays = document.getElementsByClassName("slider-value");
 
-    for (let i = 0; i < sliders.length; i++) {
+    for (let i = 0; i < numInputs; i++) {
         sliders[i].oninput = function() {
             updateSlider(sliders[i], colorBars[i], sliderValueDisplays[i]);
         };
     }
+
+    let lastSlider = document.getElementById('threshold');
+    let lastColorBar = document.getElementById('colorBar3');
+    let lastValueDisplay = document.getElementById('threshold_val');
+    lastSlider.oninput = function() {
+        updateSlider(lastSlider, lastColorBar, lastValueDisplay);
+    }
+
+}
+
+function initialize() {
+
+    let numInputs = document.getElementById('input-table').rows[0].cells.length - 1;
+
+    if (numInputs === 2) {
+        initialize2d();
+        document.getElementById('tester').style.display = "block";
+        document.getElementById('plotly-1d').style.display = "none";
+    }
+    else if (numInputs === 1) {
+        initialize1d();
+        document.getElementById('tester').style.display = "none";
+        document.getElementById('plotly-1d').style.display = "block";
+    }
+
+
+    // deciding which plotly 1d/2d/3d to set as visible
 
 }

@@ -886,6 +886,7 @@ class Demo {
                 activations.data[i][j] = perceptron.activationData[i][j]
                 if(biasMode) {
                     activations.data[i][j] += -1 * perceptron.threshold;
+                    activations.data[i][j] = perceptron.correctPrecision(activations.data[i][j]);
                 }
             }
         }
@@ -1737,7 +1738,7 @@ $('#biasToggle').change(function() { //toggle bias
     if (displaySlider.value === '3') {
         document.getElementById("output-container").style.display = "none";
         document.getElementById("activation-container").style.display = "none";
-        initialize();
+        initialize1d();
     }
 
 
