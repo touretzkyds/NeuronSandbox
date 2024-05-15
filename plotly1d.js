@@ -1,12 +1,8 @@
+window.addEventListener('load', main1d, false);
+let ranges1d = [[-0.5, -0.5], [-0.5, 1.5], [1.5, -0.5], [1.5, 1.5]];
+// let ranges1d = [[0, 0], [0, 1], [1, 0], [1, 1]];
 
-window.addEventListener('load', main, false);
-// let ranges1d = [[-0.5, -0.5], [-0.5, 1.5], [1.5, -0.5], [1.5, 1.5]];
-let ranges1d = [[0, 0], [0, 1], [1, 0], [1, 1]];
-// let camera = null;
-
-
-
-function main() {
+function main1d() {
     // clear all event listeners on all sliders
     let sliders = document.getElementsByClassName('slider-plotly');
 
@@ -34,7 +30,6 @@ function main() {
 
 function createTraces1d(inputs, outputs, weights, threshold) {
 
-    // let ranges = [[-0.5, -0.5], [-0.5, 1.5], [1.5, -0.5], [1.5, 1.5]]
     let calculatedVals = calculateInputs1d(inputs, outputs, weights, threshold, ranges1d)
 
     let trueX = calculatedVals[0];
@@ -70,8 +65,6 @@ function createTraces1d(inputs, outputs, weights, threshold) {
         labels[labels.length - 1].innerText = "Threshold";
     }
 
-
-
     let falsePoints = {
         type: 'scatter',
         x: falseX,
@@ -90,6 +83,7 @@ function createTraces1d(inputs, outputs, weights, threshold) {
             '<br>%{customdata[1]}: %{y}' +
             '<br>Desired Output: 0<extra></extra>'
     };
+
     let truePoints = {
         x: trueX,
         y: trueY,
@@ -113,13 +107,7 @@ function createTraces1d(inputs, outputs, weights, threshold) {
     let lineColor = LINE_COLOR_ACTIVE;
     let markerSize = 10;
     let inBounds = true;
-    // // check if line is within the bounds of the unit square
-    // if (intersectionX.length === 0 || intersectionY.length === 0) { // out of bounds
-    //     inBounds = false;
-    //     intersectionX = intersectionBoundsX;
-    //     intersectionY = intersectionBoundsY;
-    //     markerSize = 0;
-    // }
+
     let line = {
         x: intersectionX,
         y: intersectionY,
@@ -140,25 +128,6 @@ function createTraces1d(inputs, outputs, weights, threshold) {
         },
         showlegend: false,
         hoverinfo: 'skip'
-
-    }
-
-    let lineEndpoints = {
-        x: intersectionX,
-        y: intersectionY,
-        mode: 'markers',
-        type: 'scatter',
-        nsLineEndpoint: true,
-        inBounds: inBounds,
-        text: ["Point 1", "Point 2"],
-        hovertemplate: '<b>%{text}</b>',
-        marker: {
-            symbol: Array(intersectionX.length).fill('square'),
-            size:  Array(intersectionX.length).fill(markerSize),
-            color: Array(intersectionX.length).fill(LINE_COLOR_ACTIVE),
-            opacity: Array(intersectionX.length).fill(1),
-        },
-        showlegend: false
 
     }
 
@@ -233,29 +202,7 @@ function createTraces1d(inputs, outputs, weights, threshold) {
         hoverinfo: 'skip',
     }
 
-    let boundsX = {
-        x : [1, 1],
-        y : [0, 1],
-        mode: "line",
-        showlegend: false,
-        hoverinfo: 'skip',
-        line : {
-            color: 'black'
-        }
-    }
-    let boundsY = {
-        x: [0, 1],
-        y : [1, 1],
-        mode: "line",
-        showlegend: false,
-        hoverinfo: 'skip',
-        line : {
-            color: 'black'
-        }
-    }
-
-    console.log(falsePoints);
-    let data = [boundsX, boundsY, line, lineEndpoints, lineMidpoint, falsePoints, truePoints, incorrectlyTrue, incorrectlyFalse, plus, minus];
+    let data = [line, lineMidpoint, falsePoints, truePoints, incorrectlyTrue, incorrectlyFalse, plus, minus];
 
     let layout = {
         autosize: false,
@@ -271,7 +218,7 @@ function createTraces1d(inputs, outputs, weights, threshold) {
             // standoff: 100
         },
         yaxis: {
-            title: labels[1].innerText,
+            title: '',
             nticks: 2,
             tickcolor: 'rgb(102, 102, 102)',
             ticks: 'outside',
@@ -327,6 +274,7 @@ function createTraces1d(inputs, outputs, weights, threshold) {
 
 function calculateInputs1d(inputs, outputs, weights, threshold, ranges) {
     //preliminary step: from the bounds given in ranges, find the max/min X/Y values
+    console.log(inputs)
     let minX = Number.MAX_VALUE;
     let minY = Number.MAX_VALUE;
     let maxX = Number.MIN_VALUE;
@@ -346,10 +294,10 @@ function calculateInputs1d(inputs, outputs, weights, threshold, ranges) {
         let bool = outputs[i];
         if (bool === 1) {
             trueX.push(inputs[i][0]);
-            trueY.push(inputs[i][1]);
+            trueY.push(0);
         } else {
             falseX.push(inputs[i][0]);
-            falseY.push(inputs[i][1]);
+            falseY.push(0);
         }
 
     }
@@ -359,14 +307,14 @@ function calculateInputs1d(inputs, outputs, weights, threshold, ranges) {
     let intersections = []
     // intersection w/ y = 0
     let x_y0 = threshold/weights[0]
-    if (x_y0 <= 1 && x_y0 >= 0) {
-        intersections.push([x_y0, 0])
+    if (x_y0 <= 1.5 && x_y0 >= -0.5) {
+        intersections.push([x_y0, -0.5])
     }
 
     // intersection w/ y = 1
     let x_y1 = threshold/weights[0]
-    if (x_y1 <= 1 && x_y1 >= 0) {
-        intersections.push([x_y1, 1])
+    if (x_y1 <= 1.5 && x_y1 >= -0.5) {
+        intersections.push([x_y1, 1.5])
     }
 
     let intersectionX = []
@@ -377,9 +325,6 @@ function calculateInputs1d(inputs, outputs, weights, threshold, ranges) {
     }
 
 
-
-    // ax + by = threshold, [a, b] = weights
-    // intersection w/ x = -0.5
     let c = parseFloat(threshold)
     let a = parseFloat(weights[0])
 
@@ -513,12 +458,16 @@ function initialize1d() {
     let data = result[0];
     let layout = result[1];
 
-
-
     Plotly.newPlot('plotly-1d', data, layout, {displayModeBar: false}).then(attach);
 
     let d3 = Plotly.d3;
     let gd = document.getElementById('plotly-1d');
+
+    gd.removeAllListeners("plotly_click");
+    gd.removeAllListeners("plotly_hover");
+    gd.removeAllListeners("plotly_unhover");
+    gd.removeAllListeners("mousemove");
+    gd.removeAllListeners("mousedown");
 
     let dragLayer = document.getElementsByClassName('nsewdrag')[0]
 
@@ -530,7 +479,7 @@ function initialize1d() {
 
         gd.addEventListener('mousemove', function(e) {
             let myPlot = document.getElementById('plotly-1d');
-            let bgrect = document.getElementsByClassName('gridlayer')[0].getBoundingClientRect();
+            let bgrect = document.getElementsByClassName('gridlayer')[1].getBoundingClientRect();
             xInDataCoord = ((e.x - bgrect['x']) / (bgrect['width'])) * (myPlot.layout.xaxis.range[1] - myPlot.layout.xaxis.range[0]) + myPlot.layout.xaxis.range[0];
             yInDataCoord =((e.y - bgrect['y']) / (bgrect['height'])) * (myPlot.layout.yaxis.range[0] - myPlot.layout.yaxis.range[1]) + myPlot.layout.yaxis.range[1];
 
@@ -604,34 +553,20 @@ function initialize1d() {
 
             }
             else if (pointClicked === 1) {
-                let newData = changeLineByMidpoint(plotlyDiv.data, [xInDataCoord, yInDataCoord]);
+                let newData = changeLineByMidpoint1d(plotlyDiv.data, [xInDataCoord, yInDataCoord]);
                 updatePlotlyData('plotly-1d', newData, 0)
 
                 let weight1Slider = document.getElementById('weight1');
-                let weight2Slider = document.getElementById('weight2');
+                // let weight2Slider = document.getElementById('weight2');
                 let thresholdSlider = document.getElementById('threshold');
 
                 let outputData = generateOutputData();
-                let updated = createTraces1d(inputs.data, outputData, [weight1Slider.value, weight2Slider.value], [thresholdSlider.value])
+                let updated = createTraces1d(inputs.data, outputData, [weight1Slider.value], [thresholdSlider.value])
 
                 let updatedData = updated[0];
                 let updatedLayout = updated[1];
 
                 // TODO: add throw error statements in case trace numbers are -1 (findIndex did not find)
-
-                let linePoint = {
-                    x: [(newData.x[0] + newData.x[1])/2],
-                    y: [(newData.y[0] + newData.y[1])/2],
-                    type: 'marker',
-                    nsLineMidpoint: true,
-                    marker: {
-                        symbol: ['square'],
-                        size:  [10],
-                        color: [LINE_COLOR_ACTIVE],
-                        opacity: [1],
-                    },
-                    showlegend: false
-                }
 
                 Plotly.react('plotly-1d', updatedData, updatedLayout);
                 // updatePlotlyData('plotly-1d', newData, traceNum)
@@ -685,13 +620,10 @@ function initialize1d() {
                 let row = document.getElementById("input-table").rows[dict[string]]
                 display.hoverInput(row, "input-table", "enter")
             }
-
-
-
-
         }
 
     });
+
     myPlot.on('plotly_unhover', function(data){
         var pn='',
             tn='',
@@ -819,17 +751,11 @@ function isLegalPlacement(data, coords) {
     return true;
 }
 
-function changeLineByMidpoint(data, coords) {
-
-    let weight1Slider = document.getElementById('weight1');
-    let weight2Slider = document.getElementById('weight2');
-    let thresholdSlider = document.getElementById('threshold');
-
+function changeLineByMidpoint1d(data, coords) {
     // get a and b values in ax + by = c from weight sliders
-    let a = parseFloat(weight1Slider.value)
-    let b = parseFloat(weight2Slider.value)
+    let a = 1
     // get c value (threshold) by plugging in x and y values into ax + by = c
-    let c = a * coords[0] + b * coords[1]
+    let c = coords[0]
 
     let intersections = []
 
@@ -837,24 +763,16 @@ function changeLineByMidpoint(data, coords) {
 
     if (true) {
         inBounds = false;
-        let y_x0b = (c+0.5*a)/b
-        if (y_x0b <= 1.5 && y_x0b >= -0.5) {
-            intersections.push([-0.5, y_x0b])
+        // intersection w/ y = 0
+        let x_y0 = c/a
+        if (x_y0 <= 1.5 && x_y0 >= -0.5) {
+            intersections.push([x_y0, -0.5])
         }
-        // intersection w/ y = -0.5
-        let x_y0b = (c+0.5*b)/a
-        if (x_y0b <= 1.5 && x_y0b >= -0.5) {
-            intersections.push([x_y0b, -0.5])
-        }
-        // intersection w/ x = 1.5
-        let y_x1b = (c-1.5*a)/b
-        if (y_x1b <= 1.5 && y_x1b >= -0.5) {
-            intersections.push([1.5, y_x1b])
-        }
-        // intersection w/ y = 1,5
-        let x_y1b = (c-1.5*b)/a
-        if (x_y1b <= 1.5 && x_y1b >= -0.5) {
-            intersections.push([x_y1b, 1.5])
+
+        // intersection w/ y = 1
+        let x_y1 = c/a
+        if (x_y1 <= 1.5 && x_y1 >= -0.5) {
+            intersections.push([x_y1, 1.5])
         }
     }
 
@@ -876,10 +794,9 @@ function changeLineByMidpoint(data, coords) {
     }
 
     let roundedA = Math.ceil(a * 100) / 100;
-    let roundedB = Math.ceil(b * 100) / 100;
     let roundedC = Math.ceil(c * 100) / 100;
 
-    updateValuesPlotlyToDisplay1d(roundedA, roundedB, roundedC)
+    updateValuesPlotlyToDisplay1d(roundedA, roundedC)
 
     return {type: lineObj.type, line: lineObj.line, marker: lineObj.marker, nsX: intersectionX, nsY: intersectionY, x: intersectionX, y:intersectionY, nsLine: true, inBounds: inBounds, hoverinfo: 'skip'}
 
@@ -940,30 +857,6 @@ function updateValuesPlotlyToDisplay1d(weight1, threshold) {
     demo.update();
     checkAnswerCorrect();
     perceptron.computeAffineOutput();
-}
-
-function changeLineByEndpoint(data, coords) {
-    let lineObj = findLine(data)
-    if (!lineObj) //there exists no line
-        return
-
-    let xCoords = lineObj.nsX;
-    let yCoords = lineObj.nsY;
-    let xFinal = [-1, -1]
-    let yFinal = [-1, -1]
-
-    for (let i = 0; i < xCoords.length; i++) {
-        if (xCoords[i] === pointClickedX && yCoords[i] === pointClickedY) {
-            xFinal[i] = coords[0]
-            yFinal[i] = coords[1]
-        } else {
-            xFinal[i] = xCoords[i]
-            yFinal[i] = yCoords[i]
-        }
-    }
-
-    lineObj.marker.color = Array(xCoords.length).fill(LINE_COLOR_ACTIVE)
-    return {type: lineObj.type, line: lineObj.line, marker: lineObj.marker, x: xFinal, y:yFinal, nsLine: true, inBounds: true, hoverinfo: 'skip'}
 }
 
 function checkDist(x, y) {

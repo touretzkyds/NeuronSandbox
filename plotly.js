@@ -1,4 +1,3 @@
-
 window.addEventListener('load', main, false);
 let ranges = [[-0.5, -0.5], [-0.5, 1.5], [1.5, -0.5], [1.5, 1.5]];
 let camera = null;
@@ -347,6 +346,7 @@ function createTraces(inputs, outputs, weights, threshold) {
     return [data, layout, null, null];
 
 }
+
 function calculateInputs(inputs, outputs, weights, threshold, ranges) {
     //preliminary step: from the bounds given in ranges, find the max/min X/Y values
     let minX = Number.MAX_VALUE;
