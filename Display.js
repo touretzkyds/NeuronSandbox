@@ -1038,6 +1038,7 @@ class Display {
 
     hoverInput(row, tblId, mode) {
         const isOutputToggleChecked = document.getElementById("OutputToggle").checked
+
         let rowIdx = row.rowIndex || 0;
         if (!this.isInputTable(tblId)) //output table, convert to corresponding input row index
             rowIdx += 1;
@@ -1200,47 +1201,96 @@ class Display {
                 // document.getElementById("activation-container").style.display = "inline-flex";
                 // document.getElementById("output-container").style.display = "inline-flex";
             } else {
-                if (document.getElementById('plotly-div').style.display === 'none')
-                    return;
-                let x = '48%', y = '50%';
-                let fullPlot = document.getElementsByClassName('scatterlayer')[0];
+                let numInputs = document.getElementById('input-table').rows[0].cells.length - 1;
+                if (numInputs === 1) {
+                    if (document.getElementById('plotly-div').style.display === 'none')
+                        return;
+                    let x = '48%', y = '50%';
+                    let fullPlot = document.getElementsByClassName('scatterlayer')[1];
 
-                let plotlyData = document.getElementById('tester').data;
-                let falseIdx = display.findIndexOfPlotlyTrace(plotlyData, "falsePoints");
-                let trueIdx = display.findIndexOfPlotlyTrace(plotlyData, "truePoints");
+                    let plotlyData = document.getElementById('plotly-1d').data;
+                    let falseIdx = display.findIndexOfPlotlyTrace(plotlyData, "falsePoints");
+                    let trueIdx = display.findIndexOfPlotlyTrace(plotlyData, "truePoints");
 
-                let allTraces = fullPlot.children;
-                let falsePoints = fullPlot.children[falseIdx].children[3].children;
-                let truePoints = fullPlot.children[trueIdx].children[3].children;
-                if (fullPlot.children.length < 9) {
-                    falsePoints = fullPlot.children[falseIdx-2].children[3].children;
-                    truePoints = fullPlot.children[trueIdx-2].children[3].children;
-                }
+                    let allTraces = fullPlot.children;
+                    console.log(allTraces)
+                    let falsePoints = fullPlot.children[falseIdx].children[3].children;
+                    let truePoints = fullPlot.children[trueIdx].children[3].children;
 
-                let desiredOutputForPoint = parseFloat(outputRow.children[DESIRED_OUTPUT_COLUMN].innerText);
+                    let desiredOutputForPoint = parseFloat(outputRow.children[DESIRED_OUTPUT_COLUMN].innerText);
 
-                let inputsData = inputs.data[rowIdx - 2]
+                    let inputsData = inputs.data[rowIdx - 2]
 
-                let falsePointsPlotly = plotlyData[falseIdx];
-                let truePointsPlotly = plotlyData[trueIdx];
+                    let falsePointsPlotly = plotlyData[falseIdx];
+                    let truePointsPlotly = plotlyData[trueIdx];
 
-                let pointsUsed = desiredOutputForPoint === 0 ? falsePoints : truePoints;
-                let pointsUsedPlotly = desiredOutputForPoint === 0 ? falsePointsPlotly : truePointsPlotly;
+                    let pointsUsed = desiredOutputForPoint === 0 ? falsePoints : truePoints;
+                    console.log(pointsUsed)
+                    let pointsUsedPlotly = desiredOutputForPoint === 0 ? falsePointsPlotly : truePointsPlotly;
 
-                // for now, the order of points [0, 0], [0, 1], [1, 0], [1, 1]
-                let pointedTo = null;
+                    // for now, the order of points [0, 0], [0, 1], [1, 0], [1, 1]
+                    let pointedTo = null;
 
-                for (let i = 0; i < pointsUsed.length; i++) {
-                    if (pointsUsedPlotly.x[i] === inputsData[0] && pointsUsedPlotly.y[i] === inputsData[1]) {
-                        pointedTo = pointsUsed[i];
-                        break;
+                    for (let i = 0; i < pointsUsed.length; i++) {
+                        console.log(inputsData)
+                        console.log(pointsUsedPlotly)
+                        if (pointsUsedPlotly.x[i] === inputsData[0]) {
+                            console.log("IN!!!")
+                            pointedTo = pointsUsed[i];
+                            break;
+                        }
                     }
+                    demo.activationLines[0] = new LeaderLine(
+                        LeaderLine.pointAnchor(document.getElementById("output-links"), {x: '20%', y: '50%'}),
+                        LeaderLine.pointAnchor(pointedTo),
+                        {dash: {animation: true}}
+                    );
                 }
-                demo.activationLines[0] = new LeaderLine(
-                    LeaderLine.pointAnchor(document.getElementById("output-links"), {x: '20%', y: '50%'}),
-                    LeaderLine.pointAnchor(pointedTo),
-                    {dash: {animation: true}}
-                );
+                if (numInputs === 2) {
+                    if (document.getElementById('plotly-div').style.display === 'none')
+                        return;
+                    let x = '48%', y = '50%';
+                    let fullPlot = document.getElementsByClassName('scatterlayer')[0];
+
+                    let plotlyData = document.getElementById('tester').data;
+                    let falseIdx = display.findIndexOfPlotlyTrace(plotlyData, "falsePoints");
+                    let trueIdx = display.findIndexOfPlotlyTrace(plotlyData, "truePoints");
+
+                    let allTraces = fullPlot.children;
+                    // console.log(allTraces)
+                    let falsePoints = fullPlot.children[falseIdx].children[3].children;
+                    let truePoints = fullPlot.children[trueIdx].children[3].children;
+                    if (fullPlot.children.length < 9) {
+                        falsePoints = fullPlot.children[falseIdx-2].children[3].children;
+                        truePoints = fullPlot.children[trueIdx-2].children[3].children;
+                    }
+
+                    let desiredOutputForPoint = parseFloat(outputRow.children[DESIRED_OUTPUT_COLUMN].innerText);
+
+                    let inputsData = inputs.data[rowIdx - 2]
+
+                    let falsePointsPlotly = plotlyData[falseIdx];
+                    let truePointsPlotly = plotlyData[trueIdx];
+
+                    let pointsUsed = desiredOutputForPoint === 0 ? falsePoints : truePoints;
+                    let pointsUsedPlotly = desiredOutputForPoint === 0 ? falsePointsPlotly : truePointsPlotly;
+
+                    // for now, the order of points [0, 0], [0, 1], [1, 0], [1, 1]
+                    let pointedTo = null;
+
+                    for (let i = 0; i < pointsUsed.length; i++) {
+                        if (pointsUsedPlotly.x[i] === inputsData[0] && pointsUsedPlotly.y[i] === inputsData[1]) {
+                            pointedTo = pointsUsed[i];
+                            break;
+                        }
+                    }
+                    demo.activationLines[0] = new LeaderLine(
+                        LeaderLine.pointAnchor(document.getElementById("output-links"), {x: '20%', y: '50%'}),
+                        LeaderLine.pointAnchor(pointedTo),
+                        {dash: {animation: true}}
+                    );
+                }
+
 
             }
 

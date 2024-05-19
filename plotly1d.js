@@ -212,7 +212,7 @@ function createTraces1d(inputs, outputs, weights, threshold) {
                 standoff: -500
             },
             nticks: 2,
-            range: [-0.2, 1.2],
+            range: [-0.5, 1.5],
             tickvals: [0, 1],
             fixedrange: true,
             // standoff: 100
@@ -227,7 +227,7 @@ function createTraces1d(inputs, outputs, weights, threshold) {
                     color: 'rgb(102, 102, 102)'
                 }
             },
-            range: [-0.2, 1.2],
+            range: [-0.5, 1.5],
             tickvals: [0, 1],
             fixedrange: true,
             // standoff: 10
@@ -305,16 +305,19 @@ function calculateInputs1d(inputs, outputs, weights, threshold, ranges) {
     //need to find line endpoints
     // in the 1d case, we only care about the intersection w/ y = 0 and y = 1
     let intersections = []
+    let intersectionsShape = []
     // intersection w/ y = 0
     let x_y0 = threshold/weights[0]
     if (x_y0 <= 1.5 && x_y0 >= -0.5) {
         intersections.push([x_y0, -0.5])
+        intersectionsShape.push([x_y0, -0.01])
     }
 
     // intersection w/ y = 1
     let x_y1 = threshold/weights[0]
     if (x_y1 <= 1.5 && x_y1 >= -0.5) {
         intersections.push([x_y1, 1.5])
+        intersectionsShape.push([x_y1, 0.01])
     }
 
     let intersectionX = []
@@ -328,15 +331,16 @@ function calculateInputs1d(inputs, outputs, weights, threshold, ranges) {
     let c = parseFloat(threshold)
     let a = parseFloat(weights[0])
 
-    let truePoints = [...intersections];
-    let falsePoints = [...intersections];
+    let truePoints = [...intersectionsShape];
+    let falsePoints = [...intersectionsShape];
 
     // check if the end ranges are in the true or false points
-    for (let i = 0; i < ranges.length; i++) {
-        if (a * ranges[i][0] > c) {
-            truePoints.push(ranges[i])
+    let rangesForShape = [[-0.5, -0.01], [-0.5, 0.01], [1.5, -0.01], [1.5, 0.01]];
+    for (let i = 0; i < rangesForShape.length; i++) {
+        if (a * rangesForShape[i][0] > c) {
+            truePoints.push(rangesForShape[i])
         } else {
-            falsePoints.push(ranges[i])
+            falsePoints.push(rangesForShape[i])
         }
     }
 
@@ -349,14 +353,14 @@ function calculateInputs1d(inputs, outputs, weights, threshold, ranges) {
             // truePoints.push(inputs[i])
             if (outputs[i] === 0) {
                 incorrectlyTrueX.push(inputs[i][0])
-                incorrectlyTrueY.push(inputs[i][1])
+                incorrectlyTrueY.push(0)
             }
         }
         else {
             // falsePoints.push(inputs[i])
             if (outputs[i] === 1) {
                 incorrectlyFalseX.push(inputs[i][0])
-                incorrectlyFalseY.push(inputs[i][1])
+                incorrectlyFalseY.push(0)
             }
         }
     }
@@ -401,8 +405,8 @@ function calculateInputs1d(inputs, outputs, weights, threshold, ranges) {
         intersectionX, intersectionY,
         incorrectlyTrueX, incorrectlyTrueY,
         incorrectlyFalseX, incorrectlyFalseY,
-        centerXTrue, centerYTrue,
-        centerXFalse, centerYFalse,
+        centerXTrue, (centerYTrue + 0.5),
+        centerXFalse, (centerYFalse + 0.5),
         trueShape, falseShape,
     ]
 
@@ -609,12 +613,10 @@ function initialize1d() {
             var update = {'marker':{color: colors, size:sizeC}};
             Plotly.restyle('plotly-1d', update, [tn]);
             if (point_data) {
-                let string = point_data.data.x[pn].toString() + point_data.data.y[pn].toString()
+                let string = point_data.data.x[pn].toString()
                 let dict = {
-                    '00' : 2,
-                    '01' : 3,
-                    '10' : 4,
-                    '11' : 5,
+                    '0' : 2,
+                    '1' : 3,
                 };
                 display.hovering = true;
                 let row = document.getElementById("input-table").rows[dict[string]]
@@ -903,11 +905,10 @@ function run1d () {
 function reverseSign() {
 
     let weight1Slider = document.getElementById('weight1');
-    let weight2Slider = document.getElementById('weight2');
     let thresholdSlider = document.getElementById('threshold');
 
 
-    let weights = [-1 * weight1Slider.value, -1 * weight2Slider.value]
+    let weights = [-1 * weight1Slider.value]
     let threshold = [-1 * thresholdSlider.value]
 
     let outputData = generateOutputData();
@@ -917,5 +918,5 @@ function reverseSign() {
 
     Plotly.react('plotly-1d', updatedData, updatedLayout);
 
-    updateValuesPlotlyToDisplay1d(weights[0], weights[1], threshold[0])
+    updateValuesPlotlyToDisplay1d(weights[0], threshold[0])
 }
