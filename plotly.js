@@ -581,6 +581,12 @@ function initialize2d () {
     let d3 = Plotly.d3;
     let gd = document.getElementById('tester');
 
+    gd.removeAllListeners("plotly_click");
+    gd.removeAllListeners("plotly_hover");
+    gd.removeAllListeners("plotly_unhover");
+    gd.removeAllListeners("mousemove");
+    gd.removeAllListeners("mousedown");
+
     let dragLayer = document.getElementsByClassName('nsewdrag')[0]
 
     function attach() {
@@ -1062,7 +1068,7 @@ function checkDist(x, y) {
 
 }
 
-function run () {
+function run2d () {
     let w1 = document.getElementById('weight1').value;
     let w2 = document.getElementById('weight2').value;
     let t = document.getElementById('threshold').value;
@@ -1186,4 +1192,16 @@ function initialize() {
 
     // deciding which plotly 1d/2d/3d to set as visible
 
+}
+
+function run() {
+    let numInputs = document.getElementById('input-table').rows[0].cells.length - 1;
+
+    if (numInputs === 2) {
+        run2d();
+    }
+    else if (numInputs === 1) {
+        run1d();
+
+    }
 }

@@ -15,14 +15,17 @@ function main1d() {
     initialize1d();
 
     const weight1 = document.getElementById("weight1");
-    // const weight2 = document.getElementById("weight2");
+    const weight2 = document.getElementById("weight2");
     const threshold = document.getElementById("threshold");
 
     weight1.addEventListener("input", (event) => {
-        run1d();
+        run();
+    });
+    weight2.addEventListener("input", (event) => {
+        run();
     });
     threshold.addEventListener("input", (event) => {
-        run1d();
+        run();
     });
 
 
@@ -754,10 +757,11 @@ function isLegalPlacement(data, coords) {
 }
 
 function changeLineByMidpoint1d(data, coords) {
-    // get a and b values in ax + by = c from weight sliders
-    let a = 1
+    // get a and b values in ax = c from weight sliders
+    // coords[0] = c / curr_a c = curr_a * coor
+    let a = document.getElementById('weight1').value
     // get c value (threshold) by plugging in x and y values into ax + by = c
-    let c = coords[0]
+    let c = coords[0] * a;
 
     let intersections = []
 
