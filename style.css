@@ -474,7 +474,7 @@ article > section {
 .animation{
     opacity: 0;
     animation-name: fadeIn;
-    animation-duration: 3s;
+    animation-duration: 1.5s;
     animation-iteration-count: 1;
     animation-fill-mode: forwards;
 }

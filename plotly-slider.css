@@ -1,0 +1,65 @@
+.slider-container {
+    position: relative;
+    width: 300px;
+    margin: 25px;
+    left: 30%;
+}
+
+.slider-plotly {
+    width: 100%;
+    margin: 2px 0;
+    appearance: none;
+    height: 15px;
+    background: transparent;
+    outline: purple;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+
+.color-bar {
+    position: absolute;
+    height: 10px;
+    background-color: blue;
+    margin-top: 10px;
+    transform: translateY(-50%);
+    left: 50%;
+    right: 50%;
+}
+
+/* Customize the slider handle */
+.slider-plotly::-webkit-slider-thumb {
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    margin-top: -8px;
+    background: #4CAF50;
+    cursor: pointer;
+}
+
+.slider-plotly::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    background: #4CAF50;
+    cursor: pointer;
+}
+
+.slider-plotly::-webkit-slider-runnable-track {
+    height: 10px;
+    border: 1px solid purple;
+    border-radius: 5px;
+}
+
+.slider-plotly::-moz-range-track {
+    height: 10px;
+    border: 1px solid purple;
+    border-radius: 5px;
+}
+
+.slider-value {
+    position: absolute;
+    top: -30px;
+    color: blue; /* Initial color for value 0 */
+    font-size: 14px;
+    user-select: none;
+}
