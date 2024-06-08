@@ -83,7 +83,6 @@ function createTraces1d(inputs, outputs, weights, threshold) {
         customdata: Array(falseX.length).fill([labels[0].innerText, labels[1].innerText]),
 
         hovertemplate: '%{customdata[0]}: %{x}' +
-            '<br>%{customdata[1]}: %{y}' +
             '<br>Desired Output: 0<extra></extra>'
     };
 
@@ -102,7 +101,6 @@ function createTraces1d(inputs, outputs, weights, threshold) {
         customdata: Array(trueX.length).fill([labels[0].innerText, labels[1].innerText]),
 
         hovertemplate: '%{customdata[0]}: %{x}' +
-            '<br>%{customdata[1]}: %{y}' +
             '<br>Desired Output: 1<extra></extra>'
 
     };
