@@ -915,10 +915,9 @@ class Demo {
         //TODO: instead of initialize, change to an "update" function
 
         let inputTableObj = document.getElementById('input-table');
-        let numVariables = inputTableObj.rows[0].cells.length;
-        if (numVariables === 2) {
-            initialize();
-        }
+        // let numVariables = inputTableObj.rows[0].cells.length - 1;
+        initialize();
+
 
     }
 
@@ -1054,7 +1053,18 @@ async function detailButtonClicked() {
         document.getElementById("detailButton").innerText = "Hide details";
     }
     display.UpdateDetailToggle();
+
+    display.outputLine.position()
+    for (let i = 0; i < demo.weightLines.length; i++)
+    {
+        demo.weightLines[i].position();
+    }
+    if (demo.biasLine) {
+        demo.biasLine.position();
+    }
+
 }
+
 function addEditOption(c) {
     //cannot use getElementById since it is not accurate
     let weight_parent = document.getElementById(`input-link-text`);

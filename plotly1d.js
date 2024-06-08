@@ -205,33 +205,49 @@ function createTraces1d(inputs, outputs, weights, threshold) {
         hoverinfo: 'skip',
     }
 
+    let customticks = {
+        x: [0, 1],
+        y: [0, 0],
+        mode: "text",
+        text: '<b>0</b>',
+        textfont: {
+            size: 50, // Change the font size
+        },
+        showlegend: false,
+        hoverinfo: 'skip',
+    }
+
+
     let data = [line, lineMidpoint, falsePoints, truePoints, incorrectlyTrue, incorrectlyFalse, plus, minus];
 
     let layout = {
         autosize: false,
         xaxis: {
+            zeroline: false,
+            showgrid: false,
+            // showline: false,
             title: {
                 text: labels[0].innerText,
                 standoff: -500
             },
-            nticks: 2,
+            nticks: 2, // Disable default ticks
             range: [-0.5, 1.5],
             tickvals: [0, 1],
+            ticks: 'inside',
+            // tickfont: {
+            //     color: 'rgb(255, 255, 255)',
+            // },
             fixedrange: true,
             // standoff: 100
         },
         yaxis: {
             title: '',
             nticks: 2,
-            tickcolor: 'rgb(102, 102, 102)',
-            ticks: 'outside',
             tickfont: {
-                font: {
-                    color: 'rgb(102, 102, 102)'
-                }
+                color: 'rgb(255, 255, 255)',
             },
-            range: [-0.5, 1.5],
-            tickvals: [0, 1],
+            tickvals: [0, 0.0001], // requires two tickmarks in order to properly calculate width of plotly window
+            range: [-0.5, 0.5],
             fixedrange: true,
             // standoff: 10
         },
@@ -243,7 +259,7 @@ function createTraces1d(inputs, outputs, weights, threshold) {
             pad: 0
         },
         width: 500,
-        height: 500,
+        height: 300,
         hovermode: 'closest',
         showlegend: false,
         shapes: [
@@ -266,9 +282,7 @@ function createTraces1d(inputs, outputs, weights, threshold) {
                 opacity: 0.2, layer: 'below'
             },
         ],
-        doubleClick: false
-
-
+        doubleClick: false,
     };
 
     return [data, layout, null, null];
@@ -312,15 +326,15 @@ function calculateInputs1d(inputs, outputs, weights, threshold, ranges) {
     // intersection w/ y = 0
     let x_y0 = threshold/weights[0]
     if (x_y0 <= 1.5 && x_y0 >= -0.5) {
-        intersections.push([x_y0, -0.5])
-        intersectionsShape.push([x_y0, -0.01])
+        intersections.push([x_y0, -0.1])
+        intersectionsShape.push([x_y0, -0.016])
     }
 
     // intersection w/ y = 1
     let x_y1 = threshold/weights[0]
     if (x_y1 <= 1.5 && x_y1 >= -0.5) {
-        intersections.push([x_y1, 1.5])
-        intersectionsShape.push([x_y1, 0.01])
+        intersections.push([x_y1, 0.1])
+        intersectionsShape.push([x_y1, 0.016])
     }
 
     let intersectionX = []
@@ -338,7 +352,7 @@ function calculateInputs1d(inputs, outputs, weights, threshold, ranges) {
     let falsePoints = [...intersectionsShape];
 
     // check if the end ranges are in the true or false points
-    let rangesForShape = [[-0.5, -0.01], [-0.5, 0.01], [1.5, -0.01], [1.5, 0.01]];
+    let rangesForShape = [[-0.5, -0.016], [-0.5, 0.016], [1.5, -0.016], [1.5, 0.016]];
     for (let i = 0; i < rangesForShape.length; i++) {
         if (a * rangesForShape[i][0] > c) {
             truePoints.push(rangesForShape[i])
@@ -408,8 +422,8 @@ function calculateInputs1d(inputs, outputs, weights, threshold, ranges) {
         intersectionX, intersectionY,
         incorrectlyTrueX, incorrectlyTrueY,
         incorrectlyFalseX, incorrectlyFalseY,
-        centerXTrue, (centerYTrue + 0.5),
-        centerXFalse, (centerYFalse + 0.5),
+        centerXTrue, (centerYTrue + 0.2),
+        centerXFalse, (centerYFalse + 0.2),
         trueShape, falseShape,
     ]
 
@@ -488,7 +502,7 @@ function initialize1d() {
             let myPlot = document.getElementById('plotly-1d');
             let bgrect = document.getElementsByClassName('gridlayer')[1].getBoundingClientRect();
             xInDataCoord = ((e.x - bgrect['x']) / (bgrect['width'])) * (myPlot.layout.xaxis.range[1] - myPlot.layout.xaxis.range[0]) + myPlot.layout.xaxis.range[0];
-            yInDataCoord =((e.y - bgrect['y']) / (bgrect['height'])) * (myPlot.layout.yaxis.range[0] - myPlot.layout.yaxis.range[1]) + myPlot.layout.yaxis.range[1];
+            yInDataCoord = ((e.y - bgrect['y']) / (bgrect['height'])) * (myPlot.layout.yaxis.range[0] - myPlot.layout.yaxis.range[1]) + myPlot.layout.yaxis.range[1];
 
         });
 
