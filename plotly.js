@@ -1091,6 +1091,15 @@ function run2d () {
 }
 
 function reverseSign() {
+    let numInputs = document.getElementById('input-table').rows[0].cells.length - 1;
+
+    if (numInputs === 2) {
+        reverseSign2d();
+    } else if (numInputs === 1) {
+        reverseSign1d();
+    }
+}
+function reverseSign2d() {
 
     let weight1Slider = document.getElementById('weight1');
     let weight2Slider = document.getElementById('weight2');

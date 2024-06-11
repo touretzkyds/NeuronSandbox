@@ -918,7 +918,7 @@ function run1d () {
     Plotly.react('plotly-1d', data, layout);
 }
 
-function reverseSign() {
+function reverseSign1d() {
 
     let weight1Slider = document.getElementById('weight1');
     let thresholdSlider = document.getElementById('threshold');
