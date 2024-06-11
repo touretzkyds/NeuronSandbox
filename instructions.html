@@ -91,6 +91,27 @@ If you want a given problem to start out in "Solve for Outputs" mode
 when first loaded, switch to that mode before saving the problem to a
 file.<p/>
 
+<h3> Solve for Boundary </h3>
+
+For 2-input problems, "Solve for Boundary" mode displays the decision
+boundary as a blue line and the input cases as points in the plane.
+The half of the plane where the unit's net activation is positive (so
+the output will be 1) is shown in green; the other half is shown in
+red.  Sliders provide direct control of the weights and
+threshold/bias.  It's also possible to move the decision boundary
+directly by clicking on one of the blue square control points (which
+will turn yellow) and then clicking again to indicate where the point
+should move to.  The middle control point adjusts only the threshold,
+while the other two adjust both the weights and threshold.  The "Flip
+Sign" button flips the signs of the weights and threshold, which
+leaves the boundary unchanged but swaps the red and green regions in
+the plot.<p/>
+
+For 1-input problems the two input points are plotted on a number line
+and the decision boundary is a blue bisector of that line.<p/>
+
+Support for 3-input problems is in development.<p/>
+
 <h3> Threshold Display vs. Bias Display </h3>
 
 Normally Neuron Sandbox displays a threshold value inside the neuron
