@@ -1120,7 +1120,9 @@ class Display {
                 //document.getElementById("perceptron-detail").style.visbility = "hidden";
                 display.UpdateDetailToggle();
             }
-            document.getElementById("sigma").innerText = perceptron.affineOutput[rowIdx-2].toString() + "> ";
+
+            let affineValue = document.getElementById("activation-table").rows[rowIdx-1].cells[0].innerText;
+            document.getElementById("sigma").innerText = affineValue + "> ";
         }
         else {
             if (rowIdx % 2 === 0) {
