@@ -883,8 +883,8 @@ function isLegalPlacement(data, coords) {
         }
     }
 
-    if (xFinal[0] === xFinal[1]) return false;
-    if (yFinal[0] === yFinal[1]) return false;
+    // if (xFinal[0] === xFinal[1]) return false;
+    // if (yFinal[0] === yFinal[1]) return false;
     return true;
 }
 
