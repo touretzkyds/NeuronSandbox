@@ -7,7 +7,7 @@ let distToRegister = 0.05;
 let pointClickedX = Number.MIN_VALUE;
 let pointClickedY = Number.MIN_VALUE;
 let pointClicked = -1; // 0 = endpoint, 1 = midpoint
-let justMouseDown = false;
+// let justMouseDown = false;
 
 // Colors
 const FALSE_COLOR = 'rgba(255, 0, 21, 1)';
@@ -605,6 +605,9 @@ function initialize2d () {
 
         //NOTE: mouse is always "heard" first, before plot click
         gd.addEventListener('mousedown', function(evt) {
+            if(evt.target.id === 'closeId'){
+                return;
+            }
             let plotlyDiv = document.getElementById('tester')
             if (pointClicked === 0) {
                 let coords = checkDist(xInDataCoord, yInDataCoord);
@@ -664,7 +667,6 @@ function initialize2d () {
                         Plotly.react('tester', updatedData, updatedLayout);
                         data = plotlyDiv.data;
                         pointClicked = -1;
-                        justMouseDown = true;
                         dragLayer.style.cursor = ''
                     }
                 }
@@ -706,7 +708,6 @@ function initialize2d () {
                 data = plotlyDiv.data;
 
                 pointClicked = -1;
-                justMouseDown = true;
                 dragLayer.style.cursor = ''
 
             }
@@ -796,63 +797,59 @@ function initialize2d () {
     });
 
     myPlot.on('plotly_click', function(clickedData){
-        if (!justMouseDown) {
-            // console.log("in plotly_click, clicked on point")
-            if (pointClicked < 0) {
-                dragLayer.style.cursor = 'pointer'
-            } else {
-                dragLayer.style.cursor = ''
-            }
-            var pn='',
-                tn='',
-                colors=[],
-                sizeC = [],
-                shape = [],
-                opacity = [];
-            let correctTrace = true;
-            for (let i=0; i < clickedData.points.length; i++){
-                pn = clickedData.points[i].pointNumber;
-                tn = clickedData.points[i].curveNumber;
-                if (!clickedData.points[i].data.nsLineEndpoint && !clickedData.points[i].data.nsLineMidpoint)
-                    correctTrace = false;
-                if (pointClicked < 0) { //have not yet hit a point yet
-                    pointClickedX = clickedData.points[i].x
-                    pointClickedY = clickedData.points[i].y
-                    if (clickedData.points[i].data.nsLineEndpoint) {
-                        // check if only threshold is editable, if that is the case, not allowed to click endpoints
-                        // let allowed = document.getElementById('w1').isContentEditable && document.getElementById('w2').isContentEditable
-                        if (clickedData.points[i].data.inBounds) {
-                            pointClicked = 0;
-                        } else {
-                            correctTrace = false;
-                        }
-                    }
-
-                    else if (clickedData.points[i].data.nsLineMidpoint)
-                        pointClicked = 1;
-                }
-                else {
-                    correctTrace = false;
-                }
-                colors = clickedData.points[i].data.marker.color;
-                sizeC = clickedData.points[i].data.marker.size;
-                shape = clickedData.points[i].data.marker.symbol;
-                opacity = clickedData.points[i].data.marker.opacity;
-
-            };
-
-            if (correctTrace && pointClicked >= 0) {
-                colors[pn] = 'yellow';
-                sizeC[pn] = 10;
-                shape[pn] = 'square';
-                opacity[pn] = 1;
-
-                var update = {'marker':{color: colors, size: sizeC, symbol: shape, opacity: opacity}};
-                Plotly.restyle('tester', update, [tn]);
-            }
-
+        // console.log("in plotly_click, clicked on point")
+        if (pointClicked < 0) {
+            dragLayer.style.cursor = 'pointer'
+        } else {
+            dragLayer.style.cursor = ''
         }
-        justMouseDown = false;
+        var pn='',
+            tn='',
+            colors=[],
+            sizeC = [],
+            shape = [],
+            opacity = [];
+        let correctTrace = true;
+        for (let i=0; i < clickedData.points.length; i++){
+            pn = clickedData.points[i].pointNumber;
+            tn = clickedData.points[i].curveNumber;
+            if (!clickedData.points[i].data.nsLineEndpoint && !clickedData.points[i].data.nsLineMidpoint)
+                correctTrace = false;
+            if (pointClicked < 0) { //have not yet hit a point yet
+                pointClickedX = clickedData.points[i].x
+                pointClickedY = clickedData.points[i].y
+                if (clickedData.points[i].data.nsLineEndpoint) {
+                    // check if only threshold is editable, if that is the case, not allowed to click endpoints
+                    // let allowed = document.getElementById('w1').isContentEditable && document.getElementById('w2').isContentEditable
+                    if (clickedData.points[i].data.inBounds) {
+                        pointClicked = 0;
+                    } else {
+                        correctTrace = false;
+                    }
+                }
+
+                else if (clickedData.points[i].data.nsLineMidpoint)
+                    pointClicked = 1;
+            }
+            else {
+                correctTrace = false;
+            }
+            colors = clickedData.points[i].data.marker.color;
+            sizeC = clickedData.points[i].data.marker.size;
+            shape = clickedData.points[i].data.marker.symbol;
+            opacity = clickedData.points[i].data.marker.opacity;
+
+        };
+
+        if (correctTrace && pointClicked >= 0) {
+            colors[pn] = 'yellow';
+            sizeC[pn] = 10;
+            shape[pn] = 'square';
+            opacity[pn] = 1;
+
+            var update = {'marker':{color: colors, size: sizeC, symbol: shape, opacity: opacity}};
+            Plotly.restyle('tester', update, [tn]);
+        }
     });
 
     // console.log(data.find(e => e.nsLine))
