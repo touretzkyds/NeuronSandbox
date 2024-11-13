@@ -263,7 +263,7 @@ function createTraces(inputs, outputs, weights, threshold) {
             color: 'black'
         }
     }
-    let data = [boundsX, boundsY, line, lineEndpoints, lineMidpoint, falsePoints, truePoints, incorrectlyTrue, incorrectlyFalse, plus, minus];
+    let data = [boundsX, boundsY, line, falsePoints, truePoints, incorrectlyTrue, incorrectlyFalse, plus, minus, lineEndpoints, lineMidpoint,];
 
     /*
         Drawing the red/green regions (i.e. shapes attribute in layout).
