@@ -878,6 +878,8 @@ function updateValuesPlotlyToDisplay1d(weight1, threshold) {
 }
 
 function checkDist(x, y) {
+    if((x > 1 + distToRegister) || (x < 0 - distToRegister) || (y > 1 + distToRegister) || (y < 0 - distToRegister))
+        return [-1, -1];
     let dX0 =  Math.abs(x);
     let dX1 =  Math.abs(x-1);
     let dY0 = Math.abs(y);

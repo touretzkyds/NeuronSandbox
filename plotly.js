@@ -9,6 +9,10 @@ let pointClickedY = Number.MIN_VALUE;
 let pointClicked = -1; // 0 = endpoint, 1 = midpoint
 // let justMouseDown = false;
 
+
+let xInDataCoordMP = 0;
+let yInDataCoordMP = 0;
+
 // Colors
 const FALSE_COLOR = 'rgba(255, 0, 21, 1)';
 const TRUE_COLOR = 'rgba(0, 255, 60, 1)';
@@ -179,7 +183,7 @@ function createTraces(inputs, outputs, weights, threshold) {
         type: 'marker',
         nsLineMidpoint: true,
         marker: {
-            symbol: ['square'],
+            symbol: ['circle'],
             size:  [10],
             color: [LINE_COLOR_ACTIVE],
             opacity: [1],
@@ -263,7 +267,83 @@ function createTraces(inputs, outputs, weights, threshold) {
             color: 'black'
         }
     }
-    let data = [boundsX, boundsY, line, falsePoints, truePoints, incorrectlyTrue, incorrectlyFalse, plus, minus, lineEndpoints, lineMidpoint,];
+
+    let invis_traces = []
+    // y = 0
+    for(let i= 0; i<1; i+=0.05) { //20 invisible point traces
+        let t = {
+            x: [i],
+            y: [0],
+            marker: {
+                // symbol: ['square'],
+                size:  [10],
+                // fillcolor: 'transparent'
+                color: [LINE_COLOR_ACTIVE],
+                opacity: [0],
+            },
+            hoverinfo: 'none',
+            showlegend: false
+        }
+        invis_traces.push(t);
+    }
+
+    // y = 1
+    for(let i= 0; i<1; i+=0.05) { //20 invisible point traces
+        let t = {
+            x: [i],
+            y: [1],
+            marker: {
+                // symbol: ['square'],
+                size:  [10],
+                // fillcolor: 'transparent'
+                color: [LINE_COLOR_ACTIVE],
+                opacity: [0],
+            },
+            hoverinfo: 'none',
+            showlegend: false
+        }
+        invis_traces.push(t);
+    }
+
+    // x = 0
+    for(let i= 0; i<1; i+=0.05) { //20 invisible point traces
+        let t = {
+            x: [0],
+            y: [i],
+            marker: {
+                // symbol: ['square'],
+                size:  [10],
+                // fillcolor: 'transparent'
+                color: [LINE_COLOR_ACTIVE],
+                opacity: [0],
+            },
+            hoverinfo: 'none',
+            showlegend: false
+        }
+        invis_traces.push(t);
+    }
+
+    // x = 1
+    for(let i= 0; i<1; i+=0.05) { //20 invisible point traces
+        let t = {
+            x: [1],
+            y: [i],
+            marker: {
+                // symbol: ['square'],
+                size:  [10],
+                // fillcolor: 'transparent'
+                color: [LINE_COLOR_ACTIVE],
+                opacity: [0],
+            },
+            hoverinfo: 'none',
+            showlegend: false
+        }
+        invis_traces.push(t);
+    }
+
+    let data = invis_traces.concat([boundsX, boundsY, line, falsePoints, truePoints, incorrectlyTrue, incorrectlyFalse, plus, minus, lineEndpoints, lineMidpoint,]);
+
+    console.log(data);
 
     /*
         Drawing the red/green regions (i.e. shapes attribute in layout).
@@ -598,8 +678,9 @@ function initialize2d () {
         gd.addEventListener('mousemove', function(e) {
             let myPlot = document.getElementById('tester')
             let bgrect = document.getElementsByClassName('gridlayer')[0].getBoundingClientRect();
-            xInDataCoord = ((e.x - bgrect['x']) / (bgrect['width'])) * (myPlot.layout.xaxis.range[1] - myPlot.layout.xaxis.range[0]) + myPlot.layout.xaxis.range[0];
-            yInDataCoord =((e.y - bgrect['y']) / (bgrect['height'])) * (myPlot.layout.yaxis.range[0] - myPlot.layout.yaxis.range[1]) + myPlot.layout.yaxis.range[1];
+            //need to get midpoint points to-move from mousemove
+            xInDataCoordMP = ((e.x - bgrect['x']) / (bgrect['width'])) * (myPlot.layout.xaxis.range[1] - myPlot.layout.xaxis.range[0]) + myPlot.layout.xaxis.range[0];
+            yInDataCoordMP =((e.y - bgrect['y']) / (bgrect['height'])) * (myPlot.layout.yaxis.range[0] - myPlot.layout.yaxis.range[1]) + myPlot.layout.yaxis.range[1];
 
         });
 
@@ -610,7 +691,9 @@ function initialize2d () {
             }
             let plotlyDiv = document.getElementById('tester')
             if (pointClicked === 0) {
-                let coords = checkDist(xInDataCoord, yInDataCoord);
+                //let coords = checkDist(xInDataCoord, yInDataCoord);
+                //because we preset the xcoords and ycoords, we don't need to use checkDist
+                let coords = [xInDataCoord, yInDataCoord];
                 // want to move point
                 if (coords[0] !== -1)  {
                     if (isLegalPlacement(plotlyDiv.data, coords)) {
@@ -673,7 +756,7 @@ function initialize2d () {
 
             }
             else if (pointClicked === 1) {
-                let newData = changeLineByMidpoint(plotlyDiv.data, [xInDataCoord, yInDataCoord]);
+                let newData = changeLineByMidpoint(plotlyDiv.data, [xInDataCoordMP, yInDataCoordMP]);
                 updatePlotlyData('tester', newData, 0)
 
                 let weight1Slider = document.getElementById('weight1');
@@ -720,6 +803,12 @@ function initialize2d () {
     var myPlot = document.getElementById('tester')
 
     myPlot.on('plotly_hover', function(data){
+        var point = data.points[0];
+        xInDataCoord = point.x;
+        yInDataCoord = point.y;
+        console.log(xInDataCoord);
+        console.log(yInDataCoord);
+
         var pn='',
             tn='',
             colors=[];
@@ -761,6 +850,8 @@ function initialize2d () {
 
     });
     myPlot.on('plotly_unhover', function(data){
+        xInDataCoord = -1;
+        yInDataCoord = -1;
         var pn='',
             tn='',
             colors=[];
@@ -1045,6 +1136,8 @@ function changeLineByEndpoint(data, coords) {
 }
 
 function checkDist(x, y) {
+    if((x > 1 + distToRegister) || (x < 0 - distToRegister) || (y > 1 + distToRegister) || (y < 0 - distToRegister))
+        return [-1, -1];
     let dX0 =  Math.abs(x);
     let dX1 =  Math.abs(x-1);
     let dY0 = Math.abs(y);
