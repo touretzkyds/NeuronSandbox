@@ -714,6 +714,12 @@ function initialize2d () {
                         let slope = (newData.y[1] - newData.y[0])/(newData.x[1] - newData.x[0])
                         let a = -1 * slope
                         let b = 1
+                        //special case: if we have a vertical line, we don't want a to be Infinity. This manually
+                        //creates a vertical line
+                        if(Math.abs(a) === Infinity) {
+                            b = 0
+                            a = 1
+                        }
                         let c = a*newData.x[1] + b*newData.y[1]
 
                         let o_a = weight1Slider.value
@@ -1112,17 +1118,17 @@ function updateValuesPlotlyToDisplay(weight1, weight2, threshold) {
 }
 
 function changeLineByEndpoint(data, coords) {
-    let lineObj = findLine(data)
+    let lineObj = findLine(data) //find current line
     if (!lineObj) //there exists no line
         return
 
-    let xCoords = lineObj.nsX;
+    let xCoords = lineObj.nsX; //two endpoints of the cur line
     let yCoords = lineObj.nsY;
-    let xFinal = [-1, -1]
+    let xFinal = [-1, -1] //updated endpoints of the line
     let yFinal = [-1, -1]
 
     for (let i = 0; i < xCoords.length; i++) {
-        if (xCoords[i] === pointClickedX && yCoords[i] === pointClickedY) {
+        if (xCoords[i] === pointClickedX && yCoords[i] === pointClickedY) { //if the coord index is the new clicked
             xFinal[i] = coords[0]
             yFinal[i] = coords[1]
         } else {
