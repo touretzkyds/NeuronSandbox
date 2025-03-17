@@ -16,18 +16,30 @@
                 <tr>
                     <td class="input-cell" id="inputs">
                         <div class="input-item">bias</div>
+                        <div style="padding-top: 30px;"> </div>
                         <div class="input-item">x₁</div>
+                        <div style="padding-top: 30px;"> </div>
                         <div class="input-item">x₂</div>
                     </td>
                     <td class="perceptron-cell">
                         <div class="circle">
-                            <div>∑>0.5</div>
-                            <div>Activation</div>
-                            <div>Threshold</div>
+                            <div class="perceptron-content">
+                                <div class="threshold-container">
+                                    <span class="sigma-symbol">Σ</span>
+                                    <span class="comparison-symbol">&gt;</span>
+                                    <div class="threshold-box" contenteditable="true">0.5</div>
+                                </div>
+                                <div class="threshold-labels">
+                                    <span class="activation-label">Activation</span>
+                                    <span class="threshold-label">Threshold</span>
+                                </div>
+                            </div>
                         </div>
                     </td>
                     <td class="output-cell">
+                        <div class="output-label">&nbsp;</div>
                         <div class="output-value">y</div>
+                        <div class="output-label">output</div>
                     </td>
                 </tr>
             </table>
@@ -35,6 +47,7 @@
 
         <div class="controls">
             <button id="randomize">Randomize Weights</button>
+            <button id="switch_textbox">Edit Weights</button>
         </div>
     </div>
 

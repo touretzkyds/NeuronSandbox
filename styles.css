@@ -1,7 +1,6 @@
 body {
     margin: 0;
     padding: 20px;
-    font-family: Arial, sans-serif;
 }
 
 .container {
@@ -40,17 +39,45 @@ body {
 }
 
 .output-cell {
-    width: 25%;
-    vertical-align: middle;
+    position: absolute;
+    top: 50%;  /* Align with the vertical center */
+    transform: translateY(-50%);  /* Center it perfectly */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;  /* Space between value and label */
+    /*width: 25%;*/
+    /*vertical-align: middle;*/
 }
 
 .input-item {
+    /*padding: 10px 15px;
+    color: red;
+    font-size: 3vw;
+    text-align: right;
+    word-wrap: break-word;
+    display: inline-block;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    max-width: calc(100% - 20px);
+    min-width: 80px;
+    position: relative;
+    z-index: 1;*/
+
+    /* ported from original Neuron Sandbox: */
+    font-size: 3vw;
+
+    /* added for style (to match Neuron Sandbox) */
+    font-weight: bold;
+
+    color: red;
     padding: 10px 15px;
-    background: white;
-    border: 2px solid #333;
-    border-radius: 4px;
+    /*background: white;*/
+    /*border: 2px solid #333;*/
+    /*border-radius: 4px;*/
     margin: 10px;
-    text-align: center;
+    /*text-align: center;*/
+    text-align: right;
     word-wrap: break-word;
     overflow-wrap: break-word;
     hyphens: auto;
@@ -61,28 +88,119 @@ body {
     z-index: 1;
 }
 
+/*.circle {*/
+/*    width: 120px;*/
+/*    height: 120px;*/
+/*    border: 3px solid #333;*/
+/*    border-radius: 50%;*/
+/*    display: inline-flex;*/
+/*    flex-direction: column;*/
+/*    justify-content: center;*/
+/*    align-items: center;*/
+/*    background: white;*/
+/*    position: relative;*/
+/*    z-index: 1;*/
+/*}*/
+
 .circle {
-    width: 120px;
-    height: 120px;
-    border: 3px solid #333;
-    border-radius: 50%;
-    display: inline-flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background: white;
     position: relative;
-    z-index: 1;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 2px solid black;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;  /* Add this to ensure circle is above the line */
+}
+
+.perceptron-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.threshold-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sigma-symbol {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.threshold-box {
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 3px 6px;
+    min-width: 40px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.threshold-labels {
+    display: flex;
+    gap: 20px;
+    margin-top: 5px;
+    font-size: 12px;
+}
+
+.activation-label, .threshold-label {
+    text-align: center;
+}
+
+.comparison-symbol {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0 5px;  /* Add some spacing around the > symbol */
 }
 
 .output-value {
-    padding: 10px 20px;
-    background: white;
-    border: 2px solid #333;
-    border-radius: 4px;
-    text-align: center;
+    /* ported from original Neuron Sandbox: */
+    font-size: 3vw;
+
+    /* added for style (to match Neuron Sandbox) */
+    font-weight: bold;
+    /* no box, trying to match Neuron Sandbox */
+    padding: 10px 15px;
+    /*background: white;*/
+    /*border: 2px solid #333;*/
+    /*border-radius: 4px;*/
+    margin: 10px;
+    /*text-align: center;*/
+    text-align: left;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    max-width: calc(100% - 20px);
+    min-width: 80px;
+    box-sizing: border-box;
     position: relative;
     z-index: 1;
+
+    top: 0;  /* Reset any top positioning */
+    transform: translateY(0);  /* Reset any transform */
+
+    /* original, with box */
+    /*padding: 10px 20px;*/
+    /*background: white;*/
+    /*border: 2px solid #333;*/
+    /*border-radius: 4px;*/
+    /*text-align: center;*/
+    /*position: relative;*/
+    /*z-index: 1;*/
+}
+
+.output-label {
+    font-size: 12px;
+    text-align: center;
+    /*margin-top: 5px;*/
 }
 
 .controls {
