@@ -48,6 +48,27 @@ function main() {
 
 }
 
+function list_contains_list(listToCheck, listOfLists) {
+    for (let i = 0; i < listOfLists.length; i++) {
+        if (list_equals(listToCheck, listOfLists[i])) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function list_equals(list1, list2) {
+    if (list1.length !== list2.length) {
+        return false;
+    }
+    for (let i = 0; i < list1.length; i++) {
+        if (list1[i] !== list2[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 function createTraces(inputs, outputs, weights, threshold) {
 
     // let ranges = [[-0.5, -0.5], [-0.5, 1.5], [1.5, -0.5], [1.5, 1.5]]
@@ -479,6 +500,25 @@ function calculateInputs(inputs, outputs, weights, threshold, ranges) {
     if (x_y1 <= 1 && x_y1 >= 0) {
         intersections.push([x_y1, 1])
     }
+
+    //in order to mitigate midpoint issue with y=x, ensure there are no duplicates.
+    let no_dup_intersections = []
+    let visisted = []
+    if(intersections.length > 2) {
+        for(let i=0; i<intersections.length; i++) {
+            let cur_elem = intersections[i]
+            let cur_elem_normalized = []
+            for(let j=0; j<cur_elem.length; j++) {
+                cur_elem_normalized.push(Math.abs(cur_elem[j])) //attempting to get rid of the -0 issue
+            }
+            if(!list_contains_list(cur_elem_normalized, visisted)) {
+                visisted.push(cur_elem_normalized)
+                no_dup_intersections.push(cur_elem_normalized)
+            }
+        }
+    }
+    if(intersections.length > 2)
+        intersections = no_dup_intersections
 
     let intersectionX = []
     let intersectionY = []
