@@ -169,6 +169,13 @@ class PerceptronVisualizer {
             };
     
             const weight = this.weights[index];
+            const initialColor = weight < 0 ? 'red' : (weight > 0 ? '#333' : 'blue');
+            const initialThickness = Math.abs(weight) <= 0.5 ? 1 : 3;
+
+            line.setOptions({
+                color: initialColor,
+                size: initialThickness
+            });
 
             // create a div to hold the editable weights box and w= text label
             const weightContainer = document.createElement('div');
@@ -218,7 +225,7 @@ class PerceptronVisualizer {
                 const midX = (startPoint.left + startPoint.width/2 + endPoint.left + endPoint.width/2) / 2;
                 //const midY = (startPoint.top + startPoint.height/2 + endPoint.top + endPoint.height/2) / 2;
                 const midY = startPoint.top + startPoint.height/2
-                const yOffset = index === 1 ? -20 : 0; // Move middle weight up by 20 pixels
+                const yOffset = index === 1 ? -10 : 0; // Move middle weight up by 20 pixels
 
                 weightContainer.style.left = `${midX}px`;
                 weightContainer.style.top = `${midY + yOffset}px`;
@@ -236,7 +243,31 @@ class PerceptronVisualizer {
             editableBox.addEventListener('input', (event) => {
                 const newValue = parseFloat(event.target.innerText);
                 if (!isNaN(newValue)) {
-                    this.weights[index] = newValue; // Update the corresponding weight in the array
+                    this.weights[index] = newValue; // Update the corresponding weight
+                    
+                    // Update line color based on weight value
+                    let lineColor;
+                    if (newValue < 0) {
+                        lineColor = 'red';
+                    } else if (newValue > 0) {
+                        lineColor = '#333'; // black
+                    } else {
+                        lineColor = 'blue';
+                    }
+                    
+                    // Linear scaling for line thickness
+                    // Map weight magnitude to thickness range [1, 5]
+                    const minThickness = 1;
+                    const maxThickness = 5;
+                    const maxWeight = 2; // Maximum expected weight magnitude
+                    const thickness = minThickness + 
+                        (Math.min(Math.abs(newValue), maxWeight) / maxWeight) * (maxThickness - minThickness);
+                    
+                    // Update the line's appearance
+                    line.setOptions({
+                        color: lineColor,
+                        size: thickness
+                    });
                 }
             });
 
@@ -285,25 +316,15 @@ class PerceptronVisualizer {
         );
 
         // Function to update output position
-        /*
         const updateOutputPosition = () => {
             const container = this.container;
             const containerRect = container.getBoundingClientRect();
             const circleRect = perceptron.getBoundingClientRect();
-            // const outputRect = output.getBoundingClientRect();
-            // const circleCenter = circleRect.top + (circleRect.height / 2);
-            const circleCenter = circleRect.top - containerRect.top + (circleRect.height / 2);
-
-            output.style.position = 'absolute';
-            output.style.top = `${circleCenter}px`;
-            output.style.transform = 'translateY(-50%)';
         };
 
         // Initial position
         updateOutputPosition();
 
-        // Store the update function with the line
-        outputLine.updateOutputPosition = updateOutputPosition;*/
 
         this.lines.push(outputLine);
     }
@@ -313,9 +334,6 @@ class PerceptronVisualizer {
             if (line.updateBoxPosition) {
                 line.updateBoxPosition();
             }
-            // if (line.updateOutputPosition) {
-            //     line.updateOutputPosition();
-            // }
         });
     }
 
@@ -351,13 +369,13 @@ class PerceptronVisualizer {
             inputCell.appendChild(inputItem);
         });
 
-        // requestAnimationFrame(() => {
-        //     this.lines.forEach(line => {
-        //         if (line.updateOutputPosition) {
-        //             line.updateOutputPosition();
-        //         }
-        //     });
-        // });
+        requestAnimationFrame(() => {
+            this.lines.forEach(line => {
+                if (line.updateOutputPosition) {
+                    line.updateOutputPosition();
+                }
+            });
+        });
         
         this.weights = new Array(inputLabels.length).fill(1);
         this.drawConnections();
