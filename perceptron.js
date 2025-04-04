@@ -170,7 +170,7 @@ class PerceptronVisualizer {
     
             const weight = this.weights[index];
             const initialColor = weight < 0 ? 'red' : (weight > 0 ? '#333' : 'blue');
-            const initialThickness = Math.abs(weight) <= 0.5 ? 1 : 3;
+            const initialThickness = Math.abs(weight) <= 0.5 ? 2 : 3;
 
             line.setOptions({
                 color: initialColor,
@@ -256,12 +256,13 @@ class PerceptronVisualizer {
                     }
                     
                     // Linear scaling for line thickness
-                    // Map weight magnitude to thickness range [1, 5]
+                    // Map weight magnitude to thickness range [1, 5
                     const minThickness = 1;
                     const maxThickness = 5;
-                    const maxWeight = 2; // Maximum expected weight magnitude
-                    const thickness = minThickness + 
-                        (Math.min(Math.abs(newValue), maxWeight) / maxWeight) * (maxThickness - minThickness);
+                    // const maxWeight = 2; // Maximum expected weight magnitude
+                    const thickness = Math.abs(newValue) === 0 ? 2 : minThickness + (Math.abs(newValue) * (maxThickness - minThickness))/5;
+                    // const thickness = minThickness +
+                    //     (Math.min(Math.abs(newValue), maxWeight) / maxWeight) * (maxThickness - minThickness);
                     
                     // Update the line's appearance
                     line.setOptions({
