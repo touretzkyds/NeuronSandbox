@@ -852,8 +852,8 @@ function initialize2d () {
         var point = data.points[0];
         xInDataCoord = point.x;
         yInDataCoord = point.y;
-        console.log(xInDataCoord);
-        console.log(yInDataCoord);
+        // console.log(xInDataCoord);
+        // console.log(yInDataCoord);
 
         var pn='',
             tn='',
