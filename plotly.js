@@ -1002,8 +1002,8 @@ function isLegalPlacement(data, coords) {
     if (!lineObj) // there does not exist a line
         return
 
-    let xCoords = lineObj.x;
-    let yCoords = lineObj.y
+    let xCoords = lineObj.nsX;
+    let yCoords = lineObj.nsY;
     let xFinal = [-1, -1]
     let yFinal = [-1, -1]
 
@@ -1016,6 +1016,9 @@ function isLegalPlacement(data, coords) {
             yFinal[i] = yCoords[i]
         }
     }
+
+    if(xFinal[0] === xFinal[1] && yFinal[0] === yFinal[1])
+        return false;
 
     // if (xFinal[0] === xFinal[1]) return false;
     // if (yFinal[0] === yFinal[1]) return false;

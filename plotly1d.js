@@ -743,7 +743,7 @@ function findLine(data) {
     return data.find(obj => obj.nsLine);
 }
 
-function isLegalPlacement(data, coords) {
+function isLegalPlacement1D(data, coords) {
     let lineObj = findLine(data)
     if (!lineObj) // there does not exist a line
         return
