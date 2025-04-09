@@ -185,7 +185,7 @@ function createTraces(inputs, outputs, weights, threshold) {
         mode: 'markers',
         type: 'scatter',
         nsLineEndpoint: true,
-        inBounds: inBounds,
+        inBounds: inBounds, //true
         text: ["Point 1", "Point 2"],
         hovertemplate: '<b>%{text}</b>',
         marker: {
@@ -503,7 +503,7 @@ function calculateInputs(inputs, outputs, weights, threshold, ranges) {
 
     //in order to mitigate midpoint issue with y=x, ensure there are no duplicates.
     let no_dup_intersections = []
-    let visisted = []
+    let visited = []
     if(intersections.length > 2) {
         for(let i=0; i<intersections.length; i++) {
             let cur_elem = intersections[i]
@@ -511,14 +511,62 @@ function calculateInputs(inputs, outputs, weights, threshold, ranges) {
             for(let j=0; j<cur_elem.length; j++) {
                 cur_elem_normalized.push(Math.abs(cur_elem[j])) //attempting to get rid of the -0 issue
             }
-            if(!list_contains_list(cur_elem_normalized, visisted)) {
-                visisted.push(cur_elem_normalized)
+            if(!list_contains_list(cur_elem_normalized, visited)) {
+                visited.push(cur_elem_normalized)
                 no_dup_intersections.push(cur_elem_normalized)
             }
         }
     }
     if(intersections.length > 2)
         intersections = no_dup_intersections
+
+    // if there are less than 2 intersection points, then it is out of bounds
+    // check if there are intersections with the extended axes
+    let extended_intersections = []
+    if(intersections.length < 2) {
+        // counter, which will be used upon the special case where there are more than two
+        // extended intersection points
+        let intersection_counter = [0, 0, 0, 0]
+
+        // extended x = 0
+        let y_x0_ext = threshold/weights[1]
+        if((y_x0_ext < 0 || y_x0_ext > 1) && (y_x0_ext > -0.5 && y_x0_ext < 1.5)) {
+            extended_intersections.push([0, y_x0_ext])
+            intersection_counter[0] = 1
+        }
+        // extended y = 0
+        let x_y0_ext = threshold/weights[0]
+        if((x_y0_ext < 0 || x_y0_ext > 1) && (x_y0_ext > -0.5 && x_y0_ext < 1.5)) {
+            extended_intersections.push([x_y0_ext, 0])
+            intersection_counter[2] = 1
+        }
+        // extended x = 1
+        let y_x1_ext = (threshold-weights[0])/weights[1]
+        if ((y_x1_ext < 0 || y_x1_ext > 1) && (y_x1_ext > -0.5 && y_x1_ext < 1.5)) {
+            extended_intersections.push([1, y_x1_ext])
+            intersection_counter[1] = 1
+        }
+        // extended y = 1
+        let x_y1_ext = (threshold-weights[1])/weights[0]
+        if ((x_y1_ext < 0 || x_y1_ext > 1) && (x_y1_ext > -0.5 && x_y1_ext < 1.5)) {
+            extended_intersections.push([x_y1_ext, 1])
+            intersection_counter[3] = 1
+        }
+
+        // if there are more than 2 extended line intersections, there must be 3 extended
+        // intersections. We decide to pick the two intersections that intersect the two
+        // vertical axes or two horizontal axes, i.e. if we had 3 extended intersections on
+        // x=0, x=1, and y=1, we only display the intersections on x=0 and x=1.
+        if(extended_intersections.length > 2) {
+            if(intersection_counter[0] === 1 && intersection_counter[1] === 1)
+                extended_intersections = [[0, y_x0_ext], [1, y_x1_ext]]
+            else
+                extended_intersections = [[x_y0_ext, 0], [x_y1_ext, 1]]
+        }
+
+        console.log(extended_intersections.length);
+        intersections = intersections.concat(extended_intersections)
+    }
 
     let intersectionX = []
     let intersectionY = []
@@ -1042,7 +1090,9 @@ function changeLineByMidpoint(data, coords) {
     let inBounds = true;
 
     if (true) {
+        // calculate intersections with the border
         inBounds = false;
+        // intersection w/ x = -0.5
         let y_x0b = (c+0.5*a)/b
         if (y_x0b <= 1.5 && y_x0b >= -0.5) {
             intersections.push([-0.5, y_x0b])
@@ -1064,6 +1114,7 @@ function changeLineByMidpoint(data, coords) {
         }
     }
 
+    //"unzips" the intersection points into a list of x intersections and y intersections
     let intersectionX = []
     let intersectionY = []
     for (let i = 0; i < intersections.length; i++) {
@@ -1077,6 +1128,7 @@ function changeLineByMidpoint(data, coords) {
         lineObj.marker.size = Array(intersectionX.length).fill(10);
     }
     else {
+        //enter here if moving the midpoint keeps endpoints within the 1x1 square
         //lineObj.marker.color = Array(intersectionX.length).fill('rgb(163, 163, 162)');
         lineObj.marker.size = Array(intersectionX.length).fill(0);
     }
