@@ -289,7 +289,7 @@ function createTraces1d(inputs, outputs, weights, threshold) {
 
 function calculateInputs1d(inputs, outputs, weights, threshold, ranges) {
     //preliminary step: from the bounds given in ranges, find the max/min X/Y values
-    console.log(inputs)
+    //console.log(inputs)
     let minX = Number.MAX_VALUE;
     let minY = Number.MAX_VALUE;
     let maxX = Number.MIN_VALUE;
@@ -735,7 +735,7 @@ function initialize1d() {
         justMouseDown = false;
     });
 
-    console.log(data.find(e => e.nsLine))
+    //console.log(data.find(e => e.nsLine))
 
 }
 

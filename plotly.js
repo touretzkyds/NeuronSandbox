@@ -364,7 +364,7 @@ function createTraces(inputs, outputs, weights, threshold) {
 
     let data = invis_traces.concat([boundsX, boundsY, line, falsePoints, truePoints, incorrectlyTrue, incorrectlyFalse, plus, minus, lineEndpoints, lineMidpoint,]);
 
-    console.log(data);
+    //console.log(data);
 
     /*
         Drawing the red/green regions (i.e. shapes attribute in layout).
@@ -564,7 +564,7 @@ function calculateInputs(inputs, outputs, weights, threshold, ranges) {
                 extended_intersections = [[x_y0_ext, 0], [x_y1_ext, 1]]
         }
 
-        console.log(extended_intersections.length);
+        //console.log(extended_intersections.length);
         intersections = intersections.concat(extended_intersections)
     }
 
