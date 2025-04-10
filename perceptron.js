@@ -217,19 +217,32 @@ class PerceptronVisualizer {
 
             // Function to update the box position based on the line
             const updateBoxPosition = () => {
-                //TODO: height matches the input box? or avg between arrow and box height
                 const startPoint = input.getBoundingClientRect();
                 const endPoint = perceptron.getBoundingClientRect();
 
-                // Calculate the midpoint of the line
+                // calc the midpoint of the line
                 const midX = (startPoint.left + startPoint.width/2 + endPoint.left + endPoint.width/2) / 2;
-                //const midY = (startPoint.top + startPoint.height/2 + endPoint.top + endPoint.height/2) / 2;
-                const midY = startPoint.top + startPoint.height/2
-                const yOffset = index === 1 ? -10 : 0; // Move middle weight up by 20 pixels
-
+                
+                // calc y position 30% down the line from start to end
+                const startY = startPoint.top + startPoint.height/2;
+                const endY = endPoint.top + endPoint.height/2;
+                const midY = startY + (endY - startY) * 0.3;
+                
+                // calc the slope of the line
+                const slope = (endY - startY) / (endPoint.left - startPoint.left);
+                
+                // calc offset based on slope magnitude
+                const baseOffset = 20; // minimum offset
+                const scalingFactor = 40; // how much to scale the offset by slope
+                const maxOffset = 60; // maximum offset to prevent extreme values
+                
+                // calc scaled offset based on absolute slope value
+                let yOffset = Math.min(baseOffset + Math.abs(slope) * scalingFactor, maxOffset);
+                // offset is negative if slope >= 0 (shift up), positive if slope < 0 (shift down)
+                yOffset = slope >= 0 ? -yOffset : yOffset;
+                
                 weightContainer.style.left = `${midX}px`;
                 weightContainer.style.top = `${midY + yOffset}px`;
-                //weightContainer.style.top = `${midY}px`;
                 weightContainer.style.transform = 'translate(-50%, -50%)';
             };
 
@@ -258,7 +271,7 @@ class PerceptronVisualizer {
                     // Linear scaling for line thickness
                     // Map weight magnitude to thickness range [1, 5
                     const minThickness = 1;
-                    const maxThickness = 5;
+                    const maxThickness = 10;
                     // const maxWeight = 2; // Maximum expected weight magnitude
                     const thickness = Math.abs(newValue) === 0 ? 2 : minThickness + (Math.abs(newValue) * (maxThickness - minThickness))/5;
                     // const thickness = minThickness +
