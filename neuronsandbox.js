@@ -1748,7 +1748,13 @@ $('#biasToggle').change(function() { //toggle bias
     if (displaySlider.value === '3') {
         document.getElementById("output-container").style.display = "none";
         document.getElementById("activation-container").style.display = "none";
-        initialize1d();
+
+        let numInputs = document.getElementById('input-table').rows[0].cells.length - 1;
+
+        if (numInputs === 2)
+            initialize2d();
+        else
+            initialize1d(); //NEED TO FIX HERE
     }
 
 
