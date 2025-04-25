@@ -36,7 +36,7 @@ body {
 }
 
 .perceptron-cell {
-    width: 50%;
+    width: 40%;
     text-align: center;
     vertical-align: middle;
 }
@@ -108,9 +108,9 @@ body {
 .circle {
     position: relative;
     left: 50%;
-    transform: translateX(-50%);
-    width: 150px;
-    height: 150px;
+    transform: translateX(-40%);  /* Changed from -50% to -40% to shift right */
+    width: min(170px, 15vw);  /* Will be at most 150px, but scales with viewport width */
+    height: min(170px, 15vw); /* Same as width to maintain circle shape */
     border-radius: 50%;
     border: 2px solid black;
     background-color: white;
@@ -129,10 +129,12 @@ body {
 .threshold-container {
     display: flex;
     align-items: center;
+    /* gap: 0.8vw;  /* Reduced from 1vw for smaller default size */
     gap: 10px;
 }
 
 .sigma-symbol {
+    /* font-size: 1.5vw;  /* Reduced from 2vw for smaller default size */
     font-size: 24px;
     font-weight: bold;
 }
@@ -140,17 +142,24 @@ body {
 .threshold-box {
     background-color: white;
     border: 1px solid #ccc;
+    /* border-radius: 0.4vw;  /* Reduced from 0.5vw for smaller default size */
     border-radius: 4px;
+    /* padding: 0.4vw 0.8vw;  /* Reduced from 0.5vw 1vw for smaller default size */
     padding: 3px 6px;
+    /* min-width: 3vw;  /* Reduced from 4vw for smaller default size */
     min-width: 40px;
     text-align: center;
+    /* font-size: 1.2vw;  /* Reduced from 1.5vw for smaller default size */
     font-size: 16px;
 }
 
 .threshold-labels {
     display: flex;
+    /* gap: 1.5vw;  /* Reduced from 2vw for smaller default size */
     gap: 20px;
+    /* margin-top: 0.4vw;  /* Reduced from 0.5vw for smaller default size */
     margin-top: 5px;
+    /* font-size: 1vw;  /* Reduced from 1.2vw for smaller default size */
     font-size: 12px;
 }
 
@@ -159,9 +168,11 @@ body {
 }
 
 .comparison-symbol {
+    /* font-size: 1.5vw;  /* Reduced from 2vw for smaller default size */
     font-size: 24px;
     font-weight: bold;
-    margin: 0 5px;  /* Add some spacing around the > symbol */
+    /* margin: 0 0.4vw;  /* Reduced from 0.5vw for smaller default size */
+    margin: 0 5px;
 }
 
 .output-value {
@@ -219,18 +230,4 @@ button {
 
 .input-item[title] {
     cursor: help;
-}
-
-@media (max-width: 768px) {
-    .input-item {
-        font-size: 14px;
-        padding: 8px 12px;
-    }
-}
-
-@media (max-width: 480px) {
-    .input-item {
-        font-size: 12px;
-        padding: 6px 10px;
-    }
-}
+}  
