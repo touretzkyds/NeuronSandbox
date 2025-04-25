@@ -799,6 +799,16 @@ function initialize2d () {
                         let weight2Slider = document.getElementById('weight2');
                         let thresholdSlider = document.getElementById('threshold');
 
+                        // new weight calculation:
+                        // y = mx + b
+                        // ax + by = c
+                        // by = -ax + c
+                        // y = -(a/b)x + c
+
+                        // when we move the line by endpoint, the new weights are calculated by setting a to be
+                        // the slope, and setting b to equal 1. And then we perform a normalization to make sure
+                        // the absolute value of the weights are between 0 and 1.
+
                         let slope = (newData.y[1] - newData.y[0])/(newData.x[1] - newData.x[0])
                         let a = -1 * slope
                         let b = 1
@@ -1377,16 +1387,40 @@ function initAllSliders(numInputs= 2) {
 function initialize() {
 
     let numInputs = document.getElementById('input-table').rows[0].cells.length - 1;
+    console.log(numInputs);
+    let errorText = document.getElementById('plotly-error');
+    let plotlyDiv = document.getElementById('plotly-div');
+    let sliders = document.getElementsByClassName('plotly-slider-class');
 
     if (numInputs === 2) {
+        errorText.style.display =  "none";
+        plotlyDiv.style.display = "block";
+        for (let i = 0; i < sliders.length; i++) {
+            sliders[i].style.display = "flex";
+        }
         initialize2d();
         document.getElementById('tester').style.display = "block";
         document.getElementById('plotly-1d').style.display = "none";
     }
     else if (numInputs === 1) {
+        errorText.style.display =  "none";
+        plotlyDiv.style.display = "block";
+        for (let i = 0; i < sliders.length; i++) {
+            sliders[i].style.display = "flex";
+        }
         initialize1d();
         document.getElementById('tester').style.display = "none";
         document.getElementById('plotly-1d').style.display = "block";
+    }
+    else if (numInputs >= 3) {
+        errorText.style.display =  "block";
+        plotlyDiv.style.display = "none";
+
+        for (let i = 0; i < sliders.length; i++) {
+            sliders[i].style.display = "none";
+        }
+        demo.activationLines?.forEach(line => line.remove());
+        demo.activationLines = [];
     }
 
 

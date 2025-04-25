@@ -883,8 +883,9 @@ class Demo {
         let biasMode = document.getElementById("biasToggle").checked;
         for (let i = 0; i < perceptron.activationData.length; i++) {
             for (let j = 0; j < perceptron.activationData[0].length; j++ ) {
-                activations.data[i][j] = perceptron.activationData[i][j]
+                //activations.data[i][j] = perceptron.activationData[i][j]
                 if(biasMode) {
+                    activations.data[i][j] = perceptron.activationData[i][j]
                     activations.data[i][j] += -1 * perceptron.threshold;
                     activations.data[i][j] = perceptron.correctPrecision(activations.data[i][j]);
                 }
@@ -1430,7 +1431,6 @@ function uploadJson(text) {
     document.getElementById("FanfareToggle").checked = dict["fanfare-toggle-checked"];
 
 
-
     document.getElementById("DisplayToggle").value = dict["guessToggleChecked"] ? '1' : '2';
     let difficultyLevel = 50;
     if (dict["difficultyLevel"]) {
@@ -1726,7 +1726,7 @@ $('#BinaryToggle').change(function() { //toggle output
 // });
 
 $('#DisplayToggle').change(function() {
-
+    display.UpdateDemoToggle()
     display.UpdatePlotlyToggle();
     display.createInputLabelLines();
     if (document.getElementById("DisplayToggle").value !== '3')
@@ -1749,12 +1749,7 @@ $('#biasToggle').change(function() { //toggle bias
         document.getElementById("output-container").style.display = "none";
         document.getElementById("activation-container").style.display = "none";
 
-        let numInputs = document.getElementById('input-table').rows[0].cells.length - 1;
-
-        if (numInputs === 2)
-            initialize2d();
-        else
-            initialize1d(); //NEED TO FIX HERE
+        display.UpdatePlotlyToggle()
     }
 
 

@@ -1645,11 +1645,12 @@ class Display {
         if (demo.biasLine) {
             demo.biasLine.position();
         }
-        display.outputLine.position()
+        //display.outputLine.position() //causing console error
         display.alignTables();
 
         if (displaySlider.value === '3') {
             document.getElementById("output-container").style.display = "none";
+            document.getElementById("guess-output-container").style.display = "none";
             document.getElementById("activation-container").style.display = "none";
         }
 
@@ -1736,6 +1737,8 @@ class Display {
         if (demo.biasLine) {
             demo.biasLine.position();
         }
+
+        initialize()
     }
 
     checkDesiredOutput(output, desired, activation) {
