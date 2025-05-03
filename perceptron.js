@@ -41,10 +41,23 @@ class PerceptronVisualizer {
             const content = document.querySelector('.perceptron-content');
             if (circle && content) {
                 const circleRect = circle.getBoundingClientRect();
+                const originalWidth = 200; // Assuming this is the original circle width
+                const scale = circleRect.width / originalWidth;
+                
                 content.style.position = 'absolute';
                 content.style.left = '50%';
                 content.style.top = '50%';
-                content.style.transform = 'translate(-50%, -50%)';
+                content.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                content.style.transformOrigin = 'center center';
+                
+                // Scale all elements inside the content
+                const elements = content.querySelectorAll('*');
+                elements.forEach(element => {
+                    if (element.style.fontSize) {
+                        const originalSize = parseFloat(element.style.fontSize);
+                        element.style.fontSize = `${originalSize * scale}px`;
+                    }
+                });
             }
         };
 
@@ -318,7 +331,7 @@ class PerceptronVisualizer {
             output,
             {
                 color: '#333',
-                size: 2,
+                size: 3, // Changed from 2 to 3 to match input lines with weight 1.0
                 startSocket: 'right',
                 endSocket: 'left',
                 path: 'straight',

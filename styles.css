@@ -135,7 +135,7 @@ body {
 
 .sigma-symbol {
     /* font-size: 1.5vw;  /* Reduced from 2vw for smaller default size */
-    font-size: 24px;
+    font-size: 32px;
     font-weight: bold;
 }
 
@@ -150,7 +150,7 @@ body {
     min-width: 40px;
     text-align: center;
     /* font-size: 1.2vw;  /* Reduced from 1.5vw for smaller default size */
-    font-size: 16px;
+    font-size: 20px;
 }
 
 .threshold-labels {
@@ -160,7 +160,7 @@ body {
     /* margin-top: 0.4vw;  /* Reduced from 0.5vw for smaller default size */
     margin-top: 5px;
     /* font-size: 1vw;  /* Reduced from 1.2vw for smaller default size */
-    font-size: 12px;
+    font-size: 16px;
 }
 
 .activation-label, .threshold-label {
@@ -169,7 +169,7 @@ body {
 
 .comparison-symbol {
     /* font-size: 1.5vw;  /* Reduced from 2vw for smaller default size */
-    font-size: 24px;
+    font-size: 32px;
     font-weight: bold;
     /* margin: 0 0.4vw;  /* Reduced from 0.5vw for smaller default size */
     margin: 0 5px;
