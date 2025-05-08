@@ -1387,7 +1387,7 @@ function initAllSliders(numInputs= 2) {
 function initialize() {
 
     let numInputs = document.getElementById('input-table').rows[0].cells.length - 1;
-    console.log(numInputs);
+    //console.log(numInputs);
     let errorText = document.getElementById('plotly-error');
     let plotlyDiv = document.getElementById('plotly-div');
     let sliders = document.getElementsByClassName('plotly-slider-class');

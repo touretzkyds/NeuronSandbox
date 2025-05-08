@@ -64,8 +64,8 @@ class Table {
         // skip header row of table, start from 1
         for (let r = 1, n = this.numRows + 1; r < n; r++) {
             for (let c = 0, m = this.numCols; c < m; c++) {
-                console.log(this.dataObj);
-                console.log(this.dataObj.data);
+                // console.log(this.dataObj);
+                // console.log(this.dataObj.data);
                 const arrayValue = this.dataObj.data[r-1][c];
                 this.table.rows[r].cells[c].innerText = arrayValue;
             }
