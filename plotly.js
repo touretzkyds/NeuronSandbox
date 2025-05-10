@@ -188,7 +188,7 @@ function createTraces(inputs, outputs, weights, threshold) {
         inBounds: inBounds, //true
         // text: ["Point 1", "Point 2"],
         // hovertemplate: '<b>%{text}</b>',
-        hovertemplate: '(%{x:.3f}, %{y:.3f})<extra></extra>',
+        hovertemplate: '(%{x:.2f}, %{y:.2f})<extra></extra>',
         marker: {
             symbol: Array(intersectionX.length).fill('square'),
             size:  Array(intersectionX.length).fill(markerSize),
@@ -204,7 +204,7 @@ function createTraces(inputs, outputs, weights, threshold) {
         y: [(intersectionY[0] + intersectionY[1])/2],
         type: 'marker',
         nsLineMidpoint: true,
-        hovertemplate: '(%{x:.3f}, %{y:.3f})<extra></extra>',
+        hovertemplate: '(%{x:.2f}, %{y:.2f})<extra></extra>',
         marker: {
             symbol: ['circle'],
             size:  [10],
