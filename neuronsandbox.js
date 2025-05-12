@@ -883,7 +883,7 @@ class Demo {
         let biasMode = document.getElementById("biasToggle").checked;
         for (let i = 0; i < perceptron.activationData.length; i++) {
             for (let j = 0; j < perceptron.activationData[0].length; j++ ) {
-                //activations.data[i][j] = perceptron.activationData[i][j]
+                activations.data[i][j] = perceptron.activationData[i][j]
                 if(biasMode) {
                     activations.data[i][j] = perceptron.activationData[i][j]
                     activations.data[i][j] += -1 * perceptron.threshold;
