@@ -7,6 +7,47 @@ class hintprovider {
         this.desiredOutput = desiredOutput //keeps track of desired outputs
     }
 
+    runOneTrainingStep(selectedParams) {
+        let adjustedWeights = [];
+        for (let i = 0; i < this.parameters.length - 1; i++) {
+            adjustedWeights.push(this.parameters[i]);
+        }
+        adjustedWeights.push(this.parameters[this.parameters.length - 1] * -1); // include -threshold
+
+        for (let j = 0; j < this.inputData.length; j++) {
+            let input = this.inputData[j];
+            let actualOutput = 0;
+            for (let w = 0; w < adjustedWeights.length - 1; w++) {
+                actualOutput += input[w] * adjustedWeights[w];
+            }
+            actualOutput += adjustedWeights[adjustedWeights.length - 1]; // add threshold
+            actualOutput = actualOutput > 0 ? 1 : 0;
+
+            let desiredOutput = this.desiredOutput[j];
+            let error = desiredOutput - actualOutput;
+
+            if (error !== 0) {
+                // apply weight update
+                for (let k = 0; k < adjustedWeights.length - 1; k++) {
+                    if (selectedParams.includes(k)) {
+                        adjustedWeights[k] += error * this.inputData[j][k] * 0.1;
+                    }
+                }
+
+                if (selectedParams.includes(adjustedWeights.length - 1)) {
+                    adjustedWeights[adjustedWeights.length - 1] += error * 0.1;
+                }
+
+                // return updated parameters with threshold flipped back
+                adjustedWeights[adjustedWeights.length - 1] *= -1;
+                return adjustedWeights;
+            }
+        }
+
+        return null; // no misclassified input found
+    }
+
+
     // 0 means change, -1 or < 0, means decreasing, >0 means increasing
     getThresholdHoldText (mode) {
         let biasMode = document.getElementById("biasToggle").checked;

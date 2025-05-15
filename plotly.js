@@ -1322,6 +1322,76 @@ function reverseSign2d() {
     updateValuesPlotlyToDisplay(weights[0], weights[1], threshold[0])
 }
 
+
+async function performTrainStep() {
+    //note: currently does not support 3d
+    let desiredOutputs = []
+    let outputTable = document.getElementById("output-table")
+
+    for (let i = 1; i < outputTable.rows.length; i++) {
+        desiredOutputs.push(parseInt(outputTable.rows[i].cells[DESIRED_OUTPUT_COLUMN].innerText));
+    }
+
+    let editableList = getEditableList();
+    let hintProvider = new hintprovider([...perceptron.weights].concat(perceptron.threshold), perceptron.inputData, desiredOutputs, editableList);
+
+    // Indices of editable parameters
+    let editableIndices = [];
+    for (let i = 0; i < editableList.length; i++) {
+        if (editableList[i]) editableIndices.push(i);
+    }
+
+    let updatedParams = hintProvider.runOneTrainingStep(editableIndices);
+
+    if (updatedParams) {
+        // apply the updated weights and threshold
+        perceptron.weights = updatedParams.slice(0, updatedParams.length - 1);
+        console.log(perceptron.weights);
+        perceptron.threshold = updatedParams[updatedParams.length - 1]
+        console.log(perceptron.threshold);
+
+        console.log("performed one training step")
+
+        updateSlidersFromParams([perceptron.weights[0], perceptron.weights[1], perceptron.threshold])
+
+        //update plotly graph
+        let outputData = generateOutputData();
+        let updated = createTraces(inputs.data, outputData, perceptron.weights, [perceptron.threshold]);
+
+        let updatedData = updated[0];
+        let updatedLayout = updated[1];
+        Plotly.react('tester', updatedData, updatedLayout);
+        updateValuesPlotlyToDisplay(perceptron.weights[0].toFixed(2), perceptron.weights[1].toFixed(2), perceptron.threshold.toFixed(2))
+
+        display.outputLine.position();
+        demo.weightLines.forEach(w => w.position());
+        if (demo.biasLine) demo.biasLine.position();
+    } else {
+        console.log("no train needed")
+    }
+}
+
+function updateSlidersFromParams(newParams, numInputs = 2) {
+    let sliders = document.getElementsByClassName("slider-plotly");
+    let colorBars = document.getElementsByClassName("color-bar");
+    let sliderValueDisplays = document.getElementsByClassName("slider-value");
+
+    for (let i = 0; i < numInputs; i++) {
+        sliders[i].value = newParams[i];
+        updateSlider(sliders[i], colorBars[i], sliderValueDisplays[i]);
+    }
+
+    let thresholdSlider = document.getElementById("threshold");
+    let thresholdBar = document.getElementById("colorBar3");
+    let thresholdDisplay = document.getElementById("threshold_val");
+
+    thresholdSlider.value = newParams[numInputs];
+    updateSlider(thresholdSlider, thresholdBar, thresholdDisplay);
+
+
+}
+
+
 function updateSlider(slider, colorBar, sliderValueDisplay) {
     var value = parseFloat(slider.value);
     var percentage = Math.abs(value * 10); // Scale the percentage for 200-unit range
