@@ -24,22 +24,34 @@ class hintprovider {
             actualOutput = actualOutput > 0 ? 1 : 0;
 
             let desiredOutput = this.desiredOutput[j];
-            let error = desiredOutput - actualOutput;
 
-            if (error !== 0) {
-                // apply weight update
+            if (actualOutput < desiredOutput) {
                 for (let k = 0; k < adjustedWeights.length - 1; k++) {
                     if (selectedParams.includes(k)) {
-                        adjustedWeights[k] += error * this.inputData[j][k] * 0.1;
+                        adjustedWeights[k] += this.inputData[j][k] * 0.1;
                     }
                 }
 
                 if (selectedParams.includes(adjustedWeights.length - 1)) {
-                    adjustedWeights[adjustedWeights.length - 1] += error * 0.1;
+                    adjustedWeights[adjustedWeights.length - 1] += 0.1;
                 }
 
-                // return updated parameters with threshold flipped back
-                adjustedWeights[adjustedWeights.length - 1] *= -1;
+                adjustedWeights[adjustedWeights.length - 1] *= -1; // flip threshold back
+                return adjustedWeights;
+            }
+
+            if (actualOutput > desiredOutput) {
+                for (let k = 0; k < adjustedWeights.length - 1; k++) {
+                    if (selectedParams.includes(k)) {
+                        adjustedWeights[k] -= this.inputData[j][k] * 0.1;
+                    }
+                }
+
+                if (selectedParams.includes(adjustedWeights.length - 1)) {
+                    adjustedWeights[adjustedWeights.length - 1] -= 0.1;
+                }
+
+                adjustedWeights[adjustedWeights.length - 1] *= -1; // flip threshold back
                 return adjustedWeights;
             }
         }

@@ -275,7 +275,7 @@
                         <a id = 'hintButton' style = "margin-top: 10%" href="javascript:provideHint();" class="custom-btn myButton">
                             <i class="fa fa-lightbulb" aria-hidden="true"></i> Ask for Hint
                         </a>
-                        <a id = 'trainButton' style = "margin-top: 10%" href="javascript:performTrainStep();" class="custom-btn myButton">
+                        <a id = 'trainButton' style = "margin-top: 10%; display:none" href="javascript:performTrainStep();" class="custom-btn myButton">
                             <i class="fa fa-lightbulb" aria-hidden="true"></i> Train
                         </a>
                     </div>
@@ -510,7 +510,37 @@
                             <div class="slider-container">
                                 <div class="color-bar" id="colorBar"></div>
                                 <input type="range" min="-5" max="5" value="1" class="slider-plotly" step="0.01" id="weight1">
-                                <span id="weight1_val" class="slider-value">1</span> <!-- Value display -->
+<!--                                <div id="weight1_display_group"-->
+<!--                                     style="display: flex; align-items: center; position: absolute; top: -30px; pointer-events: none;">-->
+
+<!--                                    <span class="blank-placeholder"-->
+<!--                                          style="display: inline-block; width: 20px; height: 1px;"></span>-->
+
+<!--                                    <span id="weight1_val" class="slider-value"-->
+<!--                                          style="font-weight: bold; font-size: 16px; line-height: 1;">1</span>-->
+
+<!--                                    <span class="blank-placeholder"-->
+<!--                                          style="display: inline-block; width: 20px; height: 1px;"></span>-->
+<!--                                </div>-->
+<!--                                <div id="weight1_display_group" style="display: flex; align-items: center; position: absolute; top: -25px;">-->
+<!--                                    <span class="blank-placeholder" style="width: 20px;">&nbsp;</span>-->
+<!--                                    <span id="weight1_val" class="slider-value" style="font-weight: bold;">1</span>-->
+<!--                                    <span class="blank-placeholder" style="width: 20px;">&nbsp;</span>-->
+<!--                                </div>-->
+
+                                <!-- Value label (above green icon) -->
+                                <div id="weight1_display_group"
+                                     style="position: absolute; top: -25px; left: 0; transform: translate(-50%, 25px); pointer-events: none;">
+                                    <span id="weight1_val" class="slider-value" style="font-weight: bold;">1</span>
+                                </div>
+
+                                <!-- Direction indicator (below green icon) -->
+                                <div id="weight1_indicator"
+                                     style="position: absolute; top: 25px; left: 0; transform: translate(-50%, 50px); font-size: 14px; color: black; transition: opacity 0.3s ease; opacity: 0; pointer-events: none;">
+                                    <span id="weight1_arrow"></span>
+                                </div>
+
+<!--                                <span id="weight1_val" class="slider-value">1</span> &lt;!&ndash; Value display &ndash;&gt;-->
                             </div>
                         </div>
 
@@ -519,7 +549,23 @@
                             <div class="slider-container">
                                 <div class="color-bar" id="colorBar2"></div>
                                 <input type="range" min="-5" max="5" value="1" class="slider-plotly" step="0.01" id="weight2">
-                                <span id="weight2_val" class="slider-value">1</span> <!-- Value display -->
+                                <!-- Value label (above green icon) -->
+                                <div id="weight2_display_group"
+                                     style="position: absolute; top: -25px; left: 0; transform: translate(-50%, 25px); pointer-events: none;">
+                                    <span id="weight2_val" class="slider-value" style="font-weight: bold;">1</span>
+                                </div>
+
+                                <!-- Direction indicator (below green icon) -->
+                                <div id="weight2_indicator"
+                                     style="position: absolute; top: 25px; left: 0; transform: translate(-50%, 50px); font-size: 14px; color: black; transition: opacity 0.3s ease; opacity: 0; pointer-events: none;">
+                                    <span id="weight2_arrow"></span>
+                                </div>
+
+<!--                                <div id="weight2_display_group" style="display: flex; align-items: center;">-->
+<!--                                    <span id="weight2_arrow" class="slider-indicator" style="opacity: 0; transition: opacity 0.3s ease; font-size: 14px; margin-right: 5px;"></span>-->
+<!--                                    <span id="weight2_val" class="slider-value" style="font-weight: bold;">1</span>-->
+<!--                                </div>-->
+<!--                                <span id="weight2_val" class="slider-value">1</span> &lt;!&ndash; Value display &ndash;&gt;-->
                             </div>
                         </div>
 
@@ -528,7 +574,24 @@
                             <div class="slider-container">
                                 <div class="color-bar" id="colorBar3"></div>
                                 <input type="range" min="-5" max="5" value="1.5" class="slider-plotly" step="0.01" id="threshold">
-                                <span id="threshold_val" class="slider-value">1.5</span> <!-- Value display -->
+
+                                <!-- Value label (above green icon) -->
+                                <div id="threshold_display_group"
+                                     style="position: absolute; top: -25px; left: 0; transform: translate(-50%, 25px); pointer-events: none;">
+                                    <span id="threshold_val" class="slider-value" style="font-weight: bold;">1</span>
+                                </div>
+
+                                <!-- Direction indicator (below green icon) -->
+                                <div id="threshold_indicator"
+                                     style="position: absolute; top: 25px; left: 0; transform: translate(-50%, 2px); font-size: 14px; color: black; transition: opacity 0.3s ease; opacity: 0; pointer-events: none;">
+                                    <span id="threshold_arrow"></span>
+                                </div>
+
+<!--                                <div id="threshold_display_group" style="display: flex; align-items: center;">-->
+<!--                                    <span id="threshold_arrow" class="slider-indicator" style="opacity: 0; transition: opacity 0.3s ease; font-size: 14px; margin-right: 5px;"></span>-->
+<!--                                    <span id="threshold_val" class="slider-value" style="font-weight: bold;">1.5</span>-->
+<!--                                </div>-->
+<!--                                <span id="threshold_val" class="slider-value">1.5</span> &lt;!&ndash; Value display &ndash;&gt;-->
                             </div>
                         </div>
 

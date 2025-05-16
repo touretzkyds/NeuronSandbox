@@ -1344,6 +1344,14 @@ async function performTrainStep() {
     let updatedParams = hintProvider.runOneTrainingStep(editableIndices);
 
     if (updatedParams) {
+        // save old label positions
+        const ids = ["weight1", "weight2", "threshold"];
+        const previousPositions = {};
+        ids.forEach(id => {
+            const span = document.getElementById(id + "_val");
+            previousPositions[id] = span?.getBoundingClientRect()?.left || 0;
+        });
+
         // apply the updated weights and threshold
         perceptron.weights = updatedParams.slice(0, updatedParams.length - 1);
         console.log(perceptron.weights);
@@ -1353,6 +1361,67 @@ async function performTrainStep() {
         console.log("performed one training step")
 
         updateSlidersFromParams([perceptron.weights[0], perceptron.weights[1], perceptron.threshold])
+
+        // wait for DOM to update
+        await new Promise(r => setTimeout(r, 100));
+
+        // compare new positions and insert arrows
+        ids.forEach(id => {
+            const valSpan = document.getElementById(id + "_val");
+            const arrowSpan = document.getElementById(id + "_arrow");
+            const displayGroup = document.getElementById(id + "_display_group");
+
+            const newLeft = valSpan.getBoundingClientRect().left;
+            const prevLeft = previousPositions[id];
+            const delta = newLeft - prevLeft;
+            const color = valSpan.style.color || "black";
+
+            arrowSpan.style.color = color;
+            arrowSpan.style.opacity = "1";
+            // arrowSpan.textContent = Math.abs(delta) >= 1 ? (delta < 0 ? "←" : "→") : "•";
+            //
+            // displayGroup.style.opacity = "1"
+
+            // Add updated content and insert in correct place
+            if (Math.abs(delta) >= 1) {
+                arrowSpan.textContent = delta < 0 ? "←" : "→";
+                if (delta < 0) {
+                    // insert before value
+                    displayGroup.insertBefore(arrowSpan, valSpan);
+                } else {
+                    // insert after value
+                    displayGroup.insertBefore(arrowSpan, valSpan.nextSibling);
+                }
+            } else {
+                arrowSpan.textContent = "•";
+                displayGroup.insertBefore(arrowSpan, valSpan.nextSibling); // dot always right
+            }
+
+            // let arrow = document.getElementById(id + "_arrow");
+            // if (!arrow) {
+            //     arrow = document.createElement("span");
+            //     arrow.id = id + "_arrow";
+            //     arrow.style.transition = "opacity 0.3s ease";
+            //     arrow.style.opacity = "0";
+            //     arrow.style.fontSize = "14px";
+            //     arrow.style.margin = "0 5px";
+            //     arrow.style.verticalAlign = "middle";
+            //     group.insertBefore(arrow, delta < 0 ? span : span.nextSibling);
+            // } else {
+            //     // Move the arrow to the right place
+            //     arrow.remove();
+            //     group.insertBefore(arrow, delta < 0 ? span : span.nextSibling);
+            // }
+            //
+            // arrow.textContent = delta < 0 ? "←" : "→";
+            // arrow.style.color = color;
+            //
+            // // Trigger fade-in
+            // requestAnimationFrame(() => {
+            //     arrow.style.opacity = "1";
+            // });
+        });
+
 
         //update plotly graph
         let outputData = generateOutputData();
@@ -1411,13 +1480,24 @@ function updateSlider(slider, colorBar, sliderValueDisplay) {
     sliderValueDisplay.textContent = value;
     sliderValueDisplay.style.color = value === 0 ? 'blue' : (value > 0 ? 'black' : 'red');
 
-    // Calculate the position for the value display
-    var sliderWidth = slider.offsetWidth === 0? 300 : slider.offsetWidth;
-    var newLeft = (((10 * value) / 100)) * sliderWidth + 130;
-    if (value > 0) {
-        newLeft = (((10 * value) / 100)) * sliderWidth + 130;
-    }
-    sliderValueDisplay.style.left = newLeft + 'px';
+    // move value display (above slider thumb)
+    let displayGroup = document.getElementById(slider.id + "_display_group");
+    let indicatorGroup = document.getElementById(slider.id + "_indicator");
+
+    const sliderWidth = slider.offsetWidth || 300;
+    const trackLeftOffset = slider.offsetLeft || 0;
+    const newLeft = ((value + 5) / 10) * sliderWidth + trackLeftOffset;
+
+    displayGroup.style.left = `${newLeft}px`;
+    indicatorGroup.style.left = `${newLeft}px`; // move arrow/dot too
+
+    // // Calculate the position for the value display
+    // var sliderWidth = slider.offsetWidth === 0? 300 : slider.offsetWidth;
+    // var newLeft = (((10 * value) / 100)) * sliderWidth + 130;
+    // if (value > 0) {
+    //     newLeft = (((10 * value) / 100)) * sliderWidth + 130;
+    // }
+    // sliderValueDisplay.style.left = newLeft + 'px';
 }
 
 function updateAllSliders(numInputs = 2) {

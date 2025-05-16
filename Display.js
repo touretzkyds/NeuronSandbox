@@ -1589,6 +1589,7 @@ class Display {
             document.getElementById("hintText").style.display = "none";
             document.getElementById("perceptron-detail").style.visibility = "hidden";
             document.getElementById("output-header-container").style.visibility = "hidden";
+            document.getElementById('trainButton').style.display = "none";
             otherHeaders.forEach(header => {
                 header.hidden = true;
             });
@@ -1611,6 +1612,9 @@ class Display {
             document.getElementById("bias-toggle").style.display = "inline-flex";
             document.getElementById("hintText").style.display = "inline-block";
             document.getElementById("output-header-container").style.visibility = "visible";
+            if(displaySlider.value === '3') {
+                document.getElementById('trainButton').style.display = "inline-block";
+            }
             if(document.getElementById("detailButton").innerText === "Hide details") {
                 document.getElementById("perceptron-detail").style.visibility = "visible";
             }
@@ -1688,6 +1692,8 @@ class Display {
         let plotlyContainer = document.getElementById("plotly-container");
         let outputContainer = document.getElementById("output-container");
         let activationContainer = document.getElementById("activation-container");
+        let trainButton = document.getElementById("trainButton");
+
         if (displaySlider.value === '3') { // in graph mode
             // remove/make invisible output table
 
@@ -1696,6 +1702,7 @@ class Display {
             outputContainer.style.display = "none";
             activationContainer.style.display = "none";
             plotlyContainer.style.display = "block";
+            trainButton.style.display = "block";
 
             let plotlyDiv = document.getElementById('plotly-div');
             let sliders = document.getElementsByClassName('plotly-slider-class');
@@ -1727,6 +1734,7 @@ class Display {
             plotlyContainer.style.display = "none";
             outputContainer.style.display = "inline-flex";
             activationContainer.style.display = "inline-flex";
+            trainButton.style.display = "none";
         }
 
         if (this.outputLine != null)
