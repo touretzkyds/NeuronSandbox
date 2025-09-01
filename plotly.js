@@ -19,6 +19,10 @@ const TRUE_COLOR = 'rgba(0, 255, 60, 1)';
 const LINE_COLOR_ACTIVE = 'rgb(55, 128, 191)';
 const INCORRECT_COLOR = 'rgba(0, 0, 0, 0.95)';
 
+// for train button
+let first_train = true;
+let train_info;
+
 function generateOutputData() {
     let outputTable = document.getElementById('output-table');
     let outputData = Array(outputs.data.length).fill(0);
@@ -32,9 +36,9 @@ function generateOutputData() {
 function main() {
     initialize2d();
 
-    const weight1 = document.getElementById("weight1");
-    const weight2 = document.getElementById("weight2");
-    const threshold = document.getElementById("threshold");
+    const weight1 = document.getElementById("weight1_slider");
+    const weight2 = document.getElementById("weight2_slider");
+    const threshold = document.getElementById("threshold_slider");
 
     weight1.addEventListener("input", (event) => {
         run();
@@ -96,11 +100,11 @@ function createTraces(inputs, outputs, weights, threshold) {
     let start = document.getElementById("biasToggle").checked ? 1 : 0;
 
     let labels = document.getElementsByClassName('slider-label');
-    for (let i = start; i < inputTable.rows.length; i++) {
-        let row = inputTable.rows[i];
-        let cell = row.cells[0];
+    for (let i = start; i < inputTable.children.length; i++) {
+        let row = inputTable.children[i];
+        // let cell = row.cells[0];
 
-        labels[i-start].innerText = cell.innerText;
+        labels[i-start].innerText = row.innerText;
     }
     if (start > 0) {
         labels[labels.length - 1].innerText = "Bias";
@@ -711,11 +715,19 @@ function initialize2d () {
     weight2.style.display = "flex";
 
     let labels = document.getElementsByClassName('slider-label');
-    for (let i = start; i < inputTable.rows.length; i++) {
-        let row = inputTable.rows[i];
-        let cell = row.cells[0];
+    // console.log(labels);
+    for (let i = start; i < inputTable.children.length; i++) {
+        if (inputTable.children[i].classList.contains("input-item")) { //ensure what we're getting is an input and not padding
+            let row = inputTable.children[i];
+            let labelTarget = labels[i - start];
 
-        labels[i-start].innerText = cell.innerText;
+            if (!labelTarget) {
+                console.warn(`No corresponding label for input ${i}, skipping.`);
+                continue;
+            }
+            labels[i-start].innerText = row.innerText;
+        }
+        // let cell = row.cells[0];
     }
 
     let lastLabel = document.getElementById('threshold-label');
@@ -730,9 +742,9 @@ function initialize2d () {
     initAllSliders();
     updateAllSliders();
 
-    let w1 = document.getElementById('weight1').value;
-    let w2 = document.getElementById('weight2').value;
-    let t =  document.getElementById('threshold').value;
+    let w1 = document.getElementById('weight1_slider').value;
+    let w2 = document.getElementById('weight2_slider').value;
+    let t =  document.getElementById('threshold_slider').value;
 
 
     let weights = [w1, w2];
@@ -797,9 +809,9 @@ function initialize2d () {
                                 traceNum = i;
                         }
 
-                        let weight1Slider = document.getElementById('weight1');
-                        let weight2Slider = document.getElementById('weight2');
-                        let thresholdSlider = document.getElementById('threshold');
+                        let weight1Slider = document.getElementById('weight1_slider');
+                        let weight2Slider = document.getElementById('weight2_slider');
+                        let thresholdSlider = document.getElementById('threshold_slider');
 
                         // new weight calculation:
                         // y = mx + b
@@ -865,9 +877,9 @@ function initialize2d () {
                 let newData = changeLineByMidpoint(plotlyDiv.data, [xInDataCoordMP, yInDataCoordMP]);
                 updatePlotlyData('tester', newData, 0)
 
-                let weight1Slider = document.getElementById('weight1');
-                let weight2Slider = document.getElementById('weight2');
-                let thresholdSlider = document.getElementById('threshold');
+                let weight1Slider = document.getElementById('weight1_slider');
+                let weight2Slider = document.getElementById('weight2_slider');
+                let thresholdSlider = document.getElementById('threshold_slider');
 
                 let outputData = generateOutputData();
                 let updated = createTraces(inputs.data, outputData, [weight1Slider.value, weight2Slider.value], [thresholdSlider.value])
@@ -1087,9 +1099,9 @@ function isLegalPlacement(data, coords) {
 
 function changeLineByMidpoint(data, coords) {
 
-    let weight1Slider = document.getElementById('weight1');
-    let weight2Slider = document.getElementById('weight2');
-    let thresholdSlider = document.getElementById('threshold');
+    let weight1Slider = document.getElementById('weight1_slider');
+    let weight2Slider = document.getElementById('weight2_slider');
+    let thresholdSlider = document.getElementById('threshold_slider');
 
     // get a and b values in ax + by = c from weight sliders
     let a = parseFloat(weight1Slider.value)
@@ -1158,7 +1170,7 @@ function updateValuesDisplayToPlotly2D() {
     let biasToggleChecked = document.getElementById("biasToggle").checked;
     let biasText = document.getElementById("bias-text");
 
-    let th1 = document.getElementById("th1");
+    let th1 = document.querySelector('.threshold-box');
     let w1 = document.getElementById("w1");
     let w2 = document.getElementById("w2");
 
@@ -1166,9 +1178,9 @@ function updateValuesDisplayToPlotly2D() {
     let weight2Value = document.getElementById('weight2_val');
     let thresholdValue = document.getElementById('threshold_val');
 
-    let weight1Slider = document.getElementById('weight1');
-    let weight2Slider = document.getElementById('weight2');
-    let thresholdSlider = document.getElementById('threshold');
+    let weight1Slider = document.getElementById('weight1_slider');
+    let weight2Slider = document.getElementById('weight2_slider');
+    let thresholdSlider = document.getElementById('threshold_slider');
 
     weight1Slider.value = parseFloat(w1.innerText);
     weight2Slider.value = parseFloat(w2.innerText);
@@ -1194,9 +1206,9 @@ function updateValuesPlotlyToDisplay(weight1, weight2, threshold) {
     let weight2Value = document.getElementById('weight2_val');
     let thresholdValue = document.getElementById('threshold_val');
 
-    let weight1Slider = document.getElementById('weight1');
-    let weight2Slider = document.getElementById('weight2');
-    let thresholdSlider = document.getElementById('threshold');
+    let weight1Slider = document.getElementById('weight1_slider');
+    let weight2Slider = document.getElementById('weight2_slider');
+    let thresholdSlider = document.getElementById('threshold_slider');
 
     weight1Slider.value = weight1;
     weight2Slider.value = weight2;
@@ -1205,7 +1217,8 @@ function updateValuesPlotlyToDisplay(weight1, weight2, threshold) {
     weight2Value.innerText = weight2 + "";
     thresholdValue.innerText = threshold + "";
 
-    let th1 = document.getElementById("th1");
+    // let th1 = document.getElementById("th1");
+    let th1 = document.querySelector('.threshold-box');
     let bias = document.getElementById("bias-text");
     let w1 = document.getElementById("w1");
     let w2 = document.getElementById("w2");
@@ -1272,11 +1285,13 @@ function checkDist(x, y) {
 }
 
 function run2d () {
-    let w1 = document.getElementById('weight1').value;
-    let w2 = document.getElementById('weight2').value;
-    let t = document.getElementById('threshold').value;
+    let w1 = document.getElementById('weight1_slider').value;
+    let w2 = document.getElementById('weight2_slider').value;
+    let t = document.getElementById('threshold_slider').value;
     let weights = [w1, w2];
     let threshold = [t];
+
+    // console.log("here")
 
     updateValuesPlotlyToDisplay(w1, w2, t);
 
@@ -1304,9 +1319,9 @@ function reverseSign() {
 }
 function reverseSign2d() {
 
-    let weight1Slider = document.getElementById('weight1');
-    let weight2Slider = document.getElementById('weight2');
-    let thresholdSlider = document.getElementById('threshold');
+    let weight1Slider = document.getElementById('weight1_slider');
+    let weight2Slider = document.getElementById('weight2_slider');
+    let thresholdSlider = document.getElementById('threshold_slider');
 
 
     let weights = [-1 * weight1Slider.value, -1 * weight2Slider.value]
@@ -1323,7 +1338,15 @@ function reverseSign2d() {
 }
 
 
-async function performTrainStep() {
+//TODO: need to modify this function: needs to predict the next train, rather than display the result of the train.
+//STEPS TO DO SO:
+//1. create a function, called predictNextStep() that actually runs the train for one step. It updates the new values
+//   along with a global data structure of info.
+//2. If the user hits the button a second time, call the modified performTrainStep(), which should just read the values from
+//   the data structure and update the elements on the web with the desired amounts. At the very end, you run predictNextStep()
+//   to update the new data structure.
+
+function predictNextTrainStep() {
     //note: currently does not support 3d
     let desiredOutputs = []
     let outputTable = document.getElementById("output-table")
@@ -1342,39 +1365,31 @@ async function performTrainStep() {
     }
 
     let updatedParams = hintProvider.runOneTrainingStep(editableIndices);
+    console.log('updatedParams', updatedParams);
+    train_info = updatedParams;
 
-    if (updatedParams) {
-        // save old label positions
-        const ids = ["weight1", "weight2", "threshold"];
-        const previousPositions = {};
-        ids.forEach(id => {
-            const span = document.getElementById(id + "_val");
-            previousPositions[id] = span?.getBoundingClientRect()?.left || 0;
-        });
+    // save old label positions
+    const ids = ["weight1", "weight2", "threshold"];
+    const previousPositions = {};
+    ids.forEach(id => {
+        const span = document.getElementById(id + "_val");
+        previousPositions[id] = parseFloat(span.innerText);
+    });
 
-        // apply the updated weights and threshold
-        perceptron.weights = updatedParams.slice(0, updatedParams.length - 1);
-        console.log(perceptron.weights);
-        perceptron.threshold = updatedParams[updatedParams.length - 1]
-        console.log(perceptron.threshold);
-
-        console.log("performed one training step")
-
-        updateSlidersFromParams([perceptron.weights[0], perceptron.weights[1], perceptron.threshold])
-
-        // wait for DOM to update
-        await new Promise(r => setTimeout(r, 100));
-
+    if(updatedParams) {
+        let i = 0;
         // compare new positions and insert arrows
         ids.forEach(id => {
             const valSpan = document.getElementById(id + "_val");
             const arrowSpan = document.getElementById(id + "_arrow");
-            const displayGroup = document.getElementById(id + "_display_group");
+            const displayGroup = document.getElementById(id + "_slider_display_group");
 
-            const newLeft = valSpan.getBoundingClientRect().left;
+            const newLeft = updatedParams[i]
             const prevLeft = previousPositions[id];
             const delta = newLeft - prevLeft;
-            const color = valSpan.style.color || "black";
+            console.log(delta);
+            // const color = valSpan.style.color || "black";
+            const color = "rgb(255, 153, 0)";
 
             arrowSpan.style.color = color;
             arrowSpan.style.opacity = "1";
@@ -1383,7 +1398,7 @@ async function performTrainStep() {
             // displayGroup.style.opacity = "1"
 
             // Add updated content and insert in correct place
-            if (Math.abs(delta) >= 1) {
+            if (Math.abs(delta) != 0) {
                 arrowSpan.textContent = delta < 0 ? "←" : "→";
                 if (delta < 0) {
                     // insert before value
@@ -1396,33 +1411,44 @@ async function performTrainStep() {
                 arrowSpan.textContent = "•";
                 displayGroup.insertBefore(arrowSpan, valSpan.nextSibling); // dot always right
             }
-
-            // let arrow = document.getElementById(id + "_arrow");
-            // if (!arrow) {
-            //     arrow = document.createElement("span");
-            //     arrow.id = id + "_arrow";
-            //     arrow.style.transition = "opacity 0.3s ease";
-            //     arrow.style.opacity = "0";
-            //     arrow.style.fontSize = "14px";
-            //     arrow.style.margin = "0 5px";
-            //     arrow.style.verticalAlign = "middle";
-            //     group.insertBefore(arrow, delta < 0 ? span : span.nextSibling);
-            // } else {
-            //     // Move the arrow to the right place
-            //     arrow.remove();
-            //     group.insertBefore(arrow, delta < 0 ? span : span.nextSibling);
-            // }
-            //
-            // arrow.textContent = delta < 0 ? "←" : "→";
-            // arrow.style.color = color;
-            //
-            // // Trigger fade-in
-            // requestAnimationFrame(() => {
-            //     arrow.style.opacity = "1";
-            // });
+            i++;
         });
+    } else { //there is no update, and we set all of the arrows to .
+        ids.forEach(id => {
+            const valSpan = document.getElementById(id + "_val");
+            const arrowSpan = document.getElementById(id + "_arrow");
+            const displayGroup = document.getElementById(id + "_display_group");
 
+            arrowSpan.textContent = "•";
+            displayGroup.insertBefore(arrowSpan, valSpan.nextSibling); // dot always right
+        });
+    }
+}
 
+async function performTrainStep() {
+    //note: currently does not support 3d
+    if (first_train) { // if it is the first time the user
+        predictNextTrainStep();
+        first_train = false;
+        return;
+    }
+
+    let updatedParams = train_info
+    console.log(updatedParams)
+
+    if (updatedParams) {
+        // apply the updated weights and threshold
+        perceptron.weights = updatedParams.slice(0, updatedParams.length - 1);
+        console.log(perceptron.weights);
+        perceptron.threshold = updatedParams[updatedParams.length - 1]
+        console.log(perceptron.threshold);
+
+        console.log("performed one training step")
+
+        updateSlidersFromParams([perceptron.weights[0], perceptron.weights[1], perceptron.threshold])
+
+        // wait for DOM to update
+        await new Promise(r => setTimeout(r, 100));
         //update plotly graph
         let outputData = generateOutputData();
         let updated = createTraces(inputs.data, outputData, perceptron.weights, [perceptron.threshold]);
@@ -1432,9 +1458,10 @@ async function performTrainStep() {
         Plotly.react('tester', updatedData, updatedLayout);
         updateValuesPlotlyToDisplay(perceptron.weights[0].toFixed(2), perceptron.weights[1].toFixed(2), perceptron.threshold.toFixed(2))
 
-        display.outputLine.position();
-        demo.weightLines.forEach(w => w.position());
-        if (demo.biasLine) demo.biasLine.position();
+        // display.outputLine.position();
+        // demo.weightLines.forEach(w => w.position());
+        // if (demo.biasLine) demo.biasLine.position();
+        predictNextTrainStep(); // this sets up our next training step. Upon the next button press, it will update on the display.
     } else {
         console.log("no train needed")
     }
@@ -1450,7 +1477,7 @@ function updateSlidersFromParams(newParams, numInputs = 2) {
         updateSlider(sliders[i], colorBars[i], sliderValueDisplays[i]);
     }
 
-    let thresholdSlider = document.getElementById("threshold");
+    let thresholdSlider = document.getElementById("threshold_slider");
     let thresholdBar = document.getElementById("colorBar3");
     let thresholdDisplay = document.getElementById("threshold_val");
 
@@ -1498,6 +1525,7 @@ function updateSlider(slider, colorBar, sliderValueDisplay) {
     //     newLeft = (((10 * value) / 100)) * sliderWidth + 130;
     // }
     // sliderValueDisplay.style.left = newLeft + 'px';
+
 }
 
 function updateAllSliders(numInputs = 2) {
@@ -1510,7 +1538,7 @@ function updateAllSliders(numInputs = 2) {
 
     }
 
-    let lastSlider = document.getElementById('threshold');
+    let lastSlider = document.getElementById('threshold_slider');
     let lastColorBar = document.getElementById('colorBar3');
     let lastValueDisplay = document.getElementById('threshold_val');
     updateSlider(lastSlider, lastColorBar, lastValueDisplay);
@@ -1518,25 +1546,30 @@ function updateAllSliders(numInputs = 2) {
 
 function initAllSliders(numInputs= 2) {
     let sliders = document.getElementsByClassName("slider-plotly"); // gets all sliders
+    // console.log(sliders)
     let colorBars = document.getElementsByClassName("color-bar");
     let sliderValueDisplays = document.getElementsByClassName("slider-value");
 
     for (let i = 0; i < numInputs; i++) {
+        // console.log(sliders[i])
         sliders[i].oninput = function() {
-            updateSlider(sliders[i], colorBars[i], sliderValueDisplays[i]);
+            // updateSlider(sliders[i], colorBars[i], sliderValueDisplays[i]);
+            run()
         };
     }
 
-    let lastSlider = document.getElementById('threshold');
+    let lastSlider = document.getElementById('threshold_slider');
     let lastColorBar = document.getElementById('colorBar3');
     let lastValueDisplay = document.getElementById('threshold_val');
     lastSlider.oninput = function() {
-        updateSlider(lastSlider, lastColorBar, lastValueDisplay);
+        // updateSlider(lastSlider, lastColorBar, lastValueDisplay);
+        run()
     }
 
 }
 
 function initialize() {
+    // deciding which plotly 1d/2d/3d to set as visible
 
     let numInputs = document.getElementById('input-table').rows[0].cells.length - 1;
     //console.log(numInputs);
@@ -1575,14 +1608,11 @@ function initialize() {
         demo.activationLines = [];
     }
 
-
-    // deciding which plotly 1d/2d/3d to set as visible
-
 }
 
 function run() {
     let numInputs = document.getElementById('input-table').rows[0].cells.length - 1;
-
+    // console.log("here")
     if (numInputs === 2) {
         run2d();
     }

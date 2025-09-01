@@ -14,9 +14,9 @@ function main1d() {
 
     initialize1d();
 
-    const weight1 = document.getElementById("weight1");
-    const weight2 = document.getElementById("weight2");
-    const threshold = document.getElementById("threshold");
+    const weight1 = document.getElementById("weight1_slider");
+    const weight2 = document.getElementById("weight2_slider");
+    const threshold = document.getElementById("threshold_slider");
 
     weight1.addEventListener("input", (event) => {
         run();
@@ -56,11 +56,11 @@ function createTraces1d(inputs, outputs, weights, threshold) {
     let start = document.getElementById("biasToggle").checked ? 1 : 0;
 
     let labels = document.getElementsByClassName('slider-label');
-    for (let i = start; i < inputTable.rows.length; i++) {
-        let row = inputTable.rows[i];
-        let cell = row.cells[0];
+    for (let i = start; i < inputTable.childNodes.length; i++) {
+        let row = inputTable.childNodes[i];
+        // let cell = row.cells[0];
 
-        labels[i-start].innerText = cell.innerText;
+        labels[i-start].innerText = row.innerText;
     }
     if (start > 0) {
         labels[labels.length - 1].innerText = "Bias";
@@ -447,7 +447,8 @@ function initialize1d() {
 
     //relabel weight 1
     let weightLabel = document.getElementById('weight1-label');
-    let cell = inputTable.rows[start].cells[0];
+    // let cell = inputTable.rows[start].cells[0];
+    let cell = inputTable.childNodes[start];
     weightLabel.innerText = cell.innerText;
 
     //depending on bias/threshold mode, change label of last slider
@@ -823,14 +824,15 @@ function updateValuesDisplayToPlotly1d() {
     let biasToggleChecked = document.getElementById("biasToggle").checked;
     let biasText = document.getElementById("bias-text");
 
-    let th1 = document.getElementById("th1");
+    // let th1 = document.getElementById("th1");
+    let th1 = document.querySelector('.threshold-box');
     let w1 = document.getElementById("w1");
 
     let weight1Value = document.getElementById('weight1_val');
     let thresholdValue = document.getElementById('threshold_val');
 
-    let weight1Slider = document.getElementById('weight1');
-    let thresholdSlider = document.getElementById('threshold');
+    let weight1Slider = document.getElementById('weight1_slider');
+    let thresholdSlider = document.getElementById('threshold_slider');
 
     weight1Slider.value = parseFloat(w1.innerText);
     thresholdSlider.value = parseFloat(th1.innerText);

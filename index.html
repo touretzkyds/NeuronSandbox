@@ -5,14 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Neuron Sandbox</title>
 
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="slider.css" />
     <link rel="stylesheet" href="slider2.css" />
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="plotly-slider.css" />
     <link rel="stylesheet" href="slider-toggle.css" />
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/leader-line@1.0.7/leader-line.min.js"></script> <!-- leader line for perceptron -->
     <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
     <script src="https://pixijs.download/release/pixi.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
@@ -22,6 +25,7 @@
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.26.0.min.js" charset="utf-8"></script>
 
+    <!-- Neuron Sandbox scripts -->
     <script src="leader_line.min.js"></script>
     <script src = "truth_table.js"></script>
     <script src = "utils.js"></script>
@@ -30,11 +34,8 @@
     <script src = "VariableData.js"></script>
     <script src = "DataOperator.js"></script>
     <script src = "Table.js"></script>
-
-<!--    plotly scripts-->
     <script src = "plotly.js"></script>
     <script src = "plotly1d.js"></script>
-
     <script src = "slider.js"></script>
 
     <script type="text/javascript">
@@ -355,118 +356,170 @@
                             </tr>
                         </table>
                     </div>
-                    <div class="center-container">
-                        <div id="network-container" class="center">
-                            <div class="center-input">
-                                <table id="selected-inputs" class="selected">
-                                    <tr>
-                                        <td id="biasInput">
-                                            <div id="bias-content" class="bias-content">Bias</div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td id="selinput1">
-                                            <div class="input-content">x<sub>1</sub></div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td id="selinput2">
-                                            <div class="input-content">x<sub>2</sub></div>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                            <div id = "input-links" class="center">
-                                <svg id="svg">
-                                    <marker id="triangle" viewBox="0 0 10 10"
-                                            refX="1" refY="5"
-                                            markerUnits="strokeWidth"
-                                            markerWidth="10" markerHeight="10"
-                                            orient="auto">
-                                        <path d="M 0 0 L 10 5 L 0 10 z" fill="black"/>
-                                    </marker>
-                                    <!--<line id="line" stroke="black" stroke-width="3" x1="0%" y1="30%" x2="80%" y2="40%" marker-end="url(#triangle)"/>-->
-                                    <!--<line id="line" stroke="black" stroke-width="3" x1="0%" y1="70%" x2="80%" y2="60%" marker-end="url(#triangle)"/>-->
-                                </svg>
-                                <div id="bias-link-text" >
-                                    <div id="bias-1" class="weight_label" style="z-index: 10" >
-                                        <text fill="black">w<sub>0</sub> =</text>
-                                        <text id='bias_weight' contenteditable="false" fill="black" class="weights">1</text>
-                                    </div>
-                                </div>
-                                <div id="input-link-text" class="center" style="z-index: 1">
-                                    <div id="weight-1" class="weight_label">
-                                        <text fill="black">w<sub>1</sub> =</text>
-                                        <text contenteditable="true" id="w1" fill="black" class="weights" onkeypress="if (event.which === 13 || event.keyCode === 13) return false;"></text>
-                                    </div>
-                                    <div id="weight-2" class="weight_label">
-                                        <text fill="black">w<sub>2</sub> =</text>
-                                        <text contenteditable="true" id="w2" fill="black" class="weights" onkeypress="if (event.which === 13 || event.keyCode === 13) return false;"></text>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id = "perceptron1" class="center-perceptron" style="margin-top: 15%">
-                                <table>
-                                    <tbody>
-                                    <tr>
-                                        <td>
-                                            <div id="circle" class="circle center">
-                                                <div id="threshold-text" class="center">
-                                                    <div id="perceptron-normal" style="display: flex; align-items: center;">
-                                                        <text id="sigma">∑> </text>
-                                                        <text id="th1"></text>
-                                                        <span id = "threshold_toggleBtn" class="edit-toggle edit-toggle-off">
+<!--                    <div class="center-container">-->
+<!--                        <div id="network-container" class="center">-->
+<!--                            <div class="center-input">-->
+<!--                                <table id="selected-inputs" class="selected">-->
+<!--                                    <tr>-->
+<!--                                        <td id="biasInput">-->
+<!--                                            <div id="bias-content" class="bias-content">Bias</div>-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+<!--                                    <tr>-->
+<!--                                        <td id="selinput1">-->
+<!--                                            <div class="input-content">x<sub>1</sub></div>-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+<!--                                    <tr>-->
+<!--                                        <td id="selinput2">-->
+<!--                                            <div class="input-content">x<sub>2</sub></div>-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+<!--                                </table>-->
+<!--                            </div>-->
+<!--                            <div id = "input-links" class="center">-->
+<!--                                <svg id="svg">-->
+<!--                                    <marker id="triangle" viewBox="0 0 10 10"-->
+<!--                                            refX="1" refY="5"-->
+<!--                                            markerUnits="strokeWidth"-->
+<!--                                            markerWidth="10" markerHeight="10"-->
+<!--                                            orient="auto">-->
+<!--                                        <path d="M 0 0 L 10 5 L 0 10 z" fill="black"/>-->
+<!--                                    </marker>-->
+<!--                                    &lt;!&ndash;<line id="line" stroke="black" stroke-width="3" x1="0%" y1="30%" x2="80%" y2="40%" marker-end="url(#triangle)"/>&ndash;&gt;-->
+<!--                                    &lt;!&ndash;<line id="line" stroke="black" stroke-width="3" x1="0%" y1="70%" x2="80%" y2="60%" marker-end="url(#triangle)"/>&ndash;&gt;-->
+<!--                                </svg>-->
+<!--                                <div id="bias-link-text" >-->
+<!--                                    <div id="bias-1" class="weight_label" style="z-index: 10" >-->
+<!--                                        <text fill="black">w<sub>0</sub> =</text>-->
+<!--                                        <text id='bias_weight' contenteditable="false" fill="black" class="weights">1</text>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                                <div id="input-link-text" class="center" style="z-index: 1">-->
+<!--                                    <div id="weight-1" class="weight_label">-->
+<!--                                        <text fill="black">w<sub>1</sub> =</text>-->
+<!--                                        <text contenteditable="true" id="w1" fill="black" class="weights" onkeypress="if (event.which === 13 || event.keyCode === 13) return false;"></text>-->
+<!--                                    </div>-->
+<!--                                    <div id="weight-2" class="weight_label">-->
+<!--                                        <text fill="black">w<sub>2</sub> =</text>-->
+<!--                                        <text contenteditable="true" id="w2" fill="black" class="weights" onkeypress="if (event.which === 13 || event.keyCode === 13) return false;"></text>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div id = "perceptron1" class="center-perceptron" style="margin-top: 15%">-->
+<!--                                <table>-->
+<!--                                    <tbody>-->
+<!--                                    <tr>-->
+<!--                                        <td>-->
+<!--                                            <div id="circle" class="circle center">-->
+<!--                                                <div id="threshold-text" class="center">-->
+<!--                                                    <div id="perceptron-normal" style="display: flex; align-items: center;">-->
+<!--                                                        <text id="sigma">∑> </text>-->
+<!--                                                        <text id="th1"></text>-->
+<!--                                                        <span id = "threshold_toggleBtn" class="edit-toggle edit-toggle-off">-->
+<!--                                                          <i class="fas fa-pencil-alt"></i>-->
+<!--                                                          <i class="fas fa-lock"></i>-->
+<!--                                                        </span>-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
+<!--                                                <div style="margin-top: 40%;">-->
+<!--                                                    <text style="font-size: 12px">Activation</text>-->
+<!--                                                </div>-->
+<!--                                                <div style="margin-top: 40%; margin-left: 12% ">-->
+<!--                                                    <text style="font-size: 12px">Threshold</text>-->
+<!--                                                </div>-->
+
+
+<!--                                            </div>-->
+
+<!--                                        </td>-->
+<!--                                        <td>-->
+<!--                                            <div class="center-output" >-->
+<!--                                                <table class="selected" id="selected-output">-->
+<!--                                                    <tr>-->
+<!--                                                        <td id="seloutput" class = "output-th"></td>-->
+<!--                                                    </tr>-->
+<!--                                                </table>-->
+
+<!--                                            </div>-->
+<!--                                            <div style="margin-top:-80%">-->
+<!--                                                <text style="font-size: 12px">Output</text>-->
+<!--                                            </div>-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+<!--                                    <tr>-->
+<!--                                        <td>-->
+<!--                                            <div id="detail-toggle" style="width: 100%; display:flex; flex-direction: row; justify-content: center; align-items: center; column-gap: 10px;">-->
+<!--                                                <a id = 'detailButton' style = "height: 20px" href="javascript:detailButtonClicked();" class="custom-btn myButton">-->
+<!--                                                    <i class="fa" aria-hidden="true"></i>How does this work?-->
+<!--                                                </a>-->
+<!--                                            </div>-->
+<!--                                            <p></p>-->
+<!--                                        </td>-->
+<!--                                        <td>-->
+
+<!--                                        </td>-->
+<!--                                    </tr>-->
+<!--                                    </tbody>-->
+
+<!--                                </table>-->
+
+<!--                            </div>-->
+<!--                            <div id = "output-links" class="center">-->
+<!--                            </div>-->
+
+<!--                        </div>-->
+<!--                        <div id="perceptron-detail">-->
+<!--                            <div style="display: inline-block">-->
+<!--                                <text id="perception_detail_line"> </text>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+                    <div class="container">
+                        <div class="network-container" id="network">
+                            <table class="network-table">
+                                <tr>
+                                    <td class="selected" id="selected-inputs">
+<!--                                        <div id="bias-link-text" class="input-item">bias</div>-->
+                                        <div style="padding-top: 30px;"> </div>
+                                        <div class="input-item">x₁</div>
+                                        <div style="padding-top: 30px;"> </div>
+                                        <div class="input-item">x₂</div>
+                                    </td>
+                                    <td class="perceptron-cell">
+                                        <div class="circle">
+                                            <div class="perceptron-content">
+                                                <div class="threshold-container">
+                                                    <span class="sigma-symbol edit-toggle edit-toggle-off">Σ</span>
+                                                    <span class="comparison-symbol">&gt;</span>
+                                                    <div class="threshold-box" contenteditable="true">0.5</div>
+                                                    <span id = "threshold_toggleBtn" class="edit-toggle edit-toggle-off">
                                                           <i class="fas fa-pencil-alt"></i>
                                                           <i class="fas fa-lock"></i>
-                                                        </span>
-                                                    </div>
+                                                    </span>
                                                 </div>
-                                                <div style="margin-top: 40%;">
-                                                    <text style="font-size: 12px">Activation</text>
+                                                <div class="threshold-labels">
+                                                    <span class="activation-label">Activation</span>
+                                                    <span class="threshold-label">Threshold</span>
                                                 </div>
-                                                <div style="margin-top: 40%; margin-left: 12% ">
-                                                    <text style="font-size: 12px">Threshold</text>
-                                                </div>
-
-
                                             </div>
+                                        </div>
+                                    </td>
+                                    <td class="output-cell">
+                                        <div class="output-label">&nbsp;</div>
+                                        <div class="output-value">y
+                                            <div id="seloutput"></div></div>
+                                        <div class="output-label">output</div>
+                                    </td>
+                                </tr>
+                            </table>
 
-                                        </td>
-                                        <td>
-                                            <div class="center-output" >
-                                                <table class="selected" id="selected-output">
-                                                    <tr>
-                                                        <td id="seloutput" class = "output-th"></td>
-                                                    </tr>
-                                                </table>
-
-                                            </div>
-                                            <div style="margin-top:-80%">
-                                                <text style="font-size: 12px">Output</text>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div id="detail-toggle" style="width: 100%; display:flex; flex-direction: row; justify-content: center; align-items: center; column-gap: 10px;">
-                                                <a id = 'detailButton' style = "height: 20px" href="javascript:detailButtonClicked();" class="custom-btn myButton">
-                                                    <i class="fa" aria-hidden="true"></i>How does this work?
-                                                </a>
-                                            </div>
-                                            <p></p>
-                                        </td>
-                                        <td>
-
-                                        </td>
-                                    </tr>
-                                    </tbody>
-
-                                </table>
-
-                            </div>
-                            <div id = "output-links" class="center">
-                            </div>
-
+                        </div>
+                        <div id="detail-toggle" style="width: 100%; display:flex; flex-direction: row; justify-content: center; align-items: center; column-gap: 10px;">
+                            <a id = 'detailButton' style = "height: 20px" href="javascript:detailButtonClicked();" class="custom-btn myButton">
+                                <i class="fa" aria-hidden="true"></i>How does this work?
+                            </a>
                         </div>
                         <div id="perceptron-detail">
                             <div style="display: inline-block">
@@ -506,10 +559,10 @@
                         </div>
 
                         <div id="weight-1-container" class="plotly-slider-class" style="display:flex; flex-direction: row; justify-content: right; align-items: center; margin-top: 0px">
-                            <label class="slider-label" id="weight1-label" style="margin-right: -30%" for="weight1">Peanut Butter</label>
+                            <label class="slider-label" id="weight1-label" style="margin-right: -30%" for="weight1_slider">Peanut Butter</label>
                             <div class="slider-container">
                                 <div class="color-bar" id="colorBar"></div>
-                                <input type="range" min="-5" max="5" value="1" class="slider-plotly" step="0.01" id="weight1">
+                                <input type="range" min="-5" max="5" value="1" class="slider-plotly" step="0.01" id="weight1_slider">
 <!--                                <div id="weight1_display_group"-->
 <!--                                     style="display: flex; align-items: center; position: absolute; top: -30px; pointer-events: none;">-->
 
@@ -529,13 +582,13 @@
 <!--                                </div>-->
 
                                 <!-- Value label (above green icon) -->
-                                <div id="weight1_display_group"
+                                <div id="weight1_slider_display_group"
                                      style="position: absolute; top: -25px; left: 0; transform: translate(-50%, 25px); pointer-events: none;">
                                     <span id="weight1_val" class="slider-value" style="font-weight: bold;">1</span>
                                 </div>
 
                                 <!-- Direction indicator (below green icon) -->
-                                <div id="weight1_indicator"
+                                <div id="weight1_slider_indicator"
                                      style="position: absolute; top: 25px; left: 0; transform: translate(-50%, 50px); font-size: 14px; color: black; transition: opacity 0.3s ease; opacity: 0; pointer-events: none;">
                                     <span id="weight1_arrow"></span>
                                 </div>
@@ -545,18 +598,18 @@
                         </div>
 
                         <div id="weight-2-container" class="plotly-slider-class" style="display:flex; flex-direction: row; justify-content: right; align-items: center; margin-top: -20px">
-                            <label class="slider-label" id="weight2-label" style="margin-right: -30%" for="weight2">Jelly</label>
+                            <label class="slider-label" id="weight2-label" style="margin-right: -30%" for="weight2_slider">Jelly</label>
                             <div class="slider-container">
                                 <div class="color-bar" id="colorBar2"></div>
-                                <input type="range" min="-5" max="5" value="1" class="slider-plotly" step="0.01" id="weight2">
+                                <input type="range" min="-5" max="5" value="1" class="slider-plotly" step="0.01" id="weight2_slider">
                                 <!-- Value label (above green icon) -->
-                                <div id="weight2_display_group"
+                                <div id="weight2_slider_display_group"
                                      style="position: absolute; top: -25px; left: 0; transform: translate(-50%, 25px); pointer-events: none;">
                                     <span id="weight2_val" class="slider-value" style="font-weight: bold;">1</span>
                                 </div>
 
                                 <!-- Direction indicator (below green icon) -->
-                                <div id="weight2_indicator"
+                                <div id="weight2_slider_indicator"
                                      style="position: absolute; top: 25px; left: 0; transform: translate(-50%, 50px); font-size: 14px; color: black; transition: opacity 0.3s ease; opacity: 0; pointer-events: none;">
                                     <span id="weight2_arrow"></span>
                                 </div>
@@ -570,19 +623,19 @@
                         </div>
 
                         <div class="plotly-slider-class" style="display:flex; flex-direction: row; justify-content: right; align-items: center; margin-top: -20px">
-                            <label class="slider-label" id="threshold-label" style="margin-right: -30%" for="threshold">Threshold</label>
+                            <label class="slider-label" id="threshold-label" style="margin-right: -30%" for="threshold_slider">Threshold</label>
                             <div class="slider-container">
                                 <div class="color-bar" id="colorBar3"></div>
-                                <input type="range" min="-5" max="5" value="1.5" class="slider-plotly" step="0.01" id="threshold">
+                                <input type="range" min="-5" max="5" value="1.5" class="slider-plotly" step="0.01" id="threshold_slider">
 
                                 <!-- Value label (above green icon) -->
-                                <div id="threshold_display_group"
+                                <div id="threshold_slider_display_group"
                                      style="position: absolute; top: -25px; left: 0; transform: translate(-50%, 25px); pointer-events: none;">
                                     <span id="threshold_val" class="slider-value" style="font-weight: bold;">1</span>
                                 </div>
 
                                 <!-- Direction indicator (below green icon) -->
-                                <div id="threshold_indicator"
+                                <div id="threshold_slider_indicator"
                                      style="position: absolute; top: 25px; left: 0; transform: translate(-50%, 2px); font-size: 14px; color: black; transition: opacity 0.3s ease; opacity: 0; pointer-events: none;">
                                     <span id="threshold_arrow"></span>
                                 </div>
@@ -639,7 +692,12 @@
             </th>
         </tr>
     </table>
-
+<!--    <script src="perceptron.js"></script>-->
+<!--    <script>-->
+<!--        // Initialize both systems-->
+<!--        window.display = new Display(); // original neuron sandbox logic-->
+<!--        window.perceptron = new PerceptronVisualizer(); // New perceptron visualizer-->
+<!--    </script>-->
 
     <script src="neuronsandbox.js"></script>
     <script src="hintprovider.js"></script>

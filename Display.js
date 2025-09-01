@@ -1,25 +1,65 @@
 class Display {
     constructor(inpObj=null, percepObj=null, outObj=null){
         this.hovering = false;
+        const circleElem   = document.querySelector("#network .circle");
+        const seloutputElem= document.getElementById("seloutput");
+
+        if (!circleElem || !seloutputElem) {
+            console.warn("Display.js: Required elements not found; skipping Display init.");
+            return;
+        }
         this.initializeDisplay();
-        this.recreateOutputLine();
+        //this.recreateOutputLine();
         this.createOutputTableColors();
         this.createInputTableEditBorder();
         this.createOutputTableEditBorder();
+
+        // **Perceptron integration – state & setup**
+        // Ported from perceptron.js
+        this.weights = (demo.selectedInput || []).map(() => 1);
+        this.lines = [];
+
+        // create a high-Z overlay for weight labels
+        this.labelContainer = document.createElement('div');
+        Object.assign(this.labelContainer.style, {
+            position: 'absolute',
+            top:      0,
+            left:     0,
+            width:    '100%',
+            height:   '100%',
+            pointerEvents: 'none',
+            zIndex:   '10000'
+        });
+        document.body.appendChild(this.labelContainer);
+
+        // initial threshold
+        this.threshold = 0.5; //TODO: change this
+        this.setupThresholdBox();                 // renders and wires .threshold-box
+        this.setupPerceptronEventListeners();     // randomize button, resize handler
+        this.drawConnections();                   // draw all input-to-circle & circle-to-output lines
     }
 
     recreateOutputLine() {
-        if(this.outputLine) {
-            this.outputLine.remove()
+        // *** Modified: look for .circle inside #network, or fall back to #circle ***
+        const circleElem = document.querySelector("#network .circle")
+            || document.getElementById("circle");
+        const seloutput = document.getElementById("seloutput");
+
+        if (!circleElem || !seloutput) return;
+
+        // remove old line
+        if (this.outputLine) {
+            this.outputLine.remove();
             this.outputLine = null;
         }
-        this.outputLine = new LeaderLine(
-            LeaderLine.pointAnchor(document.getElementById("circle"), {x: '99%', y: '53%'}),
-            LeaderLine.pointAnchor(document.getElementById("seloutput"), {x: '-50%', y: 52+'%'})
-        );
 
+        // create new straight line
+        this.outputLine = new LeaderLine(
+            LeaderLine.pointAnchor(circleElem, { x: '99%',  y: '53%' }),
+            LeaderLine.pointAnchor(seloutput, { x: '-50%', y: '52%' })
+        );
         this.outputLine.color = DEFAULT_LINE_COLOR;
-        this.outputLine.path = 'straight';
+        this.outputLine.path  = 'straight';
         this.outputLine.position();
     }
     alignTables() {
@@ -62,7 +102,7 @@ class Display {
         let biasToggle = document.getElementById("biasToggle");
         let sigma = 0;
         if (!biasToggle.checked) {
-            sigma = parseFloat(document.getElementById("th1").innerText);
+            sigma = parseFloat(document.querySelector('.threshold-box').innerText);
         }
         else {
             //sigma = parseFloat(document.getElementById("bias-text").innerText) * -1;
@@ -240,6 +280,7 @@ class Display {
         else  {
             hideCameraImages();
         }
+
     }
 
     updateHintButton() {
@@ -588,7 +629,7 @@ class Display {
                     let button = document.getElementById("next-question-btn");
                     button.style.display = (nextIndex < questionDropDown.options.length - 1) && autoProgressChecked ? "inline-block" : "none";
                     //document.getElementById("congrats-msg").hidden = false;
-                    display.outputLine.position()
+                    // display.outputLine.position()
                     for (let i = 0; i < demo.weightLines.length; i++) {
                         demo.weightLines[i].position();
                     }
@@ -598,7 +639,7 @@ class Display {
                 }
                 else {
                     document.getElementById("congrats-msg").hidden = true;
-                    display.outputLine.position()
+                    // display.outputLine.position()
                     for (let i = 0; i < demo.weightLines.length; i++) {
                         demo.weightLines[i].position();
                     }
@@ -624,6 +665,7 @@ class Display {
     }
     initializeDisplay(){
         // make weights and threshold editable on initialization
+        if (!window.demo || !document.getElementById("input-table")) return;
 
         demo.weights.map((w, idx) => {
             this.displayWeightFromData(`w${idx+1}`, idx);
@@ -634,6 +676,9 @@ class Display {
         this.displaySelectedOutput();
         // edit buttons hover functionality
         this.initializeButtonHover(inputTable);
+        this.setupThresholdBox();                 // renders and wires .threshold-box
+        this.setupPerceptronEventListeners();     // randomize button, resize handler
+        this.drawConnections();                   // draw all input-to-circle & circle-to-output lines
         $( ".draggable" ).draggable();
 
     }
@@ -761,17 +806,26 @@ class Display {
         }
 
         const selections = document.getElementById("selected-inputs");
+        const children = Array.from(selections.children);
 
-        for (let c = 1; c < headerCells.length; c++) {
-            if (!document.getElementById("biasToggle").checked) {
-                if(selections.rows[c-1] && selections.rows[c-1].cells[0] )
-                    selections.rows[c-1].cells[0].style.fontSize = newFontSize + "px"
-            }
-            else {
-                if(selections.rows[c] && selections.rows[c].cells[0] )
-                    selections.rows[c].cells[0].style.fontSize = newFontSize + "px"
-            }
+        for(let i=0; i<children.length; i++) {
+            let child = children[i];
+            const isBiasOn = document.getElementById("biasToggle").checked;
+            if (!child.classList.contains("input-item")) continue; // skip padding divs
+            if (!isBiasOn && i === 0) continue;
+            child.style.fontSize = newFontSize + "px";
         }
+
+        // for (let c = 1; c < headerCells.length; c++) {
+        //     if (!document.getElementById("biasToggle").checked) {
+        //         if(selections.rows[c-1] && selections.rows[c-1].cells[0] )
+        //             selections.rows[c-1].cells[0].style.fontSize = newFontSize + "px"
+        //     }
+        //     else {
+        //         if(selections.rows[c] && selections.rows[c].cells[0] )
+        //             selections.rows[c].cells[0].style.fontSize = newFontSize + "px"
+        //     }
+        // }
 
         for (let i = 0; i < demo.weightLines.length; i++) {
             demo.weightLines[i].position();
@@ -794,7 +848,7 @@ class Display {
 
     displayThresholdFromData(percepObj){
         const thID = "th1";
-        let threshold = document.getElementById(thID);
+        let threshold = document.querySelector('.threshold-box');
         threshold.innerHTML = percepObj.threshold;
     }
 
@@ -809,21 +863,26 @@ class Display {
     }
 
     updateSelectedInput() {
-
-        if (!demo.selectedInput)
+        // this.drawConnections()
+        this.updateConnections()
+        /*if (!demo.selectedInput)
             return;
         if(document.getElementById("DisplayToggle").value === '1')
             return;
-        let selections = document.getElementById("selected-inputs");
-        selections.innerHTML = "";
-        for (let i = 0; i < demo.selectedInput.length; i++) {
-            let newRow = selections.insertRow(i);
-            let newCell = newRow.insertCell(0);
-            //newCell.innerHTML = `<div class=\"input-content\">${demo.selectedInput[i]}</div>`;
-            newCell.innerHTML = `<div lang=\"en\" class=\"input-content\">${demo.selectedInput[i]}</div>`;
-        }
+
+        // modified: selected-inputs is now a div, not a table
+        const container = document.getElementById("selected-inputs");
+        container.innerHTML = "";
+
+        demo.selectedInput.forEach(value => {
+            const item = document.createElement("div");
+            item.classList.add("input-item");            // matches CSS for .input-item
+            item.textContent = value;
+            container.appendChild(item);
+        });
+
         if(document.getElementById("biasToggle").checked) {
-            let newRow = selections.insertRow(0);
+            let newRow = container.insertRow(0);
             let newCell = newRow.insertCell(0);
 
             let bias_value = 1;
@@ -840,14 +899,15 @@ class Display {
 
         const length = document.getElementById("biasToggle").checked ? demo.selectedInput.length + 1 : demo.selectedInput.length
 
-        const circle = document.getElementById("circle");
+        // const circle = document.getElementById("circle");
+        const circle  = document.querySelector('#network .circle');
 
         const minLineSize = 0.0
         const maxLineSize = 6.0
         const newMinLineSize = 2.0
         const newMaxLineSize = 10.0
 
-        let weight_labels = document.getElementById("input-link-text").children;
+        let weight_labels = document.getElementById("selected-inputs").children;
 
         let height = circle.getBoundingClientRect().height
         let width = circle.getBoundingClientRect().width
@@ -886,7 +946,7 @@ class Display {
             }
             demo.biasLine = new LeaderLine(
                 LeaderLine.pointAnchor(document.querySelector(".bias-content"), {x: '96%', y: '50%'}),
-                LeaderLine.pointAnchor(document.getElementById("circle"), {
+                LeaderLine.pointAnchor(document.querySelector('#network .circle'), {
                     x: percentX + '%',
                     y: percentY + '%'
                 })
@@ -915,8 +975,8 @@ class Display {
             }
 
             //TODO: take into account 110% offset
-            let x = selections.rows[real_i].getBoundingClientRect().right
-            let y = selections.rows[real_i].getBoundingClientRect().top + selections.rows[real_i].offsetHeight/2
+            let x = container.children[real_i].getBoundingClientRect().right;
+            let y = container.children[real_i].getBoundingClientRect().top + container.children[real_i].offsetHeight / 2;
 
             let lengthLine = Math.sqrt((centerX-x)*(centerX-x) + (centerY-y)*(centerY-y))
             let lengthSubLine = lengthLine - width/2
@@ -938,11 +998,11 @@ class Display {
             let percentY = ((yPoint - minY) / (maxY - minY)) * (rangeMaxY - rangeMinY) + rangeMinY
 
             demo.weightLines[i] = new LeaderLine(
-                LeaderLine.pointAnchor(selections.rows[real_i].cells[0], {x: '100%', y: '50%'}),
-                LeaderLine.pointAnchor(document.getElementById("circle"), {x: percentX+'%', y: percentY+'%'})
+                LeaderLine.pointAnchor(container.children[real_i], {x: '100%', y: '50%'}),
+                LeaderLine.pointAnchor(document.querySelector('#network .circle'), {x: percentX+'%', y: percentY+'%'})
             );
 
-            let splitup = weight_labels[i].children[1].textContent.split(" ")
+            let splitup = weight_labels[i].textContent.split(" ")
             let num = splitup[splitup.length-1]
             if (!demo.stringToValidFloat(num)[1]) {
                 demo.weightLines[i].color = ERROR_COLOR;
@@ -967,7 +1027,7 @@ class Display {
             }
 
         }
-        let parentElement = document.getElementById("input-link-text");
+        let parentElement = document.getElementById("selected");
         const childCount = parentElement.children.length
 
         for (let i = 0; i < childCount; i++) {
@@ -992,7 +1052,7 @@ class Display {
         }
 
         $( ".draggable" ).draggable();
-        this.adjustSelectedInputFontSize();
+        this.adjustSelectedInputFontSize(); */
 
 
     }
@@ -1000,13 +1060,14 @@ class Display {
     // set display panel output
     displaySelectedOutput() {
         // replace variable names in selected output display with values on hover (#3)
-        let table = document.getElementById("selected-output");
+        let table = document.getElementById("seloutput");
+        // console.log(table);
         if(document.getElementById("seloutput-mark")) {
             document.getElementById("seloutput-mark").textContent = demo.selectedOutput[OUTPUT_COLUMN];
         }
         else {
-            for (let r=0; r<table.rows.length; r++){
-                let cell = table.rows[r].cells[0];
+            for (let r=0; r<table.children.length; r++){
+                let cell = table.children[r];
                 cell.innerHTML = `<mark id='seloutput-mark' class="mark">${demo.selectedOutput[OUTPUT_COLUMN]}</mark>`;
             }
         }
@@ -1052,7 +1113,7 @@ class Display {
 
         if (rowIdx < 2) {  //headers, or leave
             this.handleHoverExit();
-            display.adjustSelectedInputFontSize();
+            // display.adjustSelectedInputFontSize();
             return;
         }
 
@@ -1073,7 +1134,7 @@ class Display {
             }
             if(guessOutputRow)
                 guessOutputRow.style.background = HOVER_COLOR;
-            display.adjustSelectedInputFontSize();
+            // display.adjustSelectedInputFontSize();
 
             //show the activation number
             perceptron.computeAffineOutput();
@@ -1122,7 +1183,7 @@ class Display {
             }
 
             let affineValue = document.getElementById("activation-table").rows[rowIdx-1].cells[0].innerText;
-            document.getElementById("sigma").innerText = affineValue + "> ";
+            // document.getElementById("sigma").innerText = affineValue + "> ";
         }
         else {
             if (rowIdx % 2 === 0) {
@@ -1137,17 +1198,18 @@ class Display {
                 if (isOutputToggleChecked)
                     this.checkDesiredOutput(outputRow.children[OUTPUT_COLUMN], outputRow.children[DESIRED_OUTPUT_COLUMN], activationRow.children[ACTIVATION_COLUMN])
             }
-            document.getElementById("sigma").innerText = "∑> ";
+            // document.getElementById("sigma").innerText = "∑> ";
             display.UpdateDetailToggle();
             //document.getElementById("perceptron-detail").style.visibility= "hidden";
-            document.getElementById("perceptron-normal").style.display = "inline-flex";
+            document.querySelector(".threshold-container").style.display = "inline-flex"; //perceptron-normal
 
         }
         //this.displaySelectedInput();
         this.updateSelectedInput();
+        // this.drawConnections()
         this.displaySelectedOutput();
-        display.recreateOutputLine();
-        display.outputLine.position();
+        //display.recreateOutputLine();
+        // display.outputLine.position();
 
         // const isDemoMode = document.getElementById("DemoToggle").checked;
         const isDemoMode2 = document.getElementById("DisplayToggle").value === '1';
@@ -1173,16 +1235,19 @@ class Display {
                 real_r += 1;
             }
             if (this.hovering) {
-                selections.rows[real_r].cells[0].innerHTML = `<div lang="en" class="input-content">${demo.selectedInput[r]}</div>`;
+                // selections.rows[real_r].cells[0].innerHTML = `<div lang="en" class="input-content">${demo.selectedInput[r]}</div>`;
+                selections.childNodes[real_r].innerHTML = `<div lang="en" class="input-content">${demo.selectedInput[r]}</div>`;
                 demo.lines[r] = new LeaderLine(
                     LeaderLine.pointAnchor(inputRow.children[r+1], {x: '70%', y: '50%'}),
-                    LeaderLine.pointAnchor(selections.rows[real_r].cells[0], {x: '40%', y: '50%'}),
+                    // LeaderLine.pointAnchor(selections.rows[real_r].cells[0], {x: '40%', y: '50%'}),
+                    LeaderLine.pointAnchor(selections.childNodes[real_r], {x: '40%', y: '50%'}),
                     {dash: {animation: true}}
                 );
                 demo.lines[r].setOptions({startSocket: 'right', endSocket: 'left'});
             }
             else {
-                selections.rows[real_r].cells[0].innerHTML = `<div lang="en" class="input-content">${demo.selectedInput[r]}</div>`;
+                //selections.rows[real_r].cells[0].innerHTML = `<div lang="en" class="input-content">${demo.selectedInput[r]}</div>`;
+                selections.childNodes[real_r].innerHTML = `<div lang="en" class="input-content">${demo.selectedInput[r]}</div>`;
             }
         }
         if (this.hovering) {
@@ -1299,6 +1364,8 @@ class Display {
         }
         display.alignTables()
         display.createOutputTableEditBorder();
+        // display.drawConnections()
+        display.updateConnections()
     }
 
     handleHoverExit(inputRow, outputRow, guessOutputRow, activationRow,  isOdd = false) {
@@ -1325,7 +1392,8 @@ class Display {
         }
 
         this.updateSelectedInput();
-        display.adjustSelectedInputFontSize();
+        // this.drawConnections()
+        // display.adjustSelectedInputFontSize();
         display.alignTables();
         display.createOutputTableEditBorder();
     }
@@ -1380,19 +1448,21 @@ class Display {
                 if (headerInput.id.startsWith("tblinput")) {
                     headerInput.innerHTML = headerRowVals[c-1].html;
                     //set the checkbox for weight editable
-                    let weight_parent = document.getElementById(`input-link-text`);
+                    let weight_parent = document.getElementById(`selected-inputs`);
                     let divNode = weight_parent.childNodes[c-1];
                     const editToggle = divNode.querySelector('.edit-toggle');
-                    //let weightCheckbox = document.getElementById(`checkbox_weight_editable${c}`);
-                    if (headerRowVals[c-1].weight_editable) {
-                        editToggle.classList.add("edit-toggle-off"); //reversed
-                        editToggle.classList.remove("edit-toggle-on");
+                    if (editToggle) {
+                        //let weightCheckbox = document.getElementById(`checkbox_weight_editable${c}`);
+                        if (headerRowVals[c-1].weight_editable) {
+                            editToggle.classList.add("edit-toggle-off"); //reversed
+                            editToggle.classList.remove("edit-toggle-on");
+                        }
+                        else {
+                            editToggle.classList.add("edit-toggle-on"); //reversed
+                            editToggle.classList.remove("edit-toggle-off");
+                        }
+                        editToggle.dispatchEvent(new Event("click"));
                     }
-                    else {
-                        editToggle.classList.add("edit-toggle-on"); //reversed
-                        editToggle.classList.remove("edit-toggle-off");
-                    }
-                    editToggle.dispatchEvent(new Event("click"));
                 }
             }
         }
@@ -1421,6 +1491,7 @@ class Display {
 
         //display.createOutputTableColors();
         this.updateSelectedInput();
+        // display.drawConnections()
         if (!checkbox.checked || checkboxDemo) {
             $("#input-table tr:first").hide();
             $("#input-table tr td:nth-child(1)").hide();
@@ -1518,7 +1589,7 @@ class Display {
             demo.weightLines[i].position();
         }
 
-        display.outputLine.position();
+        // display.outputLine.position();
         display.createOutputTableEditBorder();
         handleDesiredOutputColumn()
     }
@@ -1573,7 +1644,6 @@ class Display {
     }
 
     UpdateDemoToggle() {
-
         let hintText = document.getElementById("hintText");
         // let checkbox = document.getElementById("DemoToggle");
         let displaySlider = document.getElementById("DisplayToggle");
@@ -1582,7 +1652,11 @@ class Display {
             document.getElementById("guess-output-container").style.display = "inline-block";
 
             document.getElementById("CheckAnswerBtn").style.display = "inline-block";
-            document.getElementById("network-container").style.display = "none";
+            // document.getElementById("network-container").style.display = "none";
+            document.getElementById("detail-toggle").style.visibility = "hidden";
+            document.getElementById("perceptron-detail").style.visibility = "hidden";
+            document.querySelector(".network-table").style.display = "none";
+            // document.getElementById("network-container").style.display = "none";
             document.getElementById("output-container").style.display = "none";
             document.getElementById("activation-container").style.display = "none";
             document.getElementById("bias-toggle").style.display = "none";
@@ -1606,7 +1680,11 @@ class Display {
         else {
             document.getElementById("guess-output-container").style.display = "none";
             document.getElementById("CheckAnswerBtn").style.display = "none";
-            document.getElementById("network-container").style.display = "inline-flex";
+
+            document.getElementById("detail-toggle").style.visibility = "visible";
+            document.getElementById("perceptron-detail").style.visibility = "visible";
+
+            document.querySelector(".network-table").style.display = "table";
             document.getElementById("output-container").style.display = "inline-flex";
             document.getElementById("activation-container").style.display = "inline-flex";
             document.getElementById("bias-toggle").style.display = "inline-flex";
@@ -1631,11 +1709,11 @@ class Display {
             buttonRows.forEach(element => {
                 element.style.display = binaryCheck.checked? "none" : "flex";
             });
-            this.recreateOutputLine();
+            //this.recreateOutputLine();
         }
         this.UpdateInputToggle();
         display.updateGuessTable();
-        demo.adjustWeightPlacement();
+        // demo.adjustWeightPlacement();
         FixCheckAnswerButtonPosition();
         display.createInputTableEditBorder();
         display.updateHintButton();
@@ -1663,8 +1741,9 @@ class Display {
     updateBiasToggle() {
         perceptron.setBiasUI();
         display.updateSelectedInput();
+        // display.drawConnections()
         demo.update();
-        //demo.adjustWeightPlacement();
+        // demo.adjustWeightPlacement();
         setupQuestionFields();
         display.UpdateDetailToggle();
     }
@@ -1818,8 +1897,26 @@ class Display {
         this.displaySelectedOutput();
         this.UpdateInputToggle();
         this.UpdateOutputToggle();
-        this.adjustSelectedInputFontSize()
+        // this.adjustSelectedInputFontSize()
         this.alignTables()
+
+        // this.setupThresholdBox();                 // renders and wires .threshold-box
+        this.setupPerceptronEventListeners();     // randomize button, resize handler
+        // this.drawConnections();                   // draw all input-to-circle & circle-to-output lines
+        this.updateInputLabels()
+
+        // this.lines.forEach(line => {
+        //     if (line.updateIntersection) {
+        //         line.updateIntersection();
+        //     }
+        //     if (line.updateBoxPosition) {
+        //         line.updateBoxPosition();
+        //     }
+        //     if (line.updateOutputPosition) {
+        //         line.updateOutputPosition();
+        //     }
+        //     line.position();
+        // });
 
     }
 
@@ -1855,5 +1952,253 @@ class Display {
     }
     showDesiredOutput (show, editable) {
         outputTable.showColumn(DESIRED_OUTPUT_COLUMN, show, editable);
+    }
+
+    // **Perceptron integration** – from perceptron.js
+
+    // not from perceptron.js -- function to update the input labels
+    updateInputLabels() {
+        const selections = document.getElementById("selected-inputs");
+        for (let r=0; r<demo.selectedInput.length; r++) {
+            let real_r = r;
+            if(document.getElementById("biasToggle").checked)
+            {
+                real_r += 1;
+            }
+            selections.childNodes[real_r].innerHTML = `<div lang="en" class="input-content">${demo.selectedInput[r]}</div>`;
+        }
+    }
+
+    setupThresholdBox() {
+        const thresholdBox = document.querySelector('.threshold-box');
+        if (!thresholdBox) return;
+        thresholdBox.innerText = this.threshold.toFixed(1);
+        thresholdBox.addEventListener('input', e => {
+            const val = parseFloat(e.target.innerText);
+            if (!isNaN(val)) this.threshold = val;
+        });
+        // also on resize keep content centered
+        const updateContent = () => {
+            const circle  = document.querySelector('#network .circle');
+            const content = document.querySelector('.perceptron-content');
+            if (!circle || !content) return;
+            const rect   = circle.getBoundingClientRect();
+            const scale  = rect.width / 200;  // assume 200px original
+            Object.assign(content.style, {
+                position: 'absolute',
+                left:     '50%',
+                top:      '50%',
+                transform:`translate(-50%,-50%) scale(${scale})`,
+                transformOrigin: 'center'
+            });
+            content.querySelectorAll('*').forEach(el => {
+                if (el.style.fontSize) {
+                    const os = parseFloat(el.style.fontSize);
+                    el.style.fontSize = `${os * scale}px`;
+                }
+            });
+            let unique_id = demo.generateUniqueID("weight-");
+            content.id = `weight-${unique_id}`;
+            content.className = "weight_label";
+        };
+        let raf;
+        window.addEventListener('resize', () => {
+            if (raf) cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(updateContent);
+        });
+        updateContent();
+    }
+
+    setupPerceptronEventListeners() {
+        // on window resize, update all LeaderLine anchors & label positions
+        let raf;
+        window.addEventListener('resize', () => {
+            if (raf) cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(() => this.lines.forEach(line => {
+                if (line.updateIntersection) line.updateIntersection();
+                if (line.updateBoxPosition ) line.updateBoxPosition();
+                if (line.updateOutputPosition) line.updateOutputPosition();
+                line.position();
+            }));
+        });
+    }
+
+    drawConnections() {
+        this.removeExistingLines();
+
+        const inputs     = document.querySelectorAll('#network .input-item');
+        const perceptron = document.querySelector('#network .circle');
+        const output     = document.querySelector('#network .output-value');
+        if (!perceptron || !output) return;
+
+        // connect each input to perceptron
+        inputs.forEach((input, i) => {
+            const calcIsect = () => {
+                const cRect = perceptron.getBoundingClientRect(),
+                    r     = cRect.width/2,
+                    iRect = input.getBoundingClientRect(),
+                    dx    = (iRect.left + iRect.width/2) - (cRect.left + r),
+                    dy    = (iRect.top  + iRect.height/2) - (cRect.top  + r),
+                    d     = Math.hypot(dx,dy);
+                return {
+                    x: `${((cRect.left + r + (dx/d)*r - cRect.left)/cRect.width)*100}%`,
+                    y: `${((cRect.top  + r + (dy/d)*r - cRect.top )/cRect.height)*100}%`
+                };
+            };
+
+            const line = new LeaderLine(
+                input,
+                LeaderLine.pointAnchor(perceptron, calcIsect()),
+                { color:'#333', size:2, startSocket:'right', endSocket:'left', path:'straight', endPlug:'arrow1', zIndex:1 }
+            );
+            // store updater for on-resize
+            line.updateIntersection = () => {
+                line.end = LeaderLine.pointAnchor(perceptron, calcIsect());
+            };
+
+            // styling based on weight
+            const w = this.weights[i],
+                col = w<0?'red':(w>0?'#333':'blue'),
+                sz  = Math.abs(w)<=0.5?2:3;
+            line.setOptions({ color: col, size: sz });
+
+            // create editable weight label
+            const cont = document.createElement('div');
+            Object.assign(cont.style, { display:'flex', alignItems:'center', position:'absolute', pointerEvents:'auto' });
+            const label = document.createElement('span');
+            label.innerHTML = `w<sub>${i+1}</sub>=`;
+            label.style.font = 'bold 14px Arial';
+            const box = document.createElement('div');
+            box.contentEditable = 'true';
+            box.innerText = w.toFixed(1);
+            box.id = `w${i+1}`;
+            Object.assign(box.style, { border:'1px solid #ccc', padding:'3px 6px', borderRadius:'4px', minWidth:'50px', background:'#fff', font:'14px Arial', pointerEvents:'auto' });
+            cont.append(label, box);
+            this.labelContainer.appendChild(cont);
+
+
+
+            const updateBox = () => {
+                const startPoint = input.getBoundingClientRect();
+                const endPoint = perceptron.getBoundingClientRect();
+
+                // calc the midpoint of the line
+                const midX = (startPoint.left + startPoint.width/2 + endPoint.left + endPoint.width/2) / 2;
+
+                // calc y position 30% down the line from start to end
+                const startY = startPoint.top + startPoint.height/2;
+                const endY = endPoint.top + endPoint.height/2;
+                const midY = startY + (endY - startY) * 0.3;
+
+                // calc the slope of the line
+                const slope = (endY - startY) / (endPoint.left - startPoint.left);
+
+                // calc offset based on slope magnitude
+                const baseOffset = 20; // minimum offset
+                const scalingFactor = 40; // how much to scale the offset by slope
+                const maxOffset = 60; // maximum offset to prevent extreme values
+
+                // calc scaled offset based on absolute slope value
+                let yOffset = Math.min(baseOffset + Math.abs(slope) * scalingFactor, maxOffset);
+                // offset is negative if slope >= 0 (shift up), positive if slope < 0 (shift down)
+                yOffset = slope >= 0 ? -yOffset : yOffset;
+
+                cont.style.left = `${midX}px`;
+                cont.style.top = `${midY + yOffset}px`;
+                cont.style.transform = 'translate(-50%, -50%)';
+            };
+            updateBox();
+            line.updateBoxPosition = updateBox;
+
+            // live-update on edit
+            box.addEventListener('input', e => {
+                const nv = parseFloat(e.target.innerText);
+                if (!isNaN(nv)) {
+                    this.weights[i] = nv;
+                    const c = nv<0?'red':(nv>0?'#333':'blue'),
+                        t = Math.min(1,Math.abs(nv)/5)*(10-1)+1;
+                    line.setOptions({ color:c, size:t });
+
+                    // if solve for boundary mode, update the sliders as well
+                    if (document.getElementById("DisplayToggle").value === '3') {
+                        let cur_weight = i + 1
+                        let cur_slider = document.getElementById(`weight${cur_weight}_slider`)
+                        let cur_value = document.getElementById(`weight${cur_weight}_val`)
+                        let cur_label = document.getElementById(`w${cur_weight}`)
+
+                        cur_slider.value = cur_label.innerText
+                        cur_value.innerText = cur_label.innerText
+
+                        demo.update();
+                    }
+                }
+            });
+
+            this.lines.push(line);
+        });
+
+        const circleRect = perceptron.getBoundingClientRect();
+        const radius = circleRect.width / 2;
+
+        const outputLine = new LeaderLine(
+            LeaderLine.pointAnchor(perceptron, {
+                x: '100%',  // Start from right edge of circle
+                y: '50%',   // Stay at vertical center
+                intersectR: radius  // This makes the line stop at circle boundary
+            }),
+            output,
+            {
+                color: '#333',
+                size: 3, // Changed from 2 to 3 to match input lines with weight 1.0
+                startSocket: 'right',
+                endSocket: 'left',
+                path: 'straight',
+                startSocketGravity: 50,
+                endSocketGravity: 50,
+                endPlug: 'arrow1',
+                zIndex: 1  // Make sure this is lower than the circle's z-index
+            }
+        );
+
+        this.lines.push(outputLine);
+    }
+
+    updateWeightPos() {
+        if (document.getElementById("DisplayToggle").value !== '1') {
+            this.lines.forEach(line => {
+                if (line.updateBoxPosition ) line.updateBoxPosition();
+            });
+        } else {
+            this.drawConnections()
+        }
+    }
+
+    updateConnections() {
+        this.updateLines()
+        this.updateWeightPos()
+    }
+
+    updateLines() {
+        this.lines.forEach(line => {
+            line.position();
+            if (line.updateBoxPosition ) line.updateBoxPosition();
+        });
+    }
+
+    removeExistingLines() {
+        this.lines.forEach(l => l.remove());
+        this.lines = [];
+        this.labelContainer.innerHTML = '';
+    }
+
+    formatInputLabel(label, maxLen = 20) {
+        if (label.length <= maxLen) return label;
+        const words = label.split(' ');
+        if (words.length === 1) return label.slice(0, maxLen-3) + '...';
+        let res = '', i = 0;
+        while (i < words.length && (res + words[i]).length <= maxLen) {
+            res += (i? ' ':'') + words[i++];
+        }
+        return res + (i < words.length ? '...' : '');
     }
 }

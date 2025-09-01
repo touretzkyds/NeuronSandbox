@@ -84,7 +84,7 @@ class Perceptron {
     }
 
     setWeightsUI() {
-        let childNodes = document.getElementById("input-link-text").childNodes;
+        let childNodes = document.getElementById("selected-inputs").childNodes;
         for (let i = 0; i < demo.weights.length; i++){
             //const cell = document.getElementById(`w${i+1}`);
             const cell = childNodes[i].childNodes[2];
@@ -198,8 +198,8 @@ class Perceptron {
             threshold.style.background = 'none';
         }
         else {
-            document.getElementById("bias-link-text").style.display = "none";
-            const threshold = document.getElementById("th1");
+            // document.getElementById("bias-link-text").style.display = "none";
+            const threshold = document.querySelector('.threshold-box');
             threshold.innerText = perceptron.threshold;
             if (demo.biasLine) {
                 demo.biasLine.remove();
@@ -237,7 +237,7 @@ class Perceptron {
     }
 
     updateWeightsFromUI(){
-        let childNodes = document.getElementById("input-link-text").childNodes;
+        let childNodes = document.getElementById("selected-inputs").childNodes;
         this.weightLabels = [];
         for (let i=0; i<demo.weights.length; i++){
             //const cell = document.getElementById(`w${i+1}`);
@@ -270,7 +270,7 @@ class Perceptron {
 
     updateThreshold(){
         let biasMode = document.getElementById("biasToggle").checked;
-        const cell = document.getElementById(`th${1}`);
+        const cell = document.querySelector('.threshold-box');
         if(biasMode)
         {
             const biasCell = document.getElementById("bias_weight");
@@ -327,7 +327,7 @@ function checkAnswerCorrect() {
     let activationTable = document.getElementById("activation-table")
     let guessToggle = document.getElementById("DisplayToggle")
     let editToggle = document.getElementById("InputToggle")
-    let thresholdText = document.getElementById("th1")
+    let thresholdText = document.querySelector('.threshold-box');
     let biasContent = document.getElementById("bias-text")
 
     let outputToggleChecked = document.getElementById("OutputToggle").checked
@@ -614,43 +614,60 @@ class Demo {
         return count - 1;
     }
 
-    insertWeightCol(n) {
-        let parentElement = document.getElementById("input-link-text");
-        demo.weights.splice(n, 0, 0); //add a weight
-        let wDiv = document.createElement('div');
-        //wDiv.id = `weight-${n+1}`;
-        let unique_id = this.generateUniqueID("weight-");
-        wDiv.id = `weight-${unique_id}`;
-        wDiv.className = "weight_label";
-        wDiv.innerHTML = `<text fill="black">w<sub>${unique_id}</sub> =</text> <text contenteditable="true" 
-                            onkeypress="if (event.which === 13 || event.keyCode === 13) return false;" id="w${unique_id}" fill="black" class="weight-edit-text weights">0</text>
-                           <span class="edit-toggle edit-toggle-on">
-                              <i class="fas fa-pencil-alt"></i>
-                              <i class="fas fa-lock"></i>
-                           </span>
-      `;
+    addInput(label, initialWeight = 1.0) {
+        // put in the input element
+        const inputCell = document.getElementById('selected-inputs');
+        const inputItem = document.createElement('div');
+        inputItem.className = 'input-item';
+        inputItem.title = label;
+        inputItem.textContent = display.formatInputLabel(label);
+        inputCell.appendChild(inputItem);
 
-        parentElement.insertBefore(wDiv, parentElement.children[n]);
-        const weightText = document.getElementById(`w${unique_id}`);
-        dataOp.makeEditable(weightText);
-        this.updateWeightUI(parentElement);
+        // put the weight on
+        this.weights.push(initialWeight);
+
+        // redraw the lines
+        display.drawConnections();
+    }
+
+    insertWeightCol(n) {
+      //   let parentElement = document.getElementById("selected-inputs");
+      //   demo.weights.splice(n, 0, 0); //add a weight
+      //   let wDiv = document.createElement('div');
+      //   //wDiv.id = `weight-${n+1}`;
+      //   let unique_id = this.generateUniqueID("weight-");
+      //   wDiv.id = `weight-${unique_id}`;
+      //   wDiv.className = "weight_label";
+      //   wDiv.innerHTML = `<text fill="black">w<sub>${unique_id}</sub> =</text> <text contenteditable="true"
+      //                       onkeypress="if (event.which === 13 || event.keyCode === 13) return false;" id="w${unique_id}" fill="black" class="weight-edit-text weights">0</text>
+      //                      <span class="edit-toggle edit-toggle-on">
+      //                         <i class="fas fa-pencil-alt"></i>
+      //                         <i class="fas fa-lock"></i>
+      //                      </span>
+      // `;
+      //
+      //   parentElement.insertBefore(wDiv, parentElement.children[n]);
+      //   const weightText = document.getElementById(`w${unique_id}`);
+      //   dataOp.makeEditable(weightText);
+      //   this.updateWeightUI(parentElement);
     }
 
     showWeightToggle(show) {
-        let parentElement = document.getElementById("input-link-text");
-        let weightElement = parentElement.children;
-        for (let i = 0; i < weightElement.length; i++) {
-            let toggleBtn = weightElement[i].children[2]
-            if (!show)
-                toggleBtn.style.display = 'none';
-            else
-                toggleBtn.style.display = 'inline-block';
-        }
-        let thresholdToggleBtn = document.getElementById("threshold_toggleBtn");
-        if (!show)
-            thresholdToggleBtn.style.display = 'none';
-        else
-            thresholdToggleBtn.style.display = 'inline-block';
+        // let parentElement = document.getElementById("selected-inputs");
+        // let weightElement = parentElement.children;
+        // for (let i = 0; i < weightElement.length; i++) {
+        //     // let toggleBtn = weightElement[i].children[2]
+        //     let toggleBtn = weightElement[i]
+        //     if (!show)
+        //         toggleBtn.style.display = 'none';
+        //     else
+        //         toggleBtn.style.display = 'inline-block';
+        // }
+        // let thresholdToggleBtn = document.getElementById("threshold_toggleBtn");
+        // if (!show)
+        //     thresholdToggleBtn.style.display = 'none';
+        // else
+        //     thresholdToggleBtn.style.display = 'inline-block';
     }
 
     adjustWeightPlacement() {
@@ -660,14 +677,17 @@ class Demo {
         // display.getHeaderRowVals(headerRowVals);
         // this.selectedInput = headerRowVals;
         display.updateSelectedInput();
+        // display.drawConnections()
 
         let selections = document.getElementById("selected-inputs");
-        let weights = document.getElementById("input-link-text");
+        let weights = document.getElementById("selected-inputs");
         let dimensions = weights.getBoundingClientRect()
 
         let weightsList = []
         for (let i = 0; i < weights.children.length; i++) {
-            weightsList.push(weights.children[i])
+            if(weights.children[i].classList.contains('input-item')) {
+                weightsList.push(weights.children[i])
+            }
         }
 
         let biasToggleChecked = document.getElementById("biasToggle").checked
@@ -680,7 +700,8 @@ class Demo {
 
         if(length === 2) {
             for(let i = 0; i < length; i++) {
-                let elem = selections.rows[i].cells[0];
+                // let elem = selections.rows[i].cells[0];
+                let elem = selections.children[i];
                 let rect = elem.getBoundingClientRect();
 
                 let weight = weightsList[i];
@@ -725,7 +746,8 @@ class Demo {
         }
         else if (length === 4) {
             for(let i = 0; i < length; i++) {
-                let elem = selections.rows[i].cells[0];
+                // let elem = selections.rows[i].cells[0];
+                let elem = selections.children[i]
                 let rect = elem.getBoundingClientRect();
 
                 let weight = weightsList[i];
@@ -796,7 +818,7 @@ class Demo {
     }
 
     removeAllWeightCol() {
-        let parentElement = document.getElementById("input-link-text");
+        let parentElement = document.getElementById("selected-inputs");
         parentElement.innerHTML = ""
     }
     // add new row at specific location on button click
@@ -810,7 +832,7 @@ class Demo {
         dataOp.insertDataCol(inputs, c);
         this.insertWeightCol(c);
         display.handleHoverExit();
-        demo.adjustWeightPlacement();
+        // demo.adjustWeightPlacement();
         perceptron.updateWeightsFromUI();
         if (document.getElementById("BinaryToggle").checked)
             display.UpdateBinaryToggle(true);
@@ -855,7 +877,7 @@ class Demo {
             //update selected input so it update immediately
             let headerRowVals = [];
             display.getHeaderRowVals(headerRowVals);
-            display.adjustSelectedInputFontSize();
+            // display.adjustSelectedInputFontSize();
             demo.selectedInput = headerRowVals;
         }
         let bEditOutput = false;
@@ -897,13 +919,13 @@ class Demo {
         activationTable.updateTable();
         outputTable.updateTable();
         display.updateDisplay();
-        display.outputLine.position();
+        // display.outputLine.position();
         display.alignTables()
-        display.adjustSelectedInputFontSize()
-        display.outputLine.position()
+        // display.adjustSelectedInputFontSize()
+        // display.outputLine.position()
         display.createInputTableEditBorder();
         display.createOutputTableEditBorder();
-        demo.adjustWeightPlacement();
+        // demo.adjustWeightPlacement();
         display.saveGuessComment();
         display.createGuessTable();
         display.updateHintButton();
@@ -977,8 +999,8 @@ function getEditableList() {
     const thresholdToggleBtn = document.getElementById(`threshold_toggleBtn`);
     let editableList  = [];
 
-    let weight_parent = document.getElementById(`input-link-text`);
-    let weight_lebals = weight_parent.querySelectorAll('span.edit-toggle');
+    let weight_parent = document.getElementById(`selected-inputs`);
+    let weight_lebals = weight_parent.querySelectorAll('div.input-item');
     for( let i = 0; i < weight_lebals.length; i++) {
         let weight_label = weight_lebals[i];
         if (weight_label.classList.contains("edit-toggle-on")) {
@@ -1068,7 +1090,7 @@ async function detailButtonClicked() {
 
 function addEditOption(c) {
     //cannot use getElementById since it is not accurate
-    let weight_parent = document.getElementById(`input-link-text`);
+    let weight_parent = document.getElementById(`selected-inputs`);
     let divNode = weight_parent.childNodes[c];
     const toggleBtn = divNode.querySelector('.edit-toggle');
     let weightButtonHandler = function () {
@@ -1099,28 +1121,28 @@ function addEditOption(c) {
     toggleBtn.onclick = weightButtonHandler;
 }
 
-function addThresholdEditOption() {
-    const toggleBtn = document.getElementById(`threshold_toggleBtn`);
-    let thresholdButtonHandler = function () {
-        if (toggleBtn.classList.contains("edit-toggle-on")) {
-            toggleBtn.classList.add("edit-toggle-off");
-            toggleBtn.classList.remove("edit-toggle-on")
-        }
-        else {
-            toggleBtn.classList.remove("edit-toggle-off");
-            toggleBtn.classList.add("edit-toggle-on")
-        }
-        const textbox = document.getElementById(`th1`);
-        let editable = toggleBtn.classList.contains("edit-toggle-on");
-        textbox.contentEditable = editable;
-        if (!textbox.classList.contains("weights")) {
-            textbox.classList.add("weights");
-        }
-        dataOp.makeEditable(textbox, editable);
-        setupQuestionFields();
-    };
-    toggleBtn.onclick = thresholdButtonHandler;
-}
+// function addThresholdEditOption() {
+//     const toggleBtn = document.getElementById(`threshold_toggleBtn`);
+//     let thresholdButtonHandler = function () {
+//         if (toggleBtn.classList.contains("edit-toggle-on")) {
+//             toggleBtn.classList.add("edit-toggle-off");
+//             toggleBtn.classList.remove("edit-toggle-on")
+//         }
+//         else {
+//             toggleBtn.classList.remove("edit-toggle-off");
+//             toggleBtn.classList.add("edit-toggle-on")
+//         }
+//         const textbox = document.getElementById(`th1`);
+//         let editable = toggleBtn.classList.contains("edit-toggle-on");
+//         textbox.contentEditable = editable;
+//         if (!textbox.classList.contains("weights")) {
+//             textbox.classList.add("weights");
+//         }
+//         dataOp.makeEditable(textbox, editable);
+//         setupQuestionFields();
+//     };
+//     toggleBtn.onclick = thresholdButtonHandler;
+// }
 
 function findAncestorTable(element) {
     let ancestor = element.parentNode;
@@ -1386,9 +1408,11 @@ function uploadJson(text) {
     }
 
     let parentElement = document.getElementById("input-link-text");
-    for (let c = 0; c < inputs.data[0]?.length; c++) {
-        demo.insertWeightCol(c);
-    }
+    demo.addInput("x₁", 1.0);
+    demo.addInput("x₂", 1.0);
+    // for (let c = 0; c < inputs.data[0]?.length; c++) {
+    //     demo.insertWeightCol(c);
+    // }
 
     demo.weights = dict["weight"];
     for (let r = 0, n = inputs.data.length; r < n; r++) {
@@ -1469,7 +1493,7 @@ function uploadJson(text) {
     }
     display.handleHoverExit();
     display.updateBiasToggle();
-    display.outputLine.position();
+    // display.outputLine.position();
     display.createInputTableEditBorder();
     display.createOutputTableEditBorder();
     display.alignTables();
@@ -1482,7 +1506,7 @@ function uploadJson(text) {
     demo.showWeightToggle(false);
     document.getElementById("BinaryToggle").checked = dict["binaryToggleChecked"];
     display.UpdateBinaryToggle(false);
-    addThresholdEditOption();
+    // addThresholdEditOption();
     const thresholdToggle = document.getElementById("threshold_toggleBtn");
     if (dict["binaryToggleChecked"] && document.getElementById('InputToggle').checked) {
         thresholdToggle.style.display = 'inline-block';
@@ -1595,6 +1619,8 @@ window.onload = function(){
     $(".dropdown-content").click(function(event) {
         event.stopPropagation();
     });
+
+    display.updateDisplay()
 }
 
 // initialize all classes
@@ -1628,7 +1654,7 @@ uploadFromZipUrl(encodeURI("problems/Problem 1.sandbox"), true);
 display.createOutputTableColors();
 display.createInputTableEditBorder();
 display.createOutputTableEditBorder();
-addThresholdEditOption();
+// addThresholdEditOption();
 handleDesiredOutputColumn();
 loadQuestionsAndModels();
 // document.getElementById("DemoToggle").checked = true;
@@ -1676,14 +1702,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 $('#InputToggle').change(function() { //toggle edit
     display.UpdateInputToggle();
-    display.outputLine.position();
+    // display.outputLine.position();
     const show = document.getElementById("InputToggle").checked;
     demo.showWeightToggle(show);
     display.createInputTableEditBorder();
     display.createOutputTableEditBorder();
     display.updateGuessTable();
     display.toggleProblemDisplay();
-    display.outputLine.position()
+    // display.outputLine.position()
     display.updateBiasToggle()
 
 
@@ -1701,6 +1727,10 @@ $('#InputToggle').change(function() { //toggle edit
     }
     if (display.outputLine) {
         display.outputLine.position();
+    }
+
+    if (display.lines) {
+        display.updateConnections()
     }
 });
 
@@ -1729,6 +1759,8 @@ $('#DisplayToggle').change(function() {
     display.UpdateDemoToggle()
     display.UpdatePlotlyToggle();
     display.createInputLabelLines();
+    // display.drawConnections();
+    display.updateConnections();
     if (document.getElementById("DisplayToggle").value !== '3')
         display.UpdateDemoToggle();
 })
@@ -1751,7 +1783,6 @@ $('#biasToggle').change(function() { //toggle bias
 
         display.UpdatePlotlyToggle()
     }
-
 
 
 });
