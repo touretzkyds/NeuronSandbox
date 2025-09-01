@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>3D Decision Boundary Testing</title>
+
+    <!--    <script src="https://cdn.plot.ly/plotly-2.26.0.min.js" charset="utf-8"></script>-->
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.27.0/cytoscape.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="slider.css">
+
+    <script src = "3d_db_invis.js"></script>
+</head>
+<body>
+
+<div id="tester2"></div>
+<table style="width: 900px">
+    <tr>
+        <td>
+            <div style="width: 300px">
+                <label for="weight1_3d">X Weight</label>
+                <input class="vals" id="weight1_3d" step=0.1 type="range" min=-5 max=5 value=1 oninput="this.nextElementSibling.value = this.value"></input>
+                <output>1</output>
+
+            </div>
+        </td>
+        <td>
+            <div style="width: 300px">
+                <label for="weight2_3d">Y Weight</label>
+                <input class="vals" id="weight2_3d" step=0.1 type="range" min=-5 max=5 value=1 oninput="this.nextElementSibling.value = this.value"></input>
+                <output>1</output>
+            </div>
+        </td>
+        <td>
+            <div style="width: 300px">
+                <label for="weight3_3d">Z Weight</label>
+                <input class="vals" id="weight3_3d" step=0.1 type="range" min=-5 max=5 value=1 oninput="this.nextElementSibling.value = this.value"></input>
+                <output>1</output>
+            </div>
+        </td>
+        <td>
+            <div style="width: 300px">
+                <label for="threshold_3d">Threshold</label>
+                <input class="vals" id="threshold_3d" step="0.1" type="range" min="-5" max="5" name="threshold" value=2.5 oninput="this.nextElementSibling.value = this.value"></input>
+                <output>2.5</output>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<script src="slider.js"></script>
+
+</body>
+</html>
